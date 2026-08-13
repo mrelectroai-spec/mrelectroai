@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MrElectroAI | أنور الحسن الجاسم</title>
+    <!-- FontAwesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -16,7 +17,12 @@
             --border-color: rgba(0, 242, 254, 0.2);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
         body {
             background-color: var(--bg-color);
@@ -27,11 +33,20 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
             padding: 20px 15px;
         }
 
-        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .container {
+            width: 100%;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
 
+        /* Profile Header */
         .profile-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -42,75 +57,183 @@
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             position: relative;
+            overflow: hidden;
         }
 
         .profile-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
             background: linear-gradient(90deg, transparent, var(--primary-glow), var(--accent-gold), transparent);
         }
 
         .avatar-glow {
-            width: 110px; height: 110px; margin: 0 auto 15px; border-radius: 50%;
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
             background: linear-gradient(135deg, var(--accent-gold), var(--primary-glow));
-            padding: 3px; box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+            padding: 3px;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
         }
 
         .avatar-inner {
-            width: 100%; height: 100%; background-color: #0d1322; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; font-size: 45px; color: var(--primary-glow);
+            width: 100%;
+            height: 100%;
+            background-color: #0d1322;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 45px;
+            color: var(--primary-glow);
         }
 
         .name-title {
-            font-size: 24px; font-weight: 700;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
             background: linear-gradient(90deg, #ffffff, var(--primary-glow));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
         }
 
-        .brand-subtitle { color: var(--accent-gold); font-size: 16px; font-weight: 600; margin-bottom: 12px; }
-        .bio-text { font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 480px; margin: 0 auto; }
+        .brand-subtitle {
+            color: var(--accent-gold);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
 
-        .links-section { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+        .bio-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* Quick Links Section */
+        .links-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
         .link-btn {
-            background: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: 14px; padding: 16px 20px; color: #fff; text-decoration: none;
-            display: flex; align-items: center; justify-content: space-between; font-weight: 600;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px 20px;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .link-btn:hover {
-            transform: translateY(-3px); border-color: var(--primary-glow);
-            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.25); background: rgba(24, 35, 58, 0.9);
+            transform: translateY(-3px);
+            border-color: var(--primary-glow);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.25);
+            background: rgba(24, 35, 58, 0.9);
         }
 
-        .link-left { display: flex; align-items: center; gap: 15px; }
-        .link-icon { font-size: 20px; color: var(--primary-glow); width: 30px; text-align: center; }
+        .link-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
+        .link-icon {
+            font-size: 20px;
+            color: var(--primary-glow);
+            width: 30px;
+            text-align: center;
+        }
+
+        /* Projects Feed Section */
         .projects-section {
-            width: 100%; background: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .section-title { font-size: 17px; color: var(--primary-glow); display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 17px;
+            color: var(--primary-glow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
         .project-card {
-            background: rgba(10, 15, 26, 0.6); border-right: 3px solid var(--primary-glow);
-            border-radius: 8px; padding: 12px 15px; margin-bottom: 10px;
+            background: rgba(10, 15, 26, 0.6);
+            border-right: 3px solid var(--primary-glow);
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
         }
 
-        .project-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px; }
-        .project-desc { font-size: 13px; color: var(--text-muted); }
-        .project-date { font-size: 11px; color: var(--accent-gold); margin-top: 6px; }
+        .project-card.gold-border {
+            border-right-color: var(--accent-gold);
+        }
 
-        footer { margin-top: 10px; font-size: 12px; color: var(--text-muted); text-align: center; }
+        .project-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .project-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .project-date {
+            font-size: 11px;
+            color: var(--accent-gold);
+            margin-top: 6px;
+        }
+
+        footer {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
+
+    <!-- Profile Header -->
     <div class="profile-card">
         <div class="avatar-glow">
-            <div class="avatar-inner"><i class="fa-solid fa-bolt"></i></div>
+            <div class="avatar-inner">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
         </div>
         <div class="name-title">أنور الحسن الجاسم</div>
         <div class="brand-subtitle">MrElectroAI</div>
@@ -119,31 +242,67 @@
         </div>
     </div>
 
+    <!-- Quick Links -->
     <div class="links-section">
-        <a href="https://wa.me/71736401" class="link-btn" target="_blank">
-            <div class="link-left"><i class="fa-brands fa-whatsapp link-icon"></i><span>التواصل المباشر عبر الواتساب</span></div>
+        <a href="https://wa.me/96179434479" class="link-btn" target="_blank">
+            <div class="link-left">
+                <i class="fa-brands fa-whatsapp link-icon"></i>
+                <span>التواصل المباشر عبر الواتساب (79434479)</span>
+            </div>
             <i class="fa-solid fa-chevron-left"></i>
         </a>
+
         <a href="#" class="link-btn">
-            <div class="link-left"><i class="fa-solid fa-mobile-screen-button link-icon"></i><span>تطبيقات الفنيين المخصصة (Apps)</span></div>
+            <div class="link-left">
+                <i class="fa-solid fa-mobile-screen-button link-icon"></i>
+                <span>تطبيقات الفنيين المخصصة (Apps)</span>
+            </div>
             <i class="fa-solid fa-chevron-left"></i>
         </a>
+
         <a href="#" class="link-btn">
-            <div class="link-left"><i class="fa-solid fa-brain link-icon"></i><span>استشارات حلول الكهرباء بالـ AI</span></div>
+            <div class="link-left">
+                <i class="fa-solid fa-brain link-icon"></i>
+                <span>استشارات حلول الكهرباء بالـ AI</span>
+            </div>
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+
+        <a href="#" class="link-btn">
+            <div class="link-left">
+                <i class="fa-brands fa-tiktok link-icon"></i>
+                <span>متابعة على TikTok (mrelectroai)</span>
+            </div>
             <i class="fa-solid fa-chevron-left"></i>
         </a>
     </div>
 
+    <!-- Dynamic Projects & Updates Section -->
     <div class="projects-section">
-        <div class="section-title"><i class="fa-solid fa-microchip"></i> معرض الأعمال والتحديثات</div>
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fa-solid fa-microchip"></i>
+                معرض الأعمال والتحديثات
+            </div>
+        </div>
+
         <div class="project-card">
             <div class="project-title">تطبيق حساب الأحمال والكابلات الكهربائية</div>
             <div class="project-desc">أداة تفاعلية جديدة صُممت لتسهيل حسابات الفنيين في الميدان بسرعة ودقة عالية.</div>
             <div class="project-date">⚡ تحديث جديد</div>
         </div>
+
+        <div class="project-card gold-border">
+            <div class="project-title">حل مشكلة معقدة في لوحة Classic Control بالـ AI</div>
+            <div class="project-desc">تم تشخيص العطل وإعادة برمجة تسلسل الأتمتة باستخدام خوارزميات الذكاء الاصطناعي.</div>
+            <div class="project-date">⭐ مشروع مميز</div>
+        </div>
     </div>
 
-    <footer>MrElectroAI &copy; جميع الحقوق محفوظة | إشراف وإدارة: أنور الجاسم</footer>
+    <footer>
+        MrElectroAI &copy; جميع الحقوق محفوظة | إشراف وإدارة: أنور الجاسم
+    </footer>
+
 </div>
 
 </body>
