@@ -1,0 +1,64 @@
+<div style="font-family: 'Segoe UI', sans-serif; padding: 25px; border-radius: 20px; max-width: 400px; margin: auto; 
+            background: linear-gradient(135deg, #1a1a1a, #434343); color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+  
+  <h2 style="text-align: center; color: #ffcc00; margin-bottom: 10px;">WirePhase ID</h2>
+  <p style="text-align: center; font-size: 13px; color: #ccc; margin-bottom: 20px;">Professional Field Identification Tool</p>
+  
+  <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; text-align: center; border: 1px solid #555;">
+    أداة ذكية لتحديد تسلسل أطوار الفازات (Phases) وتسهيل العمل الميداني، تعتمد على الحساب الرقمي الدقيق لضمان دقة التوصيل في اللوحات الكهربائية.
+  </div>
+
+  <input type="number" id="numInput" placeholder="أدخل الرقم (1 - 1000)" 
+         style="width: 100%; padding: 15px; border-radius: 10px; border: none; box-sizing: border-box; font-size: 16px; margin-bottom: 20px;"
+         oninput="getResult()">
+
+  <div id="displayArea" style="display: none; text-align: center; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;">
+    <div id="colorCircle" style="width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px auto; border: 3px solid white; transition: 0.3s;"></div>
+    
+    <div id="colorResult" style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #ffcc00;"></div>
+    
+    <div style="font-size: 14px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px; line-height: 1.5; margin-bottom: 15px;">
+      <strong>💡 نصيحة كهربائية:</strong><br>
+      <span id="tipResult"></span>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px; border-top: 1px solid #555; padding-top: 15px;">
+    <p style="font-size: 12px; color: #aaa; margin: 0;">للتواصل والدعم الفني:</p>
+    <a href="https://wa.me/96171736401" style="color: #ffcc00; font-weight: bold; text-decoration: none; font-size: 16px;">+961 71 736 401</a>
+    <p style="font-size: 11px; color: #888; margin-top: 5px;">Powered by <b>MrElectroAI</b></p>
+  </div>
+</div>
+
+<script>
+function getResult() {
+  const val = document.getElementById('numInput').value;
+  const area = document.getElementById('displayArea');
+  const circle = document.getElementById('colorCircle');
+  
+  if (val >= 1 && val <= 1000) {
+    const order = val % 3;
+    let colorName = "";
+    let colorHex = "";
+    
+    if (order === 1) { colorName = "اللون: أحمر"; colorHex = "#ff4d4d"; }
+    else if (order === 2) { colorName = "اللون: أصفر"; colorHex = "#ffcc00"; }
+    else { colorName = "اللون: أزرق"; colorHex = "#3399ff"; }
+
+    const tips = [
+      "دائماً تأكد من عزل الكابلات جيداً في أماكن الرطوبة.",
+      "جودة التوصيل أهم من سماكة الكابل لتقليل الحرارة.",
+      "افحص فولتية الخط دائماً قبل البدء بأي صيانة.",
+      "سلامتك أولاً، استخدم القفازات العازلة عند فحص اللوحات.",
+      "تأكد من إحكام البراغي لمنع الشرارة واحتراق الأسلاك."
+    ];
+    
+    circle.style.backgroundColor = colorHex;
+    document.getElementById('colorResult').innerText = colorName;
+    document.getElementById('tipResult').innerText = tips[val % tips.length];
+    area.style.display = 'block';
+  } else {
+    area.style.display = 'none';
+  }
+}
+</script>
