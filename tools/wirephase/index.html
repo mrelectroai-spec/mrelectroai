@@ -1,64 +1,187 @@
-<div style="font-family: 'Segoe UI', sans-serif; padding: 25px; border-radius: 20px; max-width: 400px; margin: auto; 
-            background: linear-gradient(135deg, #1a1a1a, #434343); color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-  
-  <h2 style="text-align: center; color: #ffcc00; margin-bottom: 10px;">WirePhase ID</h2>
-  <p style="text-align: center; font-size: 13px; color: #ccc; margin-bottom: 20px;">Professional Field Identification Tool</p>
-  
-  <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; text-align: center; border: 1px solid #555;">
-    أداة ذكية لتحديد تسلسل أطوار الفازات (Phases) وتسهيل العمل الميداني، تعتمد على الحساب الرقمي الدقيق لضمان دقة التوصيل في اللوحات الكهربائية.
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WirePhase ID | MrElectroAI</title>
+<meta name="description" content="أداة توزيع الفازات على الدارات حسب الترقيم التسلسلي، مع دعم عدة معايير ترميز عالمية.">
+<meta name="theme-color" content="#081311">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#081311; --panel:#0F1D1A; --panel-2:#152724; --line:#223B36;
+  --volt:#22C79B; --volt-ink:#04140F; --arc:#63E3C2;
+  --text:#E4F0EC; --muted:#7D948E; --glow:rgba(34,199,155,.14);
+  --r:14px;
+}
+[data-theme="light"]{
+  --void:#EFF4F2; --panel:#FFFFFF; --panel-2:#E9F1EE; --line:#D2E0DB;
+  --volt:#0E8F6E; --volt-ink:#FFFFFF; --arc:#0B7A5E;
+  --text:#0C1A17; --muted:#55665F; --glow:rgba(14,143,110,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--void);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px;line-height:1.7;min-height:100vh;padding:24px 16px 40px;
+  background-image:linear-gradient(to bottom,var(--glow),transparent 420px);transition:background .35s,color .35s}
+.wrap{max-width:460px;margin:0 auto}
+:where(a,button,input,select):focus-visible{outline:2px solid var(--arc);outline-offset:3px}
+
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text)}
+.brand span{width:30px;height:30px;border-radius:9px;background:var(--volt);color:var(--volt-ink);
+  display:grid;place-items:center;font-size:15px}
+.brand b{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500}
+.tbtn{background:var(--panel);border:1px solid var(--line);color:var(--muted);width:32px;height:32px;
+  border-radius:9px;cursor:pointer;font-size:14px}
+.tbtn:hover{color:var(--volt);border-color:var(--volt)}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;
+  padding:24px 20px;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;
+  background:linear-gradient(to left,var(--volt),var(--arc) 60%,transparent)}
+h1{font-family:'Readex Pro',sans-serif;font-size:24px;font-weight:700;letter-spacing:-.01em;direction:ltr;text-align:right}
+.sub{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.15em;color:var(--muted);margin-bottom:14px}
+.intro{font-size:13.5px;color:var(--muted);background:var(--panel-2);border:1px solid var(--line);
+  border-radius:11px;padding:13px 15px;margin-bottom:20px}
+
+label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+input,select{width:100%;font-family:inherit;font-size:16px;color:var(--text);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:11px;padding:13px 15px;margin-bottom:16px}
+input:focus,select:focus{border-color:var(--volt)}
+input::placeholder{color:var(--muted);opacity:.6}
+input[type=number]{-moz-appearance:textfield}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+.out{display:none;border-top:1px solid var(--line);padding-top:20px}
+.out.on{display:block}
+.phase{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.swatch{width:66px;height:66px;border-radius:14px;border:2px solid var(--line);flex-shrink:0;
+  display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;
+  transition:background .25s}
+.pinfo b{display:block;font-family:'Readex Pro',sans-serif;font-size:20px;margin-bottom:2px}
+.pinfo span{font-size:13px;color:var(--muted)}
+
+.seq{display:flex;gap:7px;margin-bottom:16px}
+.seq div{flex:1;text-align:center;background:var(--panel-2);border:1px solid var(--line);
+  border-radius:9px;padding:9px 4px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted)}
+.seq div.now{border-color:var(--volt);color:var(--text)}
+.seq div i{display:block;font-style:normal;font-size:14px;font-weight:700;margin-top:2px}
+
+.tip{font-size:13px;color:var(--muted);background:var(--panel-2);border-inline-start:2px solid var(--volt);
+  border-radius:9px;padding:12px 14px;margin-bottom:14px}
+.tip b{color:var(--text)}
+
+.warn{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:11px;
+  padding:12px 14px;margin-top:18px;background:var(--panel-2)}
+.warn b{color:var(--text)}
+
+.foot{text-align:center;margin-top:22px;font-size:12.5px;color:var(--muted)}
+.foot a{color:var(--volt);text-decoration:none;font-weight:600;font-family:'JetBrains Mono',monospace;direction:ltr;display:inline-block}
+.foot p{margin-top:6px;font-size:11.5px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a class="brand" href="../../"><span>⚡</span><b>MrElectroAI</b></a>
+    <button class="tbtn" id="theme" aria-label="تبديل الثيم">☀</button>
   </div>
 
-  <input type="number" id="numInput" placeholder="أدخل الرقم (1 - 1000)" 
-         style="width: 100%; padding: 15px; border-radius: 10px; border: none; box-sizing: border-box; font-size: 16px; margin-bottom: 20px;"
-         oninput="getResult()">
+  <div class="card">
+    <h1>WirePhase ID</h1>
+    <div class="sub">PHASE DISTRIBUTION HELPER</div>
 
-  <div id="displayArea" style="display: none; text-align: center; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;">
-    <div id="colorCircle" style="width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px auto; border: 3px solid white; transition: 0.3s;"></div>
-    
-    <div id="colorResult" style="font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #ffcc00;"></div>
-    
-    <div style="font-size: 14px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px; line-height: 1.5; margin-bottom: 15px;">
-      <strong>💡 نصيحة كهربائية:</strong><br>
-      <span id="tipResult"></span>
+    <p class="intro">بتعطي رقم الدارة، وبتطلعلك على أي فاز بتركّبها حسب التوزيع التسلسلي (1→L1، 2→L2، 3→L3، 4→L1…) — لتوزيع الأحمال بالتساوي على الفازات التلاتة.</p>
+
+    <label for="std">معيار الترميز اللوني</label>
+    <select id="std">
+      <option value="old">قديم — أحمر / أصفر / أزرق</option>
+      <option value="iec">IEC حديث — بني / أسود / رمادي</option>
+      <option value="us">أمريكي 208V — أسود / أحمر / أزرق</option>
+    </select>
+
+    <label for="num">رقم الدارة أو الخط</label>
+    <input id="num" type="number" inputmode="numeric" min="1" max="1000" placeholder="مثلاً: 7">
+
+    <div class="out" id="out">
+      <div class="phase">
+        <div class="swatch" id="sw"></div>
+        <div class="pinfo">
+          <b id="pname"></b>
+          <span id="pcolor"></span>
+        </div>
+      </div>
+
+      <div class="seq" id="seq"></div>
+
+      <div class="tip"><b>💡 نصيحة:</b> <span id="tip"></span></div>
+    </div>
+
+    <div class="warn">
+      <b>مهم:</b> هالأداة بتخطّط التوزيع، وما بتحدّد فاز موجود. أي كابل مركّب لازم يتفحص بجهاز قياس أو Phase Sequence Meter قبل التوصيل — الألوان بتنغلط بالتركيب.
     </div>
   </div>
 
-  <div style="text-align: center; margin-top: 20px; border-top: 1px solid #555; padding-top: 15px;">
-    <p style="font-size: 12px; color: #aaa; margin: 0;">للتواصل والدعم الفني:</p>
-    <a href="https://wa.me/96171736401" style="color: #ffcc00; font-weight: bold; text-decoration: none; font-size: 16px;">+961 71 736 401</a>
-    <p style="font-size: 11px; color: #888; margin-top: 5px;">Powered by <b>MrElectroAI</b></p>
+  <div class="foot">
+    للتواصل والدعم الفني:<br>
+    <a href="https://wa.me/96179434479">+961 79 434 479</a>
+    <p>Powered by <b>MrElectroAI</b></p>
   </div>
 </div>
 
 <script>
-function getResult() {
-  const val = document.getElementById('numInput').value;
-  const area = document.getElementById('displayArea');
-  const circle = document.getElementById('colorCircle');
-  
-  if (val >= 1 && val <= 1000) {
-    const order = val % 3;
-    let colorName = "";
-    let colorHex = "";
-    
-    if (order === 1) { colorName = "اللون: أحمر"; colorHex = "#ff4d4d"; }
-    else if (order === 2) { colorName = "اللون: أصفر"; colorHex = "#ffcc00"; }
-    else { colorName = "اللون: أزرق"; colorHex = "#3399ff"; }
+const STD = {
+  old: [["L1","أحمر","#E23B3B"],["L2","أصفر","#E8B21E"],["L3","أزرق","#2E86E0"]],
+  iec: [["L1","بني","#8B5A2B"],["L2","أسود","#2B2B2B"],["L3","رمادي","#9AA3A8"]],
+  us:  [["L1","أسود","#2B2B2B"],["L2","أحمر","#E23B3B"],["L3","أزرق","#2E86E0"]]
+};
+const TIPS = [
+  "وزّع الأحمال الكبيرة على فازات مختلفة لتقليل عدم الاتزان.",
+  "أحكم شدّ البراغي — أغلب حالات السخونة سببها توصيلة رخوة.",
+  "افحص الفولتية قبل ما تبلّش أي صيانة، حتى لو القاطع مفصول.",
+  "علّم الكابلات على الطرفين، مش على طرف واحد.",
+  "بالأماكن الرطبة، دقّق بالعزل وبدرجة حماية الصندوق."
+];
 
-    const tips = [
-      "دائماً تأكد من عزل الكابلات جيداً في أماكن الرطوبة.",
-      "جودة التوصيل أهم من سماكة الكابل لتقليل الحرارة.",
-      "افحص فولتية الخط دائماً قبل البدء بأي صيانة.",
-      "سلامتك أولاً، استخدم القفازات العازلة عند فحص اللوحات.",
-      "تأكد من إحكام البراغي لمنع الشرارة واحتراق الأسلاك."
-    ];
-    
-    circle.style.backgroundColor = colorHex;
-    document.getElementById('colorResult').innerText = colorName;
-    document.getElementById('tipResult').innerText = tips[val % tips.length];
-    area.style.display = 'block';
-  } else {
-    area.style.display = 'none';
-  }
+const $ = id => document.getElementById(id);
+const theme = $('theme');
+theme.onclick = () => {
+  const light = document.documentElement.dataset.theme === 'light';
+  document.documentElement.dataset.theme = light ? 'dark' : 'light';
+  theme.textContent = light ? '☀' : '☾';
+};
+
+function render() {
+  const n = parseInt($('num').value, 10);
+  const out = $('out');
+  if (!(n >= 1 && n <= 1000)) { out.classList.remove('on'); return; }
+
+  const set = STD[$('std').value];
+  const idx = (n - 1) % 3;
+  const [ph, cname, hex] = set[idx];
+
+  $('sw').style.background = hex;
+  $('sw').style.color = (idx === 1 && $('std').value !== 'old') || cname === 'أسود' ? '#fff' : '#0A0C10';
+  $('sw').textContent = ph;
+  $('pname').textContent = 'الفاز ' + ph;
+  $('pcolor').textContent = 'اللون: ' + cname + ' — الدارة رقم ' + n;
+
+  $('seq').innerHTML = [-1, 0, 1].map(d => {
+    const m = n + d;
+    if (m < 1) return '<div>—<i>·</i></div>';
+    const p = set[(m - 1) % 3];
+    return '<div class="' + (d === 0 ? 'now' : '') + '">' + m + '<i style="color:' + p[2] + '">' + p[0] + '</i></div>';
+  }).join('');
+
+  $('tip').textContent = TIPS[n % TIPS.length];
+  out.classList.add('on');
 }
+$('num').addEventListener('input', render);
+$('std').addEventListener('change', render);
 </script>
+</body>
+</html>
