@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الجردة | MrElectroAI</title>
+<meta name="description" content="جردة مواد كهربائية خطوة بخطوة — سواد، بياض، أو تقدير سريع من الخريطة.">
+<meta name="theme-color" content="#081311">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--void:#081311;--panel:#0F1D1A;--panel-2:#152724;--line:#223B36;
+  --volt:#22C79B;--volt-ink:#04140F;--arc:#63E3C2;--text:#E4F0EC;--muted:#7D948E;
+  --glow:rgba(34,199,155,.14);--warn:#E8A33D}
+[data-theme="light"]{--void:#EFF4F2;--panel:#FFFFFF;--panel-2:#E9F1EE;--line:#D2E0DB;
+  --volt:#0E8F6E;--volt-ink:#FFFFFF;--arc:#0B7A5E;--text:#0C1A17;--muted:#55665F;
+  --glow:rgba(14,143,110,.16);--warn:#9A6A12}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--void);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px;line-height:1.6;min-height:100vh;padding:18px 13px 108px;
+  background-image:linear-gradient(to bottom,var(--glow),transparent 340px)}
+.wrap{max-width:620px;margin:0 auto}
+:where(a,button,input,select):focus-visible{outline:2px solid var(--arc);outline-offset:3px}
+svg.ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text)}
+.brand span{width:31px;height:31px;border-radius:9px;background:var(--volt);color:var(--volt-ink);
+  display:grid;place-items:center;font-size:15px}
+.brand b{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500}
+.tbtn{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+  width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:14px}
+
+.prog{display:flex;gap:5px;margin-bottom:16px}
+.prog i{flex:1;height:3px;border-radius:3px;background:var(--line);transition:background .3s}
+.prog i.on{background:var(--volt)}
+
+.scr{display:none;animation:fade .28s ease}
+.scr.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-family:'Readex Pro',sans-serif;font-size:23px;font-weight:700;margin-bottom:4px}
+.lede{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:11px}
+.card>h2{font-family:'Readex Pro',sans-serif;font-size:14.5px;font-weight:600;margin-bottom:12px;
+  padding-bottom:9px;border-bottom:1px solid var(--line)}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 5px}
+select,input{width:100%;font-family:inherit;font-size:15px;color:var(--text);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+select:focus,input:focus{border-color:var(--volt)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mb{margin-bottom:11px}
+
+.pick{display:flex;align-items:center;gap:14px;width:100%;background:var(--panel);border:1px solid var(--line);
+  border-radius:15px;padding:17px 16px;margin-bottom:10px;cursor:pointer;text-align:right;
+  font-family:inherit;color:var(--text)}
+.pick.on{border-color:var(--volt);background:var(--glow)}
+.pick i{font-size:26px;font-style:normal;flex-shrink:0}
+.pick b{display:block;font-family:'Readex Pro',sans-serif;font-size:16px;margin-bottom:2px}
+.pick small{color:var(--muted);font-size:12.5px;line-height:1.45;display:block}
+
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:3px}
+.tabs button{flex-shrink:0;font-family:inherit;font-size:12.5px;color:var(--muted);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:999px;padding:7px 13px;cursor:pointer}
+.tabs button.on{color:var(--volt-ink);background:var(--volt);border-color:var(--volt);font-weight:600}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:9px}
+.tile{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:11px 9px 9px;
+  display:flex;flex-direction:column;align-items:center;gap:7px;user-select:none;text-align:center}
+.tile.has{border-color:var(--volt);background:var(--glow)}
+.tile .pic{width:38px;height:38px;border-radius:10px;background:var(--void);border:1px solid var(--line);
+  display:grid;place-items:center;font-size:21px;color:var(--arc)}
+.tile.has .pic{color:var(--volt);border-color:var(--volt)}
+.tname{font-size:12.5px;font-weight:600;line-height:1.35;width:100%;word-break:break-word}
+.tname small{display:block;font-weight:400;color:var(--muted);font-size:9.5px;
+  font-family:'JetBrains Mono',monospace;margin-top:1px}
+.pm{display:flex;align-items:center;gap:6px;margin-top:auto}
+.pm button{width:29px;height:29px;border-radius:9px;border:1px solid var(--line);background:var(--void);
+  color:var(--text);font-size:17px;cursor:pointer;line-height:1;font-family:inherit}
+.pm .plus{background:var(--volt);color:var(--volt-ink);border-color:var(--volt);font-weight:700}
+.pm b{min-width:22px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:15px}
+.hint{font-size:11.5px;color:var(--muted);margin-top:10px}
+
+.pts{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:9px}
+.pt{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:11px 10px}
+.pt.has{border-color:var(--volt)}
+.pt .lab{font-size:13px;font-weight:600}
+.pt .mod{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px}
+
+/* تسعير الإنارة */
+.prow{display:flex;align-items:center;gap:9px;background:var(--panel-2);border:1px solid var(--line);
+  border-radius:11px;padding:9px 11px;margin-bottom:7px}
+.prow .pn{flex:1;font-size:13px;font-weight:600}
+.prow .pn small{display:block;color:var(--muted);font-weight:400;font-size:11px;font-family:'JetBrains Mono',monospace}
+.prow input{width:96px;padding:8px 9px;font-size:14px;text-align:center;
+  font-family:'JetBrains Mono',monospace}
+.ptot{display:flex;justify-content:space-between;align-items:center;background:var(--glow);
+  border:1px solid var(--volt);border-radius:11px;padding:12px 14px;margin-top:10px;font-size:14px}
+.ptot b{font-family:'JetBrains Mono',monospace;font-size:17px;color:var(--volt)}
+
+.shop{display:flex;align-items:center;gap:11px;background:var(--panel-2);border:1px solid var(--line);
+  border-radius:11px;padding:11px 12px;margin-bottom:7px;cursor:pointer;text-align:right;width:100%;
+  font-family:inherit;color:var(--text)}
+.shop.sel{border-color:var(--volt);background:var(--glow)}
+.shop .si{flex:1}.shop b{display:block;font-size:13.5px}.shop small{color:var(--muted);font-size:11.5px}
+.dist{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--volt)}
+.ghead{font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;
+  margin:14px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+.ghead:first-child{margin-top:0}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;
+  border-radius:11px;font-family:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--text);cursor:pointer;margin-top:8px;text-decoration:none}
+.btn.main{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+
+pre.sum{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:12px;
+  font-family:inherit;font-size:12.5px;white-space:pre-wrap;color:var(--muted);max-height:230px;overflow:auto}
+.calc{background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:13px;
+  margin-top:11px;font-size:12.5px;line-height:1.85}
+.calc b{color:var(--volt)}
+.warnbox{font-size:12.5px;color:var(--muted);border:1px dashed var(--warn);border-radius:11px;
+  padding:12px 13px;line-height:1.7}
+.warnbox b{color:var(--warn)}
+
+.nav{position:fixed;inset-inline:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);
+  padding:10px 13px calc(10px + env(safe-area-inset-bottom));display:flex;gap:9px;align-items:center;z-index:9}
+.nav .btn{margin:0}
+.nav .back{flex:0 0 46px;padding:12px 0}
+.cnt{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);text-align:center;flex-shrink:0;min-width:42px}
+.cnt b{display:block;font-size:17px;color:var(--text)}
+
+.sheetbg{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .22s;z-index:30}
+.sheetbg.on{opacity:1;pointer-events:auto}
+.info{position:fixed;inset-inline:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);
+  border-radius:20px 20px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom));
+  transform:translateY(105%);transition:transform .28s;z-index:31;max-width:620px;margin:0 auto}
+.info.on{transform:none}
+.info .ih{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.info .pic{width:44px;height:44px;border-radius:11px;background:var(--panel-2);border:1px solid var(--line);
+  display:grid;place-items:center;font-size:23px;color:var(--arc)}
+.info h3{font-family:'Readex Pro',sans-serif;font-size:17px}
+.info .en{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted)}
+.info p{white-space:pre-line;font-size:14px;color:var(--muted);line-height:1.75}
+
+.toast{position:fixed;bottom:92px;left:50%;transform:translate(-50%,90px);background:var(--volt);
+  color:var(--volt-ink);font-size:13.5px;font-weight:600;padding:10px 19px;border-radius:999px;
+  transition:transform .3s;z-index:40;max-width:88%;text-align:center}
+.toast.on{transform:translate(-50%,0)}
+
+#sheet{display:none}
+@media print{
+  body>*:not(#sheet){display:none!important}
+  #sheet{display:block!important;color:#000;font-size:13px}
+  #sheet h2{font-size:20px}
+  #sheet .hd{border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:12px}
+  #sheet .meta{font-size:12px;color:#333;margin-bottom:13px;line-height:1.9}
+  #sheet table{width:100%;border-collapse:collapse;font-size:12.5px}
+  #sheet th,#sheet td{border:1px solid #999;padding:6px 9px;text-align:right}
+  #sheet th{background:#eee}
+  #sheet tr.grp td{background:#f4f4f4;font-weight:700}
+  #sheet .ft{margin-top:15px;padding-top:9px;border-top:1px solid #999;font-size:11.5px;line-height:1.8}
+  @page{margin:14mm}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<symbol id="i-box" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14"/></symbol>
+<symbol id="i-frame" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2.5"/><rect x="6" y="8" width="12" height="8" rx="1"/></symbol>
+<symbol id="i-chassis" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="M9 6v12M15 6v12"/></symbol>
+<symbol id="i-sw1" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 10h6"/></symbol>
+<symbol id="i-sw2" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M7 9h4M13 15h4"/></symbol>
+<symbol id="i-sw3" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M7 8h10M7 12h10M7 16h10"/></symbol>
+<symbol id="i-dim" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v4M12 12l4-3"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+<symbol id="i-socket" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/></symbol>
+<symbol id="i-schuko" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><path d="M12 4v1.6M12 18.4V20"/></symbol>
+<symbol id="i-usb" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="8" rx="2"/><path d="M8 12h8M9 10v4"/></symbol>
+<symbol id="i-tv" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="13" rx="2"/><path d="M8 21h8M12 18v3"/></symbol>
+<symbol id="i-rj" viewBox="0 0 24 24"><path d="M5 9h14v8H5z"/><path d="M9 9V6h6v3M8 17v2M12 17v2M16 17v2"/></symbol>
+<symbol id="i-mcb" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="1.5"/><path d="M12 7v4l2 2-2 3"/></symbol>
+<symbol id="i-rcd" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8v3M15 8v3M8 15h8"/></symbol>
+<symbol id="i-db" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h5"/></symbol>
+<symbol id="i-busbar" viewBox="0 0 24 24"><path d="M3 8h18M3 14h18M8 8v6M16 8v6"/></symbol>
+<symbol id="i-wire" viewBox="0 0 24 24"><path d="M3 16c3 0 3-8 6-8s3 8 6 8 3-8 6-8"/></symbol>
+<symbol id="i-cable" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="9.5" cy="10" r="2"/><circle cx="14.5" cy="10" r="2"/><circle cx="12" cy="15" r="2"/></symbol>
+<symbol id="i-conduit" viewBox="0 0 24 24"><path d="M3 12h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></symbol>
+<symbol id="i-trunk" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="1.5"/><path d="M2 12h20"/></symbol>
+<symbol id="i-tape" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-spot" viewBox="0 0 24 24"><path d="M6 5h12l-2 8H8z"/><path d="M9 17h6M10 20h4"/></symbol>
+<symbol id="i-spotr" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h10M7 14h6"/></symbol>
+<symbol id="i-strip" viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="1"/><path d="M6 10v4M10 10v4M14 10v4M18 10v4"/></symbol>
+<symbol id="i-wall" viewBox="0 0 24 24"><path d="M4 4v16"/><path d="M4 9h8a4 4 0 0 1 4 4v1"/></symbol>
+<symbol id="i-garden" viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M8 9a4 4 0 0 1 8 0v1H8z"/><path d="M7 21h10"/></symbol>
+<symbol id="i-earth" viewBox="0 0 24 24"><path d="M12 3v9M6 12h12M8 16h8M10 20h4"/></symbol>
+<symbol id="i-dish" viewBox="0 0 24 24"><path d="M4 20a12 12 0 0 1 12-12"/><circle cx="16" cy="8" r="2.2"/><path d="M4 20l4-3"/></symbol>
+<symbol id="i-pump" viewBox="0 0 24 24"><path d="M12 3s5 6 5 10a5 5 0 0 1-10 0c0-4 5-10 5-10z"/></symbol>
+</svg>
+
+<div class="wrap">
+  <div class="top">
+    <a class="brand" href="../../"><span>⚡</span><b>MrElectroAI</b></a>
+    <button class="tbtn" id="theme" aria-label="تبديل الثيم">☀</button>
+  </div>
+  <div class="prog" id="prog"></div>
+
+  <!-- 0 بياناتك -->
+  <section class="scr on" data-k="0">
+    <h1>أهلاً فيك</h1>
+    <p class="lede">عرّفنا عن حالك، ومنبلّش الجردة.</p>
+    <div class="card">
+      <h2>بياناتك</h2>
+      <div class="mb"><label class="lbl">اسمك</label><input id="cname" placeholder="الاسم الكامل"></div>
+      <div class="mb"><label class="lbl">رقم تلفونك</label><input id="cphone" type="tel" inputmode="tel" placeholder="مثلاً 70123456"></div>
+      <div><label class="lbl">اسم الشقة أو المشروع</label><input id="csite" placeholder="مثلاً شقة أبو خالد — الطابق 3"></div>
+    </div>
+  </section>
+
+  <!-- 1 شو بدك تعمل -->
+  <section class="scr" data-k="1">
+    <h1>شو بدك تعمل؟</h1>
+    <p class="lede">اختار نوع الشغل، وبنجهّزلك اللي بيلزمو بس.</p>
+    <button class="pick" data-m="sawad"><i>🕳️</i><span><b>جردة سواد</b>
+      <small>خراطيم · علب دفن · تابلوهات — تمديدات ما قبل البياض.</small></span></button>
+    <button class="pick" data-m="bayad"><i>⚪</i><span><b>جردة بياض وتسحيب</b>
+      <small>شرايط وكابلات · مفاتيح وبرايز · شاسيهات وكفرات · إنارة.</small></span></button>
+    <button class="pick" data-m="est"><i>📐</i><span><b>تقدير سريع من الخريطة</b>
+      <small>صوّر الخريطة وحطّ المساحة — بتعرف عدد النقاط تقريباً للتسعير. بدون طلب بضاعة.</small></span></button>
+  </section>
+
+  <!-- 2 التقدير السريع -->
+  <section class="scr" data-k="2">
+    <h1>تقدير سريع</h1>
+    <p class="lede">لمحة عن حجم الشغل قبل ما تسعّر.</p>
+    <div class="card">
+      <div class="warnbox mb"><b>انتبه:</b> هيدا تقدير أوّلي بس — <b>ما بتنطلب بضاعة على أساسو</b> ولا بيطلع منّو كشف رسمي. للتسعير وأخذ فكرة لا غير.</div>
+      <label class="lbl">صوّر الخريطة مع الليجاند تبعها</label>
+      <input type="file" id="plan" accept="image/*" class="mb">
+      <div id="planPrev"></div>
+      <div class="two mb">
+        <div><label class="lbl">مساحة الشقة (م²)</label><input type="number" id="area" min="0" placeholder="150"></div>
+        <div><label class="lbl">عدد الغرف</label><input type="number" id="rooms" min="0" placeholder="4"></div>
+      </div>
+      <label class="lbl">مستوى التجهيز</label>
+      <select id="level"><option value="0.8">اقتصادي — نقاط أساسية</option>
+        <option value="1" selected>عادي — تجهيز متوازن</option>
+        <option value="1.3">فخم — نقاط كتيرة وتيار خفيف</option></select>
+      <div class="calc" id="estOut" style="display:none"></div>
+    </div>
+  </section>
+
+  <!-- 3 نظام العلب -->
+  <section class="scr" data-k="3">
+    <h1 id="apTitle">نظام العلب</h1>
+    <p class="lede" id="apLede"></p>
+    <div class="card">
+      <label class="lbl">نظام العلب بالشقة</label>
+      <select id="apMode" class="mb">
+        <option value="two">كل البيت 2 موديل</option>
+        <option value="mixed">علب مشكّلة (2 · 3 · 4 · 6)</option>
+        <option value="skip">تجاوز — بعدّ يدوي</option>
+      </select>
+      <div id="apBody"></div>
+      <div class="calc" id="apOut" style="display:none"></div>
+    </div>
+  </section>
+
+  <!-- 4 المواد -->
+  <section class="scr" data-k="4">
+    <h1 id="matTitle">المواد</h1>
+    <p class="lede">اضغط مطوّل على أي قطعة لتعرف لشو بتستخدم.</p>
+    <div class="card">
+      <div class="tabs" id="tabs"></div>
+      <div id="cats"></div>
+      <div id="roofBox"></div>
+      <div class="two" style="margin-top:12px">
+        <input id="extra" placeholder="مادة مش موجودة؟">
+        <button class="btn" style="margin:0" id="addx">إضافة</button>
+      </div>
+      <div id="xbox" class="grid" style="margin-top:9px"></div>
+    </div>
+  </section>
+
+  <!-- 5 تسعير الإنارة -->
+  <section class="scr" data-k="5">
+    <h1>تسعير الإنارة</h1>
+    <p class="lede">حطّ سعر الوحدة لكل نوع اخترتو، ومنحسبلك المجموع.</p>
+    <div class="card">
+      <label class="lbl">العملة</label>
+      <select id="cur" class="mb"><option>$</option><option>ألف ل.ل.</option><option>ل.ل.</option></select>
+      <div id="prices"></div>
+    </div>
+  </section>
+
+  <!-- 6 الماركات -->
+  <section class="scr" data-k="6">
+    <h1>الماركات</h1>
+    <p class="lede">ليعرف المحل شو بدك بالظبط.</p>
+    <div class="card">
+      <div class="mb" id="bSwWrap"><label class="lbl">ماركة المفاتيح والبرايز</label>
+        <select id="bSw"><option value="">— اختار —</option>
+          <option>Legrand — ليجراند</option><option>Vimar — فيمار</option><option>Meta — ميتا</option>
+          <option>Bticino — بيتيتشينو</option><option>Gewiss — غيويس</option><option>Schneider — شنايدر</option>
+          <option>Sancy — سانشي</option><option>صيني / اقتصادي</option><option>حسب توفّر المحل</option></select></div>
+      <div class="mb"><label class="lbl">ماركة القواطع واللوحات</label>
+        <select id="bBr"><option value="">— اختار —</option>
+          <option>ABB</option><option>Schneider</option><option>Siemens</option><option>Eaton</option>
+          <option>Legrand</option><option>Hager</option><option>Chint</option><option>صيني / اقتصادي</option>
+          <option>حسب توفّر المحل</option></select></div>
+      <div id="bCaWrap"><label class="lbl">ماركة الكابلات</label>
+        <select id="bCa"><option value="">— اختار —</option>
+          <option>Liban Cables — ليبان كابل</option><option>Nexans</option><option>Prysmian</option>
+          <option>Elsewedy — السويدي</option><option>مستورد / حسب المتوفر</option></select></div>
+    </div>
+  </section>
+
+  <!-- 7 المحل -->
+  <section class="scr" data-k="7">
+    <h1>وين بدك تطلب؟</h1>
+    <p class="lede">اختار المحل، والطلب بيوصلو جاهز على واتساب.</p>
+    <div class="card">
+      <button class="btn" id="geo">📍 حدّد موقعي ورتّب حسب الأقرب</button>
+      <div id="shops" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <!-- 8 الكشف -->
+  <section class="scr" data-k="8">
+    <h1>الكشف النهائي</h1>
+    <p class="lede">راجعو، صدّرو PDF، وابعتو للمحل.</p>
+    <div class="card">
+      <pre class="sum" id="sum">لسا ما اخترت شي.</pre>
+      <button class="btn" id="print">🖨️ تصدير PDF</button>
+      <button class="btn" id="reset" style="color:#E06B6B">🔄 تصفير وبدء جردة جديدة</button>
+    </div>
+  </section>
+</div>
+
+<div class="nav">
+  <button class="btn back" id="back" aria-label="رجوع">→</button>
+  <div class="cnt" id="cntWrap"><b id="tot">0</b>قطعة</div>
+  <button class="btn main" id="next">التالي</button>
+</div>
+
+<div class="sheetbg" id="bg"></div>
+<div class="info" id="info">
+  <div class="ih"><div class="pic" id="iPic"></div>
+    <div><h3 id="iName"></h3><div class="en" id="iEn"></div></div></div>
+  <p id="iUse"></p>
+</div>
+<div class="toast" id="toast"></div>
+
+<div id="sheet">
+  <div class="hd"><h2>كشف جرد مواد كهربائية</h2>
+    <div>صادر عن تطبيق الجردات — MrElectroAI · أنور الحسن الجاسم · +961 79 434 479</div></div>
+  <div class="meta" id="sheetMeta"></div>
+  <table><thead><tr><th style="width:62%">المادة</th><th>الكمية</th></tr></thead><tbody id="sheetBody"></tbody></table>
+  <div class="ft" id="sheetFt"></div>
+</div>
+
+<script>
+/* ═══ المحلات ═══ */
+const SHOPS = [
+  { name:"إلكترو جول (حليم)", area:"حليم", g:"بيروت وجبل لبنان", wa:"9613612711", lat:33.8100, lng:35.5600 },
+  { name:"كهربجي", area:"برج المر / الحمرا", g:"بيروت وجبل لبنان", wa:"96170125488", lat:33.8895, lng:35.4820 },
+  { name:"كتانة", area:"بيروت", g:"بيروت وجبل لبنان", wa:"96170255888", lat:33.8938, lng:35.5018 },
+  { name:"أبو عضل", area:"بيروت", g:"بيروت وجبل لبنان", wa:"96171581000", lat:33.8938, lng:35.5018 },
+  { name:"دباس", area:"جونية / كسروان", g:"بيروت وجبل لبنان", wa:"96170219660", lat:33.9808, lng:35.6178 },
+  { name:"كساتلي إلكتريك", area:"جونية", g:"بيروت وجبل لبنان", wa:"96171931200", lat:33.9808, lng:35.6178 },
+  { name:"بيبلوس إلكتريك", area:"جبيل", g:"بيروت وجبل لبنان", wa:"96170546555", lat:34.1230, lng:35.6519 },
+  { name:"نهر إبراهيم إلكتريك", area:"نهر إبراهيم / جبيل", g:"بيروت وجبل لبنان", wa:"96176448220", lat:34.0642, lng:35.6461 },
+  { name:"دبوسي إلكتريك", area:"طرابلس", g:"الشمال وعكار", wa:"96171430880", lat:34.4367, lng:35.8497 },
+  { name:"المر للكهرباء", area:"طرابلس", g:"الشمال وعكار", wa:"96170440550", lat:34.4367, lng:35.8497 },
+  { name:"عكار إلكتريك", area:"حلبا / عكار", g:"الشمال وعكار", wa:"96170338912", lat:34.5450, lng:36.0800 },
+  { name:"مؤسسة الشمال", area:"العبدة / عكار", g:"الشمال وعكار", wa:"9613452189", lat:34.5170, lng:35.9860 },
+  { name:"زيباوي إلكتريك", area:"صيدا", g:"الجنوب", wa:"9613382606", lat:33.5571, lng:35.3729 },
+  { name:"بساط إلكتريك", area:"صيدا", g:"الجنوب", wa:"96176720360", lat:33.5571, lng:35.3729 },
+  { name:"بابا إلكتريك", area:"صيدا", g:"الجنوب", wa:"96170752100", lat:33.5571, lng:35.3729 }
+];
+const REGIONS = ["بيروت وجبل لبنان","الشمال وعكار","الجنوب"];
+const OWNER = { brand:"MrElectroAI", name:"أنور الحسن الجاسم", phone:"+961 79 434 479" };
+
+/* ═══ المواد ═══ */
+const STAGES = {
+sawad: { name:"سواد", cats:[
+  { t:"الخراطيم", items:[
+    ["خرطوم 13","Ø13 mm","conduit","بيمرق فيه سلك أو اتنين — للإنارة الخفيفة والتيار الخفيف."],
+    ["خرطوم 16","Ø16 mm","conduit","الأكتر استعمالاً بدارات الإنارة الداخلية."],
+    ["خرطوم 20","Ø20 mm","conduit","لدارات البرايز وعدد أسلاك أكبر."],
+    ["خرطوم 23","Ø23 mm","conduit","لخطوط أسمك أو عدد أسلاك كتير بنفس المجرى."],
+    ["خرطوم 29","Ø29 mm","conduit","للخطوط الرئيسية وتغذية اللوحات."],
+    ["خرطوم 32","Ø32 mm","conduit","الأكبر — لكابلات التغذية الرئيسية."]]},
+  { t:"العلب", items:[
+    ["علبة دفن 2 موديل","Back box 2M","box","بتتدفن بالحيط وبتحمل نقطة 2 موديل."],
+    ["علبة دفن 3 موديل","Back box 3M","box","لنقطة 3 موديل، متل مفتاح مع بريز سوا."],
+    ["علبة دفن 4 موديل","Back box 4M","box","لنقطة 4 موديل."],
+    ["علبة دفن 6 موديل","Back box 6M","box","للنقاط الكبيرة — الصالون وجنب التلفزيون."],
+    ["علبة توصيل","Junction box","box","بتجمع الوصلات وتحميها، ولازم تضل قابلة للفتح."],
+    ["علبة سقف","Ceiling box","box","نقطة تعليق الإنارة بالسقف."]]},
+  { t:"التابلوهات", items:[
+    ["تابلو 8 خانات","8 modules","db","للوحات الصغيرة أو لوحة فرعية."],
+    ["تابلو 12 خانة","12 modules","db","المقاس الشائع لشقة صغيرة/متوسطة."],
+    ["تابلو 18 خانة","18 modules","db","لشقة متوسطة مع دارات منفصلة."],
+    ["تابلو 24 خانة","24 modules","db","لشقة كبيرة أو دارات كتيرة."],
+    ["تابلو 36 خانة","36 modules","db","لفيلا أو مبنى."],
+    ["علبة تابلو دفن","Flush enclosure","db","الصندوق اللي بيتدفن بالحيط للتابلو."],
+    ["باربوس","Busbar","busbar","قضيب نحاسي بيوزّع الفاز على القواطع."],
+    ["قضيب تأريض","Earth bar","earth","نقطة تجميع أسلاك التأريض داخل اللوحة."]]},
+  { t:"تثبيت ومتفرقات", items:[
+    ["شريط سحب","Fish tape","tape","بيمرق بالخرطوم لسحب الأسلاك فيه."],
+    ["ربطات بلاستيك","Cable ties","tape","لتثبيت وتنظيم الخراطيم قبل الصبّ."],
+    ["مسامير وبراغي","Fixings","tape","لتثبيت العلب والتابلوهات."],
+    ["شريط لاصق","Tape","tape","لتثبيت الوصلات وسدّ فتحات الخرطوم."],
+    ["مجرى 20×10","Trunking","trunk","مجرى ظاهر على الحيط للتمديدات المكشوفة."],
+    ["مجرى 40×25","Trunking","trunk","مجرى أعرض لعدد كابلات أكبر."]]}
+]},
+
+bayad: { name:"بياض وتسحيب", cats:[
+  { t:"شرايط مفردة", items:[
+    ["شريط 1 مم","1 mm²","wire","بيتحمّل ~11–13 أمبير · القاطع 6–10A.\nللتيار الخفيف والإشارات."],
+    ["شريط 1.5 مم","1.5 mm²","wire","بيتحمّل ~14–16 أمبير · القاطع 10A.\nدارات الإنارة."],
+    ["شريط 2.5 مم","2.5 mm²","wire","بيتحمّل ~19–21 أمبير · القاطع 16A.\nدارات البرايز."],
+    ["شريط 4 مم","4 mm²","wire","بيتحمّل ~26–28 أمبير · القاطع 20–25A.\nللسخّان وخط المطبخ."],
+    ["شريط 6 مم","6 mm²","wire","بيتحمّل ~34–36 أمبير · القاطع 32A.\nللأحمال الكبيرة."],
+    ["شريط 10 مم","10 mm²","wire","بيتحمّل ~46–50 أمبير · القاطع 40A.\nخطوط رئيسية."],
+    ["شريط 16 مم","16 mm²","wire","بيتحمّل ~61–68 أمبير · القاطع 50–63A.\nتغذية رئيسية لشقة."],
+    ["شريط 25 مم","25 mm²","wire","بيتحمّل ~80–89 أمبير · القاطع 63–80A.\nتغذية رئيسية أو مولّد."],
+    ["شريط 35 مم","35 mm²","wire","بيتحمّل ~100–110 أمبير · القاطع 80–100A.\nتغذية مبنى."],
+    ["سلك تأريض","Earth","earth","الأخضر/أصفر — ما بينحط غيرو محلّو أبداً."]]},
+  { t:"كابلات", items:[
+    ["كابل 2×1.5","2×1.5 mm²","cable","كل عرق ~14–16 أمبير · القاطع 10A.\nخط إنارة بدون أرضي."],
+    ["كابل 3×1.5","3×1.5 mm²","cable","كل عرق ~14–16 أمبير · القاطع 10A.\nإنارة مع أرضي."],
+    ["كابل 3×2.5","3×2.5 mm²","cable","كل عرق ~19–21 أمبير · القاطع 16A.\nخط برايز مع أرضي."],
+    ["كابل 3×4","3×4 mm²","cable","كل عرق ~26–28 أمبير · القاطع 20–25A.\nللسخّان أو المكيّف."],
+    ["كابل 3×6","3×6 mm²","cable","كل عرق ~34–36 أمبير · القاطع 32A.\nخط فرعي."],
+    ["كابل 4×6","4×6 mm²","cable","تلات فازات مع نيوترال · القاطع 32A."],
+    ["كابل 4×10","4×10 mm²","cable","كل عرق ~46–50 أمبير · القاطع 40A.\nتغذية رئيسية."],
+    ["كابل 4×16","4×16 mm²","cable","كل عرق ~61–68 أمبير · القاطع 50–63A."],
+    ["كابل مدرّع","Armoured SWA","cable","بيتحمّل الدفن والضغط — للخطوط الخارجية."],
+    ["كابل مرن","Flexible","cable","للتوصيلات المتحركة والأجهزة."]]},
+  { t:"كابلات السطح", items:[
+    ["كابل دش","RG6","dish","من الطبق للريسيفر — انتبه للعزل من الشمس."],
+    ["كابل داتا Cat6","Cat6 UTP","rj","لنقاط الإنترنت — للسطح استعمل نوع Outdoor."],
+    ["كابل خزان الماء","Pump cable","pump","لمضخة الخزان — مقطع حسب المسافة وأرضي إجباري."],
+    ["كابل إنارة السطح","Outdoor","cable","بيتعرّض للشمس والمطر — لازم مقاوم UV."],
+    ["كابل تلفون","RJ11","rj","خط أرضي أو DSL."],
+    ["كابل سماعات","Speaker","cable","لتوزيع الصوت داخل الشقة."]]},
+  { t:"شاسيهات وكفرات", items:[
+    ["شاسيه 2 موديل","Chassis 2M","chassis","الهيكل اللي بيتثبت بالعلبة وبيركّب عليه المفاتيح."],
+    ["شاسيه 3 موديل","Chassis 3M","chassis","شاسيه بـ3 خانات."],
+    ["شاسيه 4 موديل","Chassis 4M","chassis","شاسيه بـ4 خانات."],
+    ["شاسيه 6 موديل","Chassis 6M","chassis","شاسيه بـ6 خانات."],
+    ["كفر 2","Frame 2M","frame","إطار لنقطة مفردة بشاسيه 2 موديل."],
+    ["كفر 2+2","Frame 2+2","frame","إطار بيغطي شاسيهين 2 موديل — مش كفر 4 موديل."],
+    ["كفر 2+2+2","Frame 2+2+2","frame","إطار بيغطي تلات شاسيهات 2 موديل."],
+    ["كفر 2+2+2+2","Frame 2+2+2+2","frame","إطار بيغطي أربع شاسيهات 2 موديل."],
+    ["كفر 3 موديل","Frame 3M","frame","إطار لشاسيه 3 موديل."],
+    ["كفر 4 موديل","Frame 4M","frame","إطار لشاسيه 4 موديل."],
+    ["كفر 6 موديل","Frame 6M","frame","إطار لشاسيه 6 موديل."]]},
+  { t:"المفاتيح", items:[
+    ["مفتاح مفرد","1 Way","sw1","بيشغّل ويطفي نقطة إنارة من مكان واحد."],
+    ["مفتاح دوبل","2 Gang","sw2","مفتاحين بنفس الخانة لنقطتين إنارة."],
+    ["مفتاح تربل","3 Gang","sw3","تلات مفاتيح بنفس الخانة."],
+    ["مفتاح درج (تبادل)","Two-way","sw2","بتطفي وتشعّل نفس اللمبة من مكانين."],
+    ["مفتاح وسطي","Intermediate","sw3","للتحكم من 3 أماكن أو أكتر."],
+    ["دفّاش جرس","Bell push","bell","بيوصل التيار وقت الضغط بس."],
+    ["ديمر","Dimmer","dim","بيتحكم بشدة الإضاءة — لازم متوافق مع اللمبات."]]},
+  { t:"البرايز", items:[
+    ["بريز عادي","Standard","socket","مأخذ تيار للأجهزة الخفيفة."],
+    ["بريز شوكو","Schuko","schuko","مؤرّض — للبراد والغسالة."],
+    ["بريز مؤرّض","Earthed","schuko","أساسي بالمطبخ والحمام."],
+    ["بريز صناعي","Industrial","socket","للأحمال العالية والمعدات."],
+    ["مأخذ USB","USB","usb","بيشحن مباشرة بدون محوّل."]]},
+  { t:"التيار الخفيف", items:[
+    ["مأخذ TV","TV","tv","نقطة الأنتين أو الستالايت."],
+    ["مأخذ RJ45","Data","rj","نقطة إنترنت سلكية."],
+    ["مأخذ تلفون","RJ11","rj","خط تلفون أرضي أو DSL."],
+    ["مأخذ سماعات","Audio","usb","نقطة سماعات مدمجة بالحيط."]]},
+  { t:"القواطع", items:[
+    ["قاطع أحادي","1P MCB","mcb","بيحمي دارة وحدة من الزيادة والقصر."],
+    ["قاطع ثنائي","2P MCB","mcb","بيفصل الفاز والنيوترال سوا."],
+    ["قاطع ثلاثي","3P MCB","mcb","لدارات التلات فازات."],
+    ["قاطع تفاضلي","RCD","rcd","بيفصل عند تسرّب التيار — بيحمي الإنسان."],
+    ["قاطع رئيسي","Main","mcb","بيقطع كل الشقة، أول اللوحة."],
+    ["كونتاكتور","Contactor","mcb","بيتحكم بأحمال كبيرة عبر إشارة صغيرة."]]},
+  { t:"الإنارة", price:true, items:[
+    ["سبوت سقف مخفي","Recessed spot","spotr","بيتركّب داخل الجبس ومستوي معو — الأنعم شكلاً."],
+    ["سبوت سقف ظاهر","Surface spot","spot","بيتركّب فوق السقف لما ما يكون في جبس."],
+    ["سبوت متحرك","Adjustable spot","spot","بيلف ليوجّه الضوء على لوحة أو خزانة."],
+    ["سبوت حمام","Bathroom spot","spotr","لازم يكون مقاوم للرطوبة (IP44 وفوق)."],
+    ["سبوت خارجي","Outdoor spot","spot","للشرفة والمدخل — مقاوم للمطر والشمس."],
+    ["أبليك حائط","Wall light","wall","إنارة حيط تزيينية أو مساعدة."],
+    ["إنارة زريعة","Garden light","garden","إنارة أرضية للزرع والمداخل — لازم IP65."],
+    ["شريط LED","LED strip","strip","إنارة مخفية بالجبس أو تحت الخزائن."],
+    ["محوّل LED","Driver","panel","بيغذّي الشريط أو السبوتات بالفولت الصحيح."],
+    ["بانل LED","Panel","panel","إنارة سطحية بتنوّر مساحة أوسع بنعومة."],
+    ["ثريا / تعليقة","Pendant","panel","إنارة معلّقة فوق الطاولة أو الدرج."]]}
+]}};
+
+const ROOF = ["كابلات السطح معرّضة للشمس — استعمل نوع UV",
+  "خط الدش لازم يكون معزول عن كابلات القوة",
+  "كابل مضخة الخزان بدو مقطع حسب المسافة + أرضي",
+  "كابل الداتا للسطح لازم Outdoor مش عادي"];
+
+const $ = i => document.getElementById(i);
+const ICON = n => '<svg class="ic"><use href="#i-'+n+'"/></svg>';
+let mode = null, scr = 0, counts = {}, extras = [], prices = {}, picked = null,
+    coords = null, tab = 0, apRes = null, apAdded = {}, pv = {};
+const ST = () => STAGES[mode];
+const key = (c,i) => mode+'_'+c+'_'+i;
+
+$('theme').onclick = () => { const l = document.documentElement.dataset.theme === 'light';
+  document.documentElement.dataset.theme = l?'dark':'light'; $('theme').textContent = l?'☀':'☾'; };
+
+/* ═══ التنقّل بين الشاشات ═══ */
+function flow(){
+  if(mode === 'est') return [0,1,2];
+  if(mode === 'sawad') return [0,1,3,4,6,7,8];
+  if(mode === 'bayad') return [0,1,3,4,5,6,7,8];
+  return [0,1];
+}
+function go(k){
+  scr = k;
+  document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', +s.dataset.k === k));
+  const F = flow(), i = F.indexOf(k);
+  $('prog').innerHTML = F.map((_,x) => '<i class="'+(x<=i?'on':'')+'"></i>').join('');
+  $('back').style.visibility = i > 0 ? 'visible' : 'hidden';
+  $('cntWrap').style.display = (mode && mode !== 'est' && k >= 3) ? 'block' : 'none';
+  const last = i === F.length-1;
+  $('next').textContent = last ? (mode === 'est' ? 'جردة جديدة' : '📲 إرسال الطلب للمحل') : 'التالي';
+  $('next').disabled = false;
+  if(k === 8) $('next').disabled = !(total() && picked !== null);
+  if(k === 8) $('next').textContent = picked === null ? '📲 اختار المحل أولاً' : '📲 إرسال الطلب للمحل';
+  window.scrollTo({top:0,behavior:'smooth'});
+  update();
+}
+$('back').onclick = () => { const F = flow(), i = F.indexOf(scr); if(i>0) go(F[i-1]); };
+$('next').onclick = () => {
+  const F = flow(), i = F.indexOf(scr);
+  if(scr === 0){
+    if(!$('cname').value.trim()) return say('اكتب اسمك أولاً');
+    if(!$('cphone').value.trim()) return say('اكتب رقم تلفونك');
+  }
+  if(scr === 1 && !mode) return say('اختار شو بدك تعمل');
+  if(i === F.length-1){
+    if(mode === 'est'){ location.reload(); return; }
+    if(picked === null) return say('اختار المحل أولاً');
+    window.open('https://wa.me/'+SHOPS[picked].wa+'?text='+encodeURIComponent(text()),'_blank');
+    return;
+  }
+  go(F[i+1]);
+};
+
+/* ═══ اختيار النوع ═══ */
+document.querySelectorAll('.pick').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.pick').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  mode = b.dataset.m; counts = {}; extras = []; apAdded = {}; apRes = null; pv = {}; tab = 0;
+  if(mode !== 'est'){
+    $('apTitle').textContent = mode === 'sawad' ? 'نظام العلب' : 'نظام الشاسيهات والكفرات';
+    $('apLede').innerHTML = mode === 'sawad'
+      ? 'حدّد نقاط الشقة وبنحسبلك <b>علب الدفن</b> — الشاسيهات والكفرات ما إلها علاقة بالسواد.'
+      : 'حدّد نقاط الشقة وبنحسبلك <b>الشاسيهات والكفرات</b> — العلب مرحلة السواد.';
+    $('matTitle').textContent = 'مواد ' + ST().name;
+    $('bSwWrap').style.display = mode === 'sawad' ? 'none' : 'block';
+    $('bCaWrap').style.display = mode === 'sawad' ? 'none' : 'block';
+    drawAp(); drawTabs(); draw(); drawRoof(); drawShops();
+  }
+  setTimeout(() => { const F = flow(); go(F[F.indexOf(1)+1]); }, 180);
+});
+
+/* ═══ المواد ═══ */
+function drawTabs(){
+  $('tabs').innerHTML = ST().cats.map((c,i) =>
+    '<button data-t="'+i+'" class="'+(i===tab?'on':'')+'">'+c.t+'</button>').join('');
+}
+$('tabs').onclick = e => { const b = e.target.closest('button[data-t]'); if(!b) return;
+  tab = +b.dataset.t; drawTabs(); draw(); };
+function draw(){
+  if(!mode || mode === 'est') return;
+  const c = ST().cats[tab];
+  $('cats').innerHTML = '<div class="grid">' + c.items.map((it,ii) => {
+    const id = key(tab,ii), v = counts[id]||0;
+    return '<div class="tile'+(v?' has':'')+'" data-id="'+id+'" data-c="'+tab+'" data-i="'+ii+'">'
+      + '<span class="pic">'+ICON(it[2])+'</span>'
+      + '<span class="tname">'+it[0]+'<small>'+it[1]+'</small></span>'
+      + '<span class="pm"><button data-d="-1">−</button><b>'+v+'</b>'
+      + '<button class="plus" data-d="1">+</button></span></div>';
+  }).join('') + '</div>';
+}
+function drawRoof(){
+  $('roofBox').innerHTML = (mode === 'bayad' && ST().cats[tab] && ST().cats[tab].t === 'كابلات السطح')
+    ? '<div class="calc"><b>ملاحظات كابلات السطح</b><br>• '+ROOF.join('<br>• ')+'</div>' : '';
+}
+$('cats').addEventListener('click', e => {
+  const b = e.target.closest('button[data-d]'); if(!b) return;
+  const tl = b.closest('.tile'), id = tl.dataset.id;
+  counts[id] = Math.max(0,(counts[id]||0)+(+b.dataset.d));
+  if(!counts[id]) delete counts[id];
+  tl.querySelector('b').textContent = counts[id]||0;
+  tl.classList.toggle('has', !!counts[id]); update();
+});
+let lp=null, moved=false;
+$('cats').addEventListener('pointerdown', e => { const tl = e.target.closest('.tile'); if(!tl) return;
+  moved=false; lp = setTimeout(()=>{ if(!moved) showInfo(+tl.dataset.c,+tl.dataset.i); },480); });
+['pointerup','pointercancel','pointerleave'].forEach(v => $('cats').addEventListener(v,()=>clearTimeout(lp)));
+$('cats').addEventListener('pointermove',()=>{ moved=true; clearTimeout(lp); });
+$('cats').addEventListener('contextmenu', e => e.preventDefault());
+$('tabs').addEventListener('click', drawRoof);
+function showInfo(ci,ii){ const it = ST().cats[ci].items[ii];
+  $('iPic').innerHTML = ICON(it[2]); $('iName').textContent = it[0];
+  $('iEn').textContent = it[1]; $('iUse').textContent = it[3];
+  $('info').classList.add('on'); $('bg').classList.add('on');
+  if(navigator.vibrate) navigator.vibrate(12); }
+$('bg').onclick = () => { $('info').classList.remove('on'); $('bg').classList.remove('on'); };
+
+/* ═══ نظام العلب ═══ */
+const PTS = { two:[["p1","نقطة مفردة","2 موديل",1],["p2","نقطة مزدوجة","2+2",2],
+                   ["p3","نقطة ثلاثية","2+2+2",3],["p4","نقطة رباعية","2+2+2+2",4]],
+              mixed:[["b2","علبة 2 موديل","2M",2],["b3","علبة 3 موديل","3M",3],
+                     ["b4","علبة 4 موديل","4M",4],["b6","علبة 6 موديل","6M",6]] };
+function drawAp(){
+  const m = $('apMode').value;
+  if(m === 'skip'){ $('apBody').innerHTML=''; apRes=null; $('apOut').style.display='none'; syncAp(); return; }
+  $('apBody').innerHTML = '<div class="pts">' + PTS[m].map(([id,lab,mod]) => {
+    const v = pv[id]||0;
+    return '<div class="pt'+(v?' has':'')+'" data-p="'+id+'"><div class="lab">'+lab+'</div>'
+      + '<div class="mod">'+mod+'</div><div class="pm"><button data-pd="-1">−</button><b>'+v+'</b>'
+      + '<button class="plus" data-pd="1">+</button></div></div>'; }).join('') + '</div>';
+  calcAp();
+}
+$('apMode').onchange = () => { pv = {}; drawAp(); };
+$('apBody').onclick = e => { const b = e.target.closest('button[data-pd]'); if(!b) return;
+  const id = b.closest('.pt').dataset.p;
+  pv[id] = Math.max(0,(pv[id]||0)+(+b.dataset.pd)); drawAp(); };
+
+function calcAp(){
+  const m = $('apMode').value, lines = []; let any = false, res = null;
+  if(m === 'two'){
+    const pts = {1:0,2:0,3:0,4:0};
+    PTS.two.forEach(([id,lab,mod,n]) => { const q = pv[id]||0; if(!q) return; any = true; pts[n] += q;
+      lines.push(mode === 'sawad'
+        ? q+'× '+lab+' → '+(q*n)+' علبة 2 موديل'
+        : q+'× '+lab+' → '+(q*n)+' شاسيه 2 موديل + '+q+' كفر '+mod); });
+    if(!any){ apRes=null; $('apOut').style.display='none'; return syncAp(); }
+    const box2 = Object.entries(pts).reduce((a,[n,q])=>a+n*q,0);
+    res = { mode:'two', pts, box2 };
+    $('apOut').innerHTML = '• ' + lines.join('<br>• ') + '<br><br>' + (mode === 'sawad'
+      ? 'الإجمالي: <b>'+box2+' علبة دفن 2 موديل</b>'
+      : 'الإجمالي: <b>'+box2+' شاسيه 2 موديل</b><br>الكفرات: <b>'
+        + [1,2,3,4].filter(n=>pts[n]).map(n=>pts[n]+'× كفر '+(n===1?'2':Array(n).fill(2).join('+'))).join('، ')+'</b>');
+  } else {
+    const boxes = {2:0,3:0,4:0,6:0};
+    PTS.mixed.forEach(([id,lab,mod,s]) => { const q = pv[id]||0; if(!q) return; any = true; boxes[s] += q;
+      lines.push(q+'× '+lab+(mode==='sawad' ? '' : ' → شاسيه + كفر '+s+' موديل')); });
+    if(!any){ apRes=null; $('apOut').style.display='none'; return syncAp(); }
+    res = { mode:'mixed', boxes };
+    $('apOut').innerHTML = '• ' + lines.join('<br>• ') + '<br><br>الإجمالي: <b>'
+      + Object.entries(boxes).filter(([,q])=>q).map(([s,q])=>q+'× '+s+' موديل').join('، ')+'</b>';
+  }
+  apRes = res; $('apOut').style.display = 'block'; syncAp();
+}
+function syncAp(){
+  Object.entries(apAdded).forEach(([k,q]) => { counts[k] = (counts[k]||0)-q; if(counts[k]<=0) delete counts[k]; });
+  apAdded = {};
+  if(apRes && mode){
+    const add = (k,q) => { if(!q) return; apAdded[k]=(apAdded[k]||0)+q; counts[k]=(counts[k]||0)+q; };
+    const BOX = {2:0,3:1,4:2,6:3}, CH = {2:0,3:1,4:2,6:3}, FRm = {2:4,3:8,4:9,6:10};
+    if(mode === 'sawad'){
+      if(apRes.mode === 'two') add(key(1,BOX[2]), apRes.box2);
+      else Object.entries(apRes.boxes).forEach(([s,q]) => add(key(1,BOX[s]), q));
+    } else if(mode === 'bayad'){
+      if(apRes.mode === 'two'){
+        add(key(3,CH[2]), apRes.box2);
+        [1,2,3,4].forEach(n => add(key(3,3+n), apRes.pts[n]||0));
+      } else Object.entries(apRes.boxes).forEach(([s,q]) => { add(key(3,CH[s]), q); add(key(3,FRm[s]), q); });
+    }
+  }
+  draw(); update();
+}
+
+/* ═══ مواد إضافية ═══ */
+$('addx').onclick = () => { const v = $('extra').value.trim(); if(!v) return;
+  extras.push({n:v,q:1}); $('extra').value=''; drawX(); update(); };
+function drawX(){
+  $('xbox').innerHTML = extras.map((x,i) =>
+    '<div class="tile has" data-x="'+i+'"><span class="pic">'+ICON('box')+'</span>'
+    + '<span class="tname">'+x.n+'<small>إضافة</small></span>'
+    + '<span class="pm"><button data-xd="-1">−</button><b>'+x.q+'</b>'
+    + '<button class="plus" data-xd="1">+</button></span></div>').join('');
+}
+$('xbox').onclick = e => { const b = e.target.closest('button[data-xd]'); if(!b) return;
+  const i = +b.closest('.tile').dataset.x; extras[i].q += (+b.dataset.xd);
+  if(extras[i].q<1) extras.splice(i,1); drawX(); update(); };
+
+/* ═══ تسعير الإنارة ═══ */
+function lightIdx(){ return ST().cats.findIndex(c => c.price); }
+function drawPrices(){
+  if(mode !== 'bayad'){ $('prices').innerHTML=''; return; }
+  const ci = lightIdx(), rows = [];
+  ST().cats[ci].items.forEach((it,ii) => { const q = counts[key(ci,ii)]; if(q) rows.push([ii,it,q]); });
+  if(!rows.length){ $('prices').innerHTML =
+    '<p class="hint" style="margin:0">ما اخترت إنارة. ارجع لقسم الإنارة إذا بدك تضيف.</p>'; return; }
+  $('prices').innerHTML = rows.map(([ii,it,q]) =>
+    '<div class="prow"><span class="pn">'+it[0]+'<small>'+q+' وحدة</small></span>'
+    + '<input type="number" min="0" data-pi="'+ii+'" value="'+(prices[key(ci,ii)]||'')+'" placeholder="سعر الوحدة"></div>'
+  ).join('') + '<div class="ptot"><span>مجموع الإنارة</span><b id="ptotV">0</b></div>';
+  calcPrices();
+}
+$('prices').addEventListener('input', e => {
+  const inp = e.target.closest('input[data-pi]'); if(!inp) return;
+  prices[key(lightIdx(), +inp.dataset.pi)] = +inp.value||0; calcPrices();
+});
+$('cur').onchange = calcPrices;
+function calcPrices(){
+  const ci = lightIdx(); if(ci < 0 || !$('ptotV')) return;
+  let t = 0;
+  ST().cats[ci].items.forEach((it,ii) => { const k = key(ci,ii);
+    t += (counts[k]||0) * (prices[k]||0); });
+  $('ptotV').textContent = t.toLocaleString('en-US') + ' ' + $('cur').value;
+}
+function priceLines(){
+  if(mode !== 'bayad') return [];
+  const ci = lightIdx(), out = [];
+  ST().cats[ci].items.forEach((it,ii) => { const k = key(ci,ii), q = counts[k]||0, p = prices[k]||0;
+    if(q && p) out.push([it[0], q, p, q*p]); });
+  return out;
+}
+
+/* ═══ التقدير السريع ═══ */
+$('plan').onchange = e => { const f = e.target.files[0]; if(!f) return;
+  $('planPrev').innerHTML = '<img src="'+URL.createObjectURL(f)+'" style="width:100%;border-radius:11px;'
+    + 'border:1px solid var(--line);margin-bottom:12px">'
+    + '<p class="hint" style="margin:0 0 12px">📎 الصورة للمراجعة عندك بس.</p>'; };
+function estimate(){
+  const a = +$('area').value||0, r = +$('rooms').value||0, L = +$('level').value;
+  if(!a && !r){ $('estOut').style.display='none'; return; }
+  const light = Math.round((a/9+r)*L), sock = Math.round((a/6+r)*L), low = Math.round(r*1.5*L);
+  const pts = light+sock+low;
+  $('estOut').innerHTML = 'تقدير أوّلي لشقة <b>'+(a||'—')+' م²</b> و<b>'+(r||'—')+' غرف</b>:<br><br>'
+    + '• نقاط إنارة: <b>~'+light+'</b><br>• نقاط برايز: <b>~'+sock+'</b><br>'
+    + '• نقاط تيار خفيف: <b>~'+low+'</b><br>• <b>مجموع النقاط ≈ '+pts+'</b> — للتسعير<br><br>'
+    + '• علب دفن ≈ <b>'+pts+'</b><br>• شريط 1.5 مم ≈ <b>'+Math.round(light*13)+' م</b> لكل لون<br>'
+    + '• شريط 2.5 مم ≈ <b>'+Math.round(sock*15)+' م</b> لكل لون<br>'
+    + '• خرطوم ≈ <b>'+Math.round(pts*4.5)+' م</b><br><br>'
+    + '<span style="color:var(--warn)">⚠️ أرقام تقريبية بتتغيّر حسب الخريطة وارتفاع السقف وطول الخطوط.</span>';
+  $('estOut').style.display='block';
+}
+['area','rooms','level'].forEach(i => $(i).addEventListener('input', estimate));
+
+/* ═══ المحلات ═══ */
+function km(a,b,c,d){ const R=6371,p=Math.PI/180,dA=(c-a)*p,dB=(d-b)*p;
+  const x=Math.sin(dA/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin(dB/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x)); }
+function shopHtml(s){ return '<button class="shop'+(picked===s.i?' sel':'')+'" data-i="'+s.i+'">'
+  + '<span class="si"><b>'+s.name+'</b><small>'+s.area+'</small></span>'
+  + (s.d!=null?'<span class="dist">'+s.d.toFixed(1)+' كم</span>':'')+'</button>'; }
+function drawShops(){
+  const L = SHOPS.map((s,i)=>({...s,i,d:coords?km(coords.lat,coords.lng,s.lat,s.lng):null}));
+  let html = '';
+  if(coords){ L.sort((a,b)=>a.d-b.d); html = '<div class="ghead">الأقرب إلك</div>'+L.map(shopHtml).join(''); }
+  else { const gs={}; L.forEach(s => (gs[s.g]=gs[s.g]||[]).push(s));
+    REGIONS.forEach(g => { if(gs[g]) html += '<div class="ghead">'+g+'</div>'+gs[g].map(shopHtml).join(''); }); }
+  $('shops').innerHTML = html;
+}
+$('shops').onclick = e => { const b = e.target.closest('.shop'); if(!b) return;
+  picked = +b.dataset.i; drawShops(); go(scr); };
+$('geo').onclick = () => {
+  if(!navigator.geolocation) return say('المتصفح ما بيدعم تحديد الموقع');
+  $('geo').textContent = '⏳ عم نحدّد موقعك...';
+  navigator.geolocation.getCurrentPosition(p => { coords={lat:p.coords.latitude,lng:p.coords.longitude};
+    $('geo').textContent='✅ مرتّبين حسب الأقرب'; drawShops(); },
+    () => { $('geo').textContent='📍 حدّد موقعي ورتّب حسب الأقرب'; say('ما قدرنا نحدّد موقعك'); },{timeout:10000});
+};
+
+/* ═══ الكشف ═══ */
+function groups(){
+  if(!mode || mode === 'est') return [];
+  const g = [];
+  ST().cats.forEach((c,ci) => { const rows = [];
+    c.items.forEach((it,ii) => { const q = counts[key(ci,ii)]; if(q) rows.push([it[0],q]); });
+    if(rows.length) g.push([c.t, rows]); });
+  if(extras.length) g.push(['مواد إضافية', extras.map(x=>[x.n,x.q])]);
+  return g;
+}
+function total(){ return groups().reduce((a,[,r])=>a+r.reduce((x,[,q])=>x+q,0),0); }
+function text(){
+  const G = groups(); if(!G.length) return 'لسا ما اخترت شي.';
+  let t = '⚡ كشف جرد مواد كهربائية — ' + ST().name + '\n';
+  t += 'تمّ إعداد هالطلب عبر تطبيق الجردات — '+OWNER.brand+'\n';
+  t += 'إشراف: '+OWNER.name+' · '+OWNER.phone+'\n';
+  t += '────────────────────\n';
+  const nm=$('cname').value.trim(), ph=$('cphone').value.trim(), st=$('csite').value.trim();
+  if(nm) t += 'الزبون: '+nm+'\n'; if(ph) t += 'رقمه: '+ph+'\n'; if(st) t += 'المشروع: '+st+'\n';
+  const bs=$('bSw').value, bb=$('bBr').value, bc=$('bCa').value;
+  if(bs) t += 'ماركة المفاتيح: '+bs+'\n';
+  if(bb) t += 'ماركة القواطع: '+bb+'\n';
+  if(bc) t += 'ماركة الكابلات: '+bc+'\n';
+  G.forEach(([g,rows]) => { t += '\n▸ '+g+'\n'; rows.forEach(([n,q]) => t += '  • '+n+' — '+q+'\n'); });
+  const P = priceLines();
+  if(P.length){ t += '\n▸ تسعير الإنارة ('+$('cur').value+')\n';
+    P.forEach(([n,q,p,s]) => t += '  • '+n+': '+q+' × '+p+' = '+s+'\n');
+    t += '  المجموع: '+P.reduce((a,[,,,s])=>a+s,0)+' '+$('cur').value+'\n'; }
+  t += '────────────────────\nالمجموع: '+total()+' قطعة\n';
+  t += 'للتواصل مع '+OWNER.brand+': '+OWNER.phone;
+  return t;
+}
+function update(){
+  const tt = total(); $('tot').textContent = tt; $('sum').textContent = text();
+  if(scr === 5) drawPrices();
+  if(scr === 8){ $('next').disabled = !(tt && picked !== null);
+    $('next').textContent = picked === null ? '📲 اختار المحل أولاً' : '📲 إرسال الطلب للمحل'; }
+}
+let resetArm = 0;
+$('reset').onclick = () => {
+  if(!resetArm){ resetArm = 1; $('reset').textContent = '⚠️ اضغط مرة تانية للتأكيد';
+    setTimeout(()=>{ resetArm=0; $('reset').textContent='🔄 تصفير وبدء جردة جديدة'; },4000); return; }
+  location.reload();
+};
+$('print').onclick = () => {
+  const G = groups(); if(!G.length) return say('لسا ما اخترت شي');
+  const v = i => $(i).value.trim() || '—';
+  $('sheetMeta').innerHTML = 'المرحلة: '+ST().name
+    + '<br>التاريخ: '+new Date().toLocaleDateString('ar-LB')
+    + '<br>الزبون: '+v('cname')+' — '+v('cphone')
+    + '<br>المشروع: '+v('csite')
+    + '<br>الماركات: مفاتيح '+($('bSw').value||'—')+' · قواطع '+($('bBr').value||'—')+' · كابلات '+($('bCa').value||'—')
+    + '<br>المحل: '+(picked!==null?SHOPS[picked].name:'—');
+  const P = priceLines();
+  $('sheetBody').innerHTML = G.map(([g,rows]) => '<tr class="grp"><td colspan="2">'+g+'</td></tr>'
+    + rows.map(([n,q])=>'<tr><td>'+n+'</td><td>'+q+'</td></tr>').join('')).join('')
+    + '<tr class="grp"><td>المجموع</td><td>'+total()+'</td></tr>'
+    + (P.length ? '<tr class="grp"><td colspan="2">تسعير الإنارة ('+$('cur').value+')</td></tr>'
+        + P.map(([n,q,p,s])=>'<tr><td>'+n+' — '+q+' × '+p+'</td><td>'+s+'</td></tr>').join('')
+        + '<tr class="grp"><td>مجموع الإنارة</td><td>'+P.reduce((a,[,,,s])=>a+s,0)+'</td></tr>' : '');
+  $('sheetFt').innerHTML = '<b>هذا الطلب تمّ إعداده بواسطة تطبيق الجردات — '+OWNER.brand+'</b><br>'
+    + 'إشراف وإدارة: '+OWNER.name+' — كهربائي ومطوّر أدوات فنية.<br>'
+    + 'التطبيق بيساعد الفني والزبون يجهّزوا جردة دقيقة وبيوصّلها للمحل جاهزة.<br>'
+    + 'للتواصل والطلبات: '+OWNER.phone+' · mrelectroai@gmail.com · @mrelectroai';
+  window.print();
+};
+function say(m){ const t=$('toast'); t.textContent=m; t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2400); }
+
+['cname','cphone','csite','bSw','bBr','bCa'].forEach(i => $(i).addEventListener('input',update));
+go(0);
+</script>
+</body>
+</html>
