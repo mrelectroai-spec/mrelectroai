@@ -1,309 +1,546 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MrElectroAI | أنور الحسن الجاسم</title>
-    <!-- FontAwesome icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-color: #0b0f19;
-            --card-bg: rgba(18, 26, 43, 0.7);
-            --primary-glow: #00f2fe;
-            --accent-gold: #d4af37;
-            --text-color: #e0e6ed;
-            --text-muted: #94a3b8;
-            --border-color: rgba(0, 242, 254, 0.2);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MrElectroAI | أدوات بتسهّل شغل الفنيين</title>
+<meta name="description" content="أدوات للفنيين: برمجة إنفرتر من صورة، حاسبة كابلات بالمواصفات العالمية، جرد شقة من الخريطة، وأدوات حسب الطلب.">
+<meta name="theme-color" content="#0A0C10">
+<meta property="og:title" content="أنور الحسن الجاسم | MrElectroAI">
+<meta property="og:description" content="كهرباء · أتمتة · ذكاء اصطناعي">
+<meta property="og:type" content="profile">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 
-        body {
-            background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.15), transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.08), transparent 40%);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 20px 15px;
-        }
+<style>
+/* ═══ الرموز ═══ */
+:root{
+  --void:#081311; --panel:#0F1D1A; --panel-2:#152724; --line:#223B36;
+  --volt:#22C79B; --volt-ink:#04140F; --arc:#63E3C2;
+  --text:#E4F0EC; --muted:#7D948E;
+  --grid:rgba(255,255,255,.02); --shadow:0 18px 40px rgba(0,0,0,.45);
+  --nav:rgba(8,19,17,.82);
+  --glow:rgba(34,199,155,.14); --glow-2:rgba(34,199,155,.55);
+  --rail:56px; --r:14px;
+}
+[data-theme="light"]{
+  --void:#EFF4F2; --panel:#FFFFFF; --panel-2:#E9F1EE; --line:#D2E0DB;
+  --volt:#0E8F6E; --volt-ink:#FFFFFF; --arc:#0B7A5E;
+  --text:#0C1A17; --muted:#55665F;
+  --grid:rgba(0,0,0,.022); --shadow:0 14px 34px rgba(12,40,33,.10);
+  --nav:rgba(239,244,242,.85);
+  --glow:rgba(14,143,110,.16); --glow-2:rgba(14,143,110,.5);
+}
 
-        .container {
-            width: 100%;
-            max-width: 650px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
 
-        /* Profile Header */
-        .profile-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(12px);
-            border-radius: 20px;
-            width: 100%;
-            padding: 30px 20px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
-        }
+i.ic{display:inline-flex;align-items:center;justify-content:center;font-style:normal;line-height:0}
+i.ic svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:78px;-webkit-text-size-adjust:100%}
+body{
+  background:var(--void); color:var(--text);
+  font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px; line-height:1.7; overflow-x:hidden;
+  transition:background .35s,color .35s;
+  background-image:
+    linear-gradient(to bottom,var(--glow),transparent 620px),
+    repeating-linear-gradient(0deg,var(--grid) 0 1px,transparent 1px 4px);
+}
+:where(a,button):focus-visible{outline:2px solid var(--arc);outline-offset:3px;border-radius:6px}
+::selection{background:var(--volt);color:var(--volt-ink)}
 
-        .profile-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--primary-glow), var(--accent-gold), transparent);
-        }
+/* ═══ شريط التقدّم ═══ */
+#bar{position:fixed;top:0;right:0;height:2px;width:0;background:var(--volt);z-index:60}
 
-        .avatar-glow {
-            width: 110px;
-            height: 110px;
-            margin: 0 auto 15px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-gold), var(--primary-glow));
-            padding: 3px;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
-        }
+/* ═══ النافبار ═══ */
+nav{position:sticky;top:0;z-index:50;background:var(--nav);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1080px;margin:0 auto;padding:12px 20px;
+  display:flex;align-items:center;gap:14px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);flex-shrink:0}
+.logo i{background:var(--volt);color:var(--volt-ink);width:32px;height:32px;border-radius:9px;
+  display:grid;place-items:center;font-size:14px}
+.logo b{font-family:'JetBrains Mono',monospace;font-size:13.5px;letter-spacing:.04em;font-weight:500}
+.menu{display:flex;gap:4px;margin-inline-start:auto}
+.menu a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;
+  padding:7px 12px;border-radius:8px;transition:color .2s,background .2s}
+.menu a:hover,.menu a.active{color:var(--text);background:var(--panel-2)}
+.tools{display:flex;gap:6px}
+.icon-btn{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+  width:34px;height:34px;border-radius:9px;cursor:pointer;font-size:12.5px;
+  font-family:'JetBrains Mono',monospace;transition:color .2s,border-color .2s}
+.icon-btn:hover{color:var(--volt);border-color:var(--volt)}
+@media(max-width:760px){.menu{display:none}.tools{margin-inline-start:auto}}
 
-        .avatar-inner {
-            width: 100%;
-            height: 100%;
-            background-color: #0d1322;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 45px;
-            color: var(--primary-glow);
-        }
+/* ═══ الهيكل ═══ */
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 70px;position:relative}
+.rail-zone{position:relative;padding-inline-end:var(--rail)}
+.bus{position:absolute;inset-block:20px 30px;inset-inline-end:22px;width:2px;
+  background:var(--line);overflow:hidden}
+.bus::after{content:"";position:absolute;inset-inline-end:-1px;width:4px;height:96px;border-radius:4px;
+  background:linear-gradient(to bottom,transparent,var(--volt),transparent);animation:flow 6s linear infinite}
+@keyframes flow{from{top:-100px}to{top:100%}}
+.node{position:absolute;inset-inline-end:-4px;width:10px;height:10px;border-radius:50%;
+  background:var(--void);border:2px solid var(--line);transition:border-color .5s,box-shadow .5s}
+.node.on{border-color:var(--volt);box-shadow:0 0 0 5px var(--glow)}
+@media(max-width:640px){:root{--rail:32px}.bus{inset-inline-end:11px}}
 
-        .name-title {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            background: linear-gradient(90deg, #ffffff, var(--primary-glow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
-        }
+section{padding:58px 0 0}
+.head{display:flex;align-items:baseline;gap:14px;margin-bottom:24px}
+.head h2{font-family:'Readex Pro',sans-serif;font-size:clamp(20px,4vw,26px);font-weight:700;letter-spacing:-.01em}
+.head hr{flex:1;border:0;height:1px;background:var(--line)}
+.head em{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);
+  font-style:normal;letter-spacing:.14em}
 
-        .brand-subtitle {
-            color: var(--accent-gold);
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
+/* ═══ الهيرو ═══ */
+.hero{padding-top:52px}
+.plate{background:var(--panel);border:1px solid var(--line);border-radius:20px;
+  padding:clamp(26px,5vw,46px);position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.plate::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;
+  background:linear-gradient(to left,var(--volt),var(--arc) 62%,transparent)}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;
+  color:var(--muted);margin-bottom:20px}
+.status{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);
+  border:1px solid var(--line);background:var(--panel-2);border-radius:999px;padding:5px 13px;margin-bottom:20px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--volt);
+  box-shadow:0 0 0 0 var(--glow-2);animation:ping 2.4s ease-out infinite}
+@keyframes ping{70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
+h1{font-family:'Readex Pro',sans-serif;font-weight:700;
+  font-size:clamp(32px,7vw,58px);line-height:1.15;letter-spacing:-.025em;margin-bottom:8px}
+.h1-sub{font-family:'JetBrains Mono',monospace;font-size:clamp(13px,2.6vw,16px);
+  color:var(--volt);letter-spacing:.06em;margin-bottom:18px}
+.lede{color:var(--muted);font-size:clamp(15px,2.4vw,17px);max-width:52ch;margin-bottom:26px}
+.lede b{color:var(--text);font-weight:600}
+.cta{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:30px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:14px 22px;border-radius:11px;font-size:14.5px;font-weight:600;font-family:inherit;
+  text-decoration:none;border:1px solid transparent;cursor:pointer;
+  transition:transform .16s,border-color .2s,color .2s}
+.btn-main{background:var(--volt);color:var(--volt-ink)}
+.btn-ghost{border-color:var(--line);color:var(--text);background:transparent}
+.btn:hover{transform:translateY(-2px)}
+.btn-ghost:hover{border-color:var(--arc);color:var(--arc)}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.spec{background:var(--panel-2);padding:15px 17px}
+.spec b{display:block;font-family:'Readex Pro',sans-serif;font-size:19px;margin-bottom:2px}
+.spec span{font-size:12px;color:var(--muted)}
 
-        .bio-text {
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.6;
-            max-width: 480px;
-            margin: 0 auto;
-        }
+/* ═══ البطاقات ═══ */
+.grid{display:grid;gap:12px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(258px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:20px;transition:border-color .25s,transform .25s,background .25s}
+.card:hover{border-color:var(--arc);transform:translateY(-3px)}
+.card h3{font-family:'Readex Pro',sans-serif;font-size:16px;font-weight:600;margin-bottom:7px;
+  display:flex;align-items:center;gap:10px}
+.card h3 i{color:var(--arc);font-size:15px;width:20px;text-align:center}
+.card p{font-size:13.5px;color:var(--muted)}
 
-        /* Quick Links Section */
-        .links-section {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+.skill{display:flex;align-items:center;gap:12px;padding:15px 17px}
+.skill i{font-size:17px;color:var(--volt);width:24px;text-align:center}
+.skill b{font-size:14px;font-weight:600;display:block}
+.skill small{font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace}
 
-        .link-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 16px 20px;
-            color: #fff;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
+.social{display:flex;gap:9px;margin:0 0 24px}
+.social a{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;
+  border:1px solid var(--line);background:var(--panel-2);color:var(--muted);font-size:19px;
+  transition:color .2s,border-color .2s,transform .18s}
+.social a:hover{color:var(--volt);border-color:var(--volt);transform:translateY(-3px)}
+.namebox{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 20px}
+.namewrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.part{display:flex;align-items:baseline;gap:8px}
+.part b{font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--volt);direction:ltr}
+.part i{font-style:normal;font-size:12.5px;color:var(--muted)}
+.nameline{font-size:13px;color:var(--muted)}
 
-        .link-btn:hover {
-            transform: translateY(-3px);
-            border-color: var(--primary-glow);
-            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.25);
-            background: rgba(24, 35, 58, 0.9);
-        }
+.tool{border-inline-start:2px solid var(--arc)}
+.tool.pin{border-inline-start-color:var(--volt);background:var(--panel-2)}
+.work{border-inline-start:2px solid var(--arc)}
+.work.pin{border-inline-start-color:var(--volt)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
+.tag{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);
+  border:1px solid var(--line);background:var(--panel-2);border-radius:6px;padding:3px 9px}
+.stamp{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;
+  color:var(--volt);display:block;margin-bottom:9px}
 
-        .link-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+.link{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--text)}
+.link>i:first-child{font-size:19px;color:var(--arc);width:26px;text-align:center}
+.link .txt{flex:1;min-width:0}
+.link .txt b{display:block;font-size:14.5px;font-weight:600}
+.link .txt small{color:var(--muted);font-size:12.5px;overflow-wrap:anywhere}
+.go{color:var(--muted);font-size:12px;transition:transform .2s,color .2s}
+a.card:hover .go{transform:translateX(-5px);color:var(--volt)}
+[dir="ltr"] a.card:hover .go{transform:translateX(5px)}
+[dir="ltr"] .go{transform:scaleX(-1)}
 
-        .link-icon {
-            font-size: 20px;
-            color: var(--primary-glow);
-            width: 30px;
-            text-align: center;
-        }
+footer{margin-top:58px;padding-top:20px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  font-size:12.5px;color:var(--muted)}
+footer b{color:var(--text);font-weight:600}
 
-        /* Projects Feed Section */
-        .projects-section {
-            width: 100%;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,90px);
+  background:var(--volt);color:var(--volt-ink);font-size:13.5px;font-weight:600;
+  padding:11px 20px;border-radius:999px;transition:transform .3s;z-index:70}
+.toast.show{transform:translate(-50%,0)}
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            padding-bottom: 10px;
-        }
+/* ═══ الظهور بالتمرير ═══ */
+.rise{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.rise.in{opacity:1;transform:none}
 
-        .section-title {
-            font-size: 17px;
-            color: var(--primary-glow);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .project-card {
-            background: rgba(10, 15, 26, 0.6);
-            border-right: 3px solid var(--primary-glow);
-            border-radius: 8px;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-        }
-
-        .project-card.gold-border {
-            border-right-color: var(--accent-gold);
-        }
-
-        .project-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-
-        .project-desc {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.4;
-        }
-
-        .project-date {
-            font-size: 11px;
-            color: var(--accent-gold);
-            margin-top: 6px;
-        }
-
-        footer {
-            margin-top: 10px;
-            font-size: 12px;
-            color: var(--text-muted);
-            text-align: center;
-        }
-    </style>
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+  .rise{opacity:1;transform:none}
+}
+</style>
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol><symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.6 9.1c.3 2.6 2.4 4.7 5 5l.9-1.3 1.7.6"/></symbol><symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M9 18V5l11-2"/><circle cx="6" cy="18" r="3"/><path d="M14 4.5c.4 2 2 3.4 4 3.6"/></symbol><symbol id="i-diagram-project" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M5 16v-3h14v3M12 13V8"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol><symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol><symbol id="i-magnifying-glass-chart" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3M9 13v-2M12 13V9M15 13v-3"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol><symbol id="i-mobile-screen-button" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M10 18h4"/></symbol><symbol id="i-solar-panel" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="12" rx="1"/><path d="M2 10h20M9 4v12M15 4v12M12 16v4M8 20h8"/></symbol><symbol id="i-video" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></symbol><symbol id="i-fire-extinguisher" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol><symbol id="i-shield-halved" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 2v20"/></symbol><symbol id="i-brain" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/><path d="M18 16l.8 2.2L21 19l-2.2.8L18 22l-.8-2.2L15 19l2.2-.8L18 16z"/></symbol><symbol id="i-microchip" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></symbol><symbol id="i-gauge-high" viewBox="0 0 24 24"><path d="M3.5 16a9 9 0 1 1 17 0"/><path d="M12 16l4.5-5"/></symbol><symbol id="i-battery-full" viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><path d="M23 11v2"/><path d="M4 9.5h11" stroke-width="3"/></symbol><symbol id="i-bell-concierge" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol><symbol id="i-wave-square" viewBox="0 0 24 24"><path d="M2 12h4V6h6v12h6v-6h4"/></symbol><symbol id="i-code" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></symbol><symbol id="i-robot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 4v4M2 14h2M20 14h2"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/></symbol><symbol id="i-toolbox" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M2 13h20"/></symbol><symbol id="i-envelope" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></symbol><symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol><symbol id="i-instagram" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></symbol><symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M16 3v10.2a4.6 4.6 0 1 1-3.6-4.5"/><path d="M16 3.2c.5 2.3 2.3 4 4.6 4.3"/></symbol><symbol id="i-facebook" viewBox="0 0 24 24"><path d="M15 3h-2.4A4.6 4.6 0 0 0 8 7.6V10H5.5v4H8v7h4v-7h3l1-4h-4V7.6c0-.3.3-.6.6-.6H16V3z"/></symbol><symbol id="i-youtube" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l6 3-6 3V9z"/></symbol><symbol id="i-channel" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.5 12h7M8.5 9h4"/></symbol></svg>
 
-<div class="container">
+<div id="bar"></div>
 
-    <!-- Profile Header -->
-    <div class="profile-card">
-        <div class="avatar-glow">
-            <div class="avatar-inner">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-        </div>
-        <div class="name-title">أنور الحسن الجاسم</div>
-        <div class="brand-subtitle">MrElectroAI</div>
-        <div class="bio-text">
-            متخصص في حلول جميع مشاكل الكهرباء بالذكاء الاصطناعي، وتطوير التطبيقات الفنية المخصصة لتسهيل عمل الفنيين، ونظم الأتمتة والتحكم الذكي.
-        </div>
+<nav>
+  <div class="nav-in">
+    <a class="logo" href="#top"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-bolt"/></svg></i><b>MrElectroAI</b></a>
+    <div class="menu">
+      <a href="#hero" data-en="Home">الرئيسية</a>
+      <a href="#tools" data-en="Tools">الأدوات</a>
+      <a href="#services" data-en="Services">الخدمات</a>
+      <a href="#skills" data-en="Skills">المهارات</a>
+      <a href="#work" data-en="Projects">الأعمال</a>
+      <a href="#contact" data-en="Contact">التواصل</a>
+    </div>
+    <div class="tools">
+      <button class="icon-btn" id="lang" aria-label="تبديل اللغة">EN</button>
+      <button class="icon-btn" id="theme" aria-label="تبديل الثيم"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-sun"/></svg></i></button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap" id="top">
+<div class="rail-zone">
+
+  <div class="bus" aria-hidden="true">
+    <i class="node" data-for="hero"></i><i class="node" data-for="tools"></i><i class="node" data-for="services"></i>
+    <i class="node" data-for="skills"></i><i class="node" data-for="work"></i>
+    <i class="node" data-for="contact"></i>
+  </div>
+
+  <!-- ═══ الهيرو ═══ -->
+  <section class="hero" id="hero">
+    <div class="plate rise">
+      <div class="eyebrow">POWER · AUTOMATION · AI</div>
+      <div class="status"><span class="dot"></span><span data-en="Open for consultations">متاح للاستشارات</span></div>
+      <h1>أنور الحسن الجاسم</h1>
+      <div class="h1-sub" data-en="Electrician &amp; builder of field tools">كهربائي ومطوّر أدوات فنية</div>
+      <p class="lede" data-en="Tools that do the technician's hard part for him: photograph the system and get the inverter settings, size a cable to international standards, take off a whole apartment from the floor plan. <b>Custom tools on request too.</b>">
+        أدوات بتشيل عن الفني أصعب جزء بشغله: صوّر المنظومة وخود إعدادات الإنفرتر، احسب الكابل حسب القياسات العالمية، جرّد شقة كاملة من الخريطة. <b>وبصنع أدوات ومواقع تعريفية حسب طلبك.</b>
+      </p>
+      <div class="cta">
+        <a class="btn btn-main" href="https://wa.me/96179434479" target="_blank" rel="noopener">
+          <i class="ic "><svg viewBox="0 0 24 24"><use href="#i-whatsapp"/></svg></i><span data-en="Message me on WhatsApp">راسلني على واتساب</span>
+        </a>
+        <a class="btn btn-ghost" href="#tools"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-toolbox"/></svg></i><span data-en="Browse the tools">شوف الأدوات</span></a>
+        <button class="btn btn-ghost" id="copy" data-num="+961 79 434 479">
+          <i class="ic "><svg viewBox="0 0 24 24"><use href="#i-copy"/></svg></i><span data-en="Copy number">نسخ الرقم</span>
+        </button>
+      </div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--muted);margin:-16px 0 26px" dir="ltr">
+        <i class="ic "><svg viewBox="0 0 24 24"><use href="#i-phone"/></svg></i>
+        <a href="tel:+96179434479" style="color:var(--text);text-decoration:none">+961 79 434 479</a>
+      </p>
+      <div class="social">
+        <a href="https://www.tiktok.com/@mrelectroai" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok @mrelectroai"><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-tiktok"/></svg></i></a>
+        <a href="https://www.instagram.com/mrelectroai" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram @mrelectroai"><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-instagram"/></svg></i></a>
+        <a href="https://www.facebook.com/mrelectroai" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook mrelectroai"><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-facebook"/></svg></i></a>
+        <a href="https://www.youtube.com/@mrelectroai" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube @mrelectroai"><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-youtube"/></svg></i></a>
+        <a href="https://whatsapp.com/channel/0029VbAeAnT7z4kXbxvH2H1U" target="_blank" rel="noopener" aria-label="WhatsApp Channel" title="قناة واتساب — Voltage Lab"><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-channel"/></svg></i></a>
+      </div>
+      <div class="specs">
+        <div class="spec"><b data-en="Photo in">صورة تدخل</b><span data-en="Settings and results out">إعدادات ونتائج تطلع</span></div>
+        <div class="spec"><b data-en="Custom built">حسب الطلب</b><span data-en="Any tool, online or on site">أي أداة، أونلاين أو على الأرض</span></div>
+        <div class="spec"><b>10K+</b><span data-en="Followers on TikTok @mrelectroai">متابع على تيك توك @mrelectroai</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ الاسم ═══ -->
+  <section id="name">
+    <div class="namebox rise">
+      <div class="namewrap">
+        <span class="part"><b>Mr</b><i data-en="the person responsible">الشخص المسؤول</i></span>
+        <span class="part"><b>Electro</b><i data-en="the trade">المهنة</i></span>
+        <span class="part"><b>AI</b><i data-en="what turns it into tools">اللي بيحوّلها لأدوات</i></span>
+      </div>
+      <p class="nameline" data-en="Three things I work with together — so they carry one name.">تلات أشياء بشتغل فيهن سوا، فحملوا اسم واحد.</p>
+    </div>
+  </section>
+
+  <!-- ═══ الأدوات ═══ -->
+  <section id="tools">
+    <div class="head rise"><h2 data-en="Tools for technicians">أدوات الفنيين</h2><hr><em>TOOLS</em></div>
+    <div class="grid g3">
+      <article class="card tool rise">
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-microchip"/></svg></i><span data-en="Inverter setup from a photo">برمجة الإنفرتر من صورة</span></h3>
+        <p data-en="Photograph the system and get the settings it needs — instead of digging through the manual on site.">صوّر المنظومة وبتعطيك الإعدادات المطلوبة، بدل ما تفتّش بالكتالوج وأنت بالموقع.</p>
+        <div class="tags"><span class="tag">Photo → Settings</span><span class="tag">Solar</span></div>
+      </article>
+
+      <article class="card tool rise">
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-gauge-high"/></svg></i><span data-en="Cable sizing calculator">حاسبة الكابلات</span></h3>
+        <p data-en="Cable sizing to international standards: load, length, voltage drop and the right section.">قياس الكابل حسب المواصفات العالمية: الحمل، الطول، هبوط الجهد، والمقطع المناسب.</p>
+        <div class="tags"><span class="tag">IEC</span><span class="tag">Voltage Drop</span></div>
+      </article>
+
+      <article class="card tool rise">
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-diagram-project"/></svg></i><span data-en="Apartment take-off from the plan">جرد شقة من الخريطة</span></h3>
+        <p data-en="Photograph the floor plan, add a few details, and get the quantities for the whole apartment in minutes.">صوّر الخريطة وحطّ شوية معطيات، وبتطلع بجرد الشقة كاملة بدقايق.</p>
+        <div class="tags"><span class="tag">Quantities</span><span class="tag">Estimation</span></div>
+      </article>
+
+      <article class="card tool rise">
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-sliders"/></svg></i><span data-en="Phase colour helper">حساب لون الفاز</span></h3>
+        <p data-en="Sorts out phase colour coding straight away, so nobody has to guess at the panel.">بيحدّد ترميز ألوان الفازات على طول، بدون تخمين قدام اللوحة.</p>
+        <div class="tags"><span class="tag">Colour Code</span><span class="tag">Field</span></div>
+      </article>
+
+      <article class="card tool rise">
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-video"/></svg></i><span data-en="More field tools">أدوات ميدانية أخرى</span></h3>
+        <p data-en="A growing set of calculation and inspection tools, built from real problems on site.">مجموعة عم تكبر من أدوات الحساب والفحص، مبنية من مشاكل حقيقية بالميدان.</p>
+        <div class="tags"><span class="tag">Growing set</span></div>
+      </article>
+
+      <article class="card tool rise">
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-code"/></svg></i><span data-en="Profile sites &amp; CVs">مواقع تعريفية وسير ذاتية</span></h3>
+        <p data-en="A professional page that presents you and your work — a personal site or a CV people can open from a link.">صفحة احترافية بتعرّف عنك وعن شغلك — موقع شخصي أو سيرة ذاتية بيفتحها الناس برابط.</p>
+        <div class="tags"><span class="tag">Personal site</span><span class="tag">CV</span><span class="tag">Portfolio</span></div>
+      </article>
+
+      <article class="card tool pin rise">
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-toolbox"/></svg></i><span data-en="Your own tool, on request">أداة حسب طلبك</span></h3>
+        <p data-en="Tell me the task that wastes your time and I build the tool for it — for electricians and other trades, online or as a device on site.">قلّي شو الشغلة اللي بتضيّع وقتك وبصنعلك أداتها — للكهربائيين ولغير الكهربائيين، أونلاين أو جهاز على أرض الواقع.</p>
+        <div class="tags"><span class="tag">Online</span><span class="tag">On-site</span><span class="tag">Any trade</span></div>
+      </article>
     </div>
 
-    <!-- Quick Links -->
-    <div class="links-section">
-        <a href="https://wa.me/96179434479" class="link-btn" target="_blank">
-            <div class="link-left">
-                <i class="fa-brands fa-whatsapp link-icon"></i>
-                <span>التواصل المباشر عبر الواتساب (79434479)</span>
-            </div>
-            <i class="fa-solid fa-chevron-left"></i>
-        </a>
+    <a class="btn btn-main" style="margin-top:16px" href="https://wa.me/96179434479?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%20%D8%A3%D9%86%D9%88%D8%B1%D8%8C%20%D8%A8%D8%AF%D9%8A%20%D8%A3%D8%B3%D8%A3%D9%84%20%D8%B9%D9%86%20%D8%A3%D8%AF%D9%88%D8%A7%D8%AA%20%D8%A7%D9%84%D9%81%D9%86%D9%8A%D9%8A%D9%86" target="_blank" rel="noopener">
+      <i class="ic"><svg viewBox="0 0 24 24"><use href="#i-whatsapp"/></svg></i><span data-en="Ask about a tool">اسأل عن أداة</span>
+    </a>
+  </section>
 
-        <a href="#" class="link-btn">
-            <div class="link-left">
-                <i class="fa-solid fa-mobile-screen-button link-icon"></i>
-                <span>تطبيقات الفنيين المخصصة (Apps)</span>
-            </div>
-            <i class="fa-solid fa-chevron-left"></i>
-        </a>
-
-        <a href="#" class="link-btn">
-            <div class="link-left">
-                <i class="fa-solid fa-brain link-icon"></i>
-                <span>استشارات حلول الكهرباء بالـ AI</span>
-            </div>
-            <i class="fa-solid fa-chevron-left"></i>
-        </a>
-
-        <a href="#" class="link-btn">
-            <div class="link-left">
-                <i class="fa-brands fa-tiktok link-icon"></i>
-                <span>متابعة على TikTok (mrelectroai)</span>
-            </div>
-            <i class="fa-solid fa-chevron-left"></i>
-        </a>
+  <!-- ═══ الخدمات ═══ -->
+  <section id="services">
+    <div class="head rise"><h2 data-en="Services">الخدمات</h2><hr><em>WHAT I DO</em></div>
+    <div class="grid g3">
+      <article class="card rise">
+        <h3><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-magnifying-glass-chart"/></svg></i><span data-en="Fault diagnosis">تشخيص الأعطال</span></h3>
+        <p data-en="We read the symptoms and the diagrams and reach the cause, instead of swapping parts at random.">بنقرأ الأعراض والمخططات ونوصل لسبب العطل، بدل التبديل العشوائي للقطع.</p>
+      </article>
+      <article class="card rise">
+        <h3><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-sliders"/></svg></i><span data-en="Control panels">لوحات التحكم</span></h3>
+        <p data-en="Building and modifying control panels and their operating sequence, from classic control to smart automation.">بناء وتعديل لوحات التحكم وتسلسل التشغيل، من الكلاسيك للتحكم الذكي.</p>
+      </article>
+      <article class="card rise">
+        <h3><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-mobile-screen-button"/></svg></i><span data-en="Field apps">تطبيقات فنية</span></h3>
+        <p data-en="Custom calculation and measurement tools, built around what the technician actually needs on site.">أدوات حساب وقياس مخصّصة، مبنية على اللي بيحتاجه الفني فعليًا بالموقع.</p>
+      </article>
+      <article class="card rise">
+        <h3><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-solar-panel"/></svg></i><span data-en="Solar systems">أنظمة الطاقة الشمسية</span></h3>
+        <p data-en="On-grid, off-grid and hybrid systems — from a home installation up to plants reaching 1 MW.">أنظمة On-Grid و Off-Grid و Hybrid، من تركيب منزلي لمنظومات توصل لحدود 1 ميغاواط.</p>
+      </article>
+      <article class="card rise">
+        <h3><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-video"/></svg></i><span data-en="CCTV &amp; intercom">كاميرات وإنتركم</span></h3>
+        <p data-en="Camera systems and intercom: choosing the gear, running the cabling, and setting up remote access.">أنظمة مراقبة وإنتركم: اختيار الأجهزة، التمديدات، وضبط المشاهدة عن بُعد.</p>
+      </article>
+      <article class="card rise">
+        <h3><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-fire-extinguisher"/></svg></i><span data-en="Fire alarm">إنذار الحريق</span></h3>
+        <p data-en="Fire alarm systems: detectors, panel and zoning, installed and commissioned to work when it matters.">أنظمة Fire Alarm: الكواشف واللوحة وتقسيم الزونات، مع التشغيل والاختبار.</p>
+      </article>
+      <article class="card rise">
+        <h3><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-shield-halved"/></svg></i><span data-en="Protection &amp; safety">الحماية والسلامة</span></h3>
+        <p data-en="Reviewing protection, earthing and breaker selection so the installation fails safely, not dangerously.">مراجعة الحماية والتأريض واختيار القواطع، ليكون التمديد آمن وقت العطل.</p>
+      </article>
+      <article class="card rise">
+        <h3><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-brain"/></svg></i><span data-en="AI consulting">استشارات بالذكاء الاصطناعي</span></h3>
+        <p data-en="Using AI to speed up analysis and documentation — the decision still gets verified on the ground.">استخدام الذكاء الاصطناعي لتسريع التحليل والتوثيق، والقرار بيتأكد بالميدان.</p>
+      </article>
     </div>
+  </section>
 
-    <!-- Dynamic Projects & Updates Section -->
-    <div class="projects-section">
-        <div class="section-header">
-            <div class="section-title">
-                <i class="fa-solid fa-microchip"></i>
-                معرض الأعمال والتحديثات
-            </div>
-        </div>
-
-        <div class="project-card">
-            <div class="project-title">تطبيق حساب الأحمال والكابلات الكهربائية</div>
-            <div class="project-desc">أداة تفاعلية جديدة صُممت لتسهيل حسابات الفنيين في الميدان بسرعة ودقة عالية.</div>
-            <div class="project-date">⚡ تحديث جديد</div>
-        </div>
-
-        <div class="project-card gold-border">
-            <div class="project-title">حل مشكلة معقدة في لوحة Classic Control بالـ AI</div>
-            <div class="project-desc">تم تشخيص العطل وإعادة برمجة تسلسل الأتمتة باستخدام خوارزميات الذكاء الاصطناعي.</div>
-            <div class="project-date">⭐ مشروع مميز</div>
-        </div>
+  <!-- ═══ المهارات ═══ -->
+  <section id="skills">
+    <div class="head rise"><h2 data-en="Skills">المهارات</h2><hr><em>STACK</em></div>
+    <div class="grid g3">
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-bolt"/></svg></i><span><b data-en="Classic Control">تحكم كلاسيكي</b><small>Relays · Contactors</small></span></div>
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-microchip"/></svg></i><span><b data-en="PLC &amp; HMI">أتمتة PLC</b><small>Ladder · HMI</small></span></div>
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-gauge-high"/></svg></i><span><b data-en="Load calculation">حساب الأحمال</b><small>Cables · Breakers</small></span></div>
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-solar-panel"/></svg></i><span><b data-en="Solar power">الطاقة الشمسية</b><small>On · Off · Hybrid</small></span></div>
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-battery-full"/></svg></i><span><b data-en="Inverters &amp; storage">إنفرترات وبطاريات</b><small>MPPT · Lithium</small></span></div>
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-video"/></svg></i><span><b data-en="CCTV">كاميرات المراقبة</b><small>IP · NVR · DVR</small></span></div>
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-bell-concierge"/></svg></i><span><b data-en="Intercom">أنظمة الإنتركم</b><small>Audio · Video</small></span></div>
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-fire-extinguisher"/></svg></i><span><b data-en="Fire alarm">إنذار الحريق</b><small>Detectors · Zoning</small></span></div>
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-wave-square"/></svg></i><span><b data-en="Measurement">القياس والفحص</b><small>Multimeter · Clamp</small></span></div>
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-code"/></svg></i><span><b data-en="App development">تطوير التطبيقات</b><small>Web · Mobile</small></span></div>
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-robot"/></svg></i><span><b data-en="AI tooling">الذكاء الاصطناعي</b><small>Diagnosis Assist</small></span></div>
+      <div class="card skill rise"><i class="ic "><svg viewBox="0 0 24 24"><use href="#i-diagram-project"/></svg></i><span><b data-en="Diagrams">قراءة المخططات</b><small>Single-line · Panel</small></span></div>
     </div>
+  </section>
 
-    <footer>
-        MrElectroAI &copy; جميع الحقوق محفوظة | إشراف وإدارة: أنور الجاسم
-    </footer>
+  <!-- ═══ الأعمال ═══ -->
+  <section id="work">
+    <div class="head rise"><h2 data-en="Projects">الأعمال</h2><hr><em>SELECTED</em></div>
+    <div class="grid g2">
+      <article class="card work pin rise">
+        <span class="stamp">★ <span data-en="FEATURED">مشروع مميّز</span></span>
+        <h3><span data-en="Classic Control panel — sequence rebuilt">لوحة Classic Control — إعادة برمجة التسلسل</span></h3>
+        <p data-en="Traced a complex control fault and rebuilt the automation sequence until the panel ran consistently again.">تشخيص عطل معقّد بالتحكم وإعادة ترتيب تسلسل الأتمتة حتى رجعت اللوحة تشتغل بشكل ثابت.</p>
+        <div class="tags"><span class="tag">Classic Control</span><span class="tag">Troubleshooting</span><span class="tag">AI Assist</span></div>
+      </article>
+      <article class="card work rise">
+        <span class="stamp">⚡ <span data-en="NEW">تحديث جديد</span></span>
+        <h3><span data-en="Load &amp; cable calculator">تطبيق حساب الأحمال والكابلات</span></h3>
+        <p data-en="An interactive tool that speeds up field calculations and cuts manual errors.">أداة تفاعلية بتسرّع حسابات الفني بالميدان وبتقلّل الأخطاء اليدوية.</p>
+        <div class="tags"><span class="tag">Web App</span><span class="tag">Calculation</span><span class="tag">Field Tool</span></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ═══ التواصل ═══ -->
+  <section id="contact">
+    <div class="head rise"><h2 data-en="Contact">التواصل</h2><hr><em>REACH ME</em></div>
+    <div class="grid g2">
+      <a class="card link rise" href="https://wa.me/96179434479" target="_blank" rel="noopener">
+        <i class="ic "><svg viewBox="0 0 24 24"><use href="#i-whatsapp"/></svg></i>
+        <span class="txt"><b>WhatsApp</b><small data-en="Consultations and job requests">للاستشارات وطلبات الشغل</small></span>
+        <i class="ic go"><svg viewBox="0 0 24 24"><use href="#i-chevron-left"/></svg></i>
+      </a>
+      <a class="card link rise" href="https://whatsapp.com/channel/0029VbAeAnT7z4kXbxvH2H1U" target="_blank" rel="noopener">
+        <i class="ic"><svg viewBox="0 0 24 24"><use href="#i-channel"/></svg></i>
+        <span class="txt"><b data-en="WhatsApp Channel">قناة واتساب</b><small>Anwar Alhasan Aljassem — Voltage Lab</small></span>
+        <i class="ic go"><svg viewBox="0 0 24 24"><use href="#i-chevron-left"/></svg></i>
+      </a>
+      <a class="card link rise" href="https://www.instagram.com/mrelectroai" target="_blank" rel="noopener">
+        <i class="ic"><svg viewBox="0 0 24 24"><use href="#i-instagram"/></svg></i>
+        <span class="txt"><b>Instagram</b><small>@mrelectroai</small></span>
+        <i class="ic go"><svg viewBox="0 0 24 24"><use href="#i-chevron-left"/></svg></i>
+      </a>
+      <a class="card link rise" href="https://www.tiktok.com/@mrelectroai" target="_blank" rel="noopener">
+        <i class="ic "><svg viewBox="0 0 24 24"><use href="#i-tiktok"/></svg></i>
+        <span class="txt"><b>TikTok</b><small>@mrelectroai</small></span>
+        <i class="ic go"><svg viewBox="0 0 24 24"><use href="#i-chevron-left"/></svg></i>
+      </a>
+      <a class="card link rise" href="tel:+96179434479">
+        <i class="ic "><svg viewBox="0 0 24 24"><use href="#i-phone"/></svg></i>
+        <span class="txt"><b data-en="Phone">رقم الهاتف</b><small dir="ltr" style="display:block;font-family:'JetBrains Mono',monospace">+961 79 434 479</small></span>
+        <i class="ic go"><svg viewBox="0 0 24 24"><use href="#i-chevron-left"/></svg></i>
+      </a>
+      <a class="card link rise" href="#">
+        <i class="ic "><svg viewBox="0 0 24 24"><use href="#i-toolbox"/></svg></i>
+        <span class="txt"><b data-en="Technician apps">تطبيقات الفنيين</b><small data-en="Add your download link here">حطّ رابط التحميل هون</small></span>
+        <i class="ic go"><svg viewBox="0 0 24 24"><use href="#i-chevron-left"/></svg></i>
+      </a>
+      <a class="card link rise" href="mailto:mrelectroai@gmail.com">
+        <i class="ic "><svg viewBox="0 0 24 24"><use href="#i-envelope"/></svg></i>
+        <span class="txt"><b data-en="Email">البريد الإلكتروني</b><small dir="ltr" style="display:block;font-family:'JetBrains Mono',monospace">mrelectroai@gmail.com</small></span>
+        <i class="ic go"><svg viewBox="0 0 24 24"><use href="#i-chevron-left"/></svg></i>
+      </a>
+    </div>
+  </section>
 
 </div>
 
+<footer>
+  <span>MrElectroAI &copy; <b id="yr">2026</b> · <a href="tel:+96179434479" style="color:var(--text);text-decoration:none;font-family:'JetBrains Mono',monospace" dir="ltr">+961 79 434 479</a></span>
+  <span data-en="Built and run by Anwar Al-Jasim">إشراف وإدارة: <b>أنور الجاسم</b></span>
+</footer>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ── الثيم ── */
+const root = document.documentElement, themeBtn = document.getElementById('theme');
+themeBtn.addEventListener('click', () => {
+  const light = root.dataset.theme === 'light';
+  root.dataset.theme = light ? 'dark' : 'light';
+  themeBtn.innerHTML = light ? '<i class="ic "><svg viewBox="0 0 24 24"><use href="#i-sun"/></svg></i>' : '<i class="ic "><svg viewBox="0 0 24 24"><use href="#i-moon"/></svg></i>';
+});
+
+/* ── اللغة ── */
+const langBtn = document.getElementById('lang');
+let en = false;
+document.querySelectorAll('[data-en]').forEach(el => el.dataset.ar = el.innerHTML);
+langBtn.addEventListener('click', () => {
+  en = !en;
+  root.lang = en ? 'en' : 'ar';
+  root.dir  = en ? 'ltr' : 'rtl';
+  langBtn.textContent = en ? 'ع' : 'EN';
+  document.querySelectorAll('[data-en]').forEach(el => el.innerHTML = en ? el.dataset.en : el.dataset.ar);
+  placeNodes();
+});
+
+/* ── نقاط القضيب الناقل ── */
+const bus = document.querySelector('.bus');
+function placeNodes(){
+  const top = bus.getBoundingClientRect().top + scrollY;
+  document.querySelectorAll('.node').forEach(n => {
+    const sec = document.getElementById(n.dataset.for);
+    if (sec) n.style.top = (sec.getBoundingClientRect().top + scrollY - top + 60) + 'px';
+  });
+}
+addEventListener('load', placeNodes);
+addEventListener('resize', placeNodes);
+placeNodes();
+
+/* ── القسم النشط + إضاءة النقطة ── */
+const spy = new IntersectionObserver(es => es.forEach(e => {
+  const n = document.querySelector('.node[data-for="' + e.target.id + '"]');
+  if (n) n.classList.toggle('on', e.isIntersecting);
+  const a = document.querySelector('.menu a[href="#' + e.target.id + '"]');
+  if (a && e.isIntersecting) {
+    document.querySelectorAll('.menu a').forEach(x => x.classList.remove('active'));
+    a.classList.add('active');
+  }
+}), { rootMargin: '-25% 0px -55% 0px' });
+document.querySelectorAll('section').forEach(s => spy.observe(s));
+
+/* ── الظهور بالتمرير ── */
+const rise = new IntersectionObserver((es, o) => es.forEach((e, i) => {
+  if (!e.isIntersecting) return;
+  e.target.style.transitionDelay = Math.min(i * 55, 220) + 'ms';
+  e.target.classList.add('in');
+  o.unobserve(e.target);
+}), { rootMargin: '0px 0px -8% 0px' });
+document.querySelectorAll('.rise').forEach(el => rise.observe(el));
+
+/* ── شريط التقدّم ── */
+const bar = document.getElementById('bar');
+addEventListener('scroll', () => {
+  const max = document.body.scrollHeight - innerHeight;
+  bar.style.width = (max > 0 ? scrollY / max * 100 : 0) + '%';
+}, { passive: true });
+
+/* ── نسخ الرقم ── */
+const toast = document.getElementById('toast');
+document.getElementById('copy').addEventListener('click', async function () {
+  const num = this.dataset.num;
+  try {
+    await navigator.clipboard.writeText(num);
+    toast.textContent = en ? 'Number copied' : 'تم نسخ الرقم';
+  } catch (err) {
+    toast.textContent = (en ? 'Copy failed — ' : 'ما زبط النسخ — ') + num;
+  }
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2300);
+});
+</script>
 </body>
 </html>
