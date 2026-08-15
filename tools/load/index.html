@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>حساب المنظومة | MrElectroAI</title>
+<meta name="description" content="احسب حجم منظومتك الشمسية من استهلاك بيتك — إنفرتر، بطاريات، وألواح.">
+<meta name="theme-color" content="#081311">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--void:#081311;--panel:#0F1D1A;--panel-2:#152724;--line:#223B36;
+  --volt:#22C79B;--volt-ink:#04140F;--arc:#63E3C2;--text:#E4F0EC;--muted:#7D948E;
+  --glow:rgba(34,199,155,.14);--warn:#E8A33D;--danger:#E06B6B;--night:#7AA7FF}
+[data-theme="light"]{--void:#EFF4F2;--panel:#FFFFFF;--panel-2:#E9F1EE;--line:#D2E0DB;
+  --volt:#0E8F6E;--volt-ink:#FFFFFF;--arc:#0B7A5E;--text:#0C1A17;--muted:#55665F;
+  --glow:rgba(14,143,110,.16);--warn:#9A6A12;--danger:#B03A3A;--night:#3B62B8}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--void);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px;line-height:1.6;min-height:100vh;padding:18px 13px 96px;
+  background-image:linear-gradient(to bottom,var(--glow),transparent 340px)}
+.wrap{max-width:620px;margin:0 auto}
+:where(a,button,input,select):focus-visible{outline:2px solid var(--arc);outline-offset:3px}
+
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text)}
+.brand span{width:31px;height:31px;border-radius:9px;background:var(--volt);color:var(--volt-ink);
+  display:grid;place-items:center;font-size:15px}
+.brand b{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500}
+.tbtn{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+  width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:14px}
+
+.prog{display:flex;gap:5px;margin-bottom:16px}
+.prog i{flex:1;height:3px;border-radius:3px;background:var(--line);transition:background .3s}
+.prog i.on{background:var(--volt)}
+.scr{display:none;animation:fade .28s ease}.scr.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-family:'Readex Pro',sans-serif;font-size:23px;font-weight:700;margin-bottom:4px}
+.lede{color:var(--muted);font-size:13.5px;margin-bottom:17px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:11px}
+.card>h2{font-family:'Readex Pro',sans-serif;font-size:14.5px;font-weight:600;margin-bottom:12px;
+  padding-bottom:9px;border-bottom:1px solid var(--line)}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 5px}
+select,input{width:100%;font-family:inherit;font-size:15px;color:var(--text);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+select:focus,input:focus{border-color:var(--volt)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mb{margin-bottom:11px}
+
+.pick{display:flex;align-items:center;gap:13px;width:100%;background:var(--panel);border:1px solid var(--line);
+  border-radius:14px;padding:16px 15px;margin-bottom:9px;cursor:pointer;text-align:right;
+  font-family:inherit;color:var(--text)}
+.pick.on{border-color:var(--volt);background:var(--glow)}
+.pick i{font-size:25px;font-style:normal;flex-shrink:0}
+.pick b{display:block;font-family:'Readex Pro',sans-serif;font-size:15.5px;margin-bottom:2px}
+.pick small{color:var(--muted);font-size:12.5px;line-height:1.45;display:block}
+
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:3px}
+.tabs button{flex-shrink:0;font-family:inherit;font-size:12.5px;color:var(--muted);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:999px;padding:7px 13px;cursor:pointer}
+.tabs button.on{color:var(--volt-ink);background:var(--volt);border-color:var(--volt);font-weight:600}
+
+.dev{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px}
+.dev.has{border-color:var(--volt)}
+.dhead{display:flex;align-items:center;gap:11px}
+.dico{width:38px;height:38px;flex-shrink:0;border-radius:10px;background:var(--void);border:1px solid var(--line);
+  display:grid;place-items:center;font-size:20px}
+.dev.has .dico{border-color:var(--volt)}
+.dmid{flex:1;min-width:0}
+.dmid b{display:block;font-size:13.5px}
+.dmid small{display:block;color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace}
+.pm{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.pm button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--void);
+  color:var(--text);font-size:16px;cursor:pointer;line-height:1;font-family:inherit}
+.pm .plus{background:var(--volt);color:var(--volt-ink);border-color:var(--volt);font-weight:700}
+.pm b{min-width:20px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:14.5px}
+.hours{display:none;gap:9px;margin-top:11px;padding-top:10px;border-top:1px dashed var(--line)}
+.dev.has .hours{display:grid;grid-template-columns:1fr 1fr}
+.hbox label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+.hbox input{padding:8px 10px;font-size:14px;text-align:center;font-family:'JetBrains Mono',monospace}
+.hbox.night label{color:var(--night)}
+.hbox.night input{border-color:rgba(122,167,255,.35)}
+
+.res{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:9px}
+.res .rl{font-size:12px;color:var(--muted);margin-bottom:3px}
+.res .rv{font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:700;color:var(--volt)}
+.res .rn{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.6}
+.res.night .rv{color:var(--night)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.row:last-child{border-bottom:0}
+.row .k{font-size:13px;flex:1}
+.row .k small{display:block;color:var(--muted);font-size:11px;margin-top:2px;line-height:1.5}
+.row .v{font-family:'JetBrains Mono',monospace;font-size:13.5px;font-weight:700;color:var(--volt);
+  background:var(--void);border:1px solid var(--volt);border-radius:8px;padding:5px 10px;white-space:nowrap}
+
+.warnbox{font-size:12.5px;color:var(--muted);border:1px dashed var(--warn);border-radius:11px;
+  padding:12px 13px;line-height:1.7;margin-top:12px}
+.warnbox b{color:var(--warn)}
+.tease{display:flex;align-items:center;gap:11px;justify-content:space-between;background:var(--glow);
+  border:1px solid var(--volt);border-radius:12px;padding:12px 14px;margin-top:12px;
+  text-decoration:none;color:var(--text)}
+.tease .tt{font-size:12.5px;line-height:1.6}
+.tease .tt em{display:block;font-style:normal;font-size:11px;color:var(--volt);font-weight:700;margin-top:4px}
+.tease .tb{font-size:12.5px;font-weight:700;color:var(--volt);white-space:nowrap}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;
+  border-radius:11px;font-family:inherit;font-size:14.5px;font-weight:600;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--text);cursor:pointer;margin-top:9px;text-decoration:none}
+.btn.main{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
+.nav{position:fixed;inset-inline:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);
+  padding:10px 13px calc(10px + env(safe-area-inset-bottom));display:flex;gap:9px;align-items:center;z-index:9}
+.nav .btn{margin:0}.nav .back{flex:0 0 48px;padding:13px 0}
+.cnt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:center;min-width:52px}
+.cnt b{display:block;font-size:15px;color:var(--text)}
+.inst{border-color:var(--volt)}
+.pintro{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.8}
+.pintro b{color:var(--text)}
+.perks{display:grid;gap:8px;margin-bottom:11px}
+.perk{background:var(--glow);border:1px solid var(--volt);border-radius:11px;padding:11px 12px}
+.perk b{display:block;font-size:13px;margin-bottom:2px}
+.perk span{font-size:11.5px;color:var(--muted);line-height:1.6}
+.instrow{display:flex;align-items:center;justify-content:space-between;gap:11px;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:12px 13px}
+.instrow .k b{display:block;font-size:14px}
+.instrow .k small{display:block;color:var(--muted);font-size:11.5px}
+.instrow .v{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--volt)}
+.hint{font-size:11.5px;color:var(--muted);margin-top:8px}
+.social{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.social a{flex:1;min-width:70px;text-align:center;font-size:12.5px;color:var(--muted);
+  background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 6px;text-decoration:none}
+footer{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted);text-align:center;line-height:1.8}
+footer b{color:var(--text)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="brand" href="../../"><span>⚡</span><b id="brandName">MrElectroAI</b></a>
+    <button class="tbtn" id="theme" aria-label="تبديل الثيم">☀</button>
+  </div>
+  <div class="prog" id="prog"></div>
+
+  <!-- 0 نوع المنظومة -->
+  <section class="scr on" data-k="0">
+    <h1>منظومتك شو نوعها؟</h1>
+    <p class="lede">تلات أسئلة سريعة ومنبلّش.</p>
+    <div class="card">
+      <div class="mb"><label class="lbl">نوع الفاز</label>
+        <select id="phase"><option value="mono">1 فاز (مونو) — الأغلب بالبيوت</option>
+          <option value="three">3 فاز — بيوت كبيرة أو مصعد ومضخات</option></select></div>
+      <div class="mb"><label class="lbl">نوع البطارية</label>
+        <select id="bt"><option value="li">ليثيوم LiFePO4 — أغلى بس بتعمر أكتر</option>
+          <option value="acid">أسيد / تيوبيلار — أرخص بس عمرها أقصر</option></select></div>
+      <div class="mb"><label class="lbl">وين منطقتك؟</label>
+        <select id="area">
+          <option value="">— اختار منطقتك —</option>
+          <option>بيروت</option><option>الضاحية</option><option>المتن</option><option>بعبدا</option>
+          <option>عاليه</option><option>كسروان / جونية</option><option>جبيل</option><option>الشوف</option>
+          <option>صيدا</option><option>صور</option><option>النبطية</option><option>جزين</option>
+          <option>طرابلس</option><option>الكورة</option><option>زغرتا</option><option>البترون</option>
+          <option>عكار</option><option>المنية / الضنية</option>
+          <option>زحلة</option><option>البقاع الغربي</option><option>بعلبك / الهرمل</option>
+        </select></div>
+      <div><label class="lbl">فولت النظام</label>
+        <select id="sysv"><option value="48">48 فولت — الأشيع</option>
+          <option value="24">24 فولت — للمنظومات الصغيرة</option></select></div>
+    </div>
+  </section>
+
+  <!-- 1 طريقة الإدخال -->
+  <section class="scr" data-k="1">
+    <h1>بتعرف استهلاكك؟</h1>
+    <p class="lede">إذا ما بتعرف، ما تشيل هم — منحسبو سوا من أجهزة بيتك.</p>
+    <button class="pick" data-m="know"><i>🔢</i><span><b>إي، بعرف بالوات أو الأمبير</b>
+      <small>بتدخّل الرقم مباشرة وبنكمّل.</small></span></button>
+    <button class="pick" data-m="list"><i>🏠</i><span><b>لأ، ما بعرف — خدني على أجهزة بيتي</b>
+      <small>لائحة كاملة: براد، غسالة، تلفزيون، AC، سخّان… بتحدد كم واحد وكم ساعة.</small></span></button>
+  </section>
+
+  <!-- 2أ إدخال مباشر -->
+  <section class="scr" data-k="2">
+    <h1>استهلاكك</h1>
+    <p class="lede">فرّق بين النهار والليل — هيدا اللي بيحدد حجم البطارية.</p>
+    <div class="card">
+      <div class="mb"><label class="lbl">الوحدة</label>
+        <select id="unit"><option value="w">وات (W)</option><option value="a">أمبير (A)</option></select></div>
+      <div class="two mb">
+        <div><label class="lbl">الحمل بالنهار</label><input type="number" id="dW" min="0" placeholder="مثلاً 2000"></div>
+        <div><label class="lbl">عدد ساعات النهار</label><input type="number" id="dH" min="0" max="24" value="10"></div>
+      </div>
+      <div class="two mb">
+        <div><label class="lbl">الحمل بالليل</label><input type="number" id="nW" min="0" placeholder="مثلاً 800"></div>
+        <div><label class="lbl">عدد ساعات الليل</label><input type="number" id="nH" min="0" max="24" value="10"></div>
+      </div>
+      <div><label class="lbl">أكبر حمل بيشتغل مرة وحدة (ذروة)</label>
+        <input type="number" id="pk" min="0" placeholder="اتركها فاضية لنحسبها إلك"></div>
+    </div>
+  </section>
+
+  <!-- 2ب أجهزة البيت -->
+  <section class="scr" data-k="3">
+    <h1>أجهزة بيتك</h1>
+    <p class="lede">حدّد العدد، وعدّل ساعات النهار والليل إذا بدك.</p>
+    <div class="card">
+      <div class="tabs" id="dtabs"></div>
+      <div id="devs"></div>
+    </div>
+  </section>
+
+  <!-- 3 النتيجة -->
+  <section class="scr" data-k="4">
+    <h1>حجم منظومتك</h1>
+    <p class="lede" id="resSub"></p>
+    <div id="result"></div>
+  </section>
+</div>
+
+<div class="nav">
+  <button class="btn back" id="back" aria-label="رجوع">→</button>
+  <div class="cnt" id="cntWrap" style="display:none"><b id="tot">0</b>وات</div>
+  <button class="btn main" id="next">التالي</button>
+</div>
+
+<script>
+/* ══════ للتخصيص ══════ */
+const BRAND = { name:"MrElectroAI", person:"أنور الحسن الجاسم",
+  wa:"96179434479", phone:"+961 79 434 479", email:"mrelectroai@gmail.com",
+  tiktok:"https://www.tiktok.com/@mrelectroai",
+  instagram:"https://www.instagram.com/mrelectroai",
+  facebook:"https://www.facebook.com/mrelectroai" };
+const INSTALLER = { name:"AZEEC", wa:"96171941921", phone:"+961 71 941 921",
+  note:"تركيب منظومات طاقة — كل لبنان" };
+/* ══════ نهاية التخصيص ══════ */
+
+/* الأجهزة: [الاسم, وات, أيقونة, ساعات نهار, ساعات ليل, ملاحظة] */
+const DEVS = [
+ { t:"الأساسيات", items:[
+   ["براد",150,"🧊",9,7,"بيشتغل متقطّع — الساعات هون فعلية مش 24"],
+   ["فريزر",200,"🧊",9,7,""],
+   ["إنارة LED",10,"💡",1,5,"لكل نقطة إنارة"],
+   ["تلفزيون",100,"📺",2,4,""],
+   ["راوتر إنترنت",15,"📶",12,12,"بيضل شغال"],
+   ["شاحن موبايل",10,"🔌",2,4,""],
+   ["مروحة",70,"🌀",5,5,""]]},
+ { t:"المطبخ", items:[
+   ["غسالة صحون",1200,"🍽️",1,0,"دورة كاملة"],
+   ["ميكروويف",1000,"📡",0.3,0.2,""],
+   ["فرن كهربائي",2000,"🔥",0.5,0.3,"حمل كبير — بيرفع الذروة"],
+   ["خلاط / أدوات صغيرة",500,"🥤",0.3,0.1,""],
+   ["غلاية ماء",1500,"☕",0.3,0.2,""],
+   ["شفاط",100,"💨",1,0.5,""]]},
+ { t:"الغسيل والتنظيف", items:[
+   ["غسالة ملابس",500,"🧺",1.5,0,"استهلاكها بيرتفع مع الماء الساخن"],
+   ["نشافة",2500,"♨️",1,0,"من أعلى الأحمال"],
+   ["مكنسة كهربائية",1000,"🧹",0.3,0,""],
+   ["مكواة",1200,"👔",0.5,0.2,""]]},
+ { t:"التبريد والتدفئة", items:[
+   ["مكيّف 1 طن (Inverter)",900,"❄️",4,6,"النوع العادي بيسحب ضعف هيك"],
+   ["مكيّف 1.5 طن (Inverter)",1300,"❄️",4,6,""],
+   ["مكيّف عادي (مش إنفرتر)",1800,"❄️",4,6,"تيار إقلاعه عالي — انتبه للذروة"],
+   ["دفاية كهربائية",2000,"🔥",2,4,"أثقل حمل بالبيت عادةً"]]},
+ { t:"الماء", items:[
+   ["سخّان ماء كهربائي",1500,"🚿",1.5,0.5,"الأفضل تشغيلو بالنهار على الشمس"],
+   ["مضخة ماء (خزان)",750,"💧",0.7,0.3,"تيار إقلاع عالي"],
+   ["مضخة ضغط",370,"💧",0.5,0.3,""]]},
+ { t:"إضافي", items:[
+   ["كمبيوتر / لابتوب",150,"💻",4,3,""],
+   ["مصعد",3000,"🛗",1,0.5,"بدو 3 فاز غالباً"],
+   ["كاميرات مراقبة",50,"📹",12,12,""],
+   ["جهاز طبي / أوكسجين",300,"🏥",8,8,"حمل حسّاس — لازم استمرارية"],
+   ["ورشة / معدات",1500,"🔧",2,0,""]]}
+];
+
+const $ = i => document.getElementById(i);
+let mode = null, scr = 0, dtab = 0, qty = {}, hrs = {};
+
+$('brandName').textContent = BRAND.name;
+$('theme').onclick = () => { const l = document.documentElement.dataset.theme === 'light';
+  document.documentElement.dataset.theme = l?'dark':'light'; $('theme').textContent = l?'☀':'☾'; };
+
+function flow(){ return mode === 'know' ? [0,1,2,4] : mode === 'list' ? [0,1,3,4] : [0,1]; }
+function go(k){
+  scr = k;
+  document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', +s.dataset.k === k));
+  const F = flow(), i = F.indexOf(k);
+  $('prog').innerHTML = F.map((_,x) => '<i class="'+(x<=i?'on':'')+'"></i>').join('');
+  $('back').style.visibility = i > 0 ? 'visible' : 'hidden';
+  $('cntWrap').style.display = (k === 3) ? 'block' : 'none';
+  $('next').textContent = k === 4 ? '📲 ابعتلي النتيجة' : k === 1 ? 'اختار طريقة' : 'التالي';
+  $('next').disabled = (k === 1 && !mode);
+  if(k === 4) calc();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('back').onclick = () => { const F = flow(), i = F.indexOf(scr); if(i>0) go(F[i-1]); };
+$('next').onclick = () => {
+  const F = flow(), i = F.indexOf(scr);
+  if(scr === 4) return sendWA();
+  if(scr === 1 && !mode) return;
+  go(F[i+1]);
+};
+document.querySelectorAll('.pick').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.pick').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); mode = b.dataset.m;
+  if(mode === 'list'){ drawTabs(); drawDevs(); }
+  setTimeout(() => { const F = flow(); go(F[F.indexOf(1)+1]); }, 170);
+});
+
+/* ── الأجهزة ── */
+function drawTabs(){
+  $('dtabs').innerHTML = DEVS.map((c,i) =>
+    '<button data-t="'+i+'" class="'+(i===dtab?'on':'')+'">'+c.t+'</button>').join('');
+}
+$('dtabs').onclick = e => { const b = e.target.closest('button[data-t]'); if(!b) return;
+  dtab = +b.dataset.t; drawTabs(); drawDevs(); };
+const key = (c,i) => c+'_'+i;
+function drawDevs(){
+  const c = DEVS[dtab];
+  $('devs').innerHTML = c.items.map((it,ii) => {
+    const k = key(dtab,ii), q = qty[k]||0;
+    const hd = hrs[k+'_d'] !== undefined ? hrs[k+'_d'] : it[3];
+    const hn = hrs[k+'_n'] !== undefined ? hrs[k+'_n'] : it[4];
+    return '<div class="dev'+(q?' has':'')+'" data-k="'+k+'">'
+      + '<div class="dhead"><span class="dico">'+it[2]+'</span>'
+      + '<span class="dmid"><b>'+it[0]+'</b><small>'+it[1]+' واط'+(it[5]?' · '+it[5]:'')+'</small></span>'
+      + '<span class="pm"><button data-d="-1">−</button><b>'+q+'</b>'
+      + '<button class="plus" data-d="1">+</button></span></div>'
+      + '<div class="hours">'
+      + '<span class="hbox"><label>☀️ ساعات النهار</label>'
+        + '<input type="number" step="0.5" min="0" max="24" data-h="d" value="'+hd+'"></span>'
+      + '<span class="hbox night"><label>🌙 ساعات الليل</label>'
+        + '<input type="number" step="0.5" min="0" max="24" data-h="n" value="'+hn+'"></span>'
+      + '</div></div>';
+  }).join('');
+  updTot();
+}
+$('devs').addEventListener('click', e => {
+  const b = e.target.closest('button[data-d]'); if(!b) return;
+  const k = b.closest('.dev').dataset.k;
+  qty[k] = Math.max(0,(qty[k]||0)+(+b.dataset.d));
+  if(!qty[k]) delete qty[k];
+  drawDevs();
+});
+$('devs').addEventListener('input', e => {
+  const inp = e.target.closest('input[data-h]'); if(!inp) return;
+  hrs[e.target.closest('.dev').dataset.k+'_'+inp.dataset.h] = parseFloat(inp.value)||0;
+  updTot();
+});
+function loads(){
+  let peak = 0, dayKWh = 0, nightKWh = 0, list = [];
+  DEVS.forEach((c,ci) => c.items.forEach((it,ii) => {
+    const k = key(ci,ii), q = qty[k]||0; if(!q) return;
+    const hd = hrs[k+'_d'] !== undefined ? hrs[k+'_d'] : it[3];
+    const hn = hrs[k+'_n'] !== undefined ? hrs[k+'_n'] : it[4];
+    peak += q*it[1]; dayKWh += q*it[1]*hd/1000; nightKWh += q*it[1]*hn/1000;
+    list.push([it[0], q, it[1], hd, hn]);
+  }));
+  return { peak, dayKWh, nightKWh, list };
+}
+function updTot(){ $('tot').textContent = Math.round(loads().peak); }
+
+/* ── الحساب ── */
+function calc(){
+  const three = $('phase').value === 'three';
+  const li = $('bt').value === 'li';
+  const VB = +$('sysv').value;
+  let peak, dayKWh, nightKWh, list = [];
+
+  if(mode === 'list'){
+    const L = loads(); peak = L.peak; dayKWh = L.dayKWh; nightKWh = L.nightKWh; list = L.list;
+  } else {
+    const isA = $('unit').value === 'a';
+    const conv = v => isA ? (parseFloat(v)||0)*230 : (parseFloat(v)||0);
+    const dW = conv($('dW').value), nW = conv($('nW').value);
+    const dH = parseFloat($('dH').value)||0, nH = parseFloat($('nH').value)||0;
+    dayKWh = dW*dH/1000; nightKWh = nW*nH/1000;
+    peak = parseFloat($('pk').value) ? conv($('pk').value) : Math.max(dW,nW)*1.4;
+  }
+
+  if(!peak && !dayKWh && !nightKWh){
+    $('result').innerHTML = '<div class="card"><p style="color:var(--muted)">ما دخّلت أي استهلاك — ارجع وعبّي المعطيات.</p></div>';
+    return;
+  }
+
+  const div = 0.65;                                  /* معامل التزامن */
+  const running = peak*div;
+
+  /* قدرات إنفرتر متوفرة بالسوق — بنقرّب لفوق ومنخلّي هامش */
+  const SIZES = VB >= 48 ? [6,8,10,12,16,20,25,30,40,50] : [3,3.6,5,6];
+  const needKW = running*1.3/1000;
+  const invKW = SIZES.find(s => s >= needKW) || SIZES[SIZES.length-1];
+
+  const totalKWh = dayKWh + nightKWh;
+  const DoD = li ? 0.9 : 0.5, eff = li ? 0.95 : 0.85;
+  let battKWh = (nightKWh*1.2)/(DoD*eff);
+  let battAh = Math.ceil(battKWh*1000/VB/50)*50;     /* بدون كسور — أقرب 50 أمبير لفوق */
+  if(battAh < 100) battAh = 100;
+  battKWh = battAh*VB/1000;
+
+  /* الألواح: ضعف حمل البيت الطبيعي */
+  const kwp = Math.max(running*2/1000, totalKWh/4.5);
+  const nPanel = Math.ceil(kwp*1000/550);
+  const pvKWh = kwp*4.5*0.8;
+
+  $('resSub').textContent = (three?'3 فاز':'1 فاز') + ' · ' + (li?'ليثيوم':'أسيد') + ' · ' + VB + 'V';
+  const box = (l,v,n,cls) => '<div class="res'+(cls?' '+cls:'')+'"><div class="rl">'+l+'</div>'
+    + '<div class="rv">'+v+'</div>'+(n?'<div class="rn">'+n+'</div>':'')+'</div>';
+  const row = (k,s,v) => '<div class="row"><span class="k">'+k+(s?'<small>'+s+'</small>':'')
+    + '</span><span class="v">'+v+'</span></div>';
+
+  let h = '<div class="card"><h2>📊 استهلاكك</h2><div class="grid2">'
+    + box('استهلاك النهار', dayKWh.toFixed(1)+' kWh','بيتغطى من الشمس مباشرة')
+    + box('استهلاك الليل', nightKWh.toFixed(1)+' kWh','هيدا اللي بيحدد البطارية','night')
+    + '</div>'
+    + box('مجموع اليوم', totalKWh.toFixed(1)+' kWh','')
+    + row('مجموع قدرة الأجهزة','لو اشتغلت كلها سوا', Math.round(peak)+' W')
+    + row('الحمل المتوقع','مع معامل تزامن 65%', Math.round(running)+' W')
+    + '</div>';
+
+  h += '<div class="card"><h2>⚡ الإنفرتر</h2>'
+    + box('القدرة المقترحة', invKW+' kW', (three?'موزّعة على تلات فازات — '+(invKW/3).toFixed(1)+' kW لكل فاز':'إنفرتر مونو'))
+    + row('الفاز','', three?'3 فاز':'1 فاز')
+    + row('هامش أمان','فوق الحمل المتوقع','30%')
+    + row('أقل قدرة على 48 فولت','تحتها الإنفرتر ما بيشتغل مرتاح', VB>=48?'6 kW':'—')
+    + (peak > invKW*1000*1.6 ? '<div class="warnbox"><b>انتبه:</b> عندك أحمال كبيرة (دفاية أو نشافة أو مكيّف عادي). إذا اشتغلوا سوا بيوقع الإنفرتر — إما تكبّر القدرة أو توزّع تشغيلهن.</div>' : '')
+    + '</div>';
+
+  h += '<div class="card"><h2>🔋 البطاريات</h2>'
+    + box('السعة المطلوبة', battAh+' Ah', 'على '+VB+' فولت ≈ '+Math.round(battKWh)+' kWh')
+    + row('نوع البطارية','', li?'ليثيوم LiFePO4':'أسيد / تيوبيلار')
+    + row('عمق التفريغ المسموح', li?'الليثيوم بيتحمّل تفريغ أعمق':'الأسيد ما بينزل تحت النص', (DoD*100)+'%')
+    + row('كفاءة الشحن والتفريغ','', (eff*100)+'%')
+    + row('احتياطي','فوق استهلاك الليل','20%')
+    + '<div class="warnbox"><b>ملاحظة:</b> '
+    + (li ? 'الليثيوم أغلى بالشراء بس بيعطيك ضعف الاستفادة من نفس الأمبير وعمر أطول بكتير.'
+          : 'الأسيد أرخص، بس لازم سعة أكبر لنفس الاستهلاك، وعمرها أقصر — احسب الكلفة على 5 سنين مش على السعر اليوم.')
+    + '</div></div>';
+
+  h += '<div class="card"><h2>☀️ الألواح</h2>'
+    + box('القدرة المطلوبة', '≈ '+(Math.round(kwp*10)/10)+' kWp',
+        'تقريباً '+(nPanel-1)+' لـ '+(nPanel+1)+' لوح — العدد بيتغيّر حسب قيمة اللوح المتوفرة بالسوق')
+    + row('إنتاج متوقع باليوم','مع خسائر النظام', Math.round(pvKWh)+' kWh')
+    + row('قاعدة الحساب','ليضل في فائض للشحن والغيم','ضعف حمل البيت')
+    + row('ساعات الشمس الفعّالة','متوسط لبنان', '4.5 ساعة')
+    + row('لو اللوح 450 واط','عدد تقريبي', '~'+Math.ceil(kwp*1000/450)+' لوح')
+    + row('لو اللوح 550 واط','عدد تقريبي', '~'+Math.ceil(kwp*1000/550)+' لوح')
+    + row('لو اللوح 700 واط','عدد تقريبي', '~'+Math.ceil(kwp*1000/700)+' لوح')
+    + '<div class="warnbox"><b>مهم:</b> عدد الألواح تقريبي — بيتحدد نهائياً حسب قيمة اللوح المتوفرة عند المحل ومساحة سطحك وتوزيع السلاسل. المهم توصل للقدرة الإجمالية، مش لعدد محدد.</div>'
+    + (nPanel > 9 ? '<div class="warnbox"><b>مهم:</b> '+nPanel+' لوح ما بتنزلن سلسلة وحدة — لازم توزيع على سلاسل وMPPT حسب فولت الدارة المفتوحة بأبرد يوم، وإلا بينحرق مدخل الإنفرتر.</div>' : '')
+    + '</div>';
+
+  h += '<div class="card"><h2>⚠️ هالأرقام تقديرية</h2>'
+    + '<p style="font-size:13px;color:var(--muted);line-height:1.9">'
+    + 'الحساب مبني على متوسطات: 4.5 ساعة شمس، معامل تزامن 65%، و230 فولت. '
+    + 'الواقع بيتغيّر حسب زاوية الألواح، الظل، حرارة الجو، وعادات الاستهلاك عندك. '
+    + '<b style="color:var(--warn)">لا تشتري بضاعة على أساس هالأرقام لحالها</b> — خليها فكرة أولية ومنراجعها سوا.'
+    + '</p>'
+    + '<a class="tease" id="teaseBtn" target="_blank" rel="noopener">'
+    + '<span class="tt">بمراجعلك الأرقام على واقع بيتك، وبقلّك وين فيك توفّر قبل ما تشتري.'
+    + '<em>استشارة بسعر رمزي</em></span><span class="tb">راسلني 💬</span></a>'
+    + '</div>';
+
+  const area = $('area').value;
+  h += '<div class="card inst"><h2>🏗️ بدك تركيب؟</h2>'
+    + '<p class="pintro">شركة <b>AZEEC</b> بتركّب منظومات الطاقة بكل لبنان. '
+    + 'بس تراسلهن، الرسالة بتوصلهن ومكتوب فيها إنك جاي من عند <b>'+BRAND.person+'</b> — '
+    + 'ومعها مواصفات منظومتك كاملة.</p>'
+    + '<div class="perks">'
+    + '<div class="perk"><b>💸 حسم خاص</b><span>لأنك جاي من عند '+BRAND.person+'، بيكون إلك حسم على التركيب.</span></div>'
+    + '<div class="perk"><b>👷 إشراف شخصي</b><span>'+BRAND.person+' بيشرف بنفسو على التركيب والتشغيل والإعدادات — مش بس بيحوّلك ويخلص.</span></div>'
+    + '<div class="perk"><b>✅ مراجعة قبل التشغيل</b><span>فحص للحماية والكابلات وإعدادات الإنفرتر قبل ما تشتغل المنظومة.</span></div>'
+    + '</div>'
+    + '<div class="instrow"><span class="k"><b>AZEEC</b><small>تركيب منظومات طاقة — كل لبنان</small></span>'
+    + '<span class="v" dir="ltr">+961 71 941 921</span></div>'
+    + (area ? '' : '<div class="warnbox"><b>ناقص:</b> ارجع لأول واجهة وحدّد منطقتك — الشركة بتحتاجها لتسعّرلك التركيب والنقل.</div>')
+    + '<a class="btn main" id="instBtn" target="_blank" rel="noopener">📲 ابعت الطلب لـ AZEEC</a>'
+    + '<p class="hint" style="text-align:center">الرسالة بتفتح جاهزة — بس اضغط إرسال.</p></div>';
+
+  h += '<div class="social">' + [['TikTok',BRAND.tiktok],['Instagram',BRAND.instagram],['Facebook',BRAND.facebook]]
+    .map(([n,u]) => '<a href="'+u+'" target="_blank" rel="noopener">'+n+'</a>').join('') + '</div>'
+    + '<footer><b>'+BRAND.name+'</b> — '+BRAND.person+'<br>'
+    + '<span dir="ltr" style="font-family:\'JetBrains Mono\',monospace;color:var(--volt)">'+BRAND.phone+'</span> · '+BRAND.email+'</footer>';
+
+  $('result').innerHTML = h;
+  window.RES = { three, li, VB, peak, running, dayKWh, nightKWh, totalKWh, invKW, battAh, battKWh, kwp, nPanel, list };
+  $('teaseBtn').href = 'https://wa.me/'+BRAND.wa+'?text='+encodeURIComponent(msg());
+  $('instBtn').href = 'https://wa.me/'+INSTALLER.wa+'?text='+encodeURIComponent(instMsg());
+}
+
+function msg(){
+  const R = window.RES; if(!R) return 'مرحبا، بدي أحسب منظومتي.';
+  let t = '⚡ حساب منظومة — أداة '+BRAND.name+'\n────────────────────\n';
+  t += 'المنطقة: '+($('area').value||'ما حدّدها')+'\n';
+  t += 'النظام: '+(R.three?'3 فاز':'1 فاز')+' · '+(R.li?'ليثيوم':'أسيد')+' · '+R.VB+'V\n';
+  t += 'استهلاك النهار: '+R.dayKWh.toFixed(1)+' kWh\n';
+  t += 'استهلاك الليل: '+R.nightKWh.toFixed(1)+' kWh\n';
+  t += 'مجموع اليوم: '+R.totalKWh.toFixed(1)+' kWh\n';
+  t += 'الحمل المتوقع: '+Math.round(R.running)+' W\n────────────────────\n';
+  t += 'إنفرتر مقترح: '+R.invKW+' kW\n';
+  t += 'بطاريات: '+R.battAh+' Ah ('+R.battKWh.toFixed(1)+' kWh)\n';
+  t += 'ألواح: ≈ '+R.kwp.toFixed(1)+' kWp (تقريباً '+R.nPanel+' لوح 550W — حسب المتوفر)\n';
+  if(R.list.length){
+    t += '────────────────────\nالأجهزة:\n';
+    R.list.forEach(([n,q,w,hd,hn]) => t += '• '+n+' ×'+q+' ('+w+'W · نهار '+hd+'س · ليل '+hn+'س)\n');
+  }
+  t += '────────────────────\nبدي مراجعة للأرقام قبل ما اشتري.';
+  return t;
+}
+function instMsg(){
+  const R = window.RES; const area = $('area').value || 'ما حدّدها';
+  let t = 'مرحبا '+INSTALLER.name+' 👋\n';
+  t += 'أنا جاي من عند *'+BRAND.person+' — '+BRAND.name+'*، وعملت حساب منظومتي عبر أداتو.\n';
+  t += '────────────────────\n';
+  t += '📍 المنطقة: '+area+'\n';
+  if(R){
+    t += '⚙️ النظام: '+(R.three?'3 فاز':'1 فاز')+' · '+(R.li?'ليثيوم':'أسيد')+' · '+R.VB+'V\n';
+    t += '🔌 إنفرتر مقترح: '+R.invKW+' kW\n';
+    t += '🔋 بطاريات: '+R.battAh+' Ah\n';
+    t += '☀️ ألواح: ≈ '+(Math.round(R.kwp*10)/10)+' kWp — تقريباً '+R.nPanel+' لوح 550W، والعدد حسب القيمة المتوفرة عندكن\n';
+    t += '📊 استهلاك يومي: '+R.totalKWh.toFixed(1)+' kWh (ليل '+R.nightKWh.toFixed(1)+' kWh)\n';
+  }
+  t += '────────────────────\n';
+  t += 'بدي تسعيرة للتركيب والمواد، والوقت المتوقع للتنفيذ.\n';
+  t += 'وحسب ما فهمت، بيكون في حسم للزباين الجايين من عند '+BRAND.person+'، وهو بيشرف على التركيب. شكراً 🙏';
+  return t;
+}
+function sendWA(){ window.open('https://wa.me/'+BRAND.wa+'?text='+encodeURIComponent(msg()),'_blank'); }
+
+go(0);
+</script>
+</body>
+</html>
