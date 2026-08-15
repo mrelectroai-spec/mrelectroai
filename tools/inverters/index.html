@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>إعدادات الإنفرترات | MrElectroAI</title>
+<meta name="description" content="دليل إعدادات إنفرترات Felicity IVEM و IVGM و Growatt و Voltronic — القوائم، البطارية، الحماية، والأعطال.">
+<meta name="theme-color" content="#081311">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--void:#081311;--panel:#0F1D1A;--panel-2:#152724;--line:#223B36;
+  --volt:#22C79B;--volt-ink:#04140F;--arc:#63E3C2;--text:#E4F0EC;--muted:#7D948E;
+  --glow:rgba(34,199,155,.14);--warn:#E8A33D;--danger:#E06B6B}
+[data-theme="light"]{--void:#EFF4F2;--panel:#FFFFFF;--panel-2:#E9F1EE;--line:#D2E0DB;
+  --volt:#0E8F6E;--volt-ink:#FFFFFF;--arc:#0B7A5E;--text:#0C1A17;--muted:#55665F;
+  --glow:rgba(14,143,110,.16);--warn:#9A6A12;--danger:#B03A3A}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--void);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px;line-height:1.6;min-height:100vh;padding:18px 13px 96px;
+  background-image:linear-gradient(to bottom,var(--glow),transparent 340px)}
+.wrap{max-width:620px;margin:0 auto}
+:where(a,button,input,select):focus-visible{outline:2px solid var(--arc);outline-offset:3px}
+
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text)}
+.brand span{width:31px;height:31px;border-radius:9px;background:var(--volt);color:var(--volt-ink);
+  display:grid;place-items:center;font-size:15px}
+.brand b{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500}
+.tbtn{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+  width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:14px}
+
+h1{font-family:'Readex Pro',sans-serif;font-size:24px;font-weight:700;margin-bottom:4px}
+.lede{color:var(--muted);font-size:13.5px;margin-bottom:16px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:11px}
+.card>h2{font-family:'Readex Pro',sans-serif;font-size:14.5px;font-weight:600;margin-bottom:12px;
+  padding-bottom:9px;border-bottom:1px solid var(--line)}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 5px}
+select,input{width:100%;font-family:inherit;font-size:15px;color:var(--text);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+select:focus,input:focus{border-color:var(--volt)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mb{margin-bottom:11px}
+
+.prog{display:flex;gap:5px;margin-bottom:16px}
+.prog i{flex:1;height:3px;border-radius:3px;background:var(--line);transition:background .3s}
+.prog i.on{background:var(--volt)}
+.scr{display:none;animation:fade .28s ease}
+.scr.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.nav{position:fixed;inset-inline:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);
+  padding:10px 13px calc(10px + env(safe-area-inset-bottom));display:flex;gap:9px;align-items:center;z-index:9}
+.nav .btn{margin:0}
+.nav .back{flex:0 0 48px;padding:13px 0}
+.pitch{border-color:var(--volt)}
+.pintro{font-size:13px;color:var(--muted);margin-bottom:13px}
+.plist{display:grid;gap:8px;margin-bottom:13px}
+.pit{background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:11px 12px}
+.pit b{display:block;font-size:13px;margin-bottom:3px}
+.pit span{font-size:11.5px;color:var(--muted);line-height:1.6}
+.pnote{background:var(--glow);border:1px solid var(--volt);border-radius:11px;
+  padding:12px;font-size:13px;text-align:center;margin-bottom:4px}
+.pnote b{color:var(--volt)}
+.shots{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
+.shot{background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:11px}
+.shot b{display:block;font-size:12.5px;margin-bottom:3px}
+.shot span{font-size:11px;color:var(--muted);line-height:1.5}
+.models{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.mcard{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:13px 11px;
+  cursor:pointer;text-align:right;font-family:inherit;color:var(--text)}
+.mcard.on{border-color:var(--volt);background:var(--glow)}
+.mcard b{display:block;font-size:14px;margin-bottom:2px}
+.mcard small{color:var(--muted);font-size:11px;line-height:1.4;display:block}
+
+.tabs{display:flex;gap:6px;margin-bottom:13px;overflow-x:auto;padding-bottom:3px}
+.tabs button{flex-shrink:0;font-family:inherit;font-size:12.5px;color:var(--muted);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:999px;padding:7px 13px;cursor:pointer}
+.tabs button.on{color:var(--volt-ink);background:var(--volt);border-color:var(--volt);font-weight:600}
+
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
+  padding:11px 0;border-bottom:1px dashed var(--line)}
+.row:last-child{border-bottom:0}
+.row .k{font-size:13px;flex:1}
+.row .k small{display:block;color:var(--muted);font-size:11px;margin-top:2px;line-height:1.5}
+.row .v{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--volt);
+  background:var(--panel-2);border:1px solid var(--volt);border-radius:8px;padding:5px 10px;
+  white-space:nowrap;flex-shrink:0}
+.row .v.q{color:var(--warn);border-color:var(--warn)}
+
+.filters{display:flex;gap:6px;margin-bottom:11px;flex-wrap:wrap}
+.filters button{font-family:inherit;font-size:12px;background:var(--panel-2);border:1px solid var(--line);
+  color:var(--muted);border-radius:999px;padding:6px 12px;cursor:pointer}
+.filters button i{font-style:normal;font-family:'JetBrains Mono',monospace;opacity:.75;font-size:11px}
+.filters button.on{color:var(--volt-ink);background:var(--volt);border-color:var(--volt);font-weight:700}
+.filters button.fmust.on{background:var(--volt)}
+.filters button.fopt.on{background:var(--arc);border-color:var(--arc)}
+.filters button.fauto.on{background:var(--muted);border-color:var(--muted)}
+.pstep{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);
+  margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed var(--line)}
+.phead{display:flex;align-items:center;gap:11px;cursor:pointer}
+.optl{font-size:11px;color:var(--muted);margin-bottom:6px}
+.ptag{display:inline-block;font-size:9.5px;font-weight:700;border-radius:5px;
+  padding:1px 6px;margin-inline-start:6px;vertical-align:middle}
+.ptag.must{background:var(--volt);color:var(--volt-ink)}
+.ptag.opt{background:var(--arc);color:var(--volt-ink)}
+.ptag.auto{background:var(--line);color:var(--muted)}
+.popts{display:none;margin-top:11px;padding-top:10px;border-top:1px dashed var(--line)}
+.pgm.open .popts{display:block}
+.opt{display:flex;gap:9px;align-items:baseline;font-size:12.5px;padding:5px 0;color:var(--muted)}
+.opt b{font-family:'JetBrains Mono',monospace;color:var(--text);min-width:58px}
+.opt.pick{color:var(--volt)}
+.opt.pick b{color:var(--volt)}
+.opt.pick::after{content:'✓';margin-inline-start:auto;color:var(--volt)}
+.steplede{font-size:12.5px;color:var(--muted);margin-bottom:11px}
+.pgm{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px}
+.pgm.auto{opacity:.7}
+.pgm.q{border-color:var(--warn);border-style:dashed}
+.pgm.lock{opacity:.72}
+.pnum{width:56px;flex-shrink:0;border-radius:11px;background:var(--volt);color:var(--volt-ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 2px;
+  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:17px;line-height:1.1}
+.pnum em{font-style:normal;font-family:'IBM Plex Sans Arabic';font-size:8.5px;font-weight:400;opacity:.8}
+.pgm.q .pnum{background:var(--warn)}
+.pgm.lock .pnum{background:var(--line);color:var(--muted)}
+.pmid{flex:1;min-width:0}
+.pmid b{display:block;font-size:13.5px;font-weight:600}
+.pmid small{display:block;color:var(--muted);font-size:11px;line-height:1.5;margin-top:1px}
+.pset{flex-shrink:0;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:14px;color:var(--volt);background:var(--void);border:1px solid var(--volt);
+  border-radius:9px;padding:7px 11px;line-height:1.3}
+.pset em{display:block;font-style:normal;font-family:'IBM Plex Sans Arabic';font-size:9.5px;
+  font-weight:400;color:var(--muted);margin-bottom:1px}
+.pset i{font-style:normal;font-size:12px;font-family:'IBM Plex Sans Arabic'}
+.pgm.q .pset{color:var(--warn);border-color:var(--warn)}
+.pgm.lock .pset{color:var(--muted);border-color:var(--line)}
+.hardbox{background:var(--panel-2);border:1px solid var(--danger);border-radius:12px;
+  padding:14px;font-size:13.5px;line-height:1.9}
+.hardbox b{color:var(--danger)}
+.askbox{background:var(--panel-2);border:1px dashed var(--warn);border-radius:12px;
+  padding:13px;margin-top:13px;font-size:13px;line-height:1.9}
+.askbox b{color:var(--warn)}
+.calcbox{background:var(--glow);border:1px solid var(--volt);border-radius:11px;
+  padding:13px 14px;margin-top:12px;font-size:13.5px;line-height:1.8}
+.calcbox b{color:var(--volt)}
+.tease{display:flex;align-items:center;gap:11px;justify-content:space-between;
+  background:var(--glow);border:1px solid var(--volt);border-radius:12px;
+  padding:12px 14px;margin-top:12px;text-decoration:none;color:var(--text)}
+.tease .tt{font-size:12.5px;line-height:1.6}
+.tease .tt em{display:block;font-style:normal;font-size:11px;color:var(--volt);font-weight:700;margin-top:4px}
+.price{font-size:12.5px;color:var(--volt);font-weight:600;margin-bottom:6px}
+.tease .tb{font-size:12.5px;font-weight:700;color:var(--volt);white-space:nowrap}
+.warnbox{font-size:12.5px;color:var(--muted);border:1px dashed var(--warn);border-radius:11px;
+  padding:12px 13px;line-height:1.7;margin-bottom:12px}
+.warnbox b{color:var(--warn)}
+.dangerbox{border-color:var(--danger)}.dangerbox b{color:var(--danger)}
+
+.faults{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:7px;margin-bottom:11px}
+.faults button{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:700;
+  background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+  border-radius:9px;padding:10px 3px;cursor:pointer}
+.faults button.on{border-color:var(--volt);color:var(--volt)}
+.fout{background:var(--panel-2);border:1px solid var(--line);border-inline-start:2px solid var(--volt);
+  border-radius:10px;padding:13px;font-size:13.5px;line-height:1.8;display:none}
+.fout.on{display:block}
+.fout b{color:var(--text)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;
+  border-radius:11px;font-family:inherit;font-size:14.5px;font-weight:600;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--text);cursor:pointer;margin-top:9px;text-decoration:none}
+.btn.main{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
+.cta{background:var(--panel);border:1px solid var(--volt);border-radius:15px;padding:17px;margin-top:14px}
+.cta h3{font-family:'Readex Pro',sans-serif;font-size:16px;margin-bottom:6px}
+.cta p{font-size:13px;color:var(--muted);margin-bottom:4px}
+.social{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.social a{flex:1;min-width:70px;text-align:center;font-size:12.5px;color:var(--muted);
+  background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 6px;text-decoration:none}
+footer{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted);text-align:center;line-height:1.8}
+footer b{color:var(--text)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a class="brand" href="../../"><span>⚡</span><b id="brandName">MrElectroAI</b></a>
+    <button class="tbtn" id="theme" aria-label="تبديل الثيم">☀</button>
+  </div>
+
+  <div class="prog" id="prog"></div>
+
+  <!-- 0 اختيار الإنفرتر -->
+  <section class="scr on" data-k="0">
+    <h1>أي إنفرتر معك؟</h1>
+    <p class="lede">اختار الماركة ومنكمّل على المعطيات.</p>
+    <div class="warnbox dangerbox">
+      <b>قبل ما تبلّش:</b> الأرقام هون نقطة انطلاق مبنية على الأدلة العامة.
+      القيم النهائية بتتغيّر حسب <b>موديلك بالضبط وكتالوج بطاريتك</b> — وأرقام غلط بتخرّب البطارية.
+    </div>
+    <div class="models" id="models"></div>
+  </section>
+
+  <!-- 1 المعطيات -->
+  <section class="scr" data-k="1">
+    <h1>معطيات منظومتك</h1>
+    <p class="lede">كل ما تدقّق أكتر، كل ما طلعت الأرقام أدقّ.</p>
+    <div class="card">
+    <div class="two mb">
+      <div><label class="lbl">نوع البطارية</label>
+        <select id="bt"><option value="li">ليثيوم LiFePO4</option><option value="agm">AGM</option>
+          <option value="gel">Gel</option><option value="wet">سائلة (Wet)</option></select></div>
+      <div><label class="lbl">السعة (Ah)</label><input type="number" id="cap" value="200" min="0"></div>
+    </div>
+    <div class="two mb">
+      <div><label class="lbl">عدد الألواح</label><input type="number" id="pvn" value="8" min="0"></div>
+      <div><label class="lbl">قدرة اللوح (W)</label>
+        <select id="pvw"><option>400</option><option>450</option><option>500</option>
+          <option selected>550</option><option>600</option><option>650</option><option>700</option></select></div>
+    </div>
+    <div class="two mb">
+      <div><label class="lbl">أمبير الدولة</label>
+        <select id="gridA"><option value="0">ما في دولة</option><option value="5">5 أمبير</option>
+          <option value="10" selected>10 أمبير</option><option value="15">15 أمبير</option>
+          <option value="20">20 أمبير</option><option value="30">30 أمبير</option>
+          <option value="40">40 أمبير</option><option value="60">60 أمبير</option></select></div>
+      <div><label class="lbl">أمبير الموتور (الاشتراك)</label>
+        <select id="genA"><option value="0">ما في موتور</option><option value="5">5 أمبير</option>
+          <option value="10" selected>10 أمبير</option><option value="15">15 أمبير</option>
+          <option value="20">20 أمبير</option><option value="30">30 أمبير</option></select></div>
+    </div>
+    <div class="two mb">
+      <div><label class="lbl">ماركة بطارية الليثيوم</label>
+        <select id="bbrand"><option value="">— ما بعرف —</option><option>Felicity</option>
+          <option>Pylontech</option><option>Dyness</option><option>Shoto</option>
+          <option>BYD</option><option>SRNE</option><option>غيرها</option></select></div>
+      <div><label class="lbl">فولت النظام</label>
+        <select id="sysv"><option value="48" selected>48V</option><option value="24">24V</option>
+          <option value="hv">فولت عالي (HV)</option></select></div>
+    </div>
+    <div class="two mb">
+      <div><label class="lbl">عدد الإنفرترات</label>
+        <select id="nInv"><option value="1" selected>واحد</option><option value="2">اتنين (توازي)</option>
+          <option value="3">تلاتة أو أكتر</option></select></div>
+      <div><label class="lbl">بدك تشحن من الدولة؟</label>
+        <select id="acChg"><option value="yes" selected>إي — وقت ما تجي</option>
+          <option value="low">بس لما تنزل البطارية</option><option value="no">لأ — شمس بس</option></select></div>
+    </div>
+    <div class="mb">
+      <label class="lbl">أولوية التشغيل</label>
+      <select id="prio"><option value="sbu" selected>شمس ← بطارية ← دولة (SBU)</option>
+        <option value="sol">شمس ← دولة ← بطارية (SOL)</option>
+        <option value="uti">دولة أولاً (UTI)</option></select>
+    </div>
+    <div>
+      <label class="lbl">الموتور موصول على منفذ GEN؟</label>
+      <select id="genPort">
+        <option value="no" selected>لأ — الموتور والدولة على نفس المدخل (AC In)</option>
+        <option value="yes">إي — الموتور على منفذ GEN منفصل</option>
+        <option value="none">ما في موتور أصلاً</option>
+      </select>
+    </div>
+    </div>
+  </section>
+
+  <!-- 2 النتائج -->
+  <section class="scr" data-k="2">
+    <h1 id="resTitle">الإعدادات</h1>
+    <p class="lede" id="resSub"></p>
+    <div class="card">
+      <div class="tabs" id="tabs">
+        <button data-t="menu" class="on">الإعدادات المطلوبة</button>
+        <button data-t="batt">البطارية</button>
+        <button data-t="src">الشحن والمصادر</button>
+        <button data-t="prot">الحماية</button>
+        <button data-t="tips">نقاط انتباه</button>
+        <button data-t="fault">الأعطال</button>
+      </div>
+      <div id="out"></div>
+      <div id="faultWrap" style="display:none">
+        <div class="faults" id="faults"></div>
+        <div class="fout" id="fout"></div>
+      </div>
+    </div>
+    <button class="btn main" id="send">📲 ابعت التقرير على واتساب</button>
+  </section>
+
+  <!-- 3 الاستشارة -->
+  <section class="scr" data-k="3">
+    <h1>بدك استشارة؟</h1>
+    <p class="lede">إذا وقفت بشي أو بدك تتأكد قبل ما تشغّل.</p>
+    <div class="card">
+      <h2>ابعتلي هالصور مع رسالتك</h2>
+      <div class="shots">
+        <div class="shot"><b>📷 صورة المنظومة كاملة</b><span>الإنفرتر والبطاريات واللوحة سوا</span></div>
+        <div class="shot"><b>📷 لوحة بيانات الإنفرتر</b><span>الملصق اللي عليه الموديل والرقم التسلسلي</span></div>
+        <div class="shot"><b>📷 ملصق البطارية</b><span>الماركة والموديل والسعة</span></div>
+        <div class="shot"><b>📷 شاشة الإنفرتر</b><span>وقت العطل أو الإعدادات الحالية</span></div>
+        <div class="shot"><b>📷 اللوحة والقواطع</b><span>لأفحص الحماية والكابلات</span></div>
+        <div class="shot"><b>📷 الألواح على السطح</b><span>التوزيع وطريقة التوصيل إذا في مشكلة إنتاج</span></div>
+      </div>
+      <p class="price" id="ctaPrice"></p>
+      <a class="btn main" id="ctaBtn" target="_blank" rel="noopener">💬 راسلني على واتساب</a>
+      <p class="hint">رسالتك رح تفتح ومعبّاية بمعطيات منظومتك — بس ضيف الصور واضغط إرسال.</p>
+    </div>
+    <div class="card pitch">
+      <h2>وشو كمان فيني أعملك؟</h2>
+      <p class="pintro">إذا عندك مشاكل بتتكرر معك بالشغل، أنا بحلّها — مش بس بالاستشارة، بأدوات بتشتغل معك دايماً.</p>
+      <div class="plist">
+        <div class="pit"><b>🌐 موقع خاص فيك</b><span>موقع تعريفي باسمك ورقمك بيعرض شغلك، أو أداة بتشتغل على موبايل زباينك.</span></div>
+        <div class="pit"><b>🔋 أداة لبطارياتك أنت</b><span>بتشتغل على ماركات بطاريات معيّنة؟ بعملك أداة بس لهالماركات، بقيمها وبروتوكولاتها الصح.</span></div>
+        <div class="pit"><b>⚡ أداة لإنفرتراتك</b><span>عندك تركيبة ثابتة إنفرتر + بطارية بتشتغل عليها؟ بعملك أداة مخصّصة إلها لحالها.</span></div>
+        <div class="pit"><b>🤖 أتمتة أي شي</b><span>لوحة تحكم، تسلسل تشغيل، أو شغلة يدوية بتضيّع وقتك — بأتمتها إلك.</span></div>
+        <div class="pit"><b>🧰 أداة حسب طلبك</b><span>احكيلي شو أصعب شي بشغلك اليومي، وبحوّلو لأداة بتخلّصو بضغطة.</span></div>
+        <div class="pit"><b>📄 نسختك أنت من هالأداة</b><span>نفس هالأداة باسمك ورقمك، بتعطيها لزباينك فتصير تسويق إلك.</span></div>
+      </div>
+      <div class="pnote">كل هالشي <b>بأسعار رمزية</b> — مش كتير. ما إلك غير <b>MrElectroAI</b> 😄</div>
+      <a class="btn main" id="pitchBtn" target="_blank" rel="noopener">💬 احكيلي شو بدك</a>
+    </div>
+    <div class="social" id="social"></div>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+
+<div class="nav">
+  <button class="btn back" id="back" aria-label="رجوع">→</button>
+  <button class="btn main" id="next">التالي</button>
+</div>
+
+<script>
+/* ══════ للتخصيص: بدّل هون وبس ══════ */
+const BRAND = {
+  name:"MrElectroAI", person:"أنور الحسن الجاسم",
+  wa:"96179434479", phone:"+961 79 434 479", email:"mrelectroai@gmail.com",
+  tiktok:"https://www.tiktok.com/@mrelectroai",
+  instagram:"https://www.instagram.com/mrelectroai",
+  facebook:"https://www.facebook.com/mrelectroai",
+  ctaTitle:"بدك القيم بالضبط لموديلك؟",
+  ctaText:"ابعتلي موديل الإنفرتر والبطارية، وبعطيك الإعدادات من الكتالوج — أو بضبطها معك عن بُعد.",
+  ctaPrice:"الاستشارة بسعر رمزي — أرخص بكتير من غلطة إعداد وحدة 😄"
+};
+/* ══════ نهاية التخصيص ══════ */
+
+const INV = {
+  felicity_ivem: {
+    name:"Felicity IVEM",
+    sub:"أوف-غريد / هجين · 48V · MPPT مزدوج",
+    menu:[
+      ["أولوية مصدر الخروج","SBU / SOL / UTI — بلبنان الأغلب SBU ليشتغل على الشمس والبطارية أولاً","من القائمة"],
+      ["أولوية مصدر الشحن","شمس فقط أو شمس + شبكة — الشمس أولاً بيوفّر عمر البطارية","من القائمة"],
+      ["نوع البطارية","لازم تختار Lithium لتشتغل مع BMS","LI / USE"],
+      ["بروتوكول BMS","بيتحدد حسب ماركة البطارية — رقم البروتوكول بيختلف","؟"],
+      ["مدى فولت الدخل","Appliance للأجهزة العادية، UPS للحساسة","APL / UPS"],
+      ["تيار الشحن الأقصى","بيتقفل تلقائياً لما يشتغل BMS الليثيوم","حسب البطارية"],
+      ["عدد الوحدات المتوازية","بيدعم لغاية 6 وحدات على التوازي","≤ 6"]
+    ],
+    tips:[
+      "المدخل الشمسي مزدوج MPPT — لا تخلط سلسلتين مختلفتين بالطول على نفس المدخل.",
+      "الواي فاي مدمج للمراقبة عن بُعد، بس الإعدادات بتنعمل من الشاشة.",
+      "قبل التوازي، لازم كل الوحدات نفس الإصدار والفيرموير."
+    ],
+    faults:{
+      "01":["مروحة معطّلة","نظّف المروحة وتأكد من دورانها — الغبار أهم سبب."],
+      "02":["حرارة زائدة","تهوية ضعيفة أو حمل مستمر عالي. باعد الإنفرتر عن الحيط."],
+      "03":["فولت البطارية عالي","إعداد فولت الشحن أعلى من اللازم، أو مصدر شحن خارجي."],
+      "04":["فولت البطارية منخفض","البطارية فرغت أو إعداد الفصل منخفض جداً."],
+      "05":["قصر بالخروج","افصل كل الأحمال وشغّل وحدة وحدة لتلاقي المسبّب."],
+      "07":["حمل زائد","تجاوزت قدرة الإنفرتر — وزّع الأحمال أو زيد القدرة."],
+      "51":["تيار زائد","حمل مفاجئ عالي (موتور أو مضخة). بدها إنفرتر يتحمّل تيار الإقلاع."],
+      "58":["خروج غير طبيعي","عطل داخلي — بدو فحص من الوكيل."]
+    }
+  },
+
+  felicity_ivgm: {
+    name:"Felicity IVGM",
+    sub:"هجين مربوط بالشبكة · عدّاد ذكي إجباري",
+    menu:[
+      ["نمط التشغيل","استهلاك ذاتي، أو أولوية الشحن، أو حسب الوقت","من القائمة"],
+      ["العدّاد الذكي (CT)","إجباري بالتركيب — بيقرأ اتجاه التيار عبر RS485","إجباري"],
+      ["اتجاه الـCT","لازم يتركّب بين الأحمال والشبكة وباتجاه السهم","تحقّق"],
+      ["منع التصدير","Zero Export لمنع الضخ للشبكة العامة","حسب الاتفاق"],
+      ["نوع البطارية والبروتوكول","لازم يطابق ماركة الليثيوم","؟"],
+      ["منفذ DRMS","للإطفاء عن بُعد بأستراليا وأوروبا — غالباً غير مستعمل بلبنان","اختياري"],
+      ["مخرج الطوارئ (Backup)","الأحمال الحساسة بتتوصل عليه","منفصل"]
+    ],
+    tips:[
+      "العدّاد الذكي مع الـCT إجباري — بدونو الإنفرتر ما بيعرف يوزّع الطاقة صح.",
+      "غلطة اتجاه الـCT بتخلّي الإنفرتر يشحن من الشبكة بدل ما يمنع التصدير.",
+      "في طرفين منفصلين: On-grid و Backup — لا تخلط بيناتن."
+    ],
+    faults:{
+      "E01":["خطأ اتصال العدّاد","كابل RS485 مفكوك أو العنوان غلط."],
+      "E02":["اتجاه CT معكوس","اقلب الـCT أو غيّر إشارة الاتجاه بالإعدادات."],
+      "E03":["فولت شبكة خارج المدى","الجهد أعلى أو أقل من حدود الحماية."],
+      "E04":["تردد خارج المدى","الشبكة أو المولّد غير مستقر."],
+      "E05":["عزل DC ضعيف","تسرّب أرضي بجهة الألواح — افحص الكابلات والرطوبة."],
+      "E06":["فقدان اتصال BMS","بروتوكول غلط أو كابل الاتصال مفكوك."],
+      "E07":["حمل زائد على Backup","الأحمال على مخرج الطوارئ أكتر من طاقتو."]
+    }
+  },
+
+  growatt: {
+    name:"Growatt SPF",
+    sub:"أوف-غريد · إعدادات برقم البرنامج",
+    menu:[
+      ["01 — أولوية الخروج","SBU (بطارية أولاً) · SOL (شمس أولاً) · UTI (شبكة أولاً)","01"],
+      ["02 — تيار الشحن الأقصى","بيتقفل تلقائياً لما تختار LI بالبرنامج 05","02"],
+      ["03 — مدى فولت الدخل","APL للأجهزة العادية · UPS للحساسة","03"],
+      ["05 — نوع البطارية","اختار LI ليشتغل مع BMS الليثيوم","05"],
+      ["11 — تيار الشحن من الشبكة","غير مفعّل مع الليثيوم","11"],
+      ["14 — أولوية مصدر الشحن","شمس فقط، أو شمس + شبكة","14"],
+      ["19 — فولت الشحن (Bulk)","بيظهر بس إذا اخترت User-Defined","19"],
+      ["20 — فولت التعويم (Float)","نفس الشرط","20"],
+      ["21 — حدّ الفصل","بيصير نسبة مئوية مع الليثيوم","21"],
+      ["36 — بروتوكول BMS","رقم البروتوكول بيتغيّر حسب ماركة البطارية","؟"]
+    ],
+    tips:[
+      "لما تختار LI بالبرنامج 05، الشاشة بتنقلك مباشرة على 36 لتختار البروتوكول.",
+      "بعد ما يشتغل الاتصال مع BMS، البرامج 12 و13 و21 بتتحوّل لنسبة مئوية، وتيار الشحن ما بيعود يتعدّل يدوياً.",
+      "بالتوازي مع ليثيوم، بتحتاج HUB خارجي لتجميع كابلات الاتصال.",
+      "حدّ الفصل بالبرنامج 21 بيتحدد حسب عمق التفريغ اللي بتوصي فيه ماركة بطاريتك."
+    ],
+    faults:{
+      "01":["مروحة معطّلة","نظّف أو بدّل المروحة."],
+      "02":["حرارة زائدة","حسّن التهوية وباعد الإنفرتر عن مصادر الحرارة."],
+      "03":["فولت بطارية عالي","راجع إعداد فولت الشحن ومصادر الشحن الخارجية."],
+      "04":["فولت بطارية منخفض","البطارية فرغت أو إعداد الفصل منخفض."],
+      "05":["قصر بالخروج","افصل الأحمال وشغّلها وحدة وحدة."],
+      "06":["خروج غير طبيعي","عطل داخلي — بدو فحص."],
+      "07":["حمل زائد","الحمل أكبر من طاقة الإنفرتر."],
+      "08":["فولت الباص عالي","افصل وأعد التشغيل، وإذا تكرر بدو فحص."],
+      "09":["إقلاع الباص فشل","عطل داخلي."],
+      "51":["تيار زائد","تيار إقلاع عالي من موتور أو مضخة."],
+      "58":["فولت الخروج منخفض","حمل زائد أو عطل داخلي."]
+    }
+  },
+
+  voltronic: {
+    name:"Voltronic / Axpert",
+    sub:"أوف-غريد · إعدادات برقم البرنامج",
+    menu:[
+      ["01 — أولوية الخروج","SBU · SOL · UTI","01"],
+      ["02 — تيار الشحن الكلي","شمس + شبكة معاً","02"],
+      ["05 — نوع البطارية","AGM · Flooded · USE (مخصص) · LI حسب الموديل","05"],
+      ["11 — تيار الشحن من الشبكة","حدّد حسب قدرة مصدر الشبكة عندك","11"],
+      ["12 — نقطة الرجوع للشبكة","الفولت اللي عندو بيتحوّل للشبكة","12"],
+      ["13 — نقطة الرجوع للبطارية","الفولت اللي عندو بيرجع للبطارية","13"],
+      ["16 — أولوية مصدر الشحن","شمس أولاً أو شمس + شبكة","16"],
+      ["26 — فولت الشحن (Bulk/CV)","مع USE بس","26"],
+      ["27 — فولت التعويم","مع USE بس","27"],
+      ["29 — فولت الفصل (Cut-off)","أهم إعداد لحماية البطارية","29"]
+    ],
+    tips:[
+      "مع بطارية ليثيوم بدون اتصال BMS، لازم تضبط 26 و27 و29 يدوياً من كتالوج البطارية — وهون بتصير أغلب الأخطاء.",
+      "البرنامج 02 هو المجموع الكلي، والبرنامج 11 جزء منّو — مش إعدادين منفصلين.",
+      "إذا اخترت SBU وحدّ الفصل منخفض، البطارية بتفرغ كل يوم وعمرها بيقصر بسرعة.",
+      "بعض الموديلات ما بتقبل تعديل 26 و27 إلا بعد ما تختار USE بالبرنامج 05."
+    ],
+    faults:{
+      "F01":["مروحة معطّلة","المروحة واقفة أو مسدودة."],
+      "F02":["حرارة زائدة","تهوية ضعيفة أو حمل مستمر."],
+      "F03":["فولت بطارية عالي","مصدر شحن خارجي أو إعداد غلط."],
+      "F04":["فولت بطارية منخفض","تفريغ عميق."],
+      "F05":["قصر بالخروج","حمل فيه قصر — افصل وجرّب وحدة وحدة."],
+      "F07":["حمل زائد بالبايباس","الحمل تجاوز الحد أثناء المرور من الشبكة."],
+      "F08":["فولت الباص منخفض","عطل داخلي."],
+      "F51":["تيار زائد","تيار إقلاع من موتور."],
+      "F52":["فولت الباص منخفض","عطل داخلي."],
+      "F55":["فولت DC غير متوازن","عطل داخلي — بدو فحص."],
+      "F58":["فولت الخروج منخفض","حمل زائد أو عطل بالمخرج."]
+    }
+  }
+};
+
+const RATES = {
+  li:{chg:0.5,dis:0.8,note:"الليثيوم بيتحمّل شحن أسرع، بس كل ماركة إلها حدّها من الكتالوج."},
+  agm:{chg:0.2,dis:0.3,note:"AGM ما بتتحمّل شحن سريع — تجاوز 0.2C بيقصّر عمرها كتير."},
+  gel:{chg:0.15,dis:0.25,note:"الجل الأكثر حساسية للحرارة والشحن الزائد."},
+  wet:{chg:0.1,dis:0.2,note:"السائلة بدها شحن بطيء وتهوية وفحص مستوى الماء."}
+};
+const VOLT = {
+  li:{bulk:"56.0–57.6 V",float:"54.0–55.2 V",low:"47.0–48.0 V"},
+  agm:{bulk:"57.6 V",float:"54.0–54.6 V",low:"46.0–47.0 V"},
+  gel:{bulk:"56.4–57.0 V",float:"54.0 V",low:"46.0–47.0 V"},
+  wet:{bulk:"57.6–58.4 V",float:"54.0–54.6 V",low:"45.0–46.0 V"}
+};
+
+const $ = i => document.getElementById(i);
+let sel = 'felicity_ivem', tab = 'menu', filt = 'all';
+
+$('brandName').textContent = BRAND.name;
+$('ctaPrice').textContent = BRAND.ctaPrice;
+function ctaMsg(){
+  const I = INV[sel] || {name:'—'};
+  return 'مرحبا '+BRAND.person+'، بدي استشارة على منظومتي:\n'
+    + '• الإنفرتر: '+I.name+'\n'
+    + '• البطارية: '+$('bt').options[$('bt').selectedIndex].text+' · '+$('cap').value+'Ah'
+      + ($('bbrand').value?' ('+$('bbrand').value+')':'')+'\n'
+    + '• الألواح: '+$('pvn').value+' × '+$('pvw').value+'W\n'
+    + '• الدولة: '+$('gridA').value+'A · الموتور: '+$('genA').value+'A\n'
+    + '• عدد الإنفرترات: '+$('nInv').options[$('nInv').selectedIndex].text+'\n'
+    + '(رح ابعت الصور بالرسالة الجاية)';
+}
+function syncCta(){
+  $('pitchBtn').href = 'https://wa.me/'+BRAND.wa+'?text='+encodeURIComponent(
+    'مرحبا '+BRAND.person+'، بدي أسأل عن أداة أو موقع مخصّص لشغلي.');
+  $('ctaBtn').href = 'https://wa.me/'+BRAND.wa+'?text='+encodeURIComponent(ctaMsg()); }
+$('social').innerHTML = [['TikTok',BRAND.tiktok],['Instagram',BRAND.instagram],['Facebook',BRAND.facebook]]
+  .map(([n,u]) => '<a href="'+u+'" target="_blank" rel="noopener">'+n+'</a>').join('');
+$('foot').innerHTML = '<b>'+BRAND.name+'</b> — '+BRAND.person+'<br><span dir="ltr" style="font-family:\'JetBrains Mono\',monospace;color:var(--volt)">'+BRAND.phone+'</span> · '+BRAND.email;
+$('theme').onclick = () => { const l = document.documentElement.dataset.theme === 'light';
+  document.documentElement.dataset.theme = l?'dark':'light'; $('theme').textContent = l?'☀':'☾'; };
+
+$('models').innerHTML = Object.entries(INV).map(([k,v]) =>
+  '<button class="mcard'+(k===sel?' on':'')+'" data-m="'+k+'"><b>'+v.name+'</b><small>'+v.sub+'</small></button>').join('');
+$('models').onclick = e => {
+  const b = e.target.closest('.mcard'); if(!b) return;
+  sel = b.dataset.m;
+  [...$('models').children].forEach(x => x.classList.toggle('on', x===b));
+  drawFaults(); render();
+  setTimeout(() => go(1), 180);
+};
+
+/* فتح الخيارات + الفلاتر */
+$('out').addEventListener('click', e => {
+  const f = e.target.closest('button[data-f]');
+  if(f){ filt = f.dataset.f; render(); return; }
+  const c = e.target.closest('.pgm');
+  if(c) c.classList.toggle('open');
+});
+
+/* ── التنقّل بين الواجهات ── */
+let scr = 0;
+function go(k){
+  scr = k;
+  document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', +s.dataset.k === k));
+  $('prog').innerHTML = [0,1,2,3].map(i => '<i class="'+(i<=k?'on':'')+'"></i>').join('');
+  $('back').style.visibility = k ? 'visible' : 'hidden';
+  $('next').textContent = k===0 ? 'اختار إنفرتر أولاً'
+    : k===1 ? 'وريني الإعدادات ←' : k===2 ? 'بدي استشارة' : '🔄 من الأول';
+  $('next').disabled = (k===0);
+  if(k===2){
+    $('resTitle').textContent = 'إعدادات ' + INV[sel].name;
+    $('resSub').textContent = INV[sel].sub;
+    render();
+  }
+  if(k===3) syncCta();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('back').onclick = () => { if(scr) go(scr-1); };
+$('next').onclick = () => { if(scr===3) location.reload(); else go(scr+1); };
+$('tabs').onclick = e => { const b = e.target.closest('button[data-t]'); if(!b) return;
+  tab = b.dataset.t; [...$('tabs').children].forEach(x => x.classList.toggle('on', x===b));
+  const f = tab === 'fault';
+  $('faultWrap').style.display = f ? 'block' : 'none';
+  $('out').style.display = f ? 'none' : 'block';
+  if(f) drawFaults(); else render(); };
+['bt','cap','pvn','pvw','gridA','genA','genPort','bbrand','sysv','nInv','acChg','prio']
+  .forEach(i => { $(i).addEventListener('input', render); $(i).addEventListener('change', render); });
+
+function cta(txt, msg){
+  return '<a class="tease" href="https://wa.me/'+BRAND.wa+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">'
+    + '<span class="tt">'+txt+'<em>استشارة بسعر رمزي</em></span><span class="tb">راسلني 💬</span></a>';
+}
+const REQL = {must:'إجباري', opt:'اختياري', auto:'تلقائي'};
+function prow(x,tot){
+  const q = x.val === '؟', locked = x.req === 'auto';
+  return '<div class="pgm '+x.req+(q?' q':'')+'">'
+    + '<div class="pstep">خطوة '+x.step+' من '+tot+'</div>'
+    + '<div class="phead">'
+    + '<span class="pnum"><em>'+(x.n==='◆'?'قائمة':'برنامج')+'</em>'+x.n+'</span>'
+    + '<span class="pmid"><b>'+x.name+'</b>'
+      + '<span class="ptag '+x.req+'">'+REQL[x.req]+'</span>'
+      + (x.hint?'<small>'+x.hint+'</small>':'')+'</span>'
+    + '<span class="pset">'+(q?'<i>اسألني</i>':locked?'<i>'+x.val+'</i>':'<em>حطّ</em>'+x.val)+'</span>'
+    + '</div>'
+    + '<div class="popts"><div class="optl">الخيارات المتاحة بهالبرنامج:</div>'
+    + x.opts.map(([code,d]) =>
+        '<div class="opt'+(code===x.val?' pick':'')+'"><b>'+code+'</b>'+(d?'<span>'+d+'</span>':'')+'</div>').join('')
+    + '</div></div>';
+}
+function row(k,s,v){ const q = v === '؟';
+  return '<div class="row"><span class="k">'+k+(s?'<small>'+s+'</small>':'')+'</span>'
+    + '<span class="v'+(q?' q':'')+'">'+v+'</span></div>'; }
+
+function complexity(){
+  const R = [], n = $('nInv').value, sv = $('sysv').value, bt = $('bt').value,
+        bb = $('bbrand').value, gA = +$('genA').value, gr = +$('gridA').value,
+        port = $('genPort').value, ah = +$('cap').value||0;
+  if(n !== '1') R.push('أكتر من إنفرتر على التوازي — بدو ضبط عناوين ومزامنة وكابل اتصال خاص.');
+  if(sv === 'hv') R.push('منظومة فولت عالي — الحماية والإعدادات مختلفة كلياً عن 48V.');
+  if(sv === '24' && ah > 300) R.push('بطارية كبيرة على 24 فولت — التيار بيصير عالي جداً والكابلات بتسخن.');
+  if(bt === 'li' && !$('bbrand').value) R.push('ماركة بطارية الليثيوم غير محددة — بروتوكول BMS ما بينحدد بدونها.');
+  if(bt === 'li' && $('bbrand').value === 'غيرها') R.push('ماركة بطارية غير شائعة — البروتوكول بدو تجربة.');
+  if(port === 'no' && gA && gr) R.push('الموتور والدولة على نفس المدخل — بدها ضبط تيار مشترك أو فصل بريليه.');
+  if(ah > 600) R.push('بنك بطاريات كبير — توزيع الكابلات والقواطع بيصير حرج.');
+  return { hard: R.length >= 2, reasons: R };
+}
+
+function ctx(){
+  const bt = $('bt').value, ah = parseFloat($('cap').value)||0;
+  const R = RATES[bt], V = VOLT[bt], VB = bt==='li'?51.2:52;
+  const gA = parseFloat($('gridA').value)||0;
+  const maxA = Math.round(ah*R.chg);
+  return { bt, ah, R, V, li: bt==='li', maxA,
+    gridA: gA ? Math.min(maxA, Math.floor(gA*230*0.85/VB)) : 0, gA,
+    prio: $('prio').value, acChg: $('acChg').value, bb: $('bbrand').value,
+    port: $('genPort').value, nInv: $('nInv').value };
+}
+const PRIO = c => ({sbu:'SBU', sol:'SOL', uti:'UTI'}[c.prio]);
+const BTC  = c => ({li:'LI', agm:'AGM', wet:'FLD', gel:'USE'}[c.bt]);
+
+/* req: must=إجباري · opt=اختياري · auto=بيتحدد تلقائياً */
+const CATALOG = {
+growatt: c => [
+ {n:'01',name:'أولوية مصدر الخروج',req:'must',hint:'من وين بياخد الكهربا للأحمال',
+  opts:[['UTI','الدولة أولاً — البطارية احتياط'],['SOL','الشمس أولاً، وبعدها الدولة'],['SBU','الشمس ← البطارية ← الدولة']],val:PRIO(c)},
+ {n:'02',name:'تيار الشحن الكلي',req:c.li?'auto':'must',hint:c.li?'البطارية بتتحكم فيه عبر BMS':'شمس + دولة معاً',
+  opts:[['10–120 A','حسب سعة بطاريتك ونوعها']],val:c.li?'من BMS':c.maxA+' A'},
+ {n:'03',name:'مدى فولت الدخل',req:'must',hint:'قدّيش بيتحمّل تذبذب الدولة قبل ما يفصل',
+  opts:[['APL','90–280V — للأجهزة العادية، بيتحمّل تذبذب أكتر'],['UPS','170–280V — للأجهزة الحساسة']],val:'APL'},
+ {n:'04',name:'وضع توفير الطاقة',req:'opt',hint:'بيطفي المخرج لما يكون الحمل صغير جداً',
+  opts:[['SDS','موقّف (الأفضل عادةً)'],['SDE','مفعّل — بيطفي مع الأحمال الخفيفة']],val:'SDS'},
+ {n:'05',name:'نوع البطارية',req:'must',hint:'أهم إعداد — كل نوع إلو منحنى شحن مختلف',
+  opts:[['AGM','بطارية AGM'],['FLD','سائلة'],['USE','مخصص — بتضبط الفولت يدوي'],['LI','ليثيوم مع اتصال BMS']],val:BTC(c)},
+ {n:'06',name:'إعادة التشغيل بعد الحمل الزائد',req:'opt',hint:'',
+  opts:[['LrD','ما بيرجع لحالو'],['LrE','بيرجع يشتغل تلقائياً']],val:'LrE'},
+ {n:'07',name:'إعادة التشغيل بعد الحرارة',req:'opt',hint:'',
+  opts:[['LtD','ما بيرجع'],['LtE','بيرجع تلقائياً بعد ما يبرد']],val:'LtE'},
+ {n:'08',name:'فولت الخروج',req:'must',hint:'حسب شبكة بلدك',
+  opts:[['220V',''],['230V','المعتمد بلبنان'],['240V','']],val:'230V'},
+ {n:'09',name:'تردد الخروج',req:'must',hint:'',
+  opts:[['50Hz','المعتمد بلبنان'],['60Hz','']],val:'50Hz'},
+ {n:'11',name:'تيار الشحن من الدولة',req:'must',hint:c.gA?('محسوب من '+c.gA+' أمبير اشتراكك'):'حدّد أمبير اشتراكك فوق',
+  opts:[['2–100 A','لازم يكون أقل من طاقة اشتراكك ليتفادى فصل القاطع']],
+  val:c.acChg==='no'?'0 A':(c.gridA?c.gridA+' A':'؟')},
+ {n:'12',name:'نقطة الرجوع للدولة',req:'opt',hint:'الفولت/النسبة اللي عندها بيتحوّل على الدولة',
+  opts:[['نسبة % مع الليثيوم',''],['فولت مع باقي الأنواع','']],val:c.li?'؟':'؟'},
+ {n:'13',name:'نقطة الرجوع للبطارية',req:'opt',hint:'بعد ما تشحن كفاية بيرجع يشتغل عليها',
+  opts:[['نسبة % مع الليثيوم',''],['فولت مع باقي الأنواع','']],val:'؟'},
+ {n:'14',name:'أولوية مصدر الشحن',req:'must',hint:'مين بيشحن البطارية',
+  opts:[['CSO','الشمس أولاً وبعدها الدولة'],['SNU','الشمس والدولة سوا'],['OSO','الشمس فقط — الدولة ما بتشحن']],
+  val:c.acChg==='no'?'OSO':'SNU'},
+ {n:'18',name:'تجاوز الحمل الزائد (Bypass)',req:'opt',hint:'بيمرّر الحمل للدولة إذا زاد عن طاقة الإنفرتر',
+  opts:[['byD','موقّف'],['byE','مفعّل — بيحمي الإنفرتر']],val:'byE'},
+ {n:'19',name:'فولت الشحن (Bulk)',req:c.li?'auto':'must',hint:c.li?'مقفول مع BMS':'بيظهر مع USE بس',
+  opts:[['48.0–58.4 V','من كتالوج بطاريتك']],val:c.li?'من BMS':c.V.bulk},
+ {n:'20',name:'فولت التعويم (Float)',req:c.li?'auto':'must',hint:c.li?'مقفول مع BMS':'',
+  opts:[['48.0–58.4 V','من كتالوج بطاريتك']],val:c.li?'من BMS':c.V.float},
+ {n:'21',name:'حدّ الفصل',req:'must',hint:c.li?'بيصير نسبة % حسب عمق التفريغ تبع بطاريتك':'فولت الفصل',
+  opts:[['5–30 %','مع الليثيوم'],['40.0–48.0 V','مع باقي الأنواع']],val:c.li?'؟':c.V.low},
+ {n:'22',name:'موازنة قدرة الشمس',req:'opt',hint:'بيحدد إذا بيسحب من الشمس بقد الحاجة بس',
+  opts:[['SbE','مفعّل'],['SbD','موقّف']],val:'SbE'},
+ {n:'24',name:'ربط النيوترال بالأرضي',req:'opt',hint:'يعتمد على نظام التأريض عندك',
+  opts:[['dIS','غير مربوط'],['ENA','مربوط']],val:'؟'},
+ {n:'36',name:'بروتوكول BMS',req:c.li?'must':'auto',
+  hint:c.li?(c.bb==='Felicity'?'لبطارية Felicity البروتوكول L04':'بيتغيّر حسب ماركة بطاريتك'):'ما بينطبق',
+  opts:[['L01–L15','اتصال RS485'],['L51–L65','اتصال CAN']],
+  val:c.li?(c.bb==='Felicity'?'L04':'؟'):'—'}
+],
+
+voltronic: c => [
+ {n:'01',name:'أولوية مصدر الخروج',req:'must',hint:'من وين بياخد الكهربا للأحمال',
+  opts:[['UTI','الدولة أولاً'],['SOL','الشمس أولاً'],['SBU','الشمس ← البطارية ← الدولة']],val:PRIO(c)},
+ {n:'02',name:'تيار الشحن الكلي',req:'must',hint:'شمس + دولة معاً — مش إعدادين منفصلين',
+  opts:[['10–120 A','حسب سعة ونوع بطاريتك']],val:c.maxA+' A'},
+ {n:'03',name:'مدى فولت الدخل',req:'must',hint:'',
+  opts:[['APL','90–280V للأجهزة العادية'],['UPS','170–280V للحساسة']],val:'APL'},
+ {n:'04',name:'وضع توفير الطاقة',req:'opt',hint:'',
+  opts:[['SDS','موقّف'],['SDE','مفعّل']],val:'SDS'},
+ {n:'05',name:'نوع البطارية',req:'must',hint:c.li?'إذا موديلك ما بيدعم LI، اختار USE واضبط 26/27/29 يدوي':'',
+  opts:[['AGM',''],['FLD','سائلة'],['USE','مخصص'],['LI','ليثيوم — حسب الموديل']],val:BTC(c)},
+ {n:'06',name:'إعادة التشغيل بعد الحمل الزائد',req:'opt',hint:'',
+  opts:[['LrD','لأ'],['LrE','إي']],val:'LrE'},
+ {n:'07',name:'إعادة التشغيل بعد الحرارة',req:'opt',hint:'',
+  opts:[['LtD','لأ'],['LtE','إي']],val:'LtE'},
+ {n:'08',name:'فولت الخروج',req:'must',hint:'',opts:[['220V',''],['230V','لبنان'],['240V','']],val:'230V'},
+ {n:'09',name:'تردد الخروج',req:'must',hint:'',opts:[['50Hz','لبنان'],['60Hz','']],val:'50Hz'},
+ {n:'11',name:'تيار الشحن من الدولة',req:'must',hint:c.gA?('محسوب من '+c.gA+' أمبير'):'حدّد أمبير اشتراكك فوق',
+  opts:[['2–100 A','جزء من البرنامج 02، مش زيادة عليه']],
+  val:c.acChg==='no'?'0 A':(c.gridA?c.gridA+' A':'؟')},
+ {n:'12',name:'نقطة الرجوع للدولة',req:'must',hint:'لما تنزل البطارية لهون بيتحوّل على الدولة',
+  opts:[['44.0–51.0 V','لنظام 48V']],val:'؟'},
+ {n:'13',name:'نقطة الرجوع للبطارية',req:'must',hint:'لما تشحن لهون بيرجع على البطارية',
+  opts:[['48.0–58.0 V','أو FUL يعني لما تمتلئ']],val:'؟'},
+ {n:'16',name:'أولوية مصدر الشحن',req:'must',hint:'',
+  opts:[['CSO','الشمس أولاً'],['SNU','الشمس والدولة سوا'],['OSO','الشمس فقط']],
+  val:c.acChg==='no'?'OSO':'SNU'},
+ {n:'23',name:'تجاوز الحمل الزائد',req:'opt',hint:'',opts:[['byD','موقّف'],['byE','مفعّل']],val:'byE'},
+ {n:'26',name:'فولت الشحن (CV)',req:'must',hint:'مع USE بس',
+  opts:[['48.0–58.4 V','من كتالوج بطاريتك']],val:c.V.bulk},
+ {n:'27',name:'فولت التعويم',req:'must',hint:'مع USE بس',
+  opts:[['48.0–58.4 V','']],val:c.V.float},
+ {n:'28',name:'وضع الخروج (توازي)',req:c.nInv==='1'?'opt':'must',hint:c.nInv==='1'?'إنفرتر واحد — ما بيلزم':'بدو ضبط عند التوازي',
+  opts:[['SIG','إنفرتر واحد'],['PAL','توازي نفس الفاز'],['3P1/3P2/3P3','ثلاث فازات']],
+  val:c.nInv==='1'?'SIG':'؟'},
+ {n:'29',name:'فولت الفصل',req:'must',hint:'أهم إعداد لحماية البطارية',
+  opts:[['40.0–48.0 V','لا تنزل تحت توصية الكتالوج']],val:c.V.low},
+ {n:'30',name:'المعادلة (Equalization)',req:'opt',hint:'للبطاريات السائلة بس',
+  opts:[['dIS','موقّفة'],['ENA','مفعّلة']],val:c.bt==='wet'?'ENA':'dIS'},
+ {n:'33',name:'فترة المعادلة',req:'opt',hint:'بالأيام — مع البطاريات السائلة',
+  opts:[['0–90 يوم','']],val:c.bt==='wet'?'30 يوم':'—'}
+],
+
+felicity: c => [
+ {n:'◆',name:'أولوية مصدر الخروج',req:'must',hint:'من قائمة الشاشة',
+  opts:[['UTI','الدولة أولاً'],['SOL','الشمس أولاً'],['SBU','الشمس ← البطارية ← الدولة']],val:PRIO(c)},
+ {n:'◆',name:'نوع البطارية',req:'must',hint:'',
+  opts:[['AGM',''],['FLD','سائلة'],['USE','مخصص'],['LI','ليثيوم مع BMS']],val:BTC(c)},
+ {n:'◆',name:'بروتوكول BMS',req:c.li?'must':'auto',hint:c.li?'بيتحدد حسب ماركة بطاريتك':'ما بينطبق',
+  opts:[['رقم بروتوكول','بيختلف بين الموديلات']],val:c.li?'؟':'—'},
+ {n:'◆',name:'تيار الشحن الأقصى',req:c.li?'auto':'must',hint:c.li?'مقفول مع BMS':'',
+  opts:[['حسب سعة البطارية','']],val:c.li?'من BMS':c.maxA+' A'},
+ {n:'◆',name:'تيار الشحن من الدولة',req:'must',hint:c.gA?('محسوب من '+c.gA+' أمبير'):'حدّد أمبير اشتراكك',
+  opts:[['أقل من طاقة اشتراكك','']],val:c.acChg==='no'?'0 A':(c.gridA?c.gridA+' A':'؟')},
+ {n:'◆',name:'فولت الشحن / التعويم',req:c.li?'auto':'must',hint:'',
+  opts:[['من كتالوج البطارية','']],val:c.li?'من BMS':c.V.bulk+' / '+c.V.float},
+ {n:'◆',name:'فولت الفصل',req:'must',hint:'حماية البطارية',
+  opts:[['من كتالوج البطارية','']],val:c.li?'؟':c.V.low},
+ {n:'◆',name:'مدى فولت الدخل',req:'must',hint:'',
+  opts:[['APL','للأجهزة العادية'],['UPS','للحساسة']],val:'APL'},
+ {n:'◆',name:'إعادة التشغيل التلقائي',req:'opt',hint:'بعد الحمل الزائد أو الحرارة',
+  opts:[['مفعّل',''],['موقّف','']],val:'مفعّل'}
+]};
+
+function settings(){
+  const c = ctx();
+  let L = sel==='growatt' ? CATALOG.growatt(c)
+        : sel==='voltronic' ? CATALOG.voltronic(c)
+        : CATALOG.felicity(c);
+  if(sel === 'felicity_ivgm') L = L.concat([
+    {n:'◆',name:'العدّاد الذكي (CT)',req:'must',hint:'إجباري بالتركيب — بيقرأ اتجاه التيار عبر RS485',
+     opts:[['بين الأحمال والشبكة','وباتجاه السهم المرسوم عليه']],val:'إجباري'},
+    {n:'◆',name:'منع التصدير',req:'must',hint:'لمنع الضخ للشبكة العامة',
+     opts:[['Zero Export','ممنوع التصدير'],['Export','بيسمح — بدو موافقة']],val:'Zero Export'}
+  ]);
+  if(c.port === 'yes') L.push({n:'◆',name:'إعداد منفذ GEN',req:'must',
+    hint:'تيار شحن منفصل للموتور غير الدولة',opts:[['أقل من طاقة موتورك','']],val:'؟'});
+  return L;
+}
+
+function render(){
+  const I = INV[sel], bt = $('bt').value, ah = parseFloat($('cap').value)||0;
+  const R = RATES[bt], V = VOLT[bt];
+  const names = {li:'ليثيوم',agm:'AGM',gel:'Gel',wet:'سائلة'};
+  let h = '';
+
+  if(tab === 'menu'){
+    const C = complexity();
+    if(C.hard){
+      $('out').innerHTML = '<div class="hardbox"><b>⚠️ هالسيستم بدو استشارة</b><br>'
+        + C.reasons.map(r => '• '+r).join('<br>')
+        + '<br><br>منظومة متل هي ما بتنضبط بأرقام جاهزة — إعداد غلط فيها بيكلّف بطارية أو إنفرتر. '
+        + 'ابعتلي التفاصيل وبضبطها معك — وبسعر رمزي، أرخص من غلطة إعداد وحدة.</div>'
+        + cta('بمشي معك على الإعدادات وحدة وحدة، أو بضبطها عن بُعد.',
+              'مرحبا، عندي منظومة '+I.name+' بدها استشارة:\n'+C.reasons.join('\n'));
+      return;
+    }
+    const ORD = {must:0, opt:1, auto:2};
+    const S = settings().sort((a,b) => ORD[a.req]-ORD[b.req]);
+    S.forEach((x,i) => x.step = i+1);
+    const numbered = S[0].n !== '◆';
+    const shown = S.filter(x => filt === 'all' || x.req === filt);
+    const cnt = r => S.filter(x => x.req === r).length;
+    h = '<div class="filters">'
+      + [['all','الكل',S.length],['must','إجباري',cnt('must')],
+         ['opt','اختياري',cnt('opt')],['auto','تلقائي',cnt('auto')]]
+        .map(([k,l,n]) => '<button data-f="'+k+'" class="f'+k+(filt===k?' on':'')+'">'+l+' <i>'+n+'</i></button>').join('')
+      + '</div>'
+      + '<p class="steplede">'+(numbered
+          ? '<b>امشي بالترتيب من خطوة 1 لآخر خطوة.</b> الرقم الكبير هو رقم البرنامج على شاشة الإنفرتر — ادخل عليه وحطّ القيمة. اضغط على أي إعداد لتشوف كل خياراتو.'
+          : '<b>امشي بالترتيب من خطوة 1 لآخر خطوة.</b> إعدادات هالموديل بالاسم مش برقم — دوّر عليها بقائمة الشاشة. اضغط على أي إعداد لتشوف خياراتو.')+'</p>'
+      + shown.map(x => prow(x, S.length)).join('');
+    const asks = S.filter(x => x.val === '؟');
+    if(asks.length){
+      h += '<div class="askbox"><b>ناقص '+asks.length+' معلومة</b><br>'
+        + 'ما بصح أعطيك رقم عام فيها — بتتغيّر حسب موديلك وبطاريتك:<br>'
+        + asks.map(x => '• '+(numbered?'برنامج '+x.n+' — ':'')+x.name).join('<br>') + '</div>'
+        + cta('ابعتلي موديل الإنفرتر وموديل البطارية، وبطلّعلك هالقيم من الكتالوج.',
+              'مرحبا، عندي '+I.name+' وبدي هالقيم:\n'+asks.map(x=>'- '+(numbered?'برنامج '+x.n+' — ':'')+x.name).join('\n'));
+    } else {
+      h += cta('جرّبها، وإذا شي ما زبط ابعتلي — غالباً بيكون في تفصيل صغير بالموديل.',
+               'مرحبا، ضبطت إعدادات '+I.name+' وعندي سؤال.');
+    }
+  }
+  else if(tab === 'batt'){
+    h = row('سعة البطارية','', ah+' Ah')
+      + row('أقصى تيار شحن','بمعدل '+R.chg+'C', Math.round(ah*R.chg)+' A')
+      + row('أقصى تيار تفريغ','بمعدل '+R.dis+'C', Math.round(ah*R.dis)+' A')
+      + row('فولت الشحن','لنظام 48V', V.bulk)
+      + row('فولت التعويم','', V.float)
+      + row('فولت الفصل','أهم إعداد للحماية', V.low)
+      + '<div class="warnbox" style="margin:13px 0 0"><b>ملاحظة:</b> '+R.note+'</div>'
+      + cta('هالأرقام عامة. كتالوج بطاريتك بيعطي قيم مختلفة حسب عدد الخلايا والحرارة — بطلّعلك ياها.',
+            'مرحبا، بطاريتي '+names[bt]+' '+ah+'Ah على إنفرتر '+I.name+' — بدي قيم الشحن الصحيحة.');
+  }
+  else if(tab === 'src'){
+    const VB = bt === 'li' ? 51.2 : 52;
+    const pvn = parseInt($('pvn').value)||0, pvw = parseInt($('pvw').value)||0;
+    const kwp = pvn*pvw/1000;
+    const gA = parseFloat($('gridA').value)||0, mA = parseFloat($('genA').value)||0;
+    const port = $('genPort').value;
+    const gKW = gA*230/1000, mKW = mA*230/1000;
+    const battKWh = ah*VB/1000;
+    const solarDay = kwp*4.5;                       /* ساعات شمس فعّالة بلبنان تقريباً */
+    const maxBattA = Math.round(ah*R.chg);
+    const acA = k => Math.min(maxBattA, Math.floor(k*1000*0.85/VB));
+    const solarA = Math.min(maxBattA, Math.floor(kwp*1000*0.8/VB));
+
+    h = row('قدرة الألواح', pvn+' لوح × '+pvw+'W', kwp.toFixed(2)+' kWp')
+      + row('إنتاج شمسي يومي','تقدير ~4.5 ساعة شمس', solarDay.toFixed(1)+' kWh')
+      + row('طاقة البطارية','من 0 لـ100%', battKWh.toFixed(1)+' kWh')
+      + row('شحن من الشمس','أقصى تيار متاح', solarA+' A')
+      + (gA ? row('شحن من الدولة', gA+' أمبير ≈ '+gKW.toFixed(1)+' kW', acA(gKW)+' A') : row('الدولة','ما في','—'))
+      + (mA ? row('شحن من الموتور', mA+' أمبير ≈ '+mKW.toFixed(1)+' kW', acA(mKW*0.8)+' A') : row('الموتور','ما في','—'));
+
+    /* منفذ GEN */
+    if(port === 'yes'){
+      h += '<div class="warnbox" style="margin:13px 0 0"><b>الموتور على منفذ GEN:</b> '
+        + 'هيدا الوضع الأفضل — بتقدر تحط تيار شحن مختلف للموتور غير الدولة، '
+        + 'وبعض الموديلات بتشغّل الموتور تلقائياً لما تنزل البطارية. '
+        + 'انتبه: منفذ GEN بأغلب الموديلات ما بيقبل تصدير للشبكة، والتيار الأقصى بيكون أقل من مدخل الشبكة.</div>';
+    } else if(port === 'no' && mA){
+      h += '<div class="warnbox dangerbox" style="margin:13px 0 0"><b>الموتور مع الدولة على نفس المدخل:</b> '
+        + 'الإنفرتر ما بيميّز بيناتن، فبيسحب من الموتور نفس تيار شحن الدولة — وهون بيوقع الموتور أو بيرمي القاطع. '
+        + 'الحل: إما توصلو على منفذ GEN، أو تخفّض تيار الشحن ليناسب الأضعف بيناتن ('
+        + acA(Math.min(gKW||99, mKW*0.8))+' A).</div>';
+    }
+
+    /* هل بيحتاج موتور */
+    const need = battKWh + (kwp*1.2);
+    let verdict, vnote;
+    if(!kwp){ verdict = 'ما في ألواح'; vnote = 'بدون شمس، كل الشحن رح يكون من الدولة أو الموتور.'; }
+    else if(solarDay >= need*1.15){ verdict = 'ممكن تستغني عن الموتور';
+      vnote = 'الإنتاج الشمسي بيغطي شحن البطارية والاستهلاك النهاري بأيام الشمس. خلّي الموتور احتياط للشتاء بس.'; }
+    else if(solarDay >= need*0.75){ verdict = 'الموتور احتياطي';
+      vnote = 'بأيام الشمس ما بتحتاجو، وبالغيم والشتا بيلزمك. خلّي شحن الموتور مفعّل بس بنسبة بطارية منخفضة.'; }
+    else { verdict = 'بتحتاج الموتور';
+      vnote = 'الألواح قليلة نسبة للبطارية والاستهلاك. زيادة الألواح بتوفّر أكتر من زيادة البطارية.'; }
+    h += '<div class="calcbox">توفير الموتور: <b>'+verdict+'</b><br><span style="color:var(--muted)">'+vnote+'</span></div>';
+
+    h += '<div class="warnbox" style="margin:11px 0 0"><b>تقديرات:</b> الأرقام مبنية على 230 فولت و~4.5 ساعة شمس فعّالة. '
+      + 'الاستهلاك الفعلي وزاوية الألواح والظل بيغيّروا النتيجة كتير.</div>'
+      + cta('بحسبلك الإعداد الصح لتيار الشحن من كل مصدر، وجدولة تشغيل الموتور لتوفّر مازوت من أول شهر.',
+            'مرحبا، عندي '+pvn+' لوح '+pvw+'W · بطارية '+ah+'Ah · دولة '+gA+'A · موتور '+mA+'A على '+I.name+' — بدي أضبط الشحن.');
+  }
+  else if(tab === 'prot'){
+    h = row('قاطع DC البطارية','حسب تيار التفريغ', Math.round(ah*R.dis*1.25)+' A تقريباً')
+      + row('كابل البطارية','قصير وسميك قدر الإمكان', '؟')
+      + row('قاطع DC للألواح','لكل سلسلة', '16A / 2P')
+      + row('قاطع AC','حسب قدرة الإنفرتر', '؟')
+      + row('التأريض','إجباري بكل الحالات', 'نعم')
+      + row('حماية الصواعق (SPD)','مهمة بالسطوح المكشوفة', 'موصى فيها')
+      + '<div class="warnbox" style="margin:13px 0 0"><b>تقديرات:</b> مقطع الكابل بيتحدد بالتيار وطول الخط وهبوط الجهد. كابل البطارية الطويل أو الرفيع بيسخّن وبيقلّل الأداء.</div>'
+      + cta('ابعتلي أطوال خطوطك وقدرة إنفرترك، وبحسبلك المقاطع والقواطع بالضبط.',
+            'مرحبا، إنفرتر '+I.name+' — بدي حساب مقاطع الكابلات والقواطع.');
+  }
+  else {
+    h = '<div style="font-size:13.5px;line-height:2">• ' + I.tips.join('<br>• ') + '</div>'
+      + cta('كل موديل عندو تفاصيل ما بتنكتب بالدليل — بتطلع بالخبرة. إذا وقفت بشي، أنا موجود.',
+            'مرحبا، عندي سؤال عن إنفرتر '+I.name+'.');
+  }
+  $('out').innerHTML = h;
+  syncCta();
+}
+
+function drawFaults(){
+  const F = INV[sel].faults;
+  $('faults').innerHTML = Object.keys(F).map(k => '<button data-f="'+k+'">'+k+'</button>').join('');
+  $('fout').classList.remove('on');
+}
+$('faults').onclick = e => {
+  const b = e.target.closest('button[data-f]'); if(!b) return;
+  [...$('faults').children].forEach(x => x.classList.toggle('on', x===b));
+  const [t,d] = INV[sel].faults[b.dataset.f];
+  const crit = /قصر|عزل|تسرّب|قوس/.test(t+d);
+  $('fout').innerHTML = '<b>'+b.dataset.f+' — '+t+'</b><br>'+d
+    + (crit ? '<div class="warnbox dangerbox" style="margin:11px 0 0"><b>خطر:</b> لا تعيد التشغيل مراراً قبل ما تلاقي السبب.</div>' : '')
+    + cta('إذا رجع العطل بعد ما جرّبت، ابعتلي صورة الشاشة وتفاصيل منظومتك وبمشي معك خطوة خطوة.',
+          'مرحبا، طالعلي عطل '+b.dataset.f+' على '+INV[sel].name+' — بدي مساعدة.')
+    + '<br><span style="color:var(--muted);font-size:12px">الأكواد بتختلف بين الموديلات — أكّدها من دليل إنفرترك.</span>';
+  $('fout').classList.add('on');
+};
+
+$('send').onclick = () => {
+  const I = INV[sel], bt = $('bt').value, ah = parseFloat($('cap').value)||0, R = RATES[bt];
+  const names = {li:'ليثيوم LiFePO4',agm:'AGM',gel:'Gel',wet:'سائلة'};
+  let t = '⚡ تقرير إعدادات إنفرتر\n';
+  t += 'صادر عن أداة '+BRAND.name+' — '+BRAND.person+'\n────────────────────\n';
+  t += 'الإنفرتر: '+I.name+' ('+I.sub+')\n';
+  t += 'البطارية: '+names[bt]+' · '+ah+' Ah\n────────────────────\n';
+  t += 'أقصى شحن: '+Math.round(ah*R.chg)+' A\n';
+  t += 'أقصى تفريغ: '+Math.round(ah*R.dis)+' A\n';
+  t += 'فولت الشحن: '+VOLT[bt].bulk+'\nفولت التعويم: '+VOLT[bt].float+'\nفولت الفصل: '+VOLT[bt].low+'\n';
+  const pvn = parseInt($('pvn').value)||0, pvw = parseInt($('pvw').value)||0;
+  const gA = $('gridA').value, mA = $('genA').value;
+  const portTxt = {yes:'على منفذ GEN منفصل', no:'مع الدولة على نفس المدخل', none:'ما في موتور'}[$('genPort').value];
+  t += '────────────────────\n';
+  t += 'الألواح: '+pvn+' × '+pvw+'W = '+(pvn*pvw/1000).toFixed(2)+' kWp\n';
+  t += 'الدولة: '+(gA==='0'?'ما في':gA+' أمبير')+'\n';
+  t += 'الموتور: '+(mA==='0'?'ما في':mA+' أمبير')+' — '+portTxt+'\n';
+  t += '────────────────────\n⚠️ أرقام استرشادية — أكّدها من كتالوج البطارية وموديل الإنفرتر.\n';
+  t += 'للاستشارة: '+BRAND.phone;
+  window.open('https://wa.me/'+BRAND.wa+'?text='+encodeURIComponent(t),'_blank');
+};
+
+$('out').addEventListener('click', e => {
+  const f = e.target.closest('button[data-f]');
+  if(f){ filt = f.dataset.f; render(); return; }
+  const c = e.target.closest('.pgm');
+  if(c) c.classList.toggle('open');
+});
+drawFaults(); render(); go(0);
+</script>
+</body>
+</html>
