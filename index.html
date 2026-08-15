@@ -146,6 +146,18 @@ h1{font-family:'Readex Pro',sans-serif;font-weight:700;
 .skill b{font-size:14px;font-weight:600;display:block}
 .skill small{font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace}
 
+.orderbox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.orderlead{color:var(--muted);font-size:14px;margin-bottom:18px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px;margin-bottom:16px}
+.fields label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.fields .wide{grid-column:1/-1}
+.fields input,.fields textarea,.fields select{
+  font-family:inherit;font-size:14px;color:var(--text);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:10px;padding:11px 13px;resize:vertical;width:100%}
+.fields input:focus,.fields textarea:focus,.fields select:focus{outline:none;border-color:var(--volt)}
+.fields input::placeholder,.fields textarea::placeholder{color:var(--muted);opacity:.6}
+.wide-btn{width:100%}
+.hint{display:block;margin-top:10px;font-size:11.5px;color:var(--muted);text-align:center}
 .social{display:flex;gap:9px;margin:0 0 24px}
 .social a{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;
   border:1px solid var(--line);background:var(--panel-2);color:var(--muted);font-size:19px;
@@ -159,7 +171,12 @@ h1{font-family:'Readex Pro',sans-serif;font-weight:700;
 .part i{font-style:normal;font-size:12.5px;color:var(--muted)}
 .nameline{font-size:13px;color:var(--muted)}
 
-.tool{border-inline-start:2px solid var(--arc)}
+.tool{border-inline-start:2px solid var(--arc);position:relative;display:block;text-decoration:none;color:inherit}
+a.tool.live{border-inline-start-color:var(--volt)}
+a.tool.live:hover{transform:translateY(-3px);border-color:var(--volt)}
+.live-tag{position:absolute;top:12px;inset-inline-end:12px;background:var(--volt);color:var(--volt-ink);
+  font-size:10px;font-weight:700;border-radius:999px;padding:3px 9px}
+.tool p b{color:var(--warn)}
 .tool.pin{border-inline-start-color:var(--volt);background:var(--panel-2)}
 .work{border-inline-start:2px solid var(--arc)}
 .work.pin{border-inline-start-color:var(--volt)}
@@ -211,6 +228,7 @@ footer b{color:var(--text);font-weight:600}
     <div class="menu">
       <a href="#hero" data-en="Home">الرئيسية</a>
       <a href="#tools" data-en="Tools">الأدوات</a>
+      <a href="#order" data-en="Request">اطلب تطبيقك</a>
       <a href="#services" data-en="Services">الخدمات</a>
       <a href="#skills" data-en="Skills">المهارات</a>
       <a href="#work" data-en="Projects">الأعمال</a>
@@ -227,7 +245,7 @@ footer b{color:var(--text);font-weight:600}
 <div class="rail-zone">
 
   <div class="bus" aria-hidden="true">
-    <i class="node" data-for="hero"></i><i class="node" data-for="tools"></i><i class="node" data-for="services"></i>
+    <i class="node" data-for="hero"></i><i class="node" data-for="tools"></i><i class="node" data-for="order"></i><i class="node" data-for="services"></i>
     <i class="node" data-for="skills"></i><i class="node" data-for="work"></i>
     <i class="node" data-for="contact"></i>
   </div>
@@ -240,7 +258,7 @@ footer b{color:var(--text);font-weight:600}
       <h1>أنور الحسن الجاسم</h1>
       <div class="h1-sub" data-en="Electrician &amp; builder of field tools">كهربائي ومطوّر أدوات فنية</div>
       <p class="lede" data-en="Tools that do the technician's hard part for him: photograph the system and get the inverter settings, size a cable to international standards, take off a whole apartment from the floor plan. <b>Custom tools on request too.</b>">
-        أدوات بتشيل عن الفني أصعب جزء بشغله: صوّر المنظومة وخود إعدادات الإنفرتر، احسب الكابل حسب القياسات العالمية، جرّد شقة كاملة من الخريطة. <b>وبصنع أدوات ومواقع تعريفية حسب طلبك.</b>
+        أدوات بتشيل عن الفني أصعب جزء بشغله: صوّر المنظومة وخود إعدادات الإنفرتر، احسب الكابل حسب القياسات العالمية، جرّد شقة كاملة من الخريطة. <b>وكل الأدوات تحت مجانية وشغّالة — جرّبها.</b>
       </p>
       <div class="cta">
         <a class="btn btn-main" href="https://wa.me/96179434479" target="_blank" rel="noopener">
@@ -263,7 +281,7 @@ footer b{color:var(--text);font-weight:600}
         <a href="https://whatsapp.com/channel/0029VbAeAnT7z4kXbxvH2H1U" target="_blank" rel="noopener" aria-label="WhatsApp Channel" title="قناة واتساب — Voltage Lab"><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-channel"/></svg></i></a>
       </div>
       <div class="specs">
-        <div class="spec"><b data-en="Photo in">صورة تدخل</b><span data-en="Settings and results out">إعدادات ونتائج تطلع</span></div>
+        <div class="spec"><b>5</b><span data-en="Free tools, live now">أدوات مجانية شغّالة الآن</span></div>
         <div class="spec"><b data-en="Custom built">حسب الطلب</b><span data-en="Any tool, online or on site">أي أداة، أونلاين أو على الأرض</span></div>
         <div class="spec"><b>10K+</b><span data-en="Followers on TikTok @mrelectroai">متابع على تيك توك @mrelectroai</span></div>
       </div>
@@ -284,54 +302,106 @@ footer b{color:var(--text);font-weight:600}
 
   <!-- ═══ الأدوات ═══ -->
   <section id="tools">
-    <div class="head rise"><h2 data-en="Tools for technicians">أدوات الفنيين</h2><hr><em>TOOLS</em></div>
+    <div class="head rise"><h2 data-en="Tools for technicians">أدوات الفنيين</h2><hr><em>5 أدوات شغّالة</em></div>
     <div class="grid g3">
-      <article class="card tool rise">
-        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-microchip"/></svg></i><span data-en="Inverter setup from a photo">برمجة الإنفرتر من صورة</span></h3>
-        <p data-en="Photograph the system and get the settings it needs — instead of digging through the manual on site.">صوّر المنظومة وبتعطيك الإعدادات المطلوبة، بدل ما تفتّش بالكتالوج وأنت بالموقع.</p>
-        <div class="tags"><span class="tag">Photo → Settings</span><span class="tag">Solar</span></div>
-      </article>
+      <a class="card tool live rise" href="tools/load/">
+        <span class="live-tag">جرّبها الآن</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-solar-panel"/></svg></i><span data-en="System sizing calculator">حساب المنظومة الشمسية</span></h3>
+        <p data-en="Enter your home appliances and get the inverter, battery and panel sizes you need.">حطّ أجهزة بيتك وبتطلعلك قدرة الإنفرتر وسعة البطاريات وعدد الألواح.</p>
+        <div class="tags"><span class="tag">Load Sizing</span><span class="tag">Battery</span><span class="tag">PV</span></div>
+      </a>
+
+      <a class="card tool live rise" href="tools/inverters/">
+        <span class="live-tag">جرّبها الآن</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-microchip"/></svg></i><span data-en="Inverter settings guide">إعدادات الإنفرترات</span></h3>
+        <p data-en="Felicity, Growatt and Voltronic — which program number to open and what value to set.">Felicity وGrowatt وVoltronic — على أي رقم برنامج تفوت وشو تحط فيه، خطوة خطوة.</p>
+        <div class="tags"><span class="tag">Felicity</span><span class="tag">Growatt</span><span class="tag">Voltronic</span></div>
+      </a>
+
+      <a class="card tool live rise" href="tools/deye/">
+        <span class="live-tag">جرّبها الآن</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-sliders"/></svg></i><span data-en="Deye inverter settings">إعدادات إنفرتر Deye</span></h3>
+        <p data-en="Charging currents, protection sizes and fault codes for Deye hybrid inverters.">تيارات الشحن وقياسات الحماية وأكواد الأعطال لإنفرترات Deye الهجينة.</p>
+        <div class="tags"><span class="tag">Deye</span><span class="tag">Fault Codes</span></div>
+      </a>
+
+      <a class="card tool live rise" href="tools/jarde/">
+        <span class="live-tag">جرّبها الآن</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-diagram-project"/></svg></i><span data-en="Materials take-off">الجردة — جرد المواد</span></h3>
+        <p data-en="Sawad or bayad take-off, then send the order straight to the nearest shop on WhatsApp.">جردة سواد أو بياض، وبتوصل للمحل الأقرب على واتساب جاهزة مع PDF.</p>
+        <div class="tags"><span class="tag">Take-off</span><span class="tag">PDF</span><span class="tag">WhatsApp</span></div>
+      </a>
+
+      <a class="card tool live rise" href="tools/wirephase/">
+        <span class="live-tag">جرّبها الآن</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-wave-square"/></svg></i><span data-en="Phase distribution helper">توزيع الفازات</span></h3>
+        <p data-en="Which phase each circuit goes on, with three colour-coding standards.">أي دارة على أي فاز، مع تلات معايير ترميز لوني.</p>
+        <div class="tags"><span class="tag">L1 · L2 · L3</span><span class="tag">IEC</span></div>
+      </a>
 
       <article class="card tool rise">
         <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-gauge-high"/></svg></i><span data-en="Cable sizing calculator">حاسبة الكابلات</span></h3>
-        <p data-en="Cable sizing to international standards: load, length, voltage drop and the right section.">قياس الكابل حسب المواصفات العالمية: الحمل، الطول، هبوط الجهد، والمقطع المناسب.</p>
-        <div class="tags"><span class="tag">IEC</span><span class="tag">Voltage Drop</span></div>
-      </article>
-
-      <article class="card tool rise">
-        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-diagram-project"/></svg></i><span data-en="Apartment take-off from the plan">جرد شقة من الخريطة</span></h3>
-        <p data-en="Photograph the floor plan, add a few details, and get the quantities for the whole apartment in minutes.">صوّر الخريطة وحطّ شوية معطيات، وبتطلع بجرد الشقة كاملة بدقايق.</p>
-        <div class="tags"><span class="tag">Quantities</span><span class="tag">Estimation</span></div>
-      </article>
-
-      <article class="card tool rise">
-        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-sliders"/></svg></i><span data-en="Phase colour helper">حساب لون الفاز</span></h3>
-        <p data-en="Sorts out phase colour coding straight away, so nobody has to guess at the panel.">بيحدّد ترميز ألوان الفازات على طول، بدون تخمين قدام اللوحة.</p>
-        <div class="tags"><span class="tag">Colour Code</span><span class="tag">Field</span></div>
-      </article>
-
-      <article class="card tool rise">
-        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-video"/></svg></i><span data-en="More field tools">أدوات ميدانية أخرى</span></h3>
-        <p data-en="A growing set of calculation and inspection tools, built from real problems on site.">مجموعة عم تكبر من أدوات الحساب والفحص، مبنية من مشاكل حقيقية بالميدان.</p>
-        <div class="tags"><span class="tag">Growing set</span></div>
+        <p data-en="Cable sizing to international standards: load, length, voltage drop and the right section.">قياس الكابل حسب المواصفات العالمية: الحمل، الطول، هبوط الجهد، والمقطع المناسب. <b>قريباً</b></p>
+        <div class="tags"><span class="tag">قريباً</span></div>
       </article>
 
       <article class="card tool rise">
         <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-code"/></svg></i><span data-en="Profile sites &amp; CVs">مواقع تعريفية وسير ذاتية</span></h3>
-        <p data-en="A professional page that presents you and your work — a personal site or a CV people can open from a link.">صفحة احترافية بتعرّف عنك وعن شغلك — موقع شخصي أو سيرة ذاتية بيفتحها الناس برابط.</p>
-        <div class="tags"><span class="tag">Personal site</span><span class="tag">CV</span><span class="tag">Portfolio</span></div>
+        <p data-en="A professional page that presents you and your work — like this site you're on.">صفحة احترافية بتعرّف عنك وعن شغلك — زي هالموقع اللي أنت عليه هلق.</p>
+        <div class="tags"><span class="tag">Personal site</span><span class="tag">CV</span></div>
       </article>
 
       <article class="card tool pin rise">
         <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-toolbox"/></svg></i><span data-en="Your own tool, on request">أداة حسب طلبك</span></h3>
-        <p data-en="Tell me the task that wastes your time and I build the tool for it — for electricians and other trades, online or as a device on site.">قلّي شو الشغلة اللي بتضيّع وقتك وبصنعلك أداتها — للكهربائيين ولغير الكهربائيين، أونلاين أو جهاز على أرض الواقع.</p>
+        <p data-en="Tell me the task that wastes your time and I build the tool for it — or your own branded copy of any tool here.">قلّي شو الشغلة اللي بتضيّع وقتك وبصنعلك أداتها — أو نسختك أنت من أي أداة هون باسمك ورقمك.</p>
         <div class="tags"><span class="tag">Online</span><span class="tag">On-site</span><span class="tag">Any trade</span></div>
       </article>
-    </div>
 
     <a class="btn btn-main" style="margin-top:16px" href="https://wa.me/96179434479?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%20%D8%A3%D9%86%D9%88%D8%B1%D8%8C%20%D8%A8%D8%AF%D9%8A%20%D8%A3%D8%B3%D8%A3%D9%84%20%D8%B9%D9%86%20%D8%A3%D8%AF%D9%88%D8%A7%D8%AA%20%D8%A7%D9%84%D9%81%D9%86%D9%8A%D9%8A%D9%86" target="_blank" rel="noopener">
       <i class="ic"><svg viewBox="0 0 24 24"><use href="#i-whatsapp"/></svg></i><span data-en="Ask about a tool">اسأل عن أداة</span>
     </a>
+  </section>
+
+  <!-- ═══ طلب تطبيق ═══ -->
+  <section id="order">
+    <div class="head rise"><h2 data-en="Request your app">اطلب تطبيقك</h2><hr><em>BUILD</em></div>
+
+    <div class="orderbox rise">
+      <p class="orderlead" data-en="Fill in the details and press send — the request opens straight in my WhatsApp, already written.">عبّي التفاصيل واضغط إرسال — الطلب بيوصلني مباشرة على الواتساب، مكتوب جاهز.</p>
+
+      <div class="fields">
+        <label><span data-en="Your name">اسمك</span>
+          <input id="f-name" type="text" placeholder="..."></label>
+
+        <label><span data-en="Your field of work">مجال شغلك</span>
+          <input id="f-job" type="text" placeholder="كهربا، سولار، صيانة..."></label>
+
+        <label class="wide"><span data-en="What should the app do?">شو بدك التطبيق يعمل؟</span>
+          <textarea id="f-need" rows="4" placeholder="اشرح الشغلة اللي بتضيّع وقتك وبدك الأداة تحلّها..."></textarea></label>
+
+        <label><span data-en="Type">نوع الأداة</span>
+          <select id="f-type">
+            <option data-en="Web tool (online)">أداة أونلاين (ويب)</option>
+            <option data-en="Phone app">تطبيق موبايل</option>
+            <option data-en="Physical device on site">جهاز على أرض الواقع</option>
+            <option data-en="Profile site or CV">موقع تعريفي أو CV</option>
+            <option data-en="Not sure yet">لسا مش متأكد</option>
+          </select></label>
+
+        <label><span data-en="When do you need it?">إمتى بتحتاجو؟</span>
+          <select id="f-when">
+            <option data-en="As soon as possible">بأسرع وقت</option>
+            <option data-en="Within a month">خلال شهر</option>
+            <option data-en="No rush">ما في استعجال</option>
+          </select></label>
+      </div>
+
+      <button class="btn btn-main wide-btn" id="send">
+        <i class="ic"><svg viewBox="0 0 24 24"><use href="#i-whatsapp"/></svg></i>
+        <span data-en="Send on WhatsApp">إرسال على واتساب</span>
+      </button>
+      <small class="hint" data-en="Nothing is stored here — the message opens in your own WhatsApp for you to send.">ما منخزّن شي هون — الرسالة بتفتح بواتسابك وأنت بتبعتها.</small>
+    </div>
   </section>
 
   <!-- ═══ الخدمات ═══ -->
@@ -540,6 +610,27 @@ document.getElementById('copy').addEventListener('click', async function () {
   }
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2300);
+});
+
+/* ── طلب تطبيق → واتساب ── */
+document.getElementById('send').addEventListener('click', () => {
+  const g = id => document.getElementById(id).value.trim();
+  const name = g('f-name'), job = g('f-job'), need = g('f-need');
+  if (!need) {
+    toast.textContent = en ? 'Tell me what the app should do' : 'اكتب شو بدك التطبيق يعمل';
+    toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2300);
+    document.getElementById('f-need').focus();
+    return;
+  }
+  const sel = id => { const s = document.getElementById(id); return s.options[s.selectedIndex].textContent; };
+  const msg =
+    (en ? 'App request — MrElectroAI' : 'طلب تطبيق — MrElectroAI') + '\n\n' +
+    (en ? 'Name: ' : 'الاسم: ') + (name || '—') + '\n' +
+    (en ? 'Field: ' : 'المجال: ') + (job || '—') + '\n' +
+    (en ? 'Type: ' : 'نوع الأداة: ') + sel('f-type') + '\n' +
+    (en ? 'Timing: ' : 'التوقيت: ') + sel('f-when') + '\n\n' +
+    (en ? 'What it should do:\n' : 'المطلوب:\n') + need;
+  window.open('https://wa.me/96179434479?text=' + encodeURIComponent(msg), '_blank');
 });
 </script>
 </body>
