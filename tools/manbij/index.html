@@ -23,6 +23,14 @@ body{background:var(--void);color:var(--text);font-family:'IBM Plex Sans Arabic'
 .wrap{max-width:640px;margin:0 auto}
 :where(a,button,input,select,textarea):focus-visible{outline:2px solid var(--sun);outline-offset:3px}
 
+.lock{position:fixed;inset:0;background:var(--void);display:grid;place-items:center;padding:22px;z-index:60;
+  background-image:radial-gradient(circle at 50% 0%,var(--glow),transparent 55%)}
+.lockbox{background:var(--panel);border:1px solid var(--line);border-radius:18px;
+  padding:26px 22px;width:100%;max-width:340px;text-align:center}
+.lockbox h2{font-family:'Readex Pro',sans-serif;font-size:17px;margin-bottom:3px}
+.lockbox p{font-size:12.5px;color:var(--muted)}
+.lkft{font-size:11.5px;color:var(--muted);margin-top:13px;line-height:1.7}
+.pinerr{font-size:12.5px;color:var(--danger);min-height:19px;margin-top:8px}
 .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
   background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px 13px}
 .bd{display:flex;align-items:center;gap:10px}
@@ -145,11 +153,25 @@ footer .of{display:block;margin-top:9px;padding-top:9px;border-top:1px dashed va
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="lock" id="lock">
+  <div class="lockbox">
+    <div class="sun" style="width:52px;height:52px;font-size:26px;margin:0 auto 14px">☀️</div>
+    <h2 id="lkTitle">مركز أبو أيهم للصيانة</h2>
+    <p id="lkSub">طاقة شمسية وإنفرترات — منبج</p>
+    <label class="lbl" style="text-align:center;margin-top:16px">كود الدخول</label>
+    <input id="pin" type="tel" inputmode="numeric" maxlength="8" placeholder="••••"
+      style="text-align:center;font-size:26px;letter-spacing:12px;font-family:'JetBrains Mono',monospace;padding:14px">
+    <div id="pinErr" class="pinerr"></div>
+    <button class="btn main" id="pinGo" style="margin-top:12px">🔓 دخول</button>
+    <p class="lkft">كل فرع إلو كودو — والكود بيحدد باسم مين بينسجّل الشغل.</p>
+  </div>
+</div>
+
+<div class="wrap" id="app" style="display:none">
   <div class="top">
     <div class="bd"><span class="sun">☀️</span><div>
       <b id="hdName">مركز أبو أيهم للصيانة</b><small id="hdSub">طاقة شمسية وإنفرترات — منبج</small></div></div>
-    <div style="display:flex;align-items:center;gap:8px"><i id="dot" title="حالة الاتصال" style="width:9px;height:9px;border-radius:50%;background:var(--muted);display:block"></i><button class="tbtn" id="theme" aria-label="تبديل الثيم">🌙</button></div>
+    <div style="display:flex;align-items:center;gap:8px"><i id="dot" title="حالة الاتصال" style="width:9px;height:9px;border-radius:50%;background:var(--muted);display:block"></i><button class="tbtn" id="theme" aria-label="تبديل الثيم">🌙</button><button class="tbtn" id="lockBtn" aria-label="قفل" title="قفل">🔒</button></div>
   </div>
   <div class="sync off" id="sync" style="display:none"><i></i><span id="syncTxt"></span></div>
 
@@ -257,8 +279,8 @@ const SHOP = {
   title:"مركز أبو أيهم للصيانة",
   sub:"طاقة شمسية وإنفرترات — منبج",
   branches: [
-    { name:"مركز أبو أيهم للصيانة", addr:"شارع الكواكبي — منبج", mgr:"أبو أيهم" },
-    { name:"مركز أبو أيهم للصيانة", addr:"تحت السرايا — وسط المدينة، منبج", mgr:"فاروق" }
+    { name:"مركز أبو أيهم للصيانة", addr:"شارع الكواكبي — منبج", mgr:"أبو أيهم", pin:"9999" },
+    { name:"مركز أبو أيهم للصيانة", addr:"تحت السرايا — وسط المدينة، منبج", mgr:"فاروق", pin:"8888" }
   ]
 };
 const DEV = { name:"MrElectroAI", person:"أنور الحسن الجاسم", wa:"96179434479", phone:"79 434 479" };
@@ -650,7 +672,59 @@ $('impFile').onchange = e => {
 function say(m){ const t=$('toast'); t.textContent=m; t.classList.add('on');
   setTimeout(()=>t.classList.remove('on'),2600); }
 
-(async () => { await cloudLoad(); bkStatus(); go(0); })();
+/* ── قفل الدخول ── */
+function unlock(i){
+  br = i;
+  const B = SHOP.branches[i];
+  $('lock').style.display = 'none';
+  $('app').style.display = 'block';
+  $('hdSub').textContent = B.addr + ' · ' + B.mgr;
+  $('mainSub').textContent = 'فرع ' + B.mgr + ' — ' + B.addr;
+  document.querySelectorAll('.branch').forEach((x,n) => x.classList.toggle('on', n===i));
+  go(1);
+}
+let tries = 0, blocked = 0;
+function tryPin(){
+  if(Date.now() < blocked){
+    $('pinErr').textContent = 'استنى شوي قبل ما تجرّب من جديد'; return; }
+  const v = $('pin').value.trim();
+  const i = SHOP.branches.findIndex(b => b.pin && b.pin === v);
+  if(i < 0){
+    tries++;
+    if(tries >= 5){ blocked = Date.now() + 30000; tries = 0;
+      $('pinErr').textContent = 'محاولات كتير — استنى ٣٠ ثانية'; }
+    else $('pinErr').textContent = 'الكود غلط — جرّب مرة تانية';
+    $('pin').value = ''; return;
+  }
+  tries = 0; $('pinErr').textContent = ''; unlock(i);
+}
+$('pinGo').onclick = tryPin;
+$('pin').addEventListener('keydown', e => { if(e.key === 'Enter') tryPin(); });
+$('pin').addEventListener('input', () => { $('pinErr').textContent = '';
+  const v = $('pin').value.trim();
+  if(SHOP.branches.some(b => b.pin === v)) tryPin(); });
+/* قفل تلقائي بعد دقيقتين من الخروج من التطبيق */
+let hiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden){ hiddenAt = Date.now(); }
+  else if(hiddenAt && Date.now() - hiddenAt > 120000 && $('app').style.display !== 'none'){
+    doLock();
+  }
+});
+function doLock(){
+  try { sessionStorage.removeItem('manbij_br'); } catch(e){}
+  $('pin').value = ''; $('pinErr').textContent = '';
+  $('app').style.display = 'none'; $('lock').style.display = 'grid';
+  setTimeout(() => $('pin').focus(), 200);
+}
+$('lockBtn').onclick = doLock;
+$('lkTitle').textContent = SHOP.title; $('lkSub').textContent = SHOP.sub;
+
+(async () => {
+  try { sessionStorage.removeItem('manbij_br'); } catch(e){}
+  await cloudLoad(); bkStatus();
+  setTimeout(() => $('pin').focus(), 250);
+})();
 </script>
 <style>
 .bkbox{font-size:12.5px;border-radius:10px;padding:10px 12px;margin-bottom:11px;line-height:1.7}
