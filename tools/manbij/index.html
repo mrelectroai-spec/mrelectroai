@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مركز أبو أيهم للصيانة | الطاقة الشمسية — منبج</title>
+<meta name="description" content="نظام زباين وصيانة منظومات الطاقة الشمسية والإنفرترات — منبج.">
+<meta name="theme-color" content="#0B1020">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--void:#0B1020;--panel:#141C33;--panel-2:#1B2542;--line:#2B3A5C;
+  --sun:#F5B301;--sun2:#FFD75E;--sun-ink:#1A1200;--sky:#4CA8FF;
+  --text:#EAF0FA;--muted:#8FA0C0;--glow:rgba(245,179,1,.13);--danger:#FF7A7A;--ok:#4ADE80}
+[data-theme="light"]{--void:#F2F5FB;--panel:#FFFFFF;--panel-2:#EAF0F9;--line:#D3DDEE;
+  --sun:#C98A00;--sun2:#A97400;--sun-ink:#FFFFFF;--sky:#1E6FC4;
+  --text:#0D1526;--muted:#5A6883;--glow:rgba(201,138,0,.12);--danger:#C23A3A;--ok:#177A44}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--void);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px;line-height:1.6;min-height:100vh;padding:14px 13px 96px;
+  background-image:radial-gradient(circle at 85% -5%,var(--glow),transparent 45%)}
+.wrap{max-width:640px;margin:0 auto}
+:where(a,button,input,select,textarea):focus-visible{outline:2px solid var(--sun);outline-offset:3px}
+
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px 13px}
+.bd{display:flex;align-items:center;gap:10px}
+.sun{width:36px;height:36px;border-radius:11px;background:linear-gradient(140deg,var(--sun2),var(--sun));
+  display:grid;place-items:center;font-size:19px;color:var(--sun-ink);flex-shrink:0}
+.bd b{font-size:13.5px;display:block;line-height:1.3;font-family:'Readex Pro',sans-serif}
+.bd small{font-size:10.5px;color:var(--muted)}
+.tbtn{background:var(--panel-2);border:1px solid var(--line);color:var(--muted);
+  width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:14px}
+
+.sync{display:flex;align-items:center;gap:8px;font-size:11.5px;border-radius:10px;
+  padding:8px 12px;margin-bottom:12px;border:1px solid var(--line);background:var(--panel)}
+.sync i{width:8px;height:8px;border-radius:50%;flex-shrink:0;font-style:normal}
+.sync.on i{background:var(--ok)} .sync.off i{background:var(--sun)} .sync.err i{background:var(--danger)}
+.sync span{color:var(--muted)} .sync b{color:var(--text)}
+
+.scr{display:none;animation:fade .25s ease}.scr.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+h1{font-family:'Readex Pro',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px}
+.lede{color:var(--muted);font-size:13px;margin-bottom:15px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:11px}
+.card>h2{font-family:'Readex Pro',sans-serif;font-size:14.5px;font-weight:600;margin-bottom:12px;
+  padding-bottom:9px;border-bottom:1px solid var(--line)}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 5px}
+select,input,textarea{width:100%;font-family:inherit;font-size:15px;color:var(--text);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:10px;padding:11px 12px;resize:vertical}
+select:focus,input:focus,textarea:focus{border-color:var(--sun)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mb{margin-bottom:11px}
+
+.branch{display:flex;align-items:flex-start;gap:13px;width:100%;background:var(--panel);
+  border:1px solid var(--line);border-radius:15px;padding:16px;margin-bottom:10px;cursor:pointer;
+  text-align:right;font-family:inherit;color:var(--text)}
+.branch.on{border-color:var(--sun);background:var(--glow)}
+.branch i{font-size:24px;font-style:normal;flex-shrink:0}
+.branch b{display:block;font-family:'Readex Pro',sans-serif;font-size:15px;margin-bottom:3px}
+.branch small{color:var(--muted);font-size:12.5px;line-height:1.6;display:block}
+.mgr{display:inline-block;font-size:11px;font-weight:700;color:var(--sun);
+  background:var(--panel-2);border:1px solid var(--sun);border-radius:999px;padding:2px 10px;margin-top:7px}
+
+.searchbar{position:relative}
+.searchbar input{font-size:16.5px;padding:14px 14px;font-weight:600}
+.modes{display:flex;gap:6px;margin:10px 0}
+.modes button{flex:1;font-family:inherit;font-size:12.5px;color:var(--muted);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:9px;padding:8px;cursor:pointer}
+.modes button.on{color:var(--sun-ink);background:var(--sun);border-color:var(--sun);font-weight:700}
+
+.stat{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:11px}
+.stat div{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:10px 4px;text-align:center}
+.stat b{display:block;font-family:'JetBrains Mono',monospace;font-size:17px;color:var(--sun)}
+.stat span{font-size:10px;color:var(--muted)}
+
+.cust{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;
+  margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:11px}
+.cust:hover{border-color:var(--sun)}
+.cav{width:38px;height:38px;flex-shrink:0;border-radius:50%;background:var(--void);border:1px solid var(--line);
+  display:grid;place-items:center;font-family:'Readex Pro',sans-serif;font-size:15px;color:var(--sun)}
+.cmid{flex:1;min-width:0}
+.cmid b{display:block;font-size:14px}
+.cmid small{display:block;color:var(--muted);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmid mark{background:var(--glow);color:var(--sun);border-radius:3px;padding:0 2px}
+.cbadge{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);
+  background:var(--void);border:1px solid var(--line);border-radius:8px;padding:4px 8px;flex-shrink:0}
+
+.addnew{display:flex;align-items:center;gap:12px;width:100%;background:var(--glow);
+  border:1px dashed var(--sun);border-radius:12px;padding:14px 13px;cursor:pointer;
+  text-align:right;font-family:inherit;color:var(--text);margin-bottom:8px}
+.addnew i{font-size:22px;font-style:normal;color:var(--sun)}
+.addnew b{display:block;font-size:14px}
+.addnew small{color:var(--muted);font-size:12px}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:11px 0}
+.chip{font-size:12px;color:var(--muted);background:var(--panel-2);border:1px solid var(--line);
+  border-radius:999px;padding:6px 12px;cursor:pointer}
+.chip.on{color:var(--sun-ink);background:var(--sun);border-color:var(--sun);font-weight:700}
+
+.visit{background:var(--panel-2);border:1px solid var(--line);border-inline-start:3px solid var(--sun);
+  border-radius:10px;padding:11px 12px;margin-bottom:8px}
+.visit.b1{border-inline-start-color:var(--sky)}
+.visit .vh{display:flex;justify-content:space-between;gap:9px;align-items:center;margin-bottom:5px}
+.visit b{font-size:13.5px}
+.visit .vd{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);white-space:nowrap}
+.visit p{font-size:12.5px;color:var(--muted);line-height:1.7}
+.vbr{display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 8px;margin-top:6px;
+  background:var(--glow);color:var(--sun);border:1px solid var(--sun)}
+.visit.b1 .vbr{background:rgba(76,168,255,.12);color:var(--sky);border-color:var(--sky)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;
+  border-radius:11px;font-family:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--text);cursor:pointer;margin-top:8px;text-decoration:none}
+.btn.main{background:linear-gradient(140deg,var(--sun2),var(--sun));color:var(--sun-ink);border-color:var(--sun)}
+.btn.dang{color:var(--danger);border-color:rgba(255,122,122,.35)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.brow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px 12px;line-height:1.9}
+.nav{position:fixed;inset-inline:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);
+  padding:9px 13px calc(9px + env(safe-area-inset-bottom));display:flex;gap:9px;align-items:center;z-index:9}
+.nav .btn{margin:0}.nav .back{flex:0 0 48px;padding:12px 0}
+.toast{position:fixed;bottom:86px;left:50%;transform:translate(-50%,90px);
+  background:linear-gradient(140deg,var(--sun2),var(--sun));color:var(--sun-ink);font-size:13.5px;font-weight:700;
+  padding:10px 19px;border-radius:999px;transition:transform .3s;z-index:40;max-width:88%;text-align:center}
+.toast.on{transform:translate(-50%,0)}
+.suggest{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+  max-height:190px;overflow:auto;margin-top:7px;display:none}
+.suggest.on{display:block}
+.suggest div{padding:10px 12px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line)}
+.suggest div:last-child{border-bottom:0}
+.suggest div:hover{background:var(--glow);color:var(--sun)}
+.setup{font-size:12.5px;line-height:1.9;color:var(--muted)}
+.setup code{background:var(--panel-2);border:1px solid var(--line);border-radius:6px;
+  padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--sun)}
+footer{margin-top:18px;padding:15px;border:1px solid var(--line);border-radius:14px;
+  background:var(--panel);font-size:12px;color:var(--muted);text-align:center;line-height:1.9}
+footer b{color:var(--text)}
+footer .ph{font-family:'JetBrains Mono',monospace;color:var(--sun);font-weight:700;text-decoration:none}
+footer .of{display:block;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);font-size:11.5px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="bd"><span class="sun">☀️</span><div>
+      <b id="hdName">مركز أبو أيهم للصيانة</b><small id="hdSub">طاقة شمسية وإنفرترات — منبج</small></div></div>
+    <div style="display:flex;align-items:center;gap:8px"><i id="dot" title="حالة الاتصال" style="width:9px;height:9px;border-radius:50%;background:var(--muted);display:block"></i><button class="tbtn" id="theme" aria-label="تبديل الثيم">🌙</button></div>
+  </div>
+  <div class="sync off" id="sync" style="display:none"><i></i><span id="syncTxt"></span></div>
+
+  <!-- 0 الفرع -->
+  <section class="scr on" data-k="0">
+    <h1>مين عم يشتغل هلق؟</h1>
+    <p class="lede">الزباين مشتركين بين الفرعين، وكل شغل بينسجّل باسم الفرع اللي عملو.</p>
+    <button class="branch" data-b="0"><i>🏪</i><span>
+      <b>مركز أبو أيهم للصيانة</b><small>شارع الكواكبي — منبج</small>
+      <span class="mgr">إدارة: أبو أيهم</span></span></button>
+    <button class="branch" data-b="1"><i>🏬</i><span>
+      <b>مركز أبو أيهم للصيانة</b><small>تحت السرايا — وسط المدينة، منبج</small>
+      <span class="mgr">إدارة: فاروق</span></span></button>
+    <div class="card" id="setupCard" style="display:none">
+      <h2>☁️ ربط قاعدة البيانات (مرة وحدة)</h2>
+      <div class="setup" id="setupTxt"></div>
+      <button class="btn" id="sqlBtn" style="margin-top:12px">📋 انسخ كود الجدول (SQL)</button>
+      <div class="two" style="margin-top:12px">
+        <div><label class="lbl">Project URL</label><input id="sbUrl" placeholder="https://xxxx.supabase.co"></div>
+        <div><label class="lbl">anon public key</label><input id="sbKey" placeholder="eyJhbGci..."></div>
+      </div>
+      <button class="btn main" id="sbSave" style="margin-top:10px">🔗 اربط وشغّل</button>
+      <button class="btn" id="sbClear" style="margin-top:8px;display:none">✂️ فكّ الربط</button>
+    </div>
+    <div class="card">
+      <h2>💾 نسخة احتياطية محلية</h2>
+      <div id="bkStatus"></div>
+      <div class="brow"><button class="btn" id="expBtn">⬇️ تصدير</button>
+        <button class="btn" id="impBtn">⬆️ استيراد</button></div>
+      <input type="file" id="impFile" accept="application/json" style="display:none">
+    </div>
+    <footer id="ftr"></footer>
+  </section>
+
+  <!-- 1 البحث -->
+  <section class="scr" data-k="1">
+    <h1>دوّر على زبون</h1>
+    <p class="lede" id="mainSub"></p>
+    <div class="stat">
+      <div><b id="sTot">0</b><span>زبون</span></div>
+      <div><b id="sVil">0</b><span>ضيعة</span></div>
+      <div><b id="sVis">0</b><span>معاملة</span></div>
+      <div><b id="sMine">0</b><span>من فرعك</span></div>
+    </div>
+    <div class="card">
+      <div class="searchbar"><input id="q" placeholder="اكتب أول حرف من الاسم..." autocomplete="off"></div>
+      <div class="modes" id="modes">
+        <button data-m="name" class="on">🔤 بالاسم واللقب</button>
+        <button data-m="phone">🔢 بالرقم</button>
+      </div>
+      <div class="chips" id="vchips"></div>
+      <div id="list"></div>
+    </div>
+  </section>
+
+  <!-- 2 زبون جديد -->
+  <section class="scr" data-k="2">
+    <h1>زبون جديد</h1>
+    <p class="lede">إذا كان إجا قبل، النظام بينبّهك ويفتحلك ملفّو.</p>
+    <div class="card">
+      <div class="two mb">
+        <div><label class="lbl">الاسم</label><input id="fName" placeholder="محمد"></div>
+        <div><label class="lbl">اللقب / الكنية</label><input id="fNick" placeholder="أبو أحمد"></div>
+      </div>
+      <div class="mb">
+        <label class="lbl">الضيعة</label>
+        <input id="fVil" placeholder="اكتب أول حرفين ليطلعوا...">
+        <div class="suggest" id="vsug"></div>
+      </div>
+      <div class="two mb">
+        <div><label class="lbl">رقم التلفون (اختياري)</label><input id="fPhone" type="tel" placeholder="09xxxxxxxx"></div>
+        <div><label class="lbl">نوع العمل</label><select id="fType"></select></div>
+      </div>
+      <div class="mb"><label class="lbl">تفاصيل الشغل</label>
+        <textarea id="fNote" rows="3" placeholder="شو كان العطل وشو انعمل..."></textarea></div>
+      <div><label class="lbl">المنظومة عندو (اختياري)</label>
+        <input id="fSys" placeholder="إنفرتر 5 كيلو + 4 بطاريات + 8 ألواح"></div>
+    </div>
+  </section>
+
+  <!-- 3 ملف الزبون -->
+  <section class="scr" data-k="3"><div id="prof"></div></section>
+</div>
+
+<div class="nav">
+  <button class="btn back" id="back" aria-label="رجوع">→</button>
+  <button class="btn main" id="next">التالي</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════ 1) الربط بـ Supabase — حط المفتاحين هون ══════════
+   من لوحة Supabase: Settings ← API
+   - Project URL       → SUPABASE_URL
+   - anon public key   → SUPABASE_KEY
+   إذا تركتهن فاضيين، النظام بيشتغل محلياً على الجهاز بس.        */
+let SUPABASE_URL = "https://utjpvjnhffapbwpbkkuc.supabase.co";
+let SUPABASE_KEY = "sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
+/* بتقدر كمان تربطها من داخل التطبيق — زر «ربط قاعدة البيانات» بأول واجهة */
+try { const s = JSON.parse(localStorage.getItem('manbij_sb')||'{}');
+  if(s.url && s.key){ SUPABASE_URL = s.url; SUPABASE_KEY = s.key; } } catch(e){}
+
+/* ══════════ 2) بيانات المحل ══════════ */
+const SHOP = {
+  title:"مركز أبو أيهم للصيانة",
+  sub:"طاقة شمسية وإنفرترات — منبج",
+  branches: [
+    { name:"مركز أبو أيهم للصيانة", addr:"شارع الكواكبي — منبج", mgr:"أبو أيهم" },
+    { name:"مركز أبو أيهم للصيانة", addr:"تحت السرايا — وسط المدينة، منبج", mgr:"فاروق" }
+  ]
+};
+const DEV = { name:"MrElectroAI", person:"أنور الحسن الجاسم", wa:"96179434479", phone:"79 434 479" };
+const TYPES = ["صيانة","تصليح إنفرتر","تبديل بطاريات","صيانة ألواح","تركيب منظومة",
+  "برمجة وإعدادات","فحص وتشخيص","قطع غيار","بيع منظومة","استشارة","غير ذلك"];
+
+/* ══════════ 3) القرى ══════════ */
+const VILLAGES = [
+"منبج","البيرة","أبو قلقل","أبو جرين","عنزاوية","أرنبية","عسلية","عرب حسن كبير","عرب حسن صغير",
+"حية كبيرة","حية صغيرة","جب الكلب كبير","جب الكلب صغير","جرن كبير","جرن صغير",
+"كابر كبير","كابر صغير","خاروفية كبيرة","خاروفية صغيرة","مدنة كبيرة","مدنة صغيرة",
+"مقطع حجر كبير","مقطع حجر صغير","محترق كبير","محترق صغير","عوسجلي كبير","عوسجلي صغير",
+"طحنة كبيرة","طحنة صغيرة","بئر خللو","قرعة كبيرة","قرعة صغيرة","بوير","بطوشية","دادات",
+"دندنية","عين النخيل","الفارات","الحجر الأبيض","الحمدونية","الحمران","هدهد","جاموسية",
+"جناة صالح الطيب","جب أبيض","جب العروس","جب القادر","جب الثور","جوتة","الكبيرة","كرسان",
+"خربة الحصان","خربة الشياب","خربة ماصي","خربة نفخ","خرفان","خشفة أم عدسة","حمام كبير",
+"حمام صغير","مجرى تحتاني","مجرى وسطاني","مجرى فوقاني","المحسنة","منلا أسعد","المنكوبة",
+"مشرفة البوير","مشرفة زكريا","مغيرات","وريدة المركز","ميلويران","معيصرة","قلعة نجم",
+"عمرية","أوشرية","قبب بنية","قبر إيمو","قناة الغرة","رفيعة","رسم الأخضر","رسم المشرفة",
+"راطونية","سعن الغزال","صافي","سعيدية","صيادة","صغيرة","شنهصة","شيخ يحيى","شويحة خزناوي",
+"سلطانية","تل أخضر","تل رفيع","تل ياسطي","طوال","أم عدسة قرب","أم عدسة الفارات",
+"أم عدس فرس","أم عدسة خليلية","أم عظام","أم السطح","أم الصفا","أم جلال","أم جلود",
+"أم تينة","أم خرزة","أم رسوم","أم طماخ","أم ميال جفتلك","أم ميال ميري","زونقل","الدويحة",
+"حطابات","خريجة","نواجة شمالي كبير","نواجة شمالي صغير","الكسرة","الأندلس","العريمة",
+"صرين","خفسة","مسكنة","أبو كهف","أبو حنايا","أبو طويل","أبو مقبرة","أبو منديل",
+"أبو جدحة كبير","أربعة كبيرة","أربعة صغيرة","بابيري فوقاني","بابيري تحتاني","تل حوذان",
+"عطشانة","رسم العبد","مسطاحة","الشيوخ فوقاني","القملق","خربة الشيخ","تل بطال",
+"جب حلاوة","تل الكبير","القادرية","أجة كبيرة","فرس كبير","خربة الجمال","سلاطة","فرجان",
+"رسم الأعمى","جب الطويل","والية","جديدة فرس","عفة","عربة بشار","قنطرة","سكاوية",
+"تل عريش","قبة قبقي","مقبلة","خرزة","طماح","طوف الخليل","مقطعة","قطمة","خشفة",
+"جب الكفن","قناة الفرد","الغور","حمر لابدة","أم حرن","مستربجة","حفتلك","مروح",
+"غرة صغيرة","غرة كبيرة","تريكة الحمر","حيمو صغير","حيمو كبير","جديدة أحمر","جميعية ماشي",
+"عيلة الشيخ","غشية","خيرة","بيلان أحمر","عطشانة الحمر","رأس العين الحمر","خان الحمر",
+"مزيونة الحمر","محيرية","تليلة","أبو طريق","أم إخيات","بلدة","شيخ أبيض","الكيبان",
+"تل أمود","جب الحمام","مسطاعة","حداد","مردة شاش","شاش","رمانة","عرب الطويل",
+"خربة الروس","حبس حمزة","عاررقفة","عربة السود","العشرة كبير","جب الشامة","نانة كبيرة",
+"نابهة","حفة","حليسية","عامودية","حيس","أبو تيلة","خربة الحمر","مشرفة","أم حاوة",
+"الشعيرة","نفخ","ودنية","حاموسية","محسنة","ريدة","الصيادة","الحجالية","الواري",
+"البطوطية","خبار كبير","وحيدة","تل الأحمر","روضة","فراطة","الربيعة","خيبان","مثلا",
+"قب بلية","تل وفيع","خربة عيرة","عدهج","ثمانية","محرية","أربعية","أم قنطر","القدحية",
+"تراس كبير","حسو","شقلة","معدة الغارة","حفدة","سبعات","الكافر"
+];
+
+const $ = i => document.getElementById(i);
+let scr = 0, br = 0, db = { c: [] }, cur = null, vfilter = '', qmode = 'name';
+let CLOUD = !!(SUPABASE_URL && SUPABASE_KEY);
+const KEY = 'manbij_solar_v3', BKEY = 'manbij_last_backup';
+
+if(navigator.storage && navigator.storage.persist)
+  navigator.storage.persisted().then(p => { if(!p) navigator.storage.persist(); });
+
+/* ── التخزين المحلي (نسخة احتياطية دائمة) ── */
+let mem = null;
+function lsGet(){ try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : { c: [] }; }
+  catch(e){ return mem || { c: [] }; } }
+function lsSet(){ mem = db; try { localStorage.setItem(KEY, JSON.stringify(db)); } catch(e){} }
+
+/* ── Supabase REST ── */
+async function api(path, opts = {}){
+  const r = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    ...opts,
+    headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY,
+      'Content-Type':'application/json', Prefer:'return=representation', ...(opts.headers||{}) }
+  });
+  if(!r.ok) throw new Error(await r.text());
+  return r.status === 204 ? null : r.json();
+}
+function setSync(state, txt){
+  const s = $('sync'); s.className = 'sync ' + state; $('syncTxt').innerHTML = txt;
+  const d = $('dot');
+  if(d) d.style.background = state==='on' ? 'var(--ok)' : state==='err' ? 'var(--danger)' : 'var(--sun)';
+}
+async function cloudLoad(){
+  if(!CLOUD){
+    db = lsGet();
+    setSync('off','<b>وضع محلي</b> <span>— البيانات على هالجهاز بس. اربط قاعدة البيانات ليصير الفرعين على نفس الشي.</span>');
+    $('setupCard').style.display = 'block';
+    return;
+  }
+  $('setupCard').style.display = 'none';
+  try {
+    const rows = await api('customers?select=*&order=updated_at.desc');
+    db = { c: rows.map(r => ({ id:r.id, name:r.name, nick:r.nick||'', vil:r.vil,
+      phone:r.phone||'', sys:r.sys||'', visits:r.visits||[] })) };
+    lsSet();
+    setSync('on','<b>متصل</b> <span>— '+db.c.length+' زبون · الفرعين على نفس القاعدة</span>');
+  } catch(e){
+    db = lsGet();
+    setSync('err','<b>ما قدرنا نتصل</b> <span>— عم نشتغل محلياً والبيانات محفوظة. رح نرجع نتصل لما يرجع النت.</span>');
+  }
+}
+async function cloudSave(c){
+  lsSet();
+  if(!CLOUD) return;
+  try {
+    const body = { name:c.name, nick:c.nick, vil:c.vil, phone:c.phone, sys:c.sys,
+      visits:c.visits, updated_at:new Date().toISOString() };
+    if(c._new){ const r = await api('customers', { method:'POST', body: JSON.stringify(body) });
+      if(r && r[0]) c.id = r[0].id; delete c._new; }
+    else await api('customers?id=eq.'+c.id, { method:'PATCH', body: JSON.stringify(body) });
+    setSync('on','<b>محفوظ بالسحابة</b> <span>— '+db.c.length+' زبون</span>');
+  } catch(e){ setSync('err','<b>ما انحفظ بالسحابة</b> <span>— محفوظ محلياً، جرّب لما يرجع النت</span>'); }
+}
+async function cloudDelete(id){
+  lsSet(); if(!CLOUD) return;
+  try { await api('customers?id=eq.'+id, { method:'DELETE' }); } catch(e){}
+}
+
+$('hdName').textContent = SHOP.title; $('hdSub').textContent = SHOP.sub;
+$('fType').innerHTML = TYPES.map(t => '<option>'+t+'</option>').join('');
+$('setupTxt').innerHTML =
+  '<b style="color:var(--text)">أربع خطوات، مرة وحدة بالعمر:</b><br>'
+  + '1) افتح <code>supabase.com</code> ← Sign up ← New project (مجاني).<br>'
+  + '2) من القائمة اليسار: <code>SQL Editor</code> ← New query ← الصق الكود (زر النسخ تحت) ← <code>Run</code>.<br>'
+  + '3) من <code>Settings ← API</code>: انسخ <code>Project URL</code> و<code>anon public</code>.<br>'
+  + '4) الصقهن بالخانتين تحت واضغط «اربط وشغّل».<br><br>'
+  + 'لحد ما تعملها، النظام شغّال محلياً وبيحفظ عادي.';
+
+const SQL = `create table if not exists customers (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  nick text default '',
+  vil text not null,
+  phone text default '',
+  sys text default '',
+  visits jsonb default '[]'::jsonb,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists customers_name_idx on customers (name);
+create index if not exists customers_vil_idx on customers (vil);
+create index if not exists customers_phone_idx on customers (phone);
+alter table customers enable row level security;
+drop policy if exists "app_read" on customers;
+drop policy if exists "app_insert" on customers;
+drop policy if exists "app_update" on customers;
+drop policy if exists "app_delete" on customers;
+create policy "app_read" on customers for select using (true);
+create policy "app_insert" on customers for insert with check (true);
+create policy "app_update" on customers for update using (true);
+create policy "app_delete" on customers for delete using (true);`;
+
+$('sqlBtn').onclick = async () => {
+  try { await navigator.clipboard.writeText(SQL); say('انتسخ الكود — الصقو بـ SQL Editor'); }
+  catch(e){ const t = document.createElement('textarea'); t.value = SQL; document.body.appendChild(t);
+    t.select(); document.execCommand('copy'); t.remove(); say('انتسخ الكود'); }
+};
+$('sbSave').onclick = async () => {
+  const u = $('sbUrl').value.trim().replace(/\/$/,''), k = $('sbKey').value.trim();
+  if(!u || !k) return say('عبّي الخانتين');
+  if(!/^https:\/\/.+\.supabase\.co$/.test(u)) return say('الرابط لازم يكون متل https://xxxx.supabase.co');
+  SUPABASE_URL = u; SUPABASE_KEY = k; CLOUD = true;
+  try { localStorage.setItem('manbij_sb', JSON.stringify({url:u,key:k})); } catch(e){}
+  say('عم نجرّب الاتصال...');
+  const local = db.c.slice();
+  await cloudLoad();
+  if($('sync').className.includes('on')){
+    let up = 0;
+    for(const c of local){
+      if(!db.c.find(x => x.name===c.name && x.vil===c.vil && (x.nick||'')===(c.nick||''))){
+        const n = {...c, _new:true}; db.c.push(n); await cloudSave(n); up++; }
+    }
+    say(up ? 'انربط ✅ ورفعنا '+up+' زبون من الجهاز' : 'انربط ✅ — الفرعين صاروا على نفس القاعدة');
+    $('setupCard').style.display = 'none';
+  }
+  $('sbClear').style.display = 'flex';
+};
+$('sbClear').onclick = () => { try { localStorage.removeItem('manbij_sb'); } catch(e){}
+  say('انفكّ الربط — رح تنعاد الصفحة'); setTimeout(()=>location.reload(),900); };
+$('ftr').innerHTML = 'هذه الواجهة مولّدة بواسطة <b>'+DEV.name+'</b> — '+DEV.person+'<br>'
+  + '<a class="ph" href="https://wa.me/'+DEV.wa+'" target="_blank" rel="noopener" dir="ltr">'+DEV.phone+'</a>'
+  + '<span class="of">بدك واجهة متلها لمحلك؟ منعملها لأي محل بمنبج أو بسوريا أو بأي بلد — '
+  + 'كهربا، طاقة شمسية، صيانة، أو أي شغل. راسلنا وبنجهّزلك ياها.</span>';
+$('theme').onclick = () => { const l = document.documentElement.dataset.theme === 'light';
+  document.documentElement.dataset.theme = l?'dark':'light'; $('theme').textContent = l?'🌙':'☀️'; };
+
+function go(k){
+  scr = k;
+  document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', +s.dataset.k === k));
+  $('back').style.visibility = k ? 'visible' : 'hidden';
+  $('next').textContent = k===0 ? 'اختار فرع' : k===1 ? '➕ زبون جديد' : k===2 ? '💾 حفظ الزبون' : '➕ شغل جديد';
+  $('next').disabled = (k===0);
+  if(k===1){ refresh(); setTimeout(()=>$('q').focus(),120); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('back').onclick = () => go(scr>=2 ? 1 : 0);
+$('next').onclick = () => {
+  if(scr===1){ clearForm(); go(2); }
+  else if(scr===2) saveCustomer();
+  else if(scr===3) addVisit();
+};
+
+document.querySelectorAll('.branch').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.branch').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); br = +b.dataset.b;
+  const B = SHOP.branches[br];
+  $('hdSub').textContent = B.addr + ' · ' + B.mgr;
+  $('mainSub').textContent = 'فرع ' + B.mgr + ' — ' + B.addr;
+  setTimeout(() => go(1), 170);
+});
+
+/* ── الضيعة ── */
+function allVillages(){ const s = new Set(VILLAGES); db.c.forEach(c => c.vil && s.add(c.vil)); return [...s]; }
+$('fVil').addEventListener('input', () => {
+  const v = $('fVil').value.trim();
+  if(!v){ $('vsug').classList.remove('on'); return; }
+  const m = allVillages().filter(x => x.includes(v)).slice(0,25);
+  $('vsug').innerHTML = m.length ? m.map(x => '<div data-v="'+x+'">'+x+'</div>').join('')
+    : '<div style="color:var(--muted)">مش موجودة — بتنحفظ كضيعة جديدة</div>';
+  $('vsug').classList.add('on');
+});
+$('vsug').onclick = e => { const d = e.target.closest('div[data-v]'); if(!d) return;
+  $('fVil').value = d.dataset.v; $('vsug').classList.remove('on'); };
+
+/* ── البحث ── */
+$('modes').onclick = e => { const b = e.target.closest('button[data-m]'); if(!b) return;
+  qmode = b.dataset.m;
+  [...$('modes').children].forEach(x => x.classList.toggle('on', x===b));
+  $('q').placeholder = qmode==='name' ? 'اكتب أول حرف من الاسم...' : 'اكتب أول أرقام التلفون...';
+  $('q').type = qmode==='name' ? 'text' : 'tel';
+  drawList(); $('q').focus();
+};
+$('q').addEventListener('input', drawList);
+const hl = (txt,q) => q ? txt.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','g'),'<mark>$1</mark>') : txt;
+
+function drawList(){
+  const q = $('q').value.trim();
+  let L = db.c.slice();
+  if(vfilter) L = L.filter(c => c.vil === vfilter);
+  if(q) L = qmode === 'phone'
+    ? L.filter(c => (c.phone||'').includes(q))
+    : L.filter(c => (c.name+' '+(c.nick||'')).includes(q) || c.vil.includes(q));
+  L.sort((a,b) => (b.visits[0]?.d||'').localeCompare(a.visits[0]?.d||''));
+
+  let html = '';
+  if(q && !L.length){
+    html += '<button class="addnew" id="addNew"><i>➕</i><span>'
+      + '<b>ما لقينا «'+q+'»</b><small>اضغط لتضيفو زبون جديد — رح نعبّي '
+      + (qmode==='phone'?'الرقم':'الاسم')+' لحالو</small></span></button>';
+  }
+  html += L.length ? L.map(c => {
+    const last = c.visits[0];
+    return '<div class="cust" data-id="'+c.id+'"><span class="cav">'+(c.name[0]||'?')+'</span>'
+    + '<span class="cmid"><b>'+hl(c.name+(c.nick?' — '+c.nick:''), qmode==='name'?q:'')+'</b>'
+    + '<small>📍 '+c.vil+(c.phone?' · '+hl(c.phone, qmode==='phone'?q:''):'')
+    + (last?' · '+last.t:'')+'</small></span>'
+    + '<span class="cbadge">'+c.visits.length+'</span></div>';
+  }).join('') : (q ? '' : '<div class="empty">'+(vfilter?'ما في زباين بهالضيعة.':'لسا ما في زباين.<br>اضغط «زبون جديد» تحت.')+'</div>');
+  $('list').innerHTML = html;
+
+  const an = $('addNew');
+  if(an) an.onclick = () => {
+    clearForm();
+    if(qmode === 'phone') $('fPhone').value = q; else $('fName').value = q;
+    go(2);
+    setTimeout(() => (qmode==='phone' ? $('fName') : $('fVil')).focus(), 250);
+  };
+}
+$('list').addEventListener('click', e => { const c = e.target.closest('.cust'); if(!c) return; openProf(c.dataset.id); });
+$('vchips').onclick = e => { const c = e.target.closest('.chip'); if(!c) return; vfilter = c.dataset.v; refresh(); };
+
+function refresh(){
+  $('sTot').textContent = db.c.length;
+  $('sVil').textContent = new Set(db.c.map(c => c.vil)).size;
+  $('sVis').textContent = db.c.reduce((a,c) => a + c.visits.length, 0);
+  $('sMine').textContent = db.c.reduce((a,c) => a + c.visits.filter(v => v.br === br).length, 0);
+  const vils = [...new Set(db.c.map(c => c.vil))].sort();
+  $('vchips').innerHTML = vils.length
+    ? '<span class="chip'+(vfilter?'':' on')+'" data-v="">كل الضِّيَع</span>'
+      + vils.map(v => '<span class="chip'+(vfilter===v?' on':'')+'" data-v="'+v+'">'+v+'</span>').join('') : '';
+  drawList(); bkStatus();
+}
+
+/* ── حفظ ── */
+function clearForm(){ ['fName','fNick','fVil','fPhone','fNote','fSys'].forEach(i => $(i).value=''); }
+function newVisit(){ return { d:new Date().toISOString(), t:$('fType').value,
+  n:$('fNote').value.trim(), br, by:SHOP.branches[br].mgr }; }
+async function saveCustomer(){
+  const name = $('fName').value.trim(), vil = $('fVil').value.trim();
+  if(!name) return say('اكتب اسم الزبون');
+  if(!vil) return say('اكتب اسم الضيعة');
+  const nick = $('fNick').value.trim();
+  const dup = db.c.find(c => c.name===name && c.vil===vil && (c.nick||'')===nick);
+  if(dup){
+    dup.visits.unshift(newVisit());
+    if($('fSys').value.trim()) dup.sys = $('fSys').value.trim();
+    if($('fPhone').value.trim()) dup.phone = $('fPhone').value.trim();
+    await cloudSave(dup); say('هالزبون مسجّل من قبل — انضاف الشغل على ملفّو');
+    return openProf(dup.id);
+  }
+  const c = { id:'tmp'+Date.now().toString(36), _new:true, name, nick, vil,
+    phone:$('fPhone').value.trim(), sys:$('fSys').value.trim(), visits:[newVisit()] };
+  db.c.push(c); await cloudSave(c); say('انحفظ الزبون'); openProf(c.id);
+}
+
+function openProf(id){
+  cur = id;
+  const c = db.c.find(x => x.id === id); if(!c) return;
+  const fmt = d => new Date(d).toLocaleDateString('ar-EG',{year:'numeric',month:'short',day:'numeric'});
+  $('prof').innerHTML =
+    '<h1>'+c.name+(c.nick?' — '+c.nick:'')+'</h1>'
+    + '<p class="lede">📍 '+c.vil+(c.phone?' · '+c.phone:'')+(c.sys?'<br>⚙️ '+c.sys:'')+'</p>'
+    + '<div class="card"><h2>معلومات الزبون</h2>'
+    + '<div class="two mb"><div><label class="lbl">الاسم</label><input id="eName" value="'+c.name+'"></div>'
+    + '<div><label class="lbl">اللقب</label><input id="eNick" value="'+(c.nick||'')+'"></div></div>'
+    + '<div class="two mb"><div><label class="lbl">الضيعة</label><input id="eVil" value="'+c.vil+'"></div>'
+    + '<div><label class="lbl">الرقم</label><input id="ePhone" value="'+(c.phone||'')+'"></div></div>'
+    + '<label class="lbl">المنظومة عندو</label><input id="eSys" value="'+(c.sys||'')+'">'
+    + '<div class="brow" style="margin-top:11px">'
+    + '<button class="btn" id="upBtn">💾 حفظ التعديل</button>'
+    + (c.phone ? '<a class="btn" href="https://wa.me/'+c.phone.replace(/\D/g,'')+'" target="_blank">💬 واتساب</a>' : '<span></span>')
+    + '</div></div>'
+    + '<div class="card"><h2>سجل الشغل ('+c.visits.length+')</h2>'
+    + (c.visits.length ? c.visits.map(v =>
+        '<div class="visit'+(v.br===1?' b1':'')+'"><div class="vh"><b>'+v.t+'</b>'
+        + '<span class="vd">'+fmt(v.d)+'</span></div>'
+        + (v.n?'<p>'+v.n+'</p>':'')
+        + '<span class="vbr">'+(SHOP.branches[v.br]?.addr.split('—')[0].trim()||'')+' · '+(v.by||'')+'</span>'
+        + '</div>').join('') : '<div class="empty">ما في شغل مسجّل.</div>')
+    + '</div>'
+    + '<div class="card"><h2>➕ شغل جديد</h2>'
+    + '<div class="mb"><label class="lbl">نوع العمل</label><select id="nType">'
+    + TYPES.map(t => '<option>'+t+'</option>').join('') + '</select></div>'
+    + '<label class="lbl">شو انعمل</label>'
+    + '<textarea id="nNote" rows="3" placeholder="شو كان العطل وشو انعمل..."></textarea>'
+    + '<p style="font-size:11.5px;color:var(--muted);margin-top:8px">بينسجّل باسم فرع <b style="color:var(--sun)">'
+    + SHOP.branches[br].mgr + '</b></p>'
+    + '<button class="btn dang" id="delBtn" style="margin-top:14px">🗑️ حذف الزبون</button></div>';
+  $('upBtn').onclick = async () => {
+    c.name = $('eName').value.trim() || c.name; c.nick = $('eNick').value.trim();
+    c.vil = $('eVil').value.trim() || c.vil; c.phone = $('ePhone').value.trim();
+    c.sys = $('eSys').value.trim(); await cloudSave(c); say('انحفظ التعديل'); openProf(c.id);
+  };
+  let arm = 0;
+  $('delBtn').onclick = async () => {
+    if(!arm){ arm = 1; $('delBtn').textContent = '⚠️ اضغط مرة تانية للحذف';
+      setTimeout(()=>{ arm=0; $('delBtn').textContent='🗑️ حذف الزبون'; },4000); return; }
+    db.c = db.c.filter(x => x.id !== c.id); await cloudDelete(c.id); say('انحذف الزبون'); go(1);
+  };
+  go(3);
+}
+async function addVisit(){
+  const c = db.c.find(x => x.id === cur); if(!c) return;
+  c.visits.unshift({ d:new Date().toISOString(), t:$('nType').value,
+    n:$('nNote').value.trim(), br, by:SHOP.branches[br].mgr });
+  await cloudSave(c); say('انضاف الشغل'); openProf(c.id);
+}
+
+/* ── النسخة الاحتياطية ── */
+function lastBackup(){ try { return localStorage.getItem(BKEY); } catch(e){ return null; } }
+function bkStatus(){
+  if(!$('bkStatus')) return;
+  const d = lastBackup(), n = db.c.length;
+  let html = '', cls = 'ok';
+  if(!n) html = 'ما في بيانات بعد.';
+  else if(!d){ html = '⚠️ <b>ما عملت نسخة احتياطية أبداً.</b>'; cls='warn'; }
+  else { const days = Math.floor((Date.now() - new Date(d)) / 86400000);
+    if(days >= 7){ html = '⚠️ <b>آخر نسخة من '+days+' يوم.</b>'; cls='warn'; }
+    else html = '✅ آخر نسخة: ' + new Date(d).toLocaleDateString('ar-EG'); }
+  $('bkStatus').innerHTML = html ? '<div class="bkbox '+cls+'">'+html+'</div>' : '';
+}
+$('expBtn').onclick = () => {
+  const blob = new Blob([JSON.stringify(db,null,1)],{type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'زباين-منبج-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+  try { localStorage.setItem(BKEY, new Date().toISOString()); } catch(e){}
+  bkStatus(); say('تم التصدير');
+};
+$('impBtn').onclick = () => $('impFile').click();
+$('impFile').onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = async () => { try {
+    const d = JSON.parse(r.result); if(!d.c) throw 0;
+    let added = 0;
+    for(const x of d.c){
+      const e2 = db.c.find(y => y.name===x.name && y.vil===x.vil && (y.nick||'')===(x.nick||''));
+      if(!e2){ const c = {...x, id:'tmp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), _new:true};
+        db.c.push(c); await cloudSave(c); added++; }
+      else { const have = new Set(e2.visits.map(v => v.d));
+        let ch = false;
+        (x.visits||[]).forEach(v => { if(!have.has(v.d)){ e2.visits.push(v); ch = true; } });
+        if(ch){ e2.visits.sort((a,b) => b.d.localeCompare(a.d)); await cloudSave(e2); } }
+    }
+    say('انضاف '+added+' زبون'); refresh();
+  } catch(err){ say('الملف مش صحيح'); } };
+  r.readAsText(f);
+};
+function say(m){ const t=$('toast'); t.textContent=m; t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2600); }
+
+(async () => { await cloudLoad(); bkStatus(); go(0); })();
+</script>
+<style>
+.bkbox{font-size:12.5px;border-radius:10px;padding:10px 12px;margin-bottom:11px;line-height:1.7}
+.bkbox.ok{background:rgba(74,222,128,.09);border:1px solid rgba(74,222,128,.3);color:var(--muted)}
+.bkbox.warn{background:var(--glow);border:1px solid var(--sun);color:var(--text)}
+.bkbox b{color:var(--sun)}
+</style>
+</body>
+</html>
