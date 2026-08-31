@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ALI AL ALI | نظام إدارة الورش</title>
+<meta name="description" content="نظام إدارة ورش المقاولات — دهانات وعزل ومنع نش.">
+<meta name="theme-color" content="#16181D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F2EE; --paper:#FFFFFF; --soft:#EDEAE4; --line:#DAD5CC;
+  --ink:#16181D; --muted:#6B6A66;
+  --orange:#E2622C; --orange-2:#C24E1E; --orange-soft:#FBEDE6;
+  --slate:#2E3440; --danger:#B03A3A; --danger-soft:#FBEAEA;
+  --ok:#1F7A4D; --ok-soft:#E6F4EC;
+  --shadow:0 1px 3px rgba(22,24,29,.05), 0 10px 26px rgba(22,24,29,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px;line-height:1.65;min-height:100vh}
+:where(a,button,input,select,textarea):focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+
+/* ─── الشريط ─── */
+.bar{background:var(--slate);color:#fff;position:sticky;top:0;z-index:20;
+  border-bottom:3px solid var(--orange)}
+.bar-in{max-width:680px;margin:0 auto;padding:12px 15px;display:flex;align-items:center;
+  justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:11px}
+.logo .m{width:38px;height:38px;border-radius:9px;background:var(--orange);
+  display:grid;place-items:center;flex-shrink:0}
+.logo .m svg{width:21px;height:21px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.logo b{font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:.06em;display:block;line-height:1.25}
+.logo small{font-size:10px;opacity:.72;display:block}
+.hbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;
+  border-radius:9px;padding:7px 11px;font-family:inherit;font-size:12px;cursor:pointer}
+
+.wrap{max-width:680px;margin:0 auto;padding:18px 15px 40px}
+.scr{display:none}.scr.on{display:block}
+h1{font-family:'Readex Pro',sans-serif;font-size:clamp(22px,5.6vw,28px);font-weight:700;
+  letter-spacing:-.02em;margin-bottom:5px}
+.lede{color:var(--muted);font-size:13.5px;margin-bottom:16px}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:15px;
+  padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card>h2{font-family:'Readex Pro',sans-serif;font-size:15px;font-weight:600;margin-bottom:13px;
+  padding-bottom:10px;border-bottom:1px solid var(--line);display:flex;align-items:center;
+  justify-content:space-between;gap:8px}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:500}
+select,input,textarea{width:100%;font-family:inherit;font-size:15px;color:var(--ink);background:var(--soft);
+  border:1px solid var(--line);border-radius:11px;padding:12px 13px;resize:vertical}
+select:focus,input:focus,textarea:focus{border-color:var(--orange);background:var(--paper)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.three{display:grid;grid-template-columns:1.4fr .8fr .8fr;gap:8px}
+.mb{margin-bottom:12px}
+
+.pick{display:flex;align-items:center;gap:14px;width:100%;background:var(--paper);
+  border:2px solid var(--line);border-radius:16px;padding:18px 16px;margin-bottom:11px;
+  cursor:pointer;text-align:right;font-family:inherit;color:var(--ink);box-shadow:var(--shadow)}
+.pick:hover,.pick.on{border-color:var(--orange);background:var(--orange-soft)}
+.pick .pi{width:46px;height:46px;border-radius:12px;background:var(--orange);flex-shrink:0;
+  display:grid;place-items:center}
+.pick .pi svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pick b{display:block;font-family:'Readex Pro',sans-serif;font-size:16.5px;margin-bottom:2px}
+.pick small{color:var(--muted);font-size:12.5px;line-height:1.55;display:block}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;
+  border-radius:12px;font-family:inherit;font-size:14.5px;font-weight:600;border:1px solid var(--line);
+  background:var(--soft);color:var(--ink);cursor:pointer;margin-top:9px;text-decoration:none}
+.btn.main{background:var(--orange);color:#fff;border-color:var(--orange)}
+.btn.dark{background:var(--slate);color:#fff;border-color:var(--slate)}
+.btn.dang{color:var(--danger);border-color:#E7C3C3;background:var(--danger-soft)}
+.btn.sm{width:auto;padding:9px 14px;font-size:13px;margin:0}
+.brow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+.job{display:flex;align-items:center;gap:12px;background:var(--paper);border:1px solid var(--line);
+  border-radius:13px;padding:13px;margin-bottom:9px;cursor:pointer;box-shadow:var(--shadow)}
+.job:hover{border-color:var(--orange)}
+.job .jav{width:42px;height:42px;border-radius:11px;background:var(--orange-soft);color:var(--orange-2);
+  display:grid;place-items:center;font-family:'Readex Pro',sans-serif;font-size:16px;flex-shrink:0}
+.job .jm{flex:1;min-width:0}
+.job .jm b{display:block;font-size:14.5px}
+.job .jm small{display:block;color:var(--muted);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;border-radius:8px;
+  padding:5px 9px;white-space:nowrap}
+.pill.due{background:var(--danger-soft);color:var(--danger)}
+.pill.paid{background:var(--ok-soft);color:var(--ok)}
+
+.sum{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:12px}
+.sum div{background:var(--paper);border:1px solid var(--line);border-radius:13px;
+  padding:13px 8px;text-align:center;box-shadow:var(--shadow)}
+.sum b{display:block;font-family:'JetBrains Mono',monospace;font-size:17px}
+.sum span{font-size:10.5px;color:var(--muted)}
+.sum .t{color:var(--slate)}.sum .p{color:var(--ok)}.sum .d{color:var(--danger)}
+
+.line{display:flex;align-items:center;gap:10px;background:var(--soft);border:1px solid var(--line);
+  border-radius:11px;padding:11px 12px;margin-bottom:8px}
+.line .lm{flex:1;min-width:0}
+.line .lm b{display:block;font-size:13.5px}
+.line .lm small{display:block;color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace}
+.line .lv{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;white-space:nowrap}
+.line .x{background:none;border:0;color:var(--danger);font-size:19px;cursor:pointer;padding:0 4px;line-height:1}
+.line.pay{background:var(--ok-soft);border-color:#BFE3CE}
+.line.pay .lv{color:var(--ok)}
+
+.role{display:inline-block;font-size:10px;font-weight:700;border-radius:6px;padding:2px 7px;
+  background:var(--slate);color:#fff;margin-inline-start:6px}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:20px 12px;line-height:1.9}
+.note{font-size:12.5px;color:var(--muted);background:var(--soft);border:1px solid var(--line);
+  border-radius:12px;padding:12px;line-height:1.8;margin-top:10px}
+
+/* بطاقة MrElectroAI */
+.dev{background:var(--slate);color:#fff;border-radius:16px;padding:18px;margin-top:22px;
+  cursor:pointer;box-shadow:var(--shadow)}
+.dev .dh{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.dev .di{width:40px;height:40px;border-radius:11px;background:#22C79B;color:#04140F;
+  display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.dev b{font-family:'JetBrains Mono',monospace;font-size:14px;display:block}
+.dev small{font-size:11px;opacity:.75;display:block}
+.dev p{font-size:12.5px;opacity:.85;line-height:1.8}
+.dev .more{display:none;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.15)}
+.dev.open .more{display:block}
+.dev .more ul{list-style:none;margin:9px 0}
+.dev .more li{font-size:12.5px;opacity:.85;padding:3px 0}
+.dev .dbtn{display:block;background:#22C79B;color:#04140F;text-align:center;font-weight:700;
+  border-radius:11px;padding:11px;margin-top:12px;text-decoration:none;font-size:13.5px}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,90px);background:var(--slate);
+  color:#fff;font-size:13.5px;font-weight:600;padding:11px 20px;border-radius:999px;
+  transition:transform .3s;z-index:60;max-width:88%;text-align:center}
+.toast.on{transform:translate(-50%,0)}
+.lock{position:fixed;inset:0;background:var(--slate);display:grid;place-items:center;padding:22px;z-index:70}
+.lockbox{background:var(--paper);border-radius:18px;padding:28px 22px;width:100%;max-width:330px;text-align:center}
+.lockbox .m{width:56px;height:56px;border-radius:14px;background:var(--orange);margin:0 auto 14px;
+  display:grid;place-items:center}
+.lockbox .m svg{width:30px;height:30px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lockbox h2{font-family:'JetBrains Mono',monospace;font-size:17px;letter-spacing:.08em}
+.lockbox p{font-size:12px;color:var(--muted);margin-bottom:18px}
+#pin{text-align:center;font-size:26px;letter-spacing:12px;font-family:'JetBrains Mono',monospace;padding:14px}
+.perr{font-size:12.5px;color:var(--danger);min-height:20px;margin-top:8px}
+
+/* ─── ورقة الطباعة ─── */
+#sheet{display:none}
+@media print{
+  body>*:not(#sheet){display:none!important}
+  #sheet{display:block!important;color:#000;font-size:13px;font-family:'IBM Plex Sans Arabic',sans-serif}
+  #sheet .hd{border-bottom:3px solid #E2622C;padding-bottom:10px;margin-bottom:14px}
+  #sheet .hd h2{font-size:22px;letter-spacing:.04em}
+  #sheet .hd .ar{font-size:15px;font-weight:600}
+  #sheet .hd .sv{font-size:12px;color:#444;margin-top:2px}
+  #sheet .hd .ph{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin-top:4px}
+  #sheet .meta{font-size:12px;color:#333;margin-bottom:14px;line-height:1.9}
+  #sheet table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:12px}
+  #sheet th,#sheet td{border:1px solid #999;padding:7px 9px;text-align:right}
+  #sheet th{background:#eee}
+  #sheet tr.grp td{background:#f3f3f3;font-weight:700}
+  #sheet tr.tot td{background:#FBEDE6;font-weight:700;font-size:14px}
+  #sheet .ft{margin-top:18px;padding-top:10px;border-top:1px solid #999;font-size:11px;line-height:1.9;color:#333}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<symbol id="i-roller" viewBox="0 0 24 24"><rect x="3" y="4" width="14" height="6" rx="1.5"/><path d="M17 7h3v4h-6"/><path d="M14 11v3h-2v7"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+<symbol id="i-team" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.6M17 20a5.5 5.5 0 0 0-2-4"/></symbol>
+</svg>
+
+<!-- قفل الدخول -->
+<div class="lock" id="lock">
+  <div class="lockbox">
+    <div class="m"><svg><use href="#i-roller"/></svg></div>
+    <h2>ALI AL ALI</h2>
+    <p>Painting · Insulation · Waterproofing</p>
+    <label class="lbl">كود الدخول</label>
+    <input id="pin" type="tel" inputmode="numeric" maxlength="8" placeholder="••••">
+    <div class="perr" id="perr"></div>
+    <button class="btn main" id="pinGo">دخول</button>
+  </div>
+</div>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="logo"><span class="m"><svg><use href="#i-roller"/></svg></span>
+      <b>ALI AL ALI<small>Painting · Insulation · Waterproofing</small></b></div>
+    <button class="hbtn" id="lockBtn">🔒 قفل</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- 0 نوع الورشة -->
+  <section class="scr on" data-k="0">
+    <h1>الورش</h1>
+    <p class="lede">اختار نوع الورشة — كل نوع إلو زباينو وحساباتو.</p>
+    <button class="pick" data-t="shalfe"><span class="pi"><svg><use href="#i-doc"/></svg></span>
+      <span><b>ورش شلفة</b><small>سعر متفق عليه للشغل كامل — الدفعات بتنخصم من السعر.</small></span></button>
+    <button class="pick" data-t="daily"><span class="pi"><svg><use href="#i-team"/></svg></span>
+      <span><b>ورش على حساب الشغيلة</b><small>يومية معلم وشغيل ومساعد + المواد — الحساب حسب الأيام.</small></span></button>
+
+    <div class="card" style="margin-top:14px">
+      <h2>👷 الشغيلة <button class="btn sm" id="teamBtn">إدارة</button></h2>
+      <div id="teamList"></div>
+    </div>
+
+    <div class="card">
+      <h2>💾 نسخة احتياطية</h2>
+      <div class="brow"><button class="btn" id="expBtn">⬇️ تصدير</button>
+        <button class="btn" id="impBtn">⬆️ استيراد</button></div>
+      <input type="file" id="impFile" accept="application/json" style="display:none">
+    </div>
+
+    <div class="dev" id="devCard">
+      <div class="dh"><span class="di">⚡</span>
+        <span><b>MrElectroAI</b><small>أنور الحسن الجاسم — اضغط لتقرأ أكتر</small></span></div>
+      <p>هذا النظام تمّ تصميمه وبرمجته بواسطة MrElectroAI.</p>
+      <div class="more">
+        <p>كهربائي ومطوّر أدوات فنية — بحوّل الشغل اليومي لأنظمة بتشتغل من الموبايل.</p>
+        <ul>
+          <li>⚡ تشخيص أعطال الكهرباء وأنظمة التحكم والأتمتة</li>
+          <li>☀️ أنظمة الطاقة الشمسية وإعدادات الإنفرترات</li>
+          <li>🧰 أدوات وأنظمة مخصّصة: فواتير، جردات، تقارير PDF</li>
+          <li>🌐 مواقع تعريفية وأنظمة إدارة للمحلات والشركات</li>
+        </ul>
+        <p>بدك نظام متل هيدا لشغلك؟ منعملو لأي مهنة وبأي بلد.</p>
+        <a class="dbtn" id="devWa" target="_blank" rel="noopener">💬 راسلنا على واتساب</a>
+        <a class="dbtn" id="devSite" target="_blank" rel="noopener" style="background:transparent;color:#22C79B;border:1px solid #22C79B">🌐 زور موقعنا الرسمي</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 قائمة الورش -->
+  <section class="scr" data-k="1">
+    <h1 id="listTitle">الورش</h1>
+    <p class="lede" id="listSub"></p>
+    <div class="sum">
+      <div><b class="t" id="sTot">0</b><span>إجمالي</span></div>
+      <div><b class="p" id="sPaid">0</b><span>مقبوض</span></div>
+      <div><b class="d" id="sDue">0</b><span>باقي</span></div>
+    </div>
+    <input id="q" placeholder="دوّر باسم الزبون أو الشقة..." class="mb">
+    <div id="jobs"></div>
+    <button class="btn main" id="newJob">➕ ورشة جديدة</button>
+    <button class="btn" id="backHome">→ رجوع</button>
+  </section>
+
+  <!-- 2 ورشة جديدة -->
+  <section class="scr" data-k="2">
+    <h1>ورشة جديدة</h1>
+    <p class="lede" id="newSub"></p>
+    <div class="card">
+      <div class="two mb">
+        <div><label class="lbl">اسم الزبون</label><input id="fName" placeholder="أبو محمد"></div>
+        <div><label class="lbl">رقم التلفون</label><input id="fPhone" type="tel" placeholder="70xxxxxx"></div>
+      </div>
+      <div class="two mb">
+        <div><label class="lbl">الشقة / المشروع</label><input id="fSite" placeholder="شقة الطابق 3 — بناية X"></div>
+        <div><label class="lbl">تاريخ البدء</label><input id="fDate" type="date"></div>
+      </div>
+      <div class="mb" id="priceBox">
+        <label class="lbl">السعر المتفق عليه ($)</label>
+        <input id="fPrice" type="number" inputmode="decimal" placeholder="1200">
+      </div>
+      <div><label class="lbl">وصف الشغل</label>
+        <textarea id="fDesc" rows="3" placeholder="دهان كامل + عزل سطح + منع نش الحمام..."></textarea></div>
+    </div>
+    <button class="btn main" id="saveJob">💾 حفظ الورشة</button>
+    <button class="btn" id="cancelJob">إلغاء</button>
+  </section>
+
+  <!-- 3 تفاصيل الورشة -->
+  <section class="scr" data-k="3"><div id="detail"></div></section>
+
+  <!-- 4 الشغيلة -->
+  <section class="scr" data-k="4">
+    <h1>الشغيلة</h1>
+    <p class="lede">ضيف أسماء الشغيلة ويومية كل واحد — بتستعملهن بكل الورش.</p>
+    <div class="card">
+      <h2>➕ إضافة</h2>
+      <div class="three mb">
+        <input id="wName" placeholder="الاسم">
+        <select id="wRole"><option>معلم</option><option>شغيل</option><option>مساعد</option></select>
+        <input id="wWage" type="number" inputmode="decimal" placeholder="يومية $">
+      </div>
+      <button class="btn main" id="addW">إضافة الشغيل</button>
+    </div>
+    <div class="card"><h2>👷 اللائحة</h2><div id="teamFull"></div></div>
+    <button class="btn" id="backHome2">→ رجوع</button>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ورقة PDF -->
+<div id="sheet">
+  <div class="hd">
+    <h2>ALI AL ALI</h2>
+    <div class="ar">شركة علي العلي للمقاولات</div>
+    <div class="sv">دهانات · عزل · منع نش</div>
+    <div class="ph" dir="ltr">+961 70 146 890</div>
+  </div>
+  <div class="meta" id="shMeta"></div>
+  <div id="shBody"></div>
+  <div class="ft" id="shFt"></div>
+</div>
+
+<script>
+/* ═════════ للتخصيص ═════════ */
+const CO = {
+  en:"ALI AL ALI", ar:"شركة علي العلي للمقاولات",
+  services:"دهانات · عزل · منع نش",
+  owner:"علي العلي", phone:"+961 70 146 890", wa:"96170146890",
+  pin:"1234"
+};
+const DEV = { name:"MrElectroAI", person:"أنور الحسن الجاسم",
+  wa:"96179434479", site:"https://mrelectroai-spec.github.io/mrelectroai/" };
+const CUR = "$";
+/* ═════════ نهاية التخصيص ═════════ */
+
+const $ = i => document.getElementById(i);
+const KEY = 'ali_jobs_v1';
+let db = { jobs:[], team:[] }, type = 'shalfe', cur = null, scr = 0;
+
+if(navigator.storage && navigator.storage.persist)
+  navigator.storage.persisted().then(p => { if(!p) navigator.storage.persist(); });
+let mem = null;
+function load(){ try{ const r = localStorage.getItem(KEY); return r?JSON.parse(r):{jobs:[],team:[]}; }
+  catch(e){ return mem||{jobs:[],team:[]}; } }
+function save(){ mem = db; try{ localStorage.setItem(KEY, JSON.stringify(db)); }catch(e){} }
+db = load();
+
+const money = n => (Math.round(n*100)/100).toLocaleString('en-US') + ' ' + CUR;
+function say(m){ const t=$('toast'); t.textContent=m; t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2400); }
+
+/* ── القفل ── */
+function tryPin(){
+  if($('pin').value.trim() === CO.pin){ $('lock').style.display='none'; go(0); }
+  else { $('perr').textContent = 'الكود غلط'; $('pin').value=''; }
+}
+$('pinGo').onclick = tryPin;
+$('pin').addEventListener('input', () => { $('perr').textContent='';
+  if($('pin').value.trim() === CO.pin) tryPin(); });
+$('pin').addEventListener('keydown', e => { if(e.key==='Enter') tryPin(); });
+$('lockBtn').onclick = () => { $('pin').value=''; $('lock').style.display='grid'; };
+
+/* ── التنقّل ── */
+function go(k){ scr = k;
+  document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', +s.dataset.k===k));
+  if(k===0){ drawTeamMini(); }
+  if(k===1) drawJobs();
+  if(k===4) drawTeamFull();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.pick').forEach(b => b.onclick = () => {
+  type = b.dataset.t;
+  $('listTitle').textContent = type==='shalfe' ? 'ورش الشلفة' : 'ورش الشغيلة';
+  $('listSub').textContent = type==='shalfe'
+    ? 'سعر متفق عليه — والدفعات بتنخصم منّو.'
+    : 'الحساب على يوميات الشغيلة + المواد.';
+  go(1);
+});
+$('backHome').onclick = () => go(0);
+$('backHome2').onclick = () => go(0);
+$('teamBtn').onclick = () => go(4);
+$('newJob').onclick = () => {
+  ['fName','fPhone','fSite','fPrice','fDesc'].forEach(i => $(i).value='');
+  $('fDate').value = new Date().toISOString().slice(0,10);
+  $('priceBox').style.display = type==='shalfe' ? 'block' : 'none';
+  $('newSub').textContent = type==='shalfe' ? 'ورشة شلفة — بسعر متفق عليه.' : 'ورشة على حساب الشغيلة.';
+  go(2);
+};
+$('cancelJob').onclick = () => go(1);
+
+/* ── الشغيلة ── */
+$('addW').onclick = () => {
+  const n = $('wName').value.trim(), w = parseFloat($('wWage').value)||0;
+  if(!n) return say('اكتب الاسم');
+  db.team.push({ id:'w'+Date.now().toString(36), name:n, role:$('wRole').value, wage:w });
+  $('wName').value=''; $('wWage').value=''; save(); drawTeamFull(); say('انضاف الشغيل');
+};
+function drawTeamFull(){
+  $('teamFull').innerHTML = db.team.length ? db.team.map(w =>
+    '<div class="line"><span class="lm"><b>'+w.name+'<span class="role">'+w.role+'</span></b>'
+    + '<small>يومية '+money(w.wage)+'</small></span>'
+    + '<button class="x" data-del="'+w.id+'">×</button></div>').join('')
+    : '<div class="empty">ما في شغيلة مسجّلين.</div>';
+}
+$('teamFull').onclick = e => { const b = e.target.closest('[data-del]'); if(!b) return;
+  db.team = db.team.filter(w => w.id !== b.dataset.del); save(); drawTeamFull(); };
+function drawTeamMini(){
+  $('teamList').innerHTML = db.team.length
+    ? db.team.slice(0,4).map(w => '<div class="line"><span class="lm"><b>'+w.name
+      +'<span class="role">'+w.role+'</span></b></span><span class="lv">'+money(w.wage)+'</span></div>').join('')
+      + (db.team.length>4 ? '<div class="note">و'+(db.team.length-4)+' غيرهم — اضغط «إدارة».</div>' : '')
+    : '<div class="empty">ما في شغيلة بعد.<br>اضغط «إدارة» لتضيف.</div>';
+}
+
+/* ── حفظ ورشة ── */
+$('saveJob').onclick = () => {
+  const n = $('fName').value.trim();
+  if(!n) return say('اكتب اسم الزبون');
+  const j = { id:'j'+Date.now().toString(36), type, name:n, phone:$('fPhone').value.trim(),
+    site:$('fSite').value.trim(), date:$('fDate').value, desc:$('fDesc').value.trim(),
+    price: type==='shalfe' ? (parseFloat($('fPrice').value)||0) : 0,
+    work:[], mats:[], pays:[] };
+  db.jobs.push(j); save(); say('انحفظت الورشة'); openJob(j.id);
+};
+
+/* ── الحسابات ── */
+function calc(j){
+  const labor = j.work.reduce((a,w) => a + w.wage*w.days, 0);
+  const mats  = j.mats.reduce((a,m) => a + m.amount, 0);
+  const paid  = j.pays.reduce((a,p) => a + p.amount, 0);
+  const total = j.type==='shalfe' ? j.price : labor + mats;
+  return { labor, mats, paid, total, due: total - paid, profit: j.price - labor - mats };
+}
+
+/* ── قائمة الورش ── */
+$('q').addEventListener('input', drawJobs);
+function drawJobs(){
+  const q = $('q').value.trim();
+  let L = db.jobs.filter(j => j.type === type);
+  if(q) L = L.filter(j => (j.name+' '+j.site+' '+j.phone).includes(q));
+  let T=0,P=0;
+  db.jobs.filter(j=>j.type===type).forEach(j => { const c=calc(j); T+=c.total; P+=c.paid; });
+  $('sTot').textContent = money(T); $('sPaid').textContent = money(P); $('sDue').textContent = money(T-P);
+  $('jobs').innerHTML = L.length ? L.slice().reverse().map(j => { const c = calc(j);
+    return '<div class="job" data-id="'+j.id+'"><span class="jav">'+(j.name[0]||'?')+'</span>'
+    + '<span class="jm"><b>'+j.name+'</b><small>'+(j.site||'—')+(j.date?' · '+j.date:'')+'</small></span>'
+    + '<span class="pill '+(c.due<=0?'paid':'due')+'">'+(c.due<=0?'مسدّد':money(c.due))+'</span></div>';
+  }).join('') : '<div class="empty">ما في ورش هون بعد.</div>';
+}
+$('jobs').onclick = e => { const j = e.target.closest('.job'); if(!j) return; openJob(j.dataset.id); };
+
+/* ── تفاصيل الورشة ── */
+function openJob(id){
+  cur = id; const j = db.jobs.find(x => x.id===id); if(!j) return;
+  const c = calc(j);
+  const opts = db.team.map(w => '<option value="'+w.id+'">'+w.name+' — '+w.role+' ('+money(w.wage)+')</option>').join('');
+
+  let h = '<h1>'+j.name+'</h1><p class="lede">'+(j.site||'—')+(j.phone?' · '+j.phone:'')
+    + ' · <b>'+(j.type==='shalfe'?'شلفة':'على حساب الشغيلة')+'</b></p>'
+    + '<div class="sum">'
+    + '<div><b class="t">'+money(c.total)+'</b><span>إجمالي</span></div>'
+    + '<div><b class="p">'+money(c.paid)+'</b><span>مقبوض</span></div>'
+    + '<div><b class="d">'+money(c.due)+'</b><span>باقي</span></div></div>';
+
+  if(j.desc) h += '<div class="card"><h2>📝 وصف الشغل</h2><p style="font-size:13.5px;color:var(--muted)">'+j.desc+'</p></div>';
+
+  /* الشغيلة */
+  h += '<div class="card"><h2>👷 الشغيلة والأيام</h2>'
+    + (j.work.length ? j.work.map((w,i) =>
+        '<div class="line"><span class="lm"><b>'+w.name+'<span class="role">'+w.role+'</span></b>'
+        + '<small>'+w.days+' يوم × '+money(w.wage)+'</small></span>'
+        + '<span class="lv">'+money(w.wage*w.days)+'</span>'
+        + '<button class="x" data-dw="'+i+'">×</button></div>').join('')
+      : '<div class="empty">ما في شغيلة مسجّلين على هالورشة.</div>')
+    + (db.team.length
+      ? '<div class="three" style="margin-top:11px"><select id="selW">'+opts+'</select>'
+        + '<input id="selD" type="number" inputmode="decimal" placeholder="أيام" value="1">'
+        + '<button class="btn sm main" id="addWork">إضافة</button></div>'
+      : '<div class="note">ضيف شغيلة من الصفحة الرئيسية أول.</div>')
+    + (j.work.length ? '<div class="line" style="background:var(--orange-soft);border-color:var(--orange)">'
+      + '<span class="lm"><b>مجموع الأجور</b></span><span class="lv" style="color:var(--orange-2)">'+money(c.labor)+'</span></div>' : '')
+    + '</div>';
+
+  /* المواد */
+  h += '<div class="card"><h2>🧱 المواد والمصاريف</h2>'
+    + (j.mats.length ? j.mats.map((m,i) =>
+        '<div class="line"><span class="lm"><b>'+m.name+'</b></span>'
+        + '<span class="lv">'+money(m.amount)+'</span>'
+        + '<button class="x" data-dm="'+i+'">×</button></div>').join('')
+      : '<div class="empty">ما في مواد مسجّلة.</div>')
+    + '<div class="three" style="margin-top:11px"><input id="mN" placeholder="اسم المادة">'
+    + '<input id="mA" type="number" inputmode="decimal" placeholder="المبلغ">'
+    + '<button class="btn sm main" id="addMat">إضافة</button></div>'
+    + (j.mats.length ? '<div class="line" style="background:var(--orange-soft);border-color:var(--orange)">'
+      + '<span class="lm"><b>مجموع المواد</b></span><span class="lv" style="color:var(--orange-2)">'+money(c.mats)+'</span></div>' : '')
+    + '</div>';
+
+  /* الدفعات */
+  h += '<div class="card"><h2>💵 الدفعات من الزبون</h2>'
+    + (j.pays.length ? j.pays.map((p,i) =>
+        '<div class="line pay"><span class="lm"><b>'+money(p.amount)+'</b>'
+        + '<small>'+p.date+(p.note?' · '+p.note:'')+'</small></span>'
+        + '<button class="x" data-dp="'+i+'">×</button></div>').join('')
+      : '<div class="empty">ما في دفعات بعد.</div>')
+    + '<div class="three" style="margin-top:11px"><input id="pA" type="number" inputmode="decimal" placeholder="المبلغ">'
+    + '<input id="pN" placeholder="ملاحظة">'
+    + '<button class="btn sm main" id="addPay">تسجيل</button></div>'
+    + '<div class="note">كل دفعة بتنخصم من الإجمالي مباشرة. الباقي حالياً: <b style="color:var(--danger)">'+money(c.due)+'</b></div>'
+    + '</div>';
+
+  if(j.type==='shalfe' && (c.labor||c.mats))
+    h += '<div class="card"><h2>📈 الربح التقديري</h2>'
+      + '<div class="line"><span class="lm"><b>سعر الشلفة</b></span><span class="lv">'+money(j.price)+'</span></div>'
+      + '<div class="line"><span class="lm"><b>ناقص الأجور والمواد</b></span><span class="lv" style="color:var(--danger)">− '+money(c.labor+c.mats)+'</span></div>'
+      + '<div class="line" style="background:var(--ok-soft);border-color:#BFE3CE"><span class="lm"><b>الربح</b></span>'
+      + '<span class="lv" style="color:var(--ok)">'+money(c.profit)+'</span></div>'
+      + '<div class="note">هالقسم إلك أنت — ما بيطلع بالـPDF تبع الزبون.</div></div>';
+
+  h += '<button class="btn main" id="pdfBtn">🖨️ كشف حساب PDF</button>'
+    + '<button class="btn dark" id="waBtn">📲 إرسال الكشف للزبون</button>'
+    + '<button class="btn" id="backList">→ رجوع للورش</button>'
+    + '<button class="btn dang" id="delJob">🗑️ حذف الورشة</button>';
+
+  $('detail').innerHTML = h;
+  go(3);
+
+  const rf = () => { save(); openJob(id); };
+  if($('addWork')) $('addWork').onclick = () => {
+    const w = db.team.find(x => x.id === $('selW').value); if(!w) return;
+    const d = parseFloat($('selD').value)||0; if(!d) return say('حدّد الأيام');
+    j.work.push({ name:w.name, role:w.role, wage:w.wage, days:d }); rf();
+  };
+  $('addMat').onclick = () => {
+    const n = $('mN').value.trim(), a = parseFloat($('mA').value)||0;
+    if(!n || !a) return say('اكتب المادة والمبلغ');
+    j.mats.push({ name:n, amount:a }); rf();
+  };
+  $('addPay').onclick = () => {
+    const a = parseFloat($('pA').value)||0; if(!a) return say('اكتب المبلغ');
+    j.pays.push({ date:new Date().toISOString().slice(0,10), amount:a, note:$('pN').value.trim() }); rf();
+  };
+  $('detail').onclick = e => {
+    const w = e.target.closest('[data-dw]'), m = e.target.closest('[data-dm]'), p = e.target.closest('[data-dp]');
+    if(w){ j.work.splice(+w.dataset.dw,1); rf(); }
+    else if(m){ j.mats.splice(+m.dataset.dm,1); rf(); }
+    else if(p){ j.pays.splice(+p.dataset.dp,1); rf(); }
+  };
+  $('backList').onclick = () => go(1);
+  let arm = 0;
+  $('delJob').onclick = () => {
+    if(!arm){ arm=1; $('delJob').textContent='⚠️ اضغط مرة تانية للحذف';
+      setTimeout(()=>{arm=0; $('delJob').textContent='🗑️ حذف الورشة';},4000); return; }
+    db.jobs = db.jobs.filter(x => x.id!==id); save(); say('انحذفت'); go(1);
+  };
+  $('pdfBtn').onclick = () => printJob(j);
+  $('waBtn').onclick = () => {
+    if(!j.phone) return say('ما في رقم للزبون');
+    window.open('https://wa.me/'+j.phone.replace(/\D/g,'')+'?text='+encodeURIComponent(waText(j)),'_blank');
+  };
+}
+
+/* ── PDF ── */
+function printJob(j){
+  const c = calc(j);
+  $('shMeta').innerHTML =
+      'كشف حساب — ' + (j.type==='shalfe' ? 'ورشة شلفة' : 'ورشة على حساب الشغيلة') + '<br>'
+    + 'الزبون: ' + j.name + (j.phone ? ' — ' + j.phone : '') + '<br>'
+    + 'الموقع: ' + (j.site||'—') + '<br>'
+    + 'تاريخ البدء: ' + (j.date||'—') + ' · تاريخ الكشف: ' + new Date().toLocaleDateString('ar-LB')
+    + (j.desc ? '<br>الشغل: ' + j.desc : '');
+
+  let b = '<table><thead><tr><th style="width:62%">البند</th><th>المبلغ</th></tr></thead><tbody>';
+  if(j.type === 'shalfe'){
+    b += '<tr><td>سعر الشغل المتفق عليه</td><td>'+money(j.price)+'</td></tr>';
+  } else {
+    if(j.work.length){
+      b += '<tr class="grp"><td colspan="2">الشغيلة</td></tr>';
+      j.work.forEach(w => b += '<tr><td>'+w.name+' ('+w.role+') — '+w.days+' يوم × '+money(w.wage)+'</td><td>'+money(w.wage*w.days)+'</td></tr>');
+    }
+    if(j.mats.length){
+      b += '<tr class="grp"><td colspan="2">المواد والمصاريف</td></tr>';
+      j.mats.forEach(m => b += '<tr><td>'+m.name+'</td><td>'+money(m.amount)+'</td></tr>');
+    }
+  }
+  b += '<tr class="tot"><td>الإجمالي</td><td>'+money(c.total)+'</td></tr></tbody></table>';
+
+  b += '<table><thead><tr><th style="width:62%">الدفعات المقبوضة</th><th>المبلغ</th></tr></thead><tbody>';
+  if(j.pays.length) j.pays.forEach(p => b += '<tr><td>'+p.date+(p.note?' — '+p.note:'')+'</td><td>'+money(p.amount)+'</td></tr>');
+  else b += '<tr><td>لا يوجد دفعات</td><td>0</td></tr>';
+  b += '<tr class="tot"><td>مجموع المقبوض</td><td>'+money(c.paid)+'</td></tr>'
+     + '<tr class="tot"><td>الرصيد المتبقي</td><td>'+money(c.due)+'</td></tr></tbody></table>';
+  $('shBody').innerHTML = b;
+
+  $('shFt').innerHTML =
+      '<b>' + CO.ar + '</b> — ' + CO.services + '<br>'
+    + 'للتواصل: ' + CO.phone + ' — ' + CO.owner + '<br><br>'
+    + 'هذا الكشف صادر عن نظام إدارة الورش الخاص بالشركة.<br>'
+    + 'تصميم وبرمجة النظام: <b>' + DEV.name + '</b> — ' + DEV.person + ' · ' + DEV.site;
+  window.print();
+}
+function waText(j){
+  const c = calc(j);
+  let t = '*' + CO.ar + '*\n' + CO.services + '\n' + CO.phone + '\n';
+  t += '────────────────────\n';
+  t += 'كشف حساب — ' + (j.type==='shalfe'?'ورشة شلفة':'على حساب الشغيلة') + '\n';
+  t += 'الزبون: ' + j.name + '\n';
+  if(j.site) t += 'الموقع: ' + j.site + '\n';
+  t += '────────────────────\n';
+  if(j.type === 'shalfe') t += 'سعر الشغل: ' + money(j.price) + '\n';
+  else {
+    if(j.work.length){ t += '▸ الشغيلة\n';
+      j.work.forEach(w => t += '  • '+w.name+' ('+w.role+') '+w.days+' يوم = '+money(w.wage*w.days)+'\n'); }
+    if(j.mats.length){ t += '▸ المواد\n';
+      j.mats.forEach(m => t += '  • '+m.name+' = '+money(m.amount)+'\n'); }
+    t += 'الإجمالي: ' + money(c.total) + '\n';
+  }
+  t += '────────────────────\n';
+  if(j.pays.length){ t += '▸ الدفعات\n';
+    j.pays.forEach(p => t += '  • '+p.date+': '+money(p.amount)+(p.note?' ('+p.note+')':'')+'\n'); }
+  t += 'المقبوض: ' + money(c.paid) + '\n';
+  t += '*الباقي: ' + money(c.due) + '*\n';
+  t += '────────────────────\n';
+  t += 'شكراً لثقتكم 🙏\n' + CO.owner + ' — ' + CO.phone;
+  return t;
+}
+
+/* ── نسخة احتياطية ── */
+$('expBtn').onclick = () => {
+  const blob = new Blob([JSON.stringify(db,null,1)],{type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'ali-alali-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); say('تم التصدير');
+};
+$('impBtn').onclick = () => $('impFile').click();
+$('impFile').onchange = e => { const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => { try{ const d = JSON.parse(r.result); if(!d.jobs) throw 0;
+      const ids = new Set(db.jobs.map(x=>x.id));
+      d.jobs.forEach(x => { if(!ids.has(x.id)) db.jobs.push(x); });
+      const wid = new Set(db.team.map(x=>x.id));
+      (d.team||[]).forEach(x => { if(!wid.has(x.id)) db.team.push(x); });
+      save(); say('تم الاستيراد'); go(0);
+    }catch(err){ say('الملف مش صحيح'); } };
+  r.readAsText(f); };
+
+/* ── بطاقة المطوّر ── */
+$('devWa').href = 'https://wa.me/'+DEV.wa+'?text='+encodeURIComponent('مرحبا، بدي نظام متل تبع علي العلي لشغلي.');
+$('devSite').href = DEV.site;
+$('devCard').onclick = e => { if(e.target.closest('a')) return; $('devCard').classList.toggle('open'); };
+
+$('fDate').value = new Date().toISOString().slice(0,10);
+drawTeamMini();
+</script>
+</body>
+</html>
