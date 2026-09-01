@@ -52,6 +52,30 @@ select:focus,input:focus{border-color:var(--teal);background:var(--paper)}
 .btn.main{background:var(--teal);color:#fff;border-color:var(--teal)}
 .brow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 
+.mapwrap{position:relative}
+.msearch{position:absolute;top:10px;inset-inline:10px;z-index:600;display:flex;gap:7px}
+.msearch input{flex:1;background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 13px;
+  font-size:14px;box-shadow:0 3px 12px rgba(13,26,23,.18)}
+.msearch button{background:var(--teal);color:#fff;border:0;border-radius:11px;padding:0 16px;
+  font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(13,26,23,.18)}
+.mres{position:absolute;top:58px;inset-inline:10px;z-index:601;background:#fff;border:1px solid var(--line);
+  border-radius:12px;box-shadow:0 6px 20px rgba(13,26,23,.2);max-height:210px;overflow:auto;display:none}
+.mres.on{display:block}
+.mres div{padding:11px 13px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--line);line-height:1.5}
+.mres div:last-child{border-bottom:0}
+.mres div:active{background:var(--teal-soft)}
+.mapwrap{position:relative}
+.msearch{position:absolute;top:10px;inset-inline:10px;z-index:500;display:flex;gap:7px}
+.msearch input{flex:1;background:#fff;border:1px solid var(--line);border-radius:11px;
+  padding:11px 13px;font-size:14px;box-shadow:0 3px 12px rgba(0,0,0,.18)}
+.msearch button{background:var(--teal);color:#fff;border:0;border-radius:11px;padding:0 16px;
+  font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.18)}
+.mres{position:absolute;top:58px;inset-inline:10px;z-index:500;background:#fff;border:1px solid var(--line);
+  border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.2);max-height:210px;overflow:auto;display:none}
+.mres.on{display:block}
+.mres div{padding:11px 13px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line);line-height:1.5}
+.mres div:last-child{border-bottom:0}
+.mres div:hover{background:var(--teal-soft);color:var(--teal-2)}
 #map{height:58vh;min-height:330px;border-radius:15px;border:1px solid var(--line);
   box-shadow:var(--shadow);margin-bottom:10px;z-index:1}
 .hint{background:var(--teal-soft);border:1px solid var(--teal);border-radius:12px;padding:11px 13px;
@@ -86,6 +110,10 @@ select:focus,input:focus{border-color:var(--teal);background:var(--paper)}
   box-shadow:var(--shadow);margin-bottom:12px}
 .plan svg{width:100%;height:auto;display:block}
 
+.tabs2{display:flex;gap:6px;margin-bottom:10px}
+.t2{flex:1;font-family:inherit;font-size:12.5px;color:var(--muted);background:var(--soft);
+  border:1px solid var(--line);border-radius:10px;padding:9px 4px;cursor:pointer}
+.t2.on{color:#fff;background:var(--teal);border-color:var(--teal);font-weight:700}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .cmp .c{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:13px;text-align:center}
 .cmp .c.win{border-color:var(--teal);background:var(--teal-soft)}
@@ -197,7 +225,14 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
   <section class="scr" data-k="2">
     <h1>ارسم السطح</h1>
     <div class="hint">اضغط على زوايا السطح وحدة وحدة. كبّر الخريطة لآخرها لتطلع الأبعاد أدق.</div>
-    <div id="map"></div>
+    <div class="mapwrap">
+      <div class="msearch">
+        <input id="mq" placeholder="🔍 دوّر عن منطقة أو الصق إحداثيات..." autocomplete="off">
+        <button id="mqBtn">بحث</button>
+      </div>
+      <div class="mres" id="mres"></div>
+      <div id="map"></div>
+    </div>
     <div class="brow">
       <button class="btn" id="undoBtn">↩️ تراجع</button>
       <button class="btn" id="clearBtn">🗑️ مسح</button>
@@ -340,13 +375,23 @@ function shadowGap(pl, tilt){
 
 /* ─── توزيع الألواح ─── */
 function layout(XY, pl, pwd, tilt){
-  /* الصفوف بتمشي مع الضلع الأطول للسطح */
-  let ang = 0, best = 0;
+  /* منجرّب اتجاهات الأضلاع كلها + دوران دقيق، ومنختار اللي بيدخل أكتر ألواح */
+  const cands = [];
   for(let i=0;i<XY.length;i++){
     const a=XY[i], b=XY[(i+1)%XY.length];
-    const d=Math.hypot(b[0]-a[0], b[1]-a[1]);
-    if(d>best){ best=d; ang=Math.atan2(b[1]-a[1], b[0]-a[0]); }
+    if(Math.hypot(b[0]-a[0], b[1]-a[1]) < 2) continue;
+    const A = Math.atan2(b[1]-a[1], b[0]-a[0]);
+    cands.push(A, A+Math.PI/2);
   }
+  for(let d=0; d<180; d+=15) cands.push(d*Math.PI/180);
+  let bestSet = null, bestN = -1;
+  for(const A of cands){
+    const s = fill(XY, pl, pwd, tilt, A);
+    if(s.length > bestN){ bestN = s.length; bestSet = s; }
+  }
+  return bestSet || [];
+}
+function fill(XY, pl, pwd, tilt, ang){
   const cos=Math.cos(-ang), sin=Math.sin(-ang);
   const rot = p => [p[0]*cos - p[1]*sin, p[0]*sin + p[1]*cos];
   const inv = p => [p[0]*Math.cos(ang) - p[1]*Math.sin(ang), p[0]*Math.sin(ang) + p[1]*Math.cos(ang)];
@@ -356,20 +401,28 @@ function layout(XY, pl, pwd, tilt){
 
   const panels = [];
   const t = tilt||0;
-  /* اللوح المايل: مسقطه الأفقي أقصر، بس بدو مسافة ورا لتفادي الظل */
   const proj = t ? pl*Math.cos(t*Math.PI/180) : pl;
   const rowPitch = t ? proj + shadowGap(pl, t) : pl;
-  let y = y0, groupIdx = 0, inGroup = 0;
-  const limit = () => (groupIdx===0 ? PATTERN[0] : PATTERN[1]);
-  while(y + proj <= y1 + .001){
-    for(let x=x0; x + pwd <= x1 + .001; x += pwd + GAP){
-      const c = [[x,y],[x+pwd,y],[x+pwd,y+proj],[x,y+proj]];
-      if(c.every(q => inPoly(q[0],q[1],R))) panels.push(c.map(inv));
+  const STEP = pwd + GAP;
+  /* منزحزح نقطة البداية بخطوات صغيرة ومنجرّب أفضل إزاحة */
+  let best = [];
+  for(let ox=0; ox<STEP; ox+=STEP/4){
+    for(let oy=0; oy<rowPitch; oy+=rowPitch/3){
+      const set = [];
+      let y = y0+oy, groupIdx = 0, inGroup = 0;
+      const limit = () => (groupIdx===0 ? PATTERN[0] : PATTERN[1]);
+      while(y + proj <= y1 + .001){
+        for(let x=x0+ox; x + pwd <= x1 + .001; x += STEP){
+          const c = [[x,y],[x+pwd,y],[x+pwd,y+proj],[x,y+proj]];
+          if(c.every(q => inPoly(q[0],q[1],R))) set.push(c.map(inv));
+        }
+        y += rowPitch; inGroup++;
+        if(!t && inGroup >= limit()){ y += PATH; inGroup = 0; groupIdx++; }
+      }
+      if(set.length > best.length) best = set;
     }
-    y += rowPitch; inGroup++;
-    if(!t && inGroup >= limit()){ y += PATH; inGroup = 0; groupIdx++; }
   }
-  return panels;
+  return best;
 }
 
 /* ─── التنقّل ─── */
@@ -587,7 +640,11 @@ function calc(){
         : 'على هالسطح، <b>المايلة بتعطي إنتاج أكبر</b> رغم قلة العدد.')
     + '</div></div>';
 
-  h2 += '<div class="plan" id="planBox"></div>';
+  h2 += '<div class="card" style="padding:12px">'
+    + '<div class="tabs2"><button class="t2 on" data-v="measure">📏 قياسات فقط</button>'
+    + '<button class="t2" data-v="panels">🔷 مع الألواح</button>'
+    + '<button class="t2" data-v="side">📐 مقطع جانبي</button></div>'
+    + '<div class="plan" id="planBox" style="margin:0;border:0;box-shadow:none;padding:0"></div></div>';
 
   h2 += '<div class="card"><h2>📐 التفاصيل</h2>'
     + '<div class="row"><span class="k">المساحة</span><span class="v">'+A.toFixed(0)+' م²</span></div>'
@@ -617,7 +674,12 @@ function calc(){
 
   $('out').innerHTML = h2;
   LAST = { A, S, n, w, kwp, err, lo, hi, P, xy, lat0, lng0, pl, pwd, tilt, nFlat, kwFlat };
-  $('planBox').innerHTML = planSVG(true, 'panels');
+  $('planBox').innerHTML = planSVG(true, 'measure');
+  document.querySelectorAll('.t2').forEach(b => b.onclick = () => {
+    document.querySelectorAll('.t2').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    $('planBox').innerHTML = planSVG(true, b.dataset.v);
+  });
 }
 
 /* ─── مخططات SVG ─── */
@@ -681,17 +743,36 @@ function planSVG(screen, mode){
   const roof = xy.map(p=>px(p).toFixed(1)+','+py(p).toFixed(1)).join(' ');
   const pan = withP ? P.map(c => '<polygon points="'+c.map(q=>px(q).toFixed(1)+','+py(q).toFixed(1)).join(' ')
     + '" fill="#2B6CB0" fill-opacity="0.55" stroke="#1B4F72" stroke-width="0.7"/>').join('') : '';
+  /* مركز المضلّع لدفع التسميات لبرّا */
+  const ctr = [xy.reduce((a,p)=>a+px(p),0)/xy.length, xy.reduce((a,p)=>a+py(p),0)/xy.length];
+  const placed = [];
   let lab='', dots='';
-  xy.forEach((p,i)=>{
+  const items = xy.map((p,i) => {
     const q = xy[(i+1)%xy.length];
-    const cx=(px(p)+px(q))/2, cy=(py(p)+py(q))/2;
-    const ox=(cx-W/2)*.12, oy=(cy-H/2)*.12;
-    lab += '<text x="'+(cx+ox).toFixed(1)+'" y="'+(cy+oy-6).toFixed(1)+'" text-anchor="middle" '
-      + 'font-family="monospace" font-size="11" fill="#5E7370">ضلع '+(i+1)+'</text>'
-      + '<text x="'+(cx+ox).toFixed(1)+'" y="'+(cy+oy+9).toFixed(1)+'" text-anchor="middle" '
-      + 'font-family="monospace" font-size="14" font-weight="700" fill="#0B7A5E">'+S[i].toFixed(1)+' م</text>';
-    dots += '<circle cx="'+px(p).toFixed(1)+'" cy="'+py(p).toFixed(1)+'" r="4.5" fill="#fff" stroke="#0E8F6E" stroke-width="2.5"/>';
+    return { i, len:S[i], mx:(px(p)+px(q))/2, my:(py(p)+py(q))/2 };
+  }).sort((a,b) => b.len - a.len);           /* الأطول أولاً ليأخد مكانه */
+
+  items.forEach(it => {
+    if(it.len < 1.5) return;                  /* أضلاع قصيرة كتير — ما بتنكتب */
+    let dx = it.mx - ctr[0], dy = it.my - ctr[1];
+    const d = Math.hypot(dx,dy) || 1;
+    let x = it.mx + dx/d*26, y = it.my + dy/d*26;
+    /* تفادي التراكب: زحزح لبرّا لحد ما يفضى المكان */
+    let tries = 0;
+    while(placed.some(pp => Math.abs(pp[0]-x)<52 && Math.abs(pp[1]-y)<26) && tries < 8){
+      x += dx/d*20; y += dy/d*20; tries++;
+    }
+    placed.push([x,y]);
+    lab += '<text x="'+x.toFixed(1)+'" y="'+(y-5).toFixed(1)+'" text-anchor="middle" '
+      + 'font-family="monospace" font-size="10" fill="#8A9A97">'+(it.i+1)+'</text>'
+      + '<text x="'+x.toFixed(1)+'" y="'+(y+9).toFixed(1)+'" text-anchor="middle" '
+      + 'font-family="monospace" font-size="13" font-weight="700" fill="#0B7A5E">'+it.len.toFixed(1)+'</text>'
+      + '<line x1="'+it.mx.toFixed(1)+'" y1="'+it.my.toFixed(1)+'" x2="'+x.toFixed(1)+'" y2="'+(y+1).toFixed(1)
+      + '" stroke="#BFD4CE" stroke-width="1"/>';
   });
+  xy.forEach(p => { dots += '<circle cx="'+px(p).toFixed(1)+'" cy="'+py(p).toFixed(1)
+    + '" r="4" fill="#fff" stroke="#0E8F6E" stroke-width="2.5"/>'; });
+
   const cx0=W-52, cy0=54, r=26;
   const comp = '<circle cx="'+cx0+'" cy="'+cy0+'" r="'+r+'" fill="#fff" stroke="#DCE6E3" stroke-width="1.5"/>'
     + '<polygon points="'+cx0+','+(cy0-r+3)+' '+(cx0-4.5)+','+(cy0-r+13)+' '+(cx0+4.5)+','+(cy0-r+13)+'" fill="#0D1A17"/>'
@@ -707,6 +788,7 @@ function planSVG(screen, mode){
     + '<polygon points="'+roof+'" fill="#22C79B" fill-opacity="'+(withP?'0.10':'0.16')+'" stroke="#0E8F6E" stroke-width="2.5" stroke-linejoin="round"/>'
     + pan + dots + lab + comp
     + '<text x="'+(W/2)+'" y="'+(H-16)+'" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#0B7A5E">'+cap+'</text>'
+    + '<text x="22" y="'+(H-16)+'" font-family="monospace" font-size="10.5" fill="#8A9A97">الأرقام بالمتر · الرقم الصغير = رقم الضلع</text>'
     + '</svg>';
 }
 function wmark(screen,W,H){
@@ -747,6 +829,62 @@ function printPlan(){
     + 'صادر عن <b>MrElectroAI</b> — أنور الحسن الجاسم<br>'+ '<span dir="ltr">+961 79 434 479</span> · mrelectroai@gmail.com<br>' + SITE;
   window.print();
 }
+
+/* ─── بحث داخل الخريطة ─── */
+async function mapSearch(){
+  if(!map) return;
+  const raw = $('mq').value.trim(); if(!raw) return;
+  const dec = raw.replace(/،/g,',').replace(/(\d),(\d)/g,'$1.$2');
+  const m = dec.match(/(-?\d{1,3}\.\d+)[,\s]+(-?\d{1,3}\.\d+)/);
+  if(m){ map.setView([+m[1],+m[2]],20); fetchElev(+m[1],+m[2]);
+    $('mres').classList.remove('on'); $('mq').blur(); return; }
+  $('mres').innerHTML = '<div>عم ندوّر...</div>'; $('mres').classList.add('on');
+  try{
+    const c = map.getCenter();
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=6&accept-language=ar&q='
+      + encodeURIComponent(raw) + '&viewbox=' + (c.lng-1) + ',' + (c.lat+1) + ',' + (c.lng+1) + ',' + (c.lat-1));
+    const d = await r.json();
+    $('mres').innerHTML = d.length
+      ? d.map(x => '<div data-la="'+x.lat+'" data-lo="'+x.lon+'">📍 '
+          + x.display_name.split(',').slice(0,4).join('، ') + '</div>').join('')
+      : '<div>ما لقينا المكان — جرّب اسم أوضح أو الصق الإحداثيات.</div>';
+  }catch(e){ $('mres').innerHTML = '<div>ما قدرنا ندوّر — الصق الإحداثيات بدل الاسم.</div>'; }
+}
+$('mqBtn').onclick = mapSearch;
+$('mq').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); mapSearch(); } });
+$('mres').onclick = e => { const d = e.target.closest('[data-la]'); if(!d) return;
+  map.setView([+d.dataset.la, +d.dataset.lo], 20); fetchElev(+d.dataset.la, +d.dataset.lo);
+  $('mres').classList.remove('on'); $('mq').value=''; };
+document.addEventListener('click', e => {
+  if(!e.target.closest('.msearch') && !e.target.closest('.mres')) $('mres').classList.remove('on'); });
+
+/* ─── بحث داخل الخريطة ─── */
+async function mapSearch(){
+  if(!map) return;
+  let t = $('mq').value.trim().replace(/،/g,',');
+  if(!t) return;
+  const dec = t.replace(/(\d),(\d)/g,'$1.$2');
+  const m = dec.match(/(-?\d{1,3}\.\d+)[,\s]+(-?\d{1,3}\.\d+)/);
+  if(m){ map.setView([+m[1],+m[2]],20); fetchElev(+m[1],+m[2]);
+    $('mres').classList.remove('on'); $('mq').blur(); return; }
+  $('mres').innerHTML = '<div>عم ندوّر...</div>'; $('mres').classList.add('on');
+  try{
+    const c = map.getCenter();
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=6&accept-language=ar&q='
+      + encodeURIComponent(t) + '&viewbox=' + (c.lng-1.5) + ',' + (c.lat+1) + ',' + (c.lng+1.5) + ',' + (c.lat-1));
+    const d = await r.json();
+    $('mres').innerHTML = d.length ? d.map(x =>
+      '<div data-la="'+x.lat+'" data-lo="'+x.lon+'">📍 '+x.display_name.split(',').slice(0,4).join('، ')+'</div>').join('')
+      : '<div>ما لقينا المكان — جرّب اسم أوضح أو الصق الإحداثيات.</div>';
+  }catch(e){ $('mres').innerHTML = '<div>ما قدرنا ندوّر — تفقّد الإنترنت.</div>'; }
+}
+$('mqBtn').onclick = mapSearch;
+$('mq').addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); mapSearch(); } });
+$('mres').onclick = e => { const d = e.target.closest('[data-la]'); if(!d||!map) return;
+  map.setView([+d.dataset.la,+d.dataset.lo],20); fetchElev(+d.dataset.la,+d.dataset.lo);
+  $('mres').classList.remove('on'); $('mq').value=''; };
+document.addEventListener('click', e => {
+  if(!e.target.closest('.msearch') && !e.target.closest('.mres')) $('mres').classList.remove('on'); });
 
 drawJobs(); go(0);
 </script>
