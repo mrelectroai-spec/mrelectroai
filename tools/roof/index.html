@@ -86,6 +86,17 @@ select:focus,input:focus{border-color:var(--teal);background:var(--paper)}
   box-shadow:var(--shadow);margin-bottom:12px}
 .plan svg{width:100%;height:auto;display:block}
 
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp .c{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:13px;text-align:center}
+.cmp .c.win{border-color:var(--teal);background:var(--teal-soft)}
+.cmp .c b{display:block;font-size:13px;margin-bottom:4px}
+.cmp .c .n{display:block;font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--teal-2)}
+.cmp .c small{display:block;font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6}
+.sides{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.sd{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:9px;text-align:center}
+.sd b{display:block;font-size:11px;color:var(--muted);font-weight:500}
+.sd span{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--teal-2)}
+.pt{font-family:'JetBrains Mono',monospace;font-size:12px;color:#333;margin:14px 0 6px;font-weight:700}
 .jobs .j{display:flex;align-items:center;gap:11px;background:var(--paper);border:1px solid var(--line);
   border-radius:13px;padding:12px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow)}
 .jobs .j:hover{border-color:var(--teal)}
@@ -205,15 +216,20 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
         <option value="700|2.38|1.30">700 واط — 2.38 × 1.30 م</option>
         <option value="0|0|0">قياس مخصّص</option>
       </select>
+      <div id="tiltNote"></div>
       <div class="two" id="customBox" style="display:none;margin-top:10px">
         <div><label class="lbl">طول اللوح (م)</label><input id="cl" type="number" step="0.01" value="2.28"></div>
         <div><label class="lbl">عرض اللوح (م)</label><input id="cw" type="number" step="0.01" value="1.13"></div>
       </div>
       <div class="two" style="margin-top:10px">
         <div><label class="lbl">قدرة اللوح (واط)</label><input id="cp" type="number" value="550"></div>
-        <div><label class="lbl">اتجاه الصفوف</label>
-          <select id="orient"><option value="auto" selected>مع الضلع الأطول</option>
-            <option value="ns">شمال ← جنوب</option></select></div>
+        <div><label class="lbl">طريقة التركيب</label>
+          <select id="tilt">
+            <option value="0" selected>نايمة على المنصّة (بدون ميل)</option>
+            <option value="30">مايلة 30°</option>
+            <option value="40">مايلة 40°</option>
+            <option value="45">مايلة 45°</option>
+          </select></div>
       </div>
     </div>
     <div id="out"></div>
@@ -314,17 +330,21 @@ function inPoly(x,y,poly){
   return c;
 }
 
+/* المسافة اللازمة ورا الصف المائل لتفادي الظل — على أساس أوطى شمس بالشتا (~22° بلبنان) */
+function shadowGap(pl, tilt){
+  const hgt = pl * Math.sin(tilt*Math.PI/180);
+  const sunAlt = 22 * Math.PI/180;
+  return hgt / Math.tan(sunAlt) * 0.75;   /* معامل عملي */
+}
+
 /* ─── توزيع الألواح ─── */
-function layout(XY, pl, pwd){
-  /* اتجاه الصفوف: مع الضلع الأطول أو شمال-جنوب */
-  let ang = 0;
-  if($('orient').value === 'auto'){
-    let best = 0;
-    for(let i=0;i<XY.length;i++){
-      const a=XY[i], b=XY[(i+1)%XY.length];
-      const d=Math.hypot(b[0]-a[0], b[1]-a[1]);
-      if(d>best){ best=d; ang=Math.atan2(b[1]-a[1], b[0]-a[0]); }
-    }
+function layout(XY, pl, pwd, tilt){
+  /* الصفوف بتمشي مع الضلع الأطول للسطح */
+  let ang = 0, best = 0;
+  for(let i=0;i<XY.length;i++){
+    const a=XY[i], b=XY[(i+1)%XY.length];
+    const d=Math.hypot(b[0]-a[0], b[1]-a[1]);
+    if(d>best){ best=d; ang=Math.atan2(b[1]-a[1], b[0]-a[0]); }
   }
   const cos=Math.cos(-ang), sin=Math.sin(-ang);
   const rot = p => [p[0]*cos - p[1]*sin, p[0]*sin + p[1]*cos];
@@ -334,15 +354,19 @@ function layout(XY, pl, pwd){
   const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
 
   const panels = [];
-  let y = y0, rowIdx = 0, groupIdx = 0, inGroup = 0;
+  const t = tilt||0;
+  /* اللوح المايل: مسقطه الأفقي أقصر، بس بدو مسافة ورا لتفادي الظل */
+  const proj = t ? pl*Math.cos(t*Math.PI/180) : pl;
+  const rowPitch = t ? proj + shadowGap(pl, t) : pl;
+  let y = y0, groupIdx = 0, inGroup = 0;
   const limit = () => (groupIdx===0 ? PATTERN[0] : PATTERN[1]);
-  while(y + pl <= y1 + .001){
+  while(y + proj <= y1 + .001){
     for(let x=x0; x + pwd <= x1 + .001; x += pwd + GAP){
-      const c = [[x,y],[x+pwd,y],[x+pwd,y+pl],[x,y+pl]];
+      const c = [[x,y],[x+pwd,y],[x+pwd,y+proj],[x,y+proj]];
       if(c.every(q => inPoly(q[0],q[1],R))) panels.push(c.map(inv));
     }
-    y += pl; inGroup++; rowIdx++;
-    if(inGroup >= limit()){ y += PATH; inGroup = 0; groupIdx++; }
+    y += rowPitch; inGroup++;
+    if(!t && inGroup >= limit()){ y += PATH; inGroup = 0; groupIdx++; }
   }
   return panels;
 }
@@ -450,19 +474,30 @@ $('pw').onchange = () => {
   if(v[0]){ $('cl').value=v[1]; $('cw').value=v[2]; $('cp').value=v[0]; }
   calc();
 };
-['cl','cw','cp','orient'].forEach(i=>$(i).addEventListener('input',calc));
-['orient'].forEach(i=>$(i).addEventListener('change',calc));
+['cl','cw','cp'].forEach(i=>$(i).addEventListener('input',calc));
+$('tilt').addEventListener('change',calc);
 
 function calc(){
   const A = area(pts);
   if(A<1 || !map){ $('out').innerHTML = '<div class="card"><div class="empty">ارسم السطح أول.</div></div>'; return; }
   const pl = parseFloat($('cl').value)||2.28, pwd = parseFloat($('cw').value)||1.13, w = parseFloat($('cp').value)||550;
+  const tilt = parseFloat($('tilt').value)||0;
   const {lat0,lng0,xy} = toXY(pts);
-  const P = layout(xy, pl, pwd);
+
+  const P = layout(xy, pl, pwd, tilt);
+  const flatP = tilt ? layout(xy, pl, pwd, 0) : P;
   const n = P.length, kwp = n*w/1000;
+  const nFlat = flatP.length, kwFlat = nFlat*w/1000;
   const S = sides(pts);
   const err = ACC[$('floors').value||''];
   const lo = Math.round(n*(1-err/100)), hi = Math.round(n*(1+err/100));
+
+  /* نصيحة الميل */
+  $('tiltNote').innerHTML = tilt
+    ? '<div class="note" style="margin-top:10px"><b>ميل '+tilt+'°:</b> بتخسر عدد ألواح مقابل إنتاج أعلى للوح الواحد. '
+      + '<b>بالمناطق الجبلية بلبنان 45° أفضل</b> — الشمس أوطى بالشتا، والثلج بينزلق عن اللوح بدل ما يتراكم.</div>'
+    : '<div class="note" style="margin-top:10px"><b>نايمة:</b> أكبر عدد ألواح بنفس المساحة، بدون ظل بين الصفوف. '
+      + 'بالمقابل الإنتاج للوح أقل ~10–15% والتنظيف بدو اهتمام أكتر.</div>';
 
   /* رسم الألواح على الخريطة */
   layers.forEach(l=>map.removeLayer(l)); layers = [];
@@ -473,63 +508,126 @@ function calc(){
   $('resTitle').textContent = $('jName').value.trim() || 'النتيجة';
   $('resSub').textContent = 'المساحة ' + A.toFixed(0) + ' م² · نسبة الخطأ ±' + err + '%';
 
-  let h = '<div class="rings">'
+  let h2 = '<div class="rings">'
     + '<div class="ring">'+ring(A.toFixed(0),'م² مساحة','#0E8F6E',Math.min(1,A/500))
       + '<div class="cap">من ' + (A*(1-err/100)).toFixed(0) + ' لـ ' + (A*(1+err/100)).toFixed(0) + ' م²</div></div>'
-    + '<div class="ring">'+ring(kwp.toFixed(1),'kWp قدرة','#B7791F',Math.min(1,kwp/30))
-      + '<div class="cap">إنتاج ~' + (kwp*4.5).toFixed(0) + ' kWh باليوم</div></div>'
-    + '<div class="ring wide">'+ring(n,'لوح '+w+'W','#2B6CB0',Math.min(1,n/60))
+    + '<div class="ring">'+ring(kwp.toFixed(1),'kWp قدرة','#B7791F',Math.min(1,kwp/40))
+      + '<div class="cap">إنتاج ~' + (kwp*4.5*(tilt?1.12:1)).toFixed(0) + ' kWh باليوم</div></div>'
+    + '<div class="ring wide">'+ring(n,'لوح '+w+'W','#2B6CB0',Math.min(1,n/80))
       + '<div class="cap">المدى المتوقع: ' + lo + ' – ' + hi + ' لوح</div></div>'
     + '</div>';
 
-  h += '<div class="plan" id="planBox"></div>';
+  /* مقارنة */
+  if(tilt) h2 += '<div class="card"><h2>⚖️ نايمة ولا مايلة؟</h2>'
+    + '<div class="cmp">'
+    + '<div class="c'+(tilt?'':' win')+'"><b>نايمة</b><span class="n">'+nFlat+' لوح</span>'
+      + '<small>'+kwFlat.toFixed(1)+' kWp · إنتاج ~'+(kwFlat*4.5).toFixed(0)+' kWh/يوم</small></div>'
+    + '<div class="c win"><b>مايلة '+tilt+'°</b><span class="n">'+n+' لوح</span>'
+      + '<small>'+kwp.toFixed(1)+' kWp · إنتاج ~'+(kwp*4.5*1.12).toFixed(0)+' kWh/يوم</small></div>'
+    + '</div>'
+    + '<div class="note" style="margin-top:11px"><b>الخلاصة:</b> '
+    + (kwFlat*4.5 > kwp*4.5*1.12
+        ? 'على هالسطح، <b>النايمة بتعطي إنتاج أكبر</b> لأن عدد الألواح الزيادة بيغطي فرق الكفاءة.'
+        : 'على هالسطح، <b>المايلة بتعطي إنتاج أكبر</b> رغم قلة العدد.')
+    + '</div></div>';
 
-  h += '<div class="card"><h2>📐 التفاصيل</h2>'
+  h2 += '<div class="plan" id="planBox"></div>';
+
+  h2 += '<div class="card"><h2>📐 التفاصيل</h2>'
     + '<div class="row"><span class="k">المساحة</span><span class="v">'+A.toFixed(0)+' م²</span></div>'
     + '<div class="row"><span class="k">المحيط</span><span class="v">'+S.reduce((a,b)=>a+b,0).toFixed(1)+' م</span></div>'
     + '<div class="row"><span class="k">قياس اللوح</span><span class="v">'+pl+' × '+pwd+' م</span></div>'
+    + '<div class="row"><span class="k">طريقة التركيب</span><span class="v">'+(tilt?'مايلة '+tilt+'°':'نايمة')+'</span></div>'
     + '<div class="row"><span class="k">بين لوح ولوح</span><span class="v">2 سم</span></div>'
-    + '<div class="row"><span class="k">ممر التنظيف</span><span class="v">40 سم</span></div>'
-    + '<div class="row"><span class="k">نمط الصفوف<small>صفّين، ممر، وبعدها كل 4 صفوف ممر</small></span><span class="v">2 · 4 · 4</span></div>'
-    + '<div class="row"><span class="k">أطوال الأضلاع</span><span class="v">'+S.map(s=>s.toFixed(1)).join(' · ')+' م</span></div>'
+    + (tilt ? '<div class="row"><span class="k">بين صف وصف<small>لتفادي ظل الشتا</small></span><span class="v">'
+        + shadowGap(pl,tilt).toFixed(2)+' م</span></div>'
+      : '<div class="row"><span class="k">ممر التنظيف<small>صفّين، ممر، وبعدها كل 4 صفوف</small></span><span class="v">40 سم</span></div>')
     + '</div>';
 
-  h += '<div class="card"><h2>⚠️ انتبه</h2>'
+  h2 += '<div class="card"><h2>📏 أطوال الأضلاع</h2><div class="sides">'
+    + S.map((s,i)=>'<div class="sd"><b>ضلع '+(i+1)+'</b><span>'+s.toFixed(1)+' م</span></div>').join('')
+    + '</div></div>';
+
+  h2 += '<div class="card"><h2>⚠️ انتبه</h2>'
     + (err>=15 ? '<div class="alert"><b>بناية عالية — الخطأ ±'+err+'%:</b> صورة القمر الصناعي بتبيّن البناية مايلة، فحواف السطح مزحوطة عن مكانها الحقيقي.</div>' : '')
     + '<div class="alert"><b>تقدير أوّلي:</b> الأداة ما بتشوف ارتفاع الجدران ولا الظل من بناية جارة ولا وضع السطح. الزيارة ضرورية قبل التنفيذ.</div>'
-    + '<div class="note"><b>التوزيع محسوب على:</b> ألواح نايمة على منصّة موحّدة فوق كل العوائق، بدون هامش حافة.</div>'
     + '</div>';
 
   const msg = 'قياس سطح — ' + ($('jName').value.trim()||'ورشة') + '\n'
     + '• المساحة: ' + A.toFixed(0) + ' م² (±' + err + '%)\n'
-    + '• الألواح: ' + n + ' لوح ' + w + 'W (' + kwp.toFixed(1) + ' kWp)\n'
+    + '• الألواح: ' + n + ' لوح ' + w + 'W (' + kwp.toFixed(1) + ' kWp)' + (tilt?' — ميل '+tilt+'°':' — نايمة') + '\n'
     + '• الموقع: https://maps.google.com/?q=' + lat0.toFixed(6) + ',' + lng0.toFixed(6);
-  h += '<a class="btn main" href="https://wa.me/'+WA+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">📲 ابعت القياس</a>';
+  h2 += '<a class="btn main" href="https://wa.me/'+WA+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">📲 ابعت القياس</a>';
 
-  $('out').innerHTML = h;
-  LAST = { A, S, n, w, kwp, err, lo, hi, P, xy, lat0, lng0, pl, pwd };
-  $('planBox').innerHTML = planSVG(true);
+  $('out').innerHTML = h2;
+  LAST = { A, S, n, w, kwp, err, lo, hi, P, xy, lat0, lng0, pl, pwd, tilt, nFlat, kwFlat };
+  $('planBox').innerHTML = planSVG(true, 'panels');
 }
 
-/* ─── مخطط SVG ─── */
-function planSVG(screen){
-  const { A, S, n, w, kwp, err, P, xy } = LAST;
-  const all = xy.concat(...P);
+/* ─── مخططات SVG ─── */
+function planSVG(screen, mode){
+  const { A, S, n, w, kwp, P, xy, pl, pwd, tilt } = LAST;
+  const W=680, H=470, PAD=58;
+
+  /* ── المقطع الجانبي ── */
+  if(mode === 'side'){
+    const t = tilt||0, scl = 150;
+    const len = pl*scl/2.28, hgt = len*Math.sin(t*Math.PI/180), prj = len*Math.cos(t*Math.PI/180);
+    const gap = t ? shadowGap(pl,t)*scl/2.28 : 12;
+    const baseY = H-140, x0 = 90;
+    let g = '', lbl = '';
+    for(let i=0;i<3;i++){
+      const x = x0 + i*(prj+gap);
+      if(t){
+        g += '<polygon points="'+x+','+baseY+' '+(x+prj)+','+(baseY-hgt)+' '+(x+prj)+','+(baseY-hgt+9)+' '+x+','+(baseY+9)+'" '
+           + 'fill="#2B6CB0" stroke="#1B4F72" stroke-width="1.5"/>'
+           + '<line x1="'+(x+prj)+'" y1="'+(baseY-hgt+9)+'" x2="'+(x+prj)+'" y2="'+baseY+'" stroke="#7B8B99" stroke-width="3"/>';
+      } else {
+        g += '<rect x="'+x+'" y="'+(baseY-8)+'" width="'+prj+'" height="9" fill="#2B6CB0" stroke="#1B4F72" stroke-width="1.5"/>';
+      }
+    }
+    /* المنصّة والسطح */
+    g += '<rect x="50" y="'+(baseY+9)+'" width="'+(W-100)+'" height="12" fill="#D8DEE4" stroke="#9AA5B1" stroke-width="1.5"/>'
+       + '<rect x="50" y="'+(baseY+52)+'" width="'+(W-100)+'" height="16" fill="#EDE7DD" stroke="#B8AE9E" stroke-width="1.5"/>'
+       + '<text x="'+(W-58)+'" y="'+(baseY+20)+'" text-anchor="end" font-family="sans-serif" font-size="11" fill="#5E7370">المنصّة</text>'
+       + '<text x="'+(W-58)+'" y="'+(baseY+64)+'" text-anchor="end" font-family="sans-serif" font-size="11" fill="#5E7370">سطح البناية</text>';
+    /* أعمدة المنصّة */
+    for(let x=90;x<W-90;x+=110)
+      g += '<line x1="'+x+'" y1="'+(baseY+21)+'" x2="'+x+'" y2="'+(baseY+52)+'" stroke="#9AA5B1" stroke-width="4"/>';
+    /* الشمس */
+    g += '<circle cx="90" cy="70" r="20" fill="#F5B301"/>'
+       + '<line x1="118" y1="88" x2="'+(x0+prj*1.6)+'" y2="'+(baseY-hgt-8)+'" stroke="#F5B301" stroke-width="2" stroke-dasharray="6 5"/>';
+    /* التسميات */
+    lbl = '<text x="'+(W/2)+'" y="34" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#0D1A17">'
+        + (t ? 'مقطع جانبي — ميل '+t+'°' : 'مقطع جانبي — ألواح نايمة') + '</text>';
+    if(t) lbl += '<text x="'+(x0+prj+gap/2)+'" y="'+(baseY+38)+'" text-anchor="middle" font-family="monospace" font-size="12" fill="#E2622C">'
+        + shadowGap(pl,t).toFixed(2)+' م</text>'
+        + '<line x1="'+(x0+prj)+'" y1="'+(baseY+28)+'" x2="'+(x0+prj+gap)+'" y2="'+(baseY+28)+'" stroke="#E2622C" stroke-width="1.5"/>'
+        + '<text x="'+(x0+prj+14)+'" y="'+(baseY-hgt/2)+'" font-family="monospace" font-size="11" fill="#5E7370">'
+        + (pl*Math.sin(t*Math.PI/180)).toFixed(2)+' م</text>';
+    return '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'
+      + '<rect width="'+W+'" height="'+H+'" fill="#fff"/>' + wmark(screen,W,H) + g + lbl + '</svg>';
+  }
+
+  /* ── المخطط العلوي ── */
+  const withP = (mode === 'panels');
+  const all = withP ? xy.concat(...P) : xy;
   const xs = all.map(p=>p[0]), ys = all.map(p=>p[1]);
   const minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys);
-  const PAD=58, W=680, H=470;
   const sc = Math.min((W-PAD*2)/((maxX-minX)||1), (H-PAD*2)/((maxY-minY)||1));
   const px = p => PAD + (p[0]-minX)*sc, py = p => H-PAD - (p[1]-minY)*sc;
 
   const roof = xy.map(p=>px(p).toFixed(1)+','+py(p).toFixed(1)).join(' ');
-  let pan = P.map(c => '<polygon points="'+c.map(q=>px(q).toFixed(1)+','+py(q).toFixed(1)).join(' ')
-    + '" fill="#2B6CB0" fill-opacity="0.55" stroke="#1B4F72" stroke-width="0.7"/>').join('');
-  let lab = '', dots = '';
+  const pan = withP ? P.map(c => '<polygon points="'+c.map(q=>px(q).toFixed(1)+','+py(q).toFixed(1)).join(' ')
+    + '" fill="#2B6CB0" fill-opacity="0.55" stroke="#1B4F72" stroke-width="0.7"/>').join('') : '';
+  let lab='', dots='';
   xy.forEach((p,i)=>{
     const q = xy[(i+1)%xy.length];
     const cx=(px(p)+px(q))/2, cy=(py(p)+py(q))/2;
-    const ox=(cx-W/2)*.1, oy=(cy-H/2)*.1;
-    lab += '<text x="'+(cx+ox).toFixed(1)+'" y="'+(cy+oy).toFixed(1)+'" text-anchor="middle" '
+    const ox=(cx-W/2)*.12, oy=(cy-H/2)*.12;
+    lab += '<text x="'+(cx+ox).toFixed(1)+'" y="'+(cy+oy-6).toFixed(1)+'" text-anchor="middle" '
+      + 'font-family="monospace" font-size="11" fill="#5E7370">ضلع '+(i+1)+'</text>'
+      + '<text x="'+(cx+ox).toFixed(1)+'" y="'+(cy+oy+9).toFixed(1)+'" text-anchor="middle" '
       + 'font-family="monospace" font-size="14" font-weight="700" fill="#0B7A5E">'+S[i].toFixed(1)+' م</text>';
     dots += '<circle cx="'+px(p).toFixed(1)+'" cy="'+py(p).toFixed(1)+'" r="4.5" fill="#fff" stroke="#0E8F6E" stroke-width="2.5"/>';
   });
@@ -539,18 +637,24 @@ function planSVG(screen){
     + '<text x="'+cx0+'" y="'+(cy0-r-5)+'" text-anchor="middle" font-family="monospace" font-size="11" font-weight="700">N</text>'
     + '<line x1="'+cx0+'" y1="'+cy0+'" x2="'+cx0+'" y2="'+(cy0+r-3)+'" stroke="#E2622C" stroke-width="3" stroke-linecap="round"/>'
     + '<text x="'+cx0+'" y="'+(cy0+r+14)+'" text-anchor="middle" font-family="monospace" font-size="10" fill="#E2622C">S 180°</text>';
-  let wm='';
-  if(!screen) for(let y=50;y<H;y+=105) for(let x=-40;x<W;x+=205)
-    wm += '<text x="'+x+'" y="'+y+'" font-family="sans-serif" font-size="14" fill="#0E8F6E" opacity="0.07" '
-       + 'transform="rotate(-28 '+x+' '+y+')">MrElectroAI · 79 434 479</text>';
+
+  const cap = withP ? A.toFixed(0)+' م² · '+n+' لوح · '+kwp.toFixed(1)+' kWp'
+                    : 'مخطط القياسات — '+A.toFixed(0)+' م² · محيط '+S.reduce((a,b)=>a+b,0).toFixed(1)+' م';
 
   return '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'
-    + '<rect width="'+W+'" height="'+H+'" fill="#fff"/>' + wm
-    + '<polygon points="'+roof+'" fill="#22C79B" fill-opacity="0.12" stroke="#0E8F6E" stroke-width="2.5" stroke-linejoin="round"/>'
+    + '<rect width="'+W+'" height="'+H+'" fill="#fff"/>' + wmark(screen,W,H)
+    + '<polygon points="'+roof+'" fill="#22C79B" fill-opacity="'+(withP?'0.10':'0.16')+'" stroke="#0E8F6E" stroke-width="2.5" stroke-linejoin="round"/>'
     + pan + dots + lab + comp
-    + '<text x="'+(W/2)+'" y="'+(H-18)+'" text-anchor="middle" font-family="monospace" font-size="15" font-weight="700" fill="#0B7A5E">'
-      + A.toFixed(0)+' م² · '+n+' لوح · '+kwp.toFixed(1)+' kWp</text>'
+    + '<text x="'+(W/2)+'" y="'+(H-16)+'" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#0B7A5E">'+cap+'</text>'
     + '</svg>';
+}
+function wmark(screen,W,H){
+  if(screen) return '';
+  let s='';
+  for(let y=50;y<H;y+=105) for(let x=-40;x<W;x+=205)
+    s += '<text x="'+x+'" y="'+y+'" font-family="sans-serif" font-size="14" fill="#0E8F6E" opacity="0.07" '
+      + 'transform="rotate(-28 '+x+' '+y+')">MrElectroAI - 79 434 479</text>';
+  return s;
 }
 
 function printPlan(){
@@ -561,13 +665,17 @@ function printPlan(){
     + '<br>الإحداثيات: <span dir="ltr">'+lat0.toFixed(6)+', '+lng0.toFixed(6)+'</span>'
     + '<br>التاريخ: '+new Date().toLocaleDateString('ar-LB')
     + '<br>نسبة الخطأ المتوقعة: ±'+err+'%';
-  $('shSvg').innerHTML = planSVG(false);
+  $('shSvg').innerHTML =
+      '<div class="pt">١ — مخطط القياسات</div>' + planSVG(false,'measure')
+    + '<div class="pt">٢ — توزيع الألواح</div>' + planSVG(false,'panels')
+    + '<div class="pt">٣ — مقطع جانبي</div>' + planSVG(false,'side');
   $('shTable').innerHTML = '<table><tbody>'
     + '<tr><td>مساحة السطح</td><td>'+A.toFixed(0)+' م² (من '+(A*(1-err/100)).toFixed(0)+' لـ '+(A*(1+err/100)).toFixed(0)+')</td></tr>'
     + '<tr><td>عدد الألواح</td><td>'+n+' لوح (المدى '+lo+' – '+hi+')</td></tr>'
     + '<tr><td>قدرة اللوح</td><td>'+w+' واط · '+pl+' × '+pwd+' م</td></tr>'
     + '<tr><td>القدرة الإجمالية</td><td>'+kwp.toFixed(1)+' kWp</td></tr>'
-    + '<tr><td>التوزيع</td><td>ألواح نايمة · 2 سم بين لوح ولوح · ممر 40 سم (2 صف ثم كل 4 صفوف)</td></tr>'
+    + '<tr><td>طريقة التركيب</td><td>'+(LAST.tilt?('مايلة '+LAST.tilt+'° · مسافة بين الصفوف '+shadowGap(LAST.pl,LAST.tilt).toFixed(2)+' م')
+        :'نايمة · 2 سم بين لوح ولوح · ممر 40 سم (صفّين ثم كل 4 صفوف)')+'</td></tr>'
     + '</tbody></table>'
     + '<table><thead><tr><th>الضلع</th><th>الطول</th></tr></thead><tbody>'
     + S.map((s,i)=>'<tr><td>ضلع '+(i+1)+'</td><td>'+s.toFixed(2)+' م</td></tr>').join('')
@@ -575,7 +683,7 @@ function printPlan(){
   $('shFt').innerHTML = '<b>تنبيه:</b> هذا المخطط تقدير أوّلي من صور الأقمار الصناعية. '
     + 'الأبعاد قد تختلف بنسبة ±'+err+'%، ولا يشمل ارتفاع الجدران أو الظل أو وضع السطح. '
     + 'القياس النهائي يتطلب زيارة ميدانية.<br><br>'
-    + 'صادر عن <b>MrElectroAI</b> — أنور الحسن الجاسم · +961 79 434 479 · mrelectroai@gmail.com<br>' + SITE;
+    + 'صادر عن <b>MrElectroAI</b> — أنور الحسن الجاسم<br>'+ '<span dir="ltr">+961 79 434 479</span> · mrelectroai@gmail.com<br>' + SITE;
   window.print();
 }
 
