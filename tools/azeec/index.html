@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AZEEC | نظام الحضور</title>
+<meta name="description" content="نظام حضور وانصراف — بصمة وموقع وكشف أسبوعي.">
+<meta name="theme-color" content="#0B1F3A">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F6FA;--paper:#FFF;--soft:#EBF0F7;--line:#D7DFEA;--ink:#0B1F3A;--muted:#5B6B80;
+  --brand:#1B6FD4;--brand-2:#14549F;--brand-soft:#E4EEFB;
+  --ok:#1F8A55;--ok-soft:#E4F4EC;--warn:#B7791F;--warn-soft:#FBF3E3;
+  --danger:#B03A3A;--danger-soft:#FBEAEA;
+  --shadow:0 2px 8px rgba(11,31,58,.05),0 12px 30px rgba(11,31,58,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px;line-height:1.65;min-height:100vh;padding-bottom:78px;position:relative;overflow-x:hidden}
+:where(a,button,input,select):focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+/* علامة مائية */
+.wm{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;opacity:.045}
+.wm span{position:absolute;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;
+  color:var(--brand);white-space:nowrap;transform:rotate(-28deg)}
+
+.bar{background:var(--ink);color:#fff;position:sticky;top:0;z-index:20;border-bottom:3px solid var(--brand)}
+.bar-in{max-width:660px;margin:0 auto;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:11px}
+.logo .m{width:38px;height:38px;border-radius:10px;background:var(--brand);display:grid;place-items:center;flex-shrink:0}
+.logo .m svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.logo b{font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:.1em;display:block;line-height:1.2}
+.logo small{font-size:10px;opacity:.7;display:block}
+.hbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;
+  border-radius:9px;padding:7px 11px;font-family:inherit;font-size:12px;cursor:pointer}
+
+.wrap{max-width:660px;margin:0 auto;padding:18px 15px 30px;position:relative;z-index:1}
+.scr{display:none}.scr.on{display:block}
+h1{font-family:'Readex Pro',sans-serif;font-size:clamp(21px,5.4vw,26px);font-weight:700;margin-bottom:5px}
+.lede{color:var(--muted);font-size:13.5px;margin-bottom:16px}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px;
+  margin-bottom:12px;box-shadow:var(--shadow)}
+.card>h2{font-family:'Readex Pro',sans-serif;font-size:15px;font-weight:600;margin-bottom:13px;
+  padding-bottom:10px;border-bottom:1px solid var(--line);display:flex;align-items:center;
+  justify-content:space-between;gap:8px}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:500}
+select,input{width:100%;font-family:inherit;font-size:15px;color:var(--ink);background:var(--soft);
+  border:1px solid var(--line);border-radius:11px;padding:12px 13px}
+select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mb{margin-bottom:12px}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;
+  border-radius:12px;font-family:inherit;font-size:14.5px;font-weight:600;border:1px solid var(--line);
+  background:var(--soft);color:var(--ink);cursor:pointer;margin-top:9px;text-decoration:none}
+.btn.main{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.btn.dang{color:var(--danger);border-color:#E7C3C3;background:var(--danger-soft)}
+.btn.sm{width:auto;padding:9px 14px;font-size:13px;margin:0}
+.btn:disabled{opacity:.5;pointer-events:none}
+.brow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+/* البصمة */
+.punch{text-align:center;padding:26px 16px}
+.fp{width:120px;height:120px;border-radius:50%;background:var(--brand-soft);border:3px solid var(--brand);
+  display:grid;place-items:center;margin:0 auto 16px;cursor:pointer;transition:transform .15s}
+.fp:active{transform:scale(.95)}
+.fp svg{width:58px;height:58px;fill:none;stroke:var(--brand);stroke-width:1.8;stroke-linecap:round}
+.fp.in{background:var(--ok-soft);border-color:var(--ok)}
+.fp.in svg{stroke:var(--ok)}
+.punch h3{font-family:'Readex Pro',sans-serif;font-size:19px;margin-bottom:4px}
+.punch p{font-size:13px;color:var(--muted)}
+.clock{font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:700;color:var(--ink);margin:6px 0}
+.state{display:inline-block;font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 14px;margin-top:8px}
+.state.in{background:var(--ok-soft);color:var(--ok)}
+.state.out{background:var(--soft);color:var(--muted)}
+
+.emp{display:flex;align-items:center;gap:11px;background:var(--paper);border:1px solid var(--line);
+  border-radius:13px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow)}
+.emp .av{width:42px;height:42px;border-radius:50%;background:var(--brand-soft);color:var(--brand-2);
+  display:grid;place-items:center;font-family:'Readex Pro',sans-serif;font-size:16px;flex-shrink:0}
+.emp.on .av{background:var(--ok-soft);color:var(--ok)}
+.emp .em{flex:1;min-width:0}
+.emp .em b{display:block;font-size:14.5px}
+.emp .em small{display:block;color:var(--muted);font-size:11.5px}
+.dot{width:9px;height:9px;border-radius:50%;background:#C3CCD8;flex-shrink:0}
+.dot.on{background:var(--ok);box-shadow:0 0 0 4px rgba(31,138,85,.16)}
+.emp .x{background:none;border:0;color:var(--danger);font-size:19px;cursor:pointer;padding:0 4px}
+
+.sum{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:12px}
+.sum div{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:13px 6px;
+  text-align:center;box-shadow:var(--shadow)}
+.sum b{display:block;font-family:'JetBrains Mono',monospace;font-size:19px}
+.sum span{font-size:10.5px;color:var(--muted)}
+.sum .a{color:var(--ok)}.sum .b2{color:var(--brand-2)}.sum .c{color:var(--warn)}
+
+.line{display:flex;align-items:center;gap:10px;background:var(--soft);border:1px solid var(--line);
+  border-radius:11px;padding:11px 12px;margin-bottom:8px}
+.line .lm{flex:1;min-width:0}
+.line .lm b{display:block;font-size:13.5px}
+.line .lm small{display:block;color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace}
+.line .lv{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;white-space:nowrap;color:var(--brand-2)}
+
+.note{font-size:12.5px;color:var(--muted);background:var(--warn-soft);border:1px solid #EBD8AE;
+  border-radius:12px;padding:12px;line-height:1.8;margin-top:10px}
+.note b{color:var(--warn)}
+.alert{font-size:13px;color:#7A1F1F;background:var(--danger-soft);border:1px solid #E9B7B7;
+  border-inline-start:4px solid var(--danger);border-radius:12px;padding:12px 14px;line-height:1.8;margin-top:10px}
+.alert b{color:var(--danger)}
+.okbox{font-size:13px;color:#14562F;background:var(--ok-soft);border:1px solid #B6DEC7;
+  border-radius:12px;padding:12px 14px;line-height:1.8;margin-top:10px}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px;line-height:1.9}
+
+.nav{position:fixed;inset-inline:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);
+  padding:8px 12px calc(8px + env(safe-area-inset-bottom));display:flex;gap:6px;z-index:30}
+.nav button{flex:1;background:none;border:0;font-family:inherit;font-size:11px;color:var(--muted);
+  padding:7px 3px;cursor:pointer;border-radius:10px}
+.nav button i{display:block;font-size:19px;font-style:normal;margin-bottom:2px}
+.nav button.on{color:var(--brand);background:var(--brand-soft);font-weight:700}
+
+.lock{position:fixed;inset:0;background:var(--ink);display:grid;place-items:center;padding:22px;z-index:80}
+.lockbox{background:var(--paper);border-radius:20px;padding:28px 22px;width:100%;max-width:340px;text-align:center}
+.lockbox .m{width:60px;height:60px;border-radius:15px;background:var(--brand);margin:0 auto 14px;display:grid;place-items:center}
+.lockbox .m svg{width:32px;height:32px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lockbox h2{font-family:'JetBrains Mono',monospace;font-size:20px;letter-spacing:.12em}
+.lockbox p{font-size:12px;color:var(--muted);margin-bottom:18px}
+#pin{text-align:center;font-size:26px;letter-spacing:12px;font-family:'JetBrains Mono',monospace;padding:14px}
+.perr{font-size:12.5px;color:var(--danger);min-height:20px;margin-top:8px}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+.roles button{background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:13px 8px;
+  font-family:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
+.roles button.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-2);font-weight:700}
+
+.about{background:var(--ink);color:#fff;border-radius:16px;padding:20px;margin-top:20px}
+.about .ah{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.about .ai{width:44px;height:44px;border-radius:12px;background:#22C79B;color:#04140F;
+  display:grid;place-items:center;font-size:22px;flex-shrink:0}
+.about b{font-family:'JetBrains Mono',monospace;font-size:15px;display:block}
+.about small{font-size:11.5px;opacity:.75;display:block}
+.about p{font-size:12.5px;opacity:.88;line-height:1.9;margin-bottom:8px}
+.about ul{list-style:none;margin:10px 0}
+.about li{font-size:12.5px;opacity:.85;padding:3px 0}
+.about .ab{display:block;background:#22C79B;color:#04140F;text-align:center;font-weight:700;
+  border-radius:11px;padding:12px;margin-top:11px;text-decoration:none;font-size:13.5px}
+.about .ab2{background:transparent;color:#22C79B;border:1px solid #22C79B}
+
+.toast{position:fixed;bottom:86px;left:50%;transform:translate(-50%,90px);background:var(--ink);
+  color:#fff;font-size:13.5px;font-weight:600;padding:11px 20px;border-radius:999px;
+  transition:transform .3s;z-index:90;max-width:88%;text-align:center}
+.toast.on{transform:translate(-50%,0)}
+
+#sheet{display:none}
+@media print{
+  body>*:not(#sheet){display:none!important}
+  #sheet{display:block!important;color:#000;font-size:13px}
+  #sheet .hd{border-bottom:3px solid #1B6FD4;padding-bottom:10px;margin-bottom:14px}
+  #sheet .hd h2{font-family:'JetBrains Mono',monospace;font-size:23px;letter-spacing:.1em}
+  #sheet .hd .sv{font-size:12px;color:#444;margin-top:2px}
+  #sheet h3{font-size:16px;margin:0 0 10px}
+  #sheet .meta{font-size:12px;color:#333;margin-bottom:13px;line-height:1.9}
+  #sheet table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px}
+  #sheet th,#sheet td{border:1px solid #999;padding:6px 8px;text-align:right}
+  #sheet th{background:#eee}
+  #sheet tr.grp td{background:#E4EEFB;font-weight:700}
+  #sheet tr.tot td{background:#F0F4F9;font-weight:700;font-size:13px}
+  #sheet .ft{margin-top:16px;padding-top:10px;border-top:2px solid #1B6FD4;font-size:11px;line-height:1.85;color:#333}
+  #sheet .sig .sn{font-size:15px;font-weight:700;color:#0B1F3A}
+  @page{margin:12mm}
+}
+</style>
+</head>
+<body>
+
+<div class="wm" id="wm"></div>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></symbol>
+<symbol id="i-fp" viewBox="0 0 24 24">
+  <path d="M12 3a9 9 0 0 0-9 9v3"/><path d="M21 15v-3a9 9 0 0 0-4.5-7.8"/>
+  <path d="M7 12a5 5 0 0 1 10 0v5"/><path d="M12 12v8"/><path d="M17 17v2"/><path d="M7 15v4"/>
+</symbol>
+</svg>
+
+<!-- الدخول -->
+<div class="lock" id="lock">
+  <div class="lockbox">
+    <div class="m"><svg><use href="#i-bolt"/></svg></div>
+    <h2>AZEEC</h2>
+    <p>نظام الحضور والانصراف</p>
+    <div class="roles">
+      <button data-r="emp" class="on">👷 موظف</button>
+      <button data-r="mgr">👔 مدير</button>
+    </div>
+    <div id="empPick"></div>
+    <div id="pinBox" style="display:none">
+      <label class="lbl">كود المدير</label>
+      <input id="pin" type="tel" inputmode="numeric" maxlength="8" placeholder="••••">
+    </div>
+    <div class="perr" id="perr"></div>
+    <button class="btn main" id="enter">دخول</button>
+  </div>
+</div>
+
+<div class="bar"><div class="bar-in">
+  <div class="logo"><span class="m"><svg><use href="#i-bolt"/></svg></span>
+    <b>AZEEC<small id="hdSub">نظام الحضور</small></b></div>
+  <button class="hbtn" id="lockBtn">🔒 خروج</button>
+</div></div>
+
+<div class="wrap">
+
+  <!-- 0 شاشة الموظف -->
+  <section class="scr" data-k="0">
+    <div class="card punch">
+      <div class="fp" id="fpBtn"><svg><use href="#i-fp"/></svg></div>
+      <h3 id="pName">—</h3>
+      <div class="clock" id="clock">--:--</div>
+      <p id="pHint">اضغط البصمة لتسجيل الدخول</p>
+      <div class="state out" id="pState">خارج الدوام</div>
+      <div id="pMsg"></div>
+    </div>
+    <div class="card">
+      <h2>📅 هالأسبوع</h2>
+      <div class="sum">
+        <div><b class="b2" id="wDays">0</b><span>أيام</span></div>
+        <div><b class="a" id="wHours">0</b><span>ساعة</span></div>
+        <div><b class="c" id="wPay">0</b><span>مستحق $</span></div>
+      </div>
+      <div id="myLog"></div>
+    </div>
+  </section>
+
+  <!-- 1 لوحة المدير -->
+  <section class="scr" data-k="1">
+    <h1>لوحة المدير</h1>
+    <p class="lede" id="mgrSub"></p>
+    <div class="sum">
+      <div><b class="a" id="mNow">0</b><span>حاضر الآن</span></div>
+      <div><b class="b2" id="mTot">0</b><span>الموظفين</span></div>
+      <div><b class="c" id="mWeek">0</b><span>ساعات الأسبوع</span></div>
+    </div>
+    <div class="card">
+      <h2>👥 الحالة الآن</h2>
+      <div id="liveList"></div>
+    </div>
+    <div class="card">
+      <h2>📄 كشف الأسبوع</h2>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:11px">
+        من السبت للجمعة — الأجر = اليومية ÷ 8 × الساعات الفعلية.</p>
+      <div id="weekTable"></div>
+      <button class="btn main" id="pdfBtn">🖨️ تصدير الكشف PDF</button>
+    </div>
+  </section>
+
+  <!-- 2 الموظفين -->
+  <section class="scr" data-k="2">
+    <h1>الموظفين</h1>
+    <p class="lede">المدير وحدو بيضيف ويعدّل.</p>
+    <div class="card">
+      <h2>➕ إضافة موظف</h2>
+      <div class="two mb">
+        <div><label class="lbl">الاسم</label><input id="eName" placeholder="أحمد خالد"></div>
+        <div><label class="lbl">اليومية ($)</label><input id="eWage" type="number" placeholder="30"></div>
+      </div>
+      <div class="two mb">
+        <div><label class="lbl">بداية الدوام</label>
+          <select id="eStart"><option value="7">7:00 صباحاً</option><option value="8" selected>8:00 صباحاً</option></select></div>
+        <div><label class="lbl">نهاية الدوام</label>
+          <select id="eEnd"><option value="16" selected>4:00 عصراً</option><option value="17">5:00 عصراً</option></select></div>
+      </div>
+      <div><label class="lbl">رقم التلفون (اختياري)</label><input id="ePhone" type="tel" placeholder="70xxxxxx"></div>
+      <button class="btn main" id="addEmp">إضافة</button>
+    </div>
+    <div class="card"><h2>👷 اللائحة</h2><div id="empList"></div></div>
+  </section>
+
+  <!-- 3 المواقع -->
+  <section class="scr" data-k="3">
+    <h1>مواقع العمل</h1>
+    <p class="lede">الموظف بيقدر يسجّل من أي موقع مسجّل هون — ضمن 500 متر.</p>
+    <div class="card">
+      <h2>➕ إضافة موقع</h2>
+      <div class="mb"><label class="lbl">اسم الموقع</label><input id="lName" placeholder="ورشة الزلقا"></div>
+      <div class="two mb">
+        <div><label class="lbl">Latitude</label><input id="lLat" placeholder="33.886425"></div>
+        <div><label class="lbl">Longitude</label><input id="lLng" placeholder="35.544135"></div>
+      </div>
+      <button class="btn" id="hereBtn">📍 خد موقعي الحالي</button>
+      <button class="btn main" id="addLoc">إضافة الموقع</button>
+    </div>
+    <div class="card"><h2>📍 المواقع المسجّلة</h2><div id="locList"></div></div>
+
+    <div class="about" id="about">
+      <div class="ah"><span class="ai">⚡</span>
+        <span><b>MrElectroAI</b><small>أنور الحسن الجاسم — مؤسس ومطوّر النظام</small></span></div>
+      <p>كهربائي ومطوّر أدوات فنية. بحوّل الشغل اليومي لأنظمة بتشتغل من الموبايل، بدون تعقيد وبدون برامج تتحمّل.</p>
+      <ul>
+        <li>⚡ تشخيص أعطال الكهرباء وأنظمة التحكم والأتمتة</li>
+        <li>☀️ الطاقة الشمسية وإعدادات الإنفرترات وقياس السطوح</li>
+        <li>🧰 أنظمة إدارية: حضور، فواتير، جردات، تقارير PDF</li>
+        <li>🌐 مواقع تعريفية وأنظمة زباين للمحلات والشركات</li>
+      </ul>
+      <p>هذا النظام مصمّم ومبرمج بالكامل لصالح شركة AZEEC.</p>
+      <a class="ab" id="devWa" target="_blank" rel="noopener">💬 راسلنا على واتساب</a>
+      <a class="ab ab2" id="devSite" target="_blank" rel="noopener">🌐 زور موقعنا الرسمي</a>
+    </div>
+  </section>
+</div>
+
+<div class="nav" id="nav"></div>
+<div class="toast" id="toast"></div>
+
+<div id="sheet">
+  <div class="hd"><h2>AZEEC</h2><div class="sv">كشف الحضور الأسبوعي</div></div>
+  <h3 id="shTitle"></h3>
+  <div class="meta" id="shMeta"></div>
+  <div id="shBody"></div>
+  <div class="ft" id="shFt"></div>
+</div>
+
+<script>
+/* ═════════ للتخصيص ═════════ */
+const CO = {
+  name:"AZEEC",
+  mgrPin:"1234",
+  lunch:1,                                   /* ساعة غدا بتنخصم */
+  radius:500,                                /* نطاق التسجيل بالمتر */
+  home:{ name:"مقر الشركة — خلف مخفر النبعة", lat:33.8864259, lng:35.5441350 }
+};
+const DEV = { name:"MrElectroAI", person:"أنور الحسن الجاسم",
+  wa:"96179434479", phone:"+961 79 434 479", site:"https://mrelectroai-spec.github.io/mrelectroai/" };
+/* ═════════ نهاية التخصيص ═════════ */
+
+const $ = i => document.getElementById(i);
+const KEY = 'azeec_v1';
+let db = load(), role = 'emp', me = null, scr = 0;
+
+function load(){ try{ const r = localStorage.getItem(KEY);
+    const d = r ? JSON.parse(r) : {};
+    return { emps:d.emps||[], logs:d.logs||[], locs:d.locs||[CO.home] };
+  }catch(e){ return { emps:[], logs:[], locs:[CO.home] }; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(db)); }catch(e){} }
+if(navigator.storage && navigator.storage.persist)
+  navigator.storage.persisted().then(p=>{ if(!p) navigator.storage.persist(); });
+
+function say(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2600); }
+const money = n => (Math.round(n*100)/100).toLocaleString('en-US') + ' $';
+const pad = n => String(n).padStart(2,'0');
+const hhmm = d => pad(new Date(d).getHours())+':'+pad(new Date(d).getMinutes());
+const dayName = d => ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'][new Date(d).getDay()];
+
+/* علامة مائية */
+(function(){ let s='';
+  for(let y=40;y<window.innerHeight+400;y+=110)
+    for(let x=-80;x<window.innerWidth+200;x+=230)
+      s += '<span style="top:'+y+'px;left:'+x+'px">MrElectroAI · 79 434 479</span>';
+  $('wm').innerHTML = s;
+})();
+
+/* ─── الدخول ─── */
+document.querySelectorAll('.roles button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.roles button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); role = b.dataset.r;
+  $('pinBox').style.display = role==='mgr' ? 'block' : 'none';
+  $('empPick').style.display = role==='emp' ? 'block' : 'none';
+  drawEmpPick();
+});
+function drawEmpPick(){
+  $('empPick').innerHTML = db.emps.length
+    ? '<label class="lbl">مين أنت؟</label><select id="whoSel">'
+      + db.emps.map(e=>'<option value="'+e.id+'">'+e.name+'</option>').join('') + '</select>'
+    : '<div class="note" style="margin:0 0 12px"><b>ما في موظفين بعد.</b> المدير لازم يضيفهم أول.</div>';
+}
+$('enter').onclick = () => {
+  if(role === 'mgr'){
+    if($('pin').value.trim() !== CO.mgrPin){ $('perr').textContent='الكود غلط'; $('pin').value=''; return; }
+    $('lock').style.display='none'; $('hdSub').textContent='لوحة المدير'; buildNav(true); go(1);
+  } else {
+    if(!db.emps.length) return say('ما في موظفين — المدير لازم يضيفهم');
+    me = $('whoSel').value; $('lock').style.display='none';
+    const e = emp(me); $('hdSub').textContent = e ? e.name : 'موظف';
+    buildNav(false); go(0);
+  }
+};
+$('lockBtn').onclick = () => { me=null; $('pin').value=''; $('perr').textContent='';
+  $('lock').style.display='grid'; drawEmpPick(); };
+
+function buildNav(isMgr){
+  $('nav').innerHTML = isMgr
+    ? '<button data-k="1" class="on"><i>📊</i>اللوحة</button>'
+      + '<button data-k="2"><i>👥</i>الموظفين</button>'
+      + '<button data-k="3"><i>📍</i>المواقع</button>'
+    : '<button data-k="0" class="on"><i>👆</i>البصمة</button>';
+}
+$('nav').onclick = e => { const b = e.target.closest('[data-k]'); if(!b) return;
+  [...$('nav').children].forEach(x=>x.classList.remove('on')); b.classList.add('on'); go(+b.dataset.k); };
+function go(k){ scr=k;
+  document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('on', +s.dataset.k===k));
+  if(k===0) drawPunch();
+  if(k===1) drawMgr();
+  if(k===2) drawEmps();
+  if(k===3) drawLocs();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+const emp = id => db.emps.find(e=>e.id===id);
+
+/* ─── الساعة ─── */
+setInterval(()=>{ const n=new Date();
+  if($('clock')) $('clock').textContent = pad(n.getHours())+':'+pad(n.getMinutes()); },1000);
+
+/* ─── المسافة ─── */
+function dist(a,b,c,d){ const R=6371000,p=Math.PI/180;
+  const x=Math.sin((c-a)*p/2)**2 + Math.cos(a*p)*Math.cos(c*p)*Math.sin((d-b)*p/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x)); }
+function nearest(lat,lng){
+  let best=null, bd=Infinity;
+  db.locs.forEach(l => { const d = dist(lat,lng,l.lat,l.lng); if(d<bd){ bd=d; best=l; } });
+  return { loc:best, d:bd };
+}
+
+/* ─── البصمة ─── */
+async function bio(){
+  if(!window.PublicKeyCredential) return { ok:true, note:'الجهاز ما بيدعم البصمة' };
+  try{
+    const ch = new Uint8Array(32); crypto.getRandomValues(ch);
+    await navigator.credentials.create({ publicKey:{
+      challenge: ch, rp:{ name:CO.name },
+      user:{ id:new TextEncoder().encode(me||'u'), name:me||'user', displayName:me||'user' },
+      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection:{ authenticatorAttachment:'platform', userVerification:'required' },
+      timeout:45000 }});
+    return { ok:true };
+  }catch(e){ return { ok:false, note:'ما تأكدنا من البصمة' }; }
+}
+function geo(){
+  return new Promise(res => {
+    if(!navigator.geolocation) return res(null);
+    navigator.geolocation.getCurrentPosition(
+      p=>res({lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy}),
+      ()=>res(null), {enableHighAccuracy:true,timeout:12000,maximumAge:0});
+  });
+}
+const openLog = () => db.logs.find(l => l.emp===me && !l.out);
+
+$('fpBtn').onclick = async () => {
+  if(!me) return;
+  const isIn = !!openLog();
+  $('pMsg').innerHTML = '<div class="note" style="margin-top:14px">⏳ عم نتحقق من البصمة والموقع...</div>';
+  const b = await bio();
+  if(!b.ok){ $('pMsg').innerHTML = '<div class="alert">❌ '+b.note+' — جرّب مرة تانية.</div>'; return; }
+  const g = await geo();
+  if(!g){ $('pMsg').innerHTML = '<div class="alert"><b>ما قدرنا نحدّد موقعك.</b> فعّل الموقع وجرّب مرة تانية.</div>'; return; }
+  const nr = nearest(g.lat,g.lng);
+  if(nr.d > CO.radius){
+    $('pMsg').innerHTML = '<div class="alert"><b>أنت برّا نطاق العمل.</b><br>'
+      + 'أقرب موقع: '+nr.loc.name+' — بعيد '+Math.round(nr.d)+' متر (المسموح '+CO.radius+' م).</div>';
+    return;
+  }
+  const now = new Date().toISOString();
+  if(isIn){
+    const l = openLog(); l.out = now; l.outLoc = nr.loc.name; save();
+    $('pMsg').innerHTML = '<div class="okbox">✅ تم تسجيل <b>الخروج</b> الساعة '+hhmm(now)+' من '+nr.loc.name+'</div>';
+  } else {
+    db.logs.push({ id:'l'+Date.now().toString(36), emp:me, in:now, out:null, inLoc:nr.loc.name }); save();
+    $('pMsg').innerHTML = '<div class="okbox">✅ تم تسجيل <b>الدخول</b> الساعة '+hhmm(now)+' من '+nr.loc.name+'</div>';
+  }
+  drawPunch();
+};
+
+function drawPunch(){
+  const e = emp(me); if(!e) return;
+  const isIn = !!openLog();
+  $('pName').textContent = e.name;
+  $('fpBtn').classList.toggle('in', isIn);
+  $('pHint').textContent = isIn ? 'اضغط البصمة لتسجيل الخروج' : 'اضغط البصمة لتسجيل الدخول';
+  $('pState').className = 'state ' + (isIn?'in':'out');
+  $('pState').textContent = isIn ? 'داخل الدوام منذ ' + hhmm(openLog().in) : 'خارج الدوام';
+  const w = weekOf(me);
+  $('wDays').textContent = w.days; $('wHours').textContent = w.hours.toFixed(1);
+  $('wPay').textContent = w.pay.toFixed(0);
+  $('myLog').innerHTML = w.rows.length ? w.rows.map(r =>
+    '<div class="line"><span class="lm"><b>'+r.day+' '+r.date+'</b>'
+    + '<small>'+r.in+' → '+(r.out||'—')+' · '+r.loc+'</small></span>'
+    + '<span class="lv">'+r.h.toFixed(1)+' س</span></div>').join('')
+    : '<div class="empty">ما في تسجيلات هالأسبوع.</div>';
+}
+
+/* ─── حساب الأسبوع (السبت → الجمعة) ─── */
+function weekStart(d){
+  const x = new Date(d); x.setHours(0,0,0,0);
+  const diff = (x.getDay() + 1) % 7;          /* السبت = بداية */
+  x.setDate(x.getDate() - diff); return x;
+}
+function weekOf(empId, ref){
+  const s = weekStart(ref||new Date()), e2 = new Date(s); e2.setDate(s.getDate()+7);
+  const em = emp(empId);
+  const rate = em ? em.wage/8 : 0;
+  const rows = [];
+  let hours = 0; const days = new Set();
+  db.logs.filter(l => l.emp===empId && new Date(l.in)>=s && new Date(l.in)<e2)
+    .sort((a,b)=>a.in.localeCompare(b.in))
+    .forEach(l => {
+      const h = l.out ? Math.max(0,(new Date(l.out)-new Date(l.in))/3600000 - CO.lunch) : 0;
+      hours += h; days.add(new Date(l.in).toDateString());
+      rows.push({ day:dayName(l.in), date:new Date(l.in).toLocaleDateString('ar-LB',{day:'numeric',month:'numeric'}),
+        in:hhmm(l.in), out:l.out?hhmm(l.out):null, h, loc:l.inLoc||'—' });
+    });
+  return { rows, hours, days:days.size, pay:hours*rate, start:s, end:e2 };
+}
+
+/* ─── المدير ─── */
+function drawMgr(){
+  const now = db.logs.filter(l=>!l.out);
+  $('mNow').textContent = now.length;
+  $('mTot').textContent = db.emps.length;
+  let tot = 0; db.emps.forEach(e=>tot += weekOf(e.id).hours);
+  $('mWeek').textContent = tot.toFixed(0);
+  const s = weekStart(new Date());
+  $('mgrSub').textContent = 'أسبوع ' + s.toLocaleDateString('ar-LB') + ' — ' + CO.name;
+
+  $('liveList').innerHTML = db.emps.length ? db.emps.map(e => {
+    const l = db.logs.find(x=>x.emp===e.id && !x.out);
+    return '<div class="emp'+(l?' on':'')+'"><span class="dot'+(l?' on':'')+'"></span>'
+      + '<span class="av">'+(e.name[0]||'?')+'</span>'
+      + '<span class="em"><b>'+e.name+'</b><small>'
+      + (l ? 'داخل منذ '+hhmm(l.in)+' · '+(l.inLoc||'—') : 'خارج الدوام')+'</small></span></div>';
+  }).join('') : '<div class="empty">ما في موظفين — ضيفهم من تبويب الموظفين.</div>';
+
+  $('weekTable').innerHTML = db.emps.length ? db.emps.map(e => {
+    const w = weekOf(e.id);
+    return '<div class="line"><span class="lm"><b>'+e.name+'</b>'
+      + '<small>'+w.days+' يوم · '+w.hours.toFixed(1)+' ساعة · يومية '+money(e.wage)+'</small></span>'
+      + '<span class="lv">'+money(w.pay)+'</span></div>';
+  }).join('') + '<div class="line" style="background:var(--brand-soft);border-color:var(--brand)">'
+    + '<span class="lm"><b>المجموع</b></span><span class="lv">'
+    + money(db.emps.reduce((a,e)=>a+weekOf(e.id).pay,0))+'</span></div>'
+    : '<div class="empty">—</div>';
+}
+
+/* ─── الموظفين ─── */
+$('addEmp').onclick = () => {
+  const n = $('eName').value.trim(), w = parseFloat($('eWage').value)||0;
+  if(!n) return say('اكتب الاسم');
+  if(!w) return say('حدّد اليومية');
+  db.emps.push({ id:'e'+Date.now().toString(36), name:n, wage:w,
+    start:+$('eStart').value, end:+$('eEnd').value, phone:$('ePhone').value.trim() });
+  $('eName').value=''; $('eWage').value=''; $('ePhone').value='';
+  save(); drawEmps(); say('انضاف الموظف');
+};
+function drawEmps(){
+  $('empList').innerHTML = db.emps.length ? db.emps.map(e =>
+    '<div class="emp"><span class="av">'+(e.name[0]||'?')+'</span>'
+    + '<span class="em"><b>'+e.name+'</b><small>يومية '+money(e.wage)+' · دوام '
+    + e.start+':00 – '+(e.end>12?e.end-12:e.end)+':00 · ساعة غدا</small></span>'
+    + '<button class="x" data-del="'+e.id+'">×</button></div>').join('')
+    : '<div class="empty">ما في موظفين.</div>';
+}
+$('empList').onclick = e => { const b = e.target.closest('[data-del]'); if(!b) return;
+  db.emps = db.emps.filter(x=>x.id!==b.dataset.del);
+  db.logs = db.logs.filter(x=>x.emp!==b.dataset.del); save(); drawEmps(); };
+
+/* ─── المواقع ─── */
+$('hereBtn').onclick = async () => {
+  say('عم نحدّد موقعك...');
+  const g = await geo();
+  if(!g) return say('ما قدرنا نحدّد موقعك');
+  $('lLat').value = g.lat.toFixed(7); $('lLng').value = g.lng.toFixed(7);
+  say('تم — دقة '+Math.round(g.acc)+' متر');
+};
+$('addLoc').onclick = () => {
+  const n = $('lName').value.trim(), la = parseFloat($('lLat').value), ln = parseFloat($('lLng').value);
+  if(!n || isNaN(la) || isNaN(ln)) return say('عبّي الاسم والإحداثيات');
+  db.locs.push({ name:n, lat:la, lng:ln });
+  $('lName').value=''; $('lLat').value=''; $('lLng').value='';
+  save(); drawLocs(); say('انضاف الموقع');
+};
+function drawLocs(){
+  $('locList').innerHTML = db.locs.map((l,i) =>
+    '<div class="line"><span class="lm"><b>'+l.name+'</b>'
+    + '<small dir="ltr">'+l.lat.toFixed(5)+', '+l.lng.toFixed(5)+'</small></span>'
+    + '<span class="lv">'+CO.radius+' م</span>'
+    + (i>0?'<button class="x" data-dl="'+i+'">×</button>':'')+'</div>').join('');
+}
+$('locList').onclick = e => { const b = e.target.closest('[data-dl]'); if(!b) return;
+  db.locs.splice(+b.dataset.dl,1); save(); drawLocs(); };
+
+/* ─── كشف PDF ─── */
+$('pdfBtn').onclick = () => {
+  const s = weekStart(new Date()), e2 = new Date(s); e2.setDate(s.getDate()+6);
+  $('shTitle').textContent = 'كشف الحضور والأجور — من ' + s.toLocaleDateString('ar-LB')
+    + ' إلى ' + e2.toLocaleDateString('ar-LB');
+  $('shMeta').innerHTML = 'الشركة: <b>'+CO.name+'</b><br>'
+    + 'عدد الموظفين: '+db.emps.length+'<br>'
+    + 'تاريخ الإصدار: '+new Date().toLocaleDateString('ar-LB')+'<br>'
+    + 'الحساب: اليومية ÷ 8 ساعات × الساعات الفعلية · ساعة غدا مخصومة يومياً';
+
+  let b = '', gt=0, gh=0;
+  db.emps.forEach(e => {
+    const w = weekOf(e.id); gt += w.pay; gh += w.hours;
+    b += '<table><thead><tr><th colspan="4" style="background:#E4EEFB">'+e.name
+      + ' — يومية '+money(e.wage)+'</th></tr>'
+      + '<tr><th>اليوم</th><th>دخول</th><th>خروج</th><th>ساعات</th></tr></thead><tbody>';
+    if(w.rows.length) w.rows.forEach(r =>
+      b += '<tr><td>'+r.day+' '+r.date+'</td><td>'+r.in+'</td><td>'+(r.out||'—')+'</td><td>'+r.h.toFixed(1)+'</td></tr>');
+    else b += '<tr><td colspan="4">لا يوجد تسجيلات</td></tr>';
+    b += '<tr class="tot"><td>'+w.days+' يوم</td><td colspan="2">مجموع الساعات '+w.hours.toFixed(1)+'</td>'
+      + '<td>'+money(w.pay)+'</td></tr></tbody></table>';
+  });
+  b += '<table><tbody><tr class="tot"><td>الإجمالي العام</td><td>'+gh.toFixed(1)+' ساعة</td>'
+    + '<td>'+money(gt)+'</td></tr></tbody></table>';
+  $('shBody').innerHTML = b;
+
+  $('shFt').innerHTML = '<div class="sig"><div class="sn">'+CO.name+'</div>'
+    + 'كشف صادر عن نظام الحضور والانصراف — للاستخدام الداخلي.<br><br>'
+    + '<b>تصميم وبرمجة النظام:</b> '+DEV.name+' — '+DEV.person+'<br>'
+    + '<span dir="ltr">'+DEV.phone+'</span> · '+DEV.site.replace('https://','')+'</div>';
+  window.print();
+};
+
+$('devWa').href = 'https://wa.me/'+DEV.wa+'?text='+encodeURIComponent('مرحبا، بدي نظام متل تبع AZEEC لشركتي.');
+$('devSite').href = DEV.site;
+drawEmpPick();
+</script>
+</body>
+</html>
