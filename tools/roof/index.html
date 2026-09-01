@@ -170,6 +170,18 @@ select:focus,input:focus{border-color:var(--teal);background:var(--paper)}
   color:#fff;font-size:13.5px;font-weight:600;padding:10px 19px;border-radius:999px;
   transition:transform .3s;z-index:960;max-width:88%;text-align:center}
 .toast.on{transform:translate(-50%,0)}
+.ask{position:fixed;inset:0;background:rgba(13,26,23,.55);display:none;place-items:center;padding:20px;z-index:990}
+.ask.on{display:grid}
+.abox{background:var(--paper);border-radius:18px;padding:22px;width:100%;max-width:400px;position:relative;
+  box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.abox h3{font-family:'Readex Pro',sans-serif;font-size:17px;margin-bottom:6px}
+.abox p{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.7}
+.abox .std{font-size:12px;background:var(--teal-soft);border:1px solid var(--teal);border-radius:10px;
+  padding:9px 11px;color:var(--teal-2);margin:12px 0 4px}
+.abox .std b{font-family:'JetBrains Mono',monospace}
+.ax{position:absolute;top:12px;inset-inline-start:14px;background:none;border:0;font-size:24px;
+  color:var(--muted);cursor:pointer;line-height:1}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 footer{margin-top:18px;padding-top:15px;border-top:1px solid var(--line);font-size:12.5px;
   color:var(--muted);text-align:center;line-height:1.9}
 footer b{color:var(--ink)}
@@ -184,8 +196,22 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
   #sheet .hd h2{font-family:'JetBrains Mono',monospace;font-size:21px}
   #sheet .hd .ar{font-size:13px;color:#333}
   #sheet .hd .ph{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin-top:3px}
-  #sheet h3{font-size:16px;margin-bottom:8px}
-  #sheet .meta{font-size:12px;color:#333;margin-bottom:12px;line-height:1.9}
+  #sheet h3{font-size:17px;margin:0 0 10px}
+  #sheet h3 .tag{font-size:11px;background:#FBF3E3;border:1px solid #EBD8AE;color:#9A6A12;
+    border-radius:6px;padding:2px 8px;font-weight:400}
+  #sheet .mt{width:100%;margin-bottom:14px}
+  #sheet .mt td{border:0;padding:3px 0;font-size:12px;color:#333}
+  #sheet .mt td:first-child{color:#666;width:38%}
+  #sheet .sec{font-size:13px;font-weight:700;color:#0B7A5E;margin:16px 0 6px;
+    padding-bottom:4px;border-bottom:2px solid #0E8F6E}
+  #sheet tr.hi td{background:#E4F4EF;font-weight:700}
+  #sheet .warn{background:#FCEAEA;border:1px solid #E9B7B7;border-radius:8px;padding:9px 11px;
+    font-size:11px;color:#7A1F1F;line-height:1.7;margin-bottom:14px}
+  #sheet .sig{border-top:2px solid #0E8F6E;padding-top:10px}
+  #sheet .sig .sn{font-size:16px;font-weight:700;color:#0D1A17}
+  #sheet .sig .sr{font-size:11.5px;color:#555;margin-top:1px}
+  #sheet .sig .sc{font-size:12px;color:#0B7A5E;font-weight:700;margin-top:5px;font-family:'JetBrains Mono',monospace}
+  #sheet .sig .sw2{font-size:10.5px;color:#888;margin-top:3px}
   #sheet svg{border:1px solid #999;border-radius:6px;width:100%;height:auto}
   #sheet table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:12px}
   #sheet th,#sheet td{border:1px solid #999;padding:6px 9px;text-align:right}
@@ -284,14 +310,14 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
       <label class="lbl">قياس اللوح</label>
       <select id="pw">
         <option value="450|1.90|1.13">450 واط — 1.90 × 1.13 م</option>
-        <option value="550|2.28|1.13" selected>550 واط — 2.28 × 1.13 م</option>
+        <option value="550|2.27|1.13" selected>550 واط — 2.27 × 1.13 م</option>
         <option value="600|2.38|1.13">600 واط — 2.38 × 1.13 م</option>
         <option value="700|2.38|1.30">700 واط — 2.38 × 1.30 م</option>
         <option value="0|0|0">قياس مخصّص</option>
       </select>
       <div id="tiltNote"></div>
       <div class="two" id="customBox" style="display:none;margin-top:10px">
-        <div><label class="lbl">طول اللوح (م)</label><input id="cl" type="number" step="0.01" value="2.28"></div>
+        <div><label class="lbl">طول اللوح (م)</label><input id="cl" type="number" step="0.01" value="2.27"></div>
         <div><label class="lbl">عرض اللوح (م)</label><input id="cw" type="number" step="0.01" value="1.13"></div>
       </div>
       <div class="two" style="margin-top:10px">
@@ -314,6 +340,22 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
   <button class="btn main" id="next">التالي</button>
 </div>
 <div class="toast" id="toast"></div>
+
+<div class="ask" id="ask">
+  <div class="abox">
+    <button class="ax" id="askX">×</button>
+    <h3>بدك تركّب ألواح على هالسطح؟</h3>
+    <p>إذا إي، حطّ قياس اللوح وبنضيف حساب الألواح للمخطط.</p>
+    <div class="three">
+      <div><label class="lbl">الطول (م)</label><input id="aL" type="number" step="0.01" value="2.27"></div>
+      <div><label class="lbl">العرض (م)</label><input id="aW" type="number" step="0.01" value="1.13"></div>
+      <div><label class="lbl">القدرة (واط)</label><input id="aP" type="number" value="550"></div>
+    </div>
+    <p class="std">القياس القياسي: <b>2.27 × 1.13 م</b> — بدّلو إذا لوحك مختلف.</p>
+    <button class="btn main" id="askYes">إي — احسب الألواح</button>
+    <button class="btn" id="askNo">لأ — قياسات السطح فقط</button>
+  </div>
+</div>
 
 <div id="sheet">
   <div class="hd"><h2>MrElectroAI</h2>
@@ -542,7 +584,7 @@ $('next').onclick = () => {
   if(scr===0){ if(!$('jName').value.trim()) return say('اكتب اسم الورشة'); go(1); }
   else if(scr===1) go(2);
   else if(scr===2){ if(pts.length<3) return say('ارسم 3 نقاط على الأقل'); saveJob(); go(3); }
-  else printPlan();
+  else askPanels();
 };
 
 /* ─── الورش المحفوظة ─── */
@@ -683,7 +725,7 @@ $('tilt').addEventListener('change',()=>{ $('tilt').dataset.touched='1'; calc();
 function calc(){
   const A = area(pts);
   if(A<1 || !map){ $('out').innerHTML = '<div class="card"><div class="empty">ارسم السطح أول.</div></div>'; return; }
-  const pl = parseFloat($('cl').value)||2.28, pwd = parseFloat($('cw').value)||1.13, w = parseFloat($('cp').value)||550;
+  const pl = parseFloat($('cl').value)||2.27, pwd = parseFloat($('cw').value)||1.13, w = parseFloat($('cp').value)||550;
   const tilt = parseFloat($('tilt').value)||0;
   const {lat0,lng0,xy} = toXY(pts);
 
@@ -746,8 +788,7 @@ function calc(){
     + '</div></div>';
 
   h2 += '<div class="card" style="padding:12px">'
-    + '<div class="tabs2"><button class="t2 on" data-v="measure">📏 مخطط القياسات</button>'
-    + '<button class="t2" data-v="side">📐 مقطع جانبي</button></div>'
+
     + '<div class="plan" id="planBox" style="margin:0;border:0;box-shadow:none;padding:0"></div></div>';
 
   h2 += '<div class="card"><h2>📐 التفاصيل</h2>'
@@ -779,11 +820,6 @@ function calc(){
   $('out').innerHTML = h2;
   LAST = { A, S, n, w, kwp, err, lo, hi, P, xy, lat0, lng0, pl, pwd, tilt, nFlat, kwFlat };
   $('planBox').innerHTML = planSVG(true, 'measure');
-  document.querySelectorAll('.t2').forEach(b => b.onclick = () => {
-    document.querySelectorAll('.t2').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on');
-    $('planBox').innerHTML = planSVG(true, b.dataset.v);
-  });
 }
 
 /* ─── مخططات SVG ─── */
@@ -898,96 +934,76 @@ function planSVG(screen, mode){
 function wmark(screen,W,H){
   if(screen) return '';
   let s='';
-  for(let y=50;y<H;y+=105) for(let x=-40;x<W;x+=205)
-    s += '<text x="'+x+'" y="'+y+'" font-family="sans-serif" font-size="14" fill="#0E8F6E" opacity="0.07" '
+  for(let y=34;y<H;y+=62) for(let x=-60;x<W;x+=140)
+    s += '<text x="'+x+'" y="'+y+'" font-family="sans-serif" font-size="12" fill="#0E8F6E" opacity="0.10" '
       + 'transform="rotate(-28 '+x+' '+y+')">MrElectroAI - 79 434 479</text>';
   return s;
 }
 
-function printPlan(){
+/* سؤال قبل التصدير */
+function askPanels(){
+  $('ask').classList.add('on');
+  $('aL').value = $('cl').value || 2.27;
+  $('aW').value = $('cw').value || 1.13;
+  $('aP').value = $('cp').value || 550;
+}
+$('askNo').onclick = () => { $('ask').classList.remove('on'); printPlan(false); };
+$('askYes').onclick = () => {
+  $('cl').value = $('aL').value; $('cw').value = $('aW').value; $('cp').value = $('aP').value;
+  calc(); $('ask').classList.remove('on'); setTimeout(()=>printPlan(true), 150);
+};
+$('askX').onclick = () => $('ask').classList.remove('on');
+
+function printPlan(withPanels){
   if(!LAST) return say('ما في نتيجة بعد');
-  const { A, S, n, w, kwp, err, lo, hi, lat0, lng0, pl, pwd } = LAST;
-  $('shTitle').textContent = 'مخطط قياس سطح وتوزيع ألواح — تقدير أوّلي';
-  $('shMeta').innerHTML = 'الورشة: <b>'+($('jName').value.trim()||'—')+'</b>'
-    + '<br>الإحداثيات: <span dir="ltr">'+lat0.toFixed(6)+', '+lng0.toFixed(6)+'</span>'
-    + '<br>التاريخ: '+new Date().toLocaleDateString('ar-LB')
-    + '<br>نسبة الخطأ المتوقعة: ±'+err+'%';
-  $('shSvg').innerHTML =
-      '<div class="pt">١ — مخطط القياسات</div>' + planSVG(false,'measure')
-    + '<div class="pt">٢ — مقطع جانبي</div>' + planSVG(false,'side');
-  $('shTable').innerHTML = '<table><tbody>'
-    + '<tr><td>مساحة السطح</td><td>'+A.toFixed(0)+' م² (من '+(A*(1-err/100)).toFixed(0)+' لـ '+(A*(1+err/100)).toFixed(0)+')</td></tr>'
-    + '<tr><td>عدد الألواح</td><td>'+n+' لوح (المدى '+lo+' – '+hi+')</td></tr>'
-    + '<tr><td>قدرة اللوح</td><td>'+w+' واط · '+pl+' × '+pwd+' م</td></tr>'
-    + '<tr><td>القدرة الإجمالية</td><td>'+kwp.toFixed(1)+' kWp</td></tr>'
-    + '<tr><td>طريقة التركيب</td><td>'+(LAST.tilt?('مايلة '+LAST.tilt+'° · مسافة بين الصفوف '+shadowGap(LAST.pl,LAST.tilt).toFixed(2)+' م')
-        :'نايمة · 2 سم بين لوح ولوح · ممر 40 سم (صفّين ثم كل 4 صفوف)')+'</td></tr>'
-    + '</tbody></table>'
-    + '<table><thead><tr><th>الضلع</th><th>الطول</th></tr></thead><tbody>'
+  const { A, S, n, w, kwp, err, lo, hi, lat0, lng0, pl, pwd, tilt } = LAST;
+  const per = S.reduce((a,b)=>a+b,0);
+
+  $('shTitle').innerHTML = 'مخطط قياس سطح'
+    + (withPanels ? ' وحساب ألواح' : '') + ' — <span class="tag">تقدير أوّلي</span>';
+
+  $('shMeta').innerHTML = '<table class="mt"><tbody>'
+    + '<tr><td>الورشة / الزبون</td><td><b>'+($('jName').value.trim()||'—')+'</b></td></tr>'
+    + '<tr><td>الإحداثيات</td><td><span dir="ltr">'+lat0.toFixed(6)+', '+lng0.toFixed(6)+'</span></td></tr>'
+    + '<tr><td>التاريخ</td><td>'+new Date().toLocaleDateString('ar-LB')+'</td></tr>'
+    + '<tr><td>نسبة الخطأ المتوقعة</td><td>±'+err+'%</td></tr>'
+    + '</tbody></table>';
+
+  $('shSvg').innerHTML = planSVG(false,'measure');
+
+  let t = '<div class="sec">قياسات السطح</div>'
+    + '<table><tbody>'
+    + '<tr class="hi"><td>المساحة الإجمالية</td><td>'+A.toFixed(0)+' م²</td></tr>'
+    + '<tr><td>المدى المتوقع</td><td>'+(A*(1-err/100)).toFixed(0)+' – '+(A*(1+err/100)).toFixed(0)+' م²</td></tr>'
+    + '<tr><td>المحيط</td><td>'+per.toFixed(1)+' م</td></tr>'
+    + '<tr><td>عدد الأضلاع</td><td>'+S.length+'</td></tr>'
+    + '</tbody></table>';
+
+  if(withPanels) t += '<div class="sec">حساب الألواح</div>'
+    + '<table><tbody>'
+    + '<tr class="hi"><td>عدد الألواح</td><td>'+n+' لوح</td></tr>'
+    + '<tr><td>المدى المتوقع</td><td>'+lo+' – '+hi+' لوح</td></tr>'
+    + '<tr><td>قياس اللوح</td><td>'+pl+' × '+pwd+' م</td></tr>'
+    + '<tr><td>قدرة اللوح</td><td>'+w+' واط</td></tr>'
+    + '<tr class="hi"><td>القدرة الإجمالية</td><td>'+kwp.toFixed(1)+' kWp</td></tr>'
+    + '<tr><td>طريقة التركيب</td><td>'+(tilt?('مايلة '+tilt+'° · بين الصفوف '+shadowGap(pl,tilt).toFixed(2)+' م')
+        :'نايمة · 2 سم بين لوح ولوح · ممر 40 سم')+'</td></tr>'
+    + '</tbody></table>';
+
+  t += '<div class="sec">أطوال الأضلاع</div><table><thead><tr><th>الضلع</th><th>الطول</th></tr></thead><tbody>'
     + S.map((s,i)=>'<tr><td>ضلع '+(i+1)+'</td><td>'+s.toFixed(2)+' م</td></tr>').join('')
     + '</tbody></table>';
-  $('shFt').innerHTML = '<b>تنبيه:</b> هذا المخطط تقدير أوّلي من صور الأقمار الصناعية. '
+  $('shTable').innerHTML = t;
+
+  $('shFt').innerHTML = '<div class="warn"><b>تنبيه:</b> هذا المخطط تقدير أوّلي من صور الأقمار الصناعية. '
     + 'الأبعاد قد تختلف بنسبة ±'+err+'%، ولا يشمل ارتفاع الجدران أو الظل أو وضع السطح. '
-    + 'القياس النهائي يتطلب زيارة ميدانية.<br><br>'
-    + 'صادر عن <b>MrElectroAI</b> — أنور الحسن الجاسم<br>'+ '<span dir="ltr">+961 79 434 479</span> · mrelectroai@gmail.com<br>' + SITE;
+    + 'القياس النهائي يتطلب زيارة ميدانية.</div>'
+    + '<div class="sig"><div class="sn">أنور الحسن الجاسم</div>'
+    + '<div class="sr">كهرباء · طاقة شمسية · أنظمة تحكم</div>'
+    + '<div class="sc"><span dir="ltr">+961 79 434 479</span> · mrelectroai@gmail.com</div>'
+    + '<div class="sw2">MrElectroAI · ' + SITE.replace('https://','') + '</div></div>';
   window.print();
 }
-
-/* ─── بحث داخل الخريطة ─── */
-async function mapSearch(){
-  if(!map) return;
-  const raw = $('mq').value.trim(); if(!raw) return;
-  const dec = raw.replace(/،/g,',').replace(/(\d),(\d)/g,'$1.$2');
-  const m = dec.match(/(-?\d{1,3}\.\d+)[,\s]+(-?\d{1,3}\.\d+)/);
-  if(m){ map.setView([+m[1],+m[2]],20); fetchElev(+m[1],+m[2]);
-    $('mres').classList.remove('on'); $('mq').blur(); return; }
-  $('mres').innerHTML = '<div>عم ندوّر...</div>'; $('mres').classList.add('on');
-  try{
-    const c = map.getCenter();
-    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=6&accept-language=ar&q='
-      + encodeURIComponent(raw) + '&viewbox=' + (c.lng-1) + ',' + (c.lat+1) + ',' + (c.lng+1) + ',' + (c.lat-1));
-    const d = await r.json();
-    $('mres').innerHTML = d.length
-      ? d.map(x => '<div data-la="'+x.lat+'" data-lo="'+x.lon+'">📍 '
-          + x.display_name.split(',').slice(0,4).join('، ') + '</div>').join('')
-      : '<div>ما لقينا المكان — جرّب اسم أوضح أو الصق الإحداثيات.</div>';
-  }catch(e){ $('mres').innerHTML = '<div>ما قدرنا ندوّر — الصق الإحداثيات بدل الاسم.</div>'; }
-}
-$('mqBtn').onclick = mapSearch;
-$('mq').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); mapSearch(); } });
-$('mres').onclick = e => { const d = e.target.closest('[data-la]'); if(!d) return;
-  map.setView([+d.dataset.la, +d.dataset.lo], 20); fetchElev(+d.dataset.la, +d.dataset.lo);
-  $('mres').classList.remove('on'); $('mq').value=''; };
-document.addEventListener('click', e => {
-  if(!e.target.closest('.msearch') && !e.target.closest('.mres')) $('mres').classList.remove('on'); });
-
-/* ─── بحث داخل الخريطة ─── */
-async function mapSearch(){
-  if(!map) return;
-  let t = $('mq').value.trim().replace(/،/g,',');
-  if(!t) return;
-  const dec = t.replace(/(\d),(\d)/g,'$1.$2');
-  const m = dec.match(/(-?\d{1,3}\.\d+)[,\s]+(-?\d{1,3}\.\d+)/);
-  if(m){ map.setView([+m[1],+m[2]],20); fetchElev(+m[1],+m[2]);
-    $('mres').classList.remove('on'); $('mq').blur(); return; }
-  $('mres').innerHTML = '<div>عم ندوّر...</div>'; $('mres').classList.add('on');
-  try{
-    const c = map.getCenter();
-    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=6&accept-language=ar&q='
-      + encodeURIComponent(t) + '&viewbox=' + (c.lng-1.5) + ',' + (c.lat+1) + ',' + (c.lng+1.5) + ',' + (c.lat-1));
-    const d = await r.json();
-    $('mres').innerHTML = d.length ? d.map(x =>
-      '<div data-la="'+x.lat+'" data-lo="'+x.lon+'">📍 '+x.display_name.split(',').slice(0,4).join('، ')+'</div>').join('')
-      : '<div>ما لقينا المكان — جرّب اسم أوضح أو الصق الإحداثيات.</div>';
-  }catch(e){ $('mres').innerHTML = '<div>ما قدرنا ندوّر — تفقّد الإنترنت.</div>'; }
-}
-$('mqBtn').onclick = mapSearch;
-$('mq').addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); mapSearch(); } });
-$('mres').onclick = e => { const d = e.target.closest('[data-la]'); if(!d||!map) return;
-  map.setView([+d.dataset.la,+d.dataset.lo],20); fetchElev(+d.dataset.la,+d.dataset.lo);
-  $('mres').classList.remove('on'); $('mq').value=''; };
-document.addEventListener('click', e => {
-  if(!e.target.closest('.msearch') && !e.target.closest('.mres')) $('mres').classList.remove('on'); });
 
 drawJobs(); go(0);
 </script>
