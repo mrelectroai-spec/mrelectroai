@@ -76,6 +76,18 @@ select:focus,input:focus{border-color:var(--teal);background:var(--paper)}
 .mres div{padding:11px 13px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--line);line-height:1.5}
 .mres div:last-child{border-bottom:0}
 .mres div:hover{background:var(--teal-soft);color:var(--teal-2)}
+.toggle{display:flex;align-items:center;gap:12px;background:var(--paper);border:1px solid var(--line);
+  border-radius:13px;padding:11px 13px;margin-top:10px;box-shadow:var(--shadow)}
+.toggle.off{border-color:#E0C9A6;background:#FDF8EF}
+.sw{position:relative;display:inline-block;width:52px;height:30px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.sl{position:absolute;inset:0;background:#C7D3D0;border-radius:30px;transition:.25s;cursor:pointer}
+.sl:before{content:"";position:absolute;width:24px;height:24px;right:3px;top:3px;background:#fff;
+  border-radius:50%;transition:.25s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.sw input:checked + .sl{background:var(--teal)}
+.sw input:checked + .sl:before{transform:translateX(-22px)}
+.toggle .tt b{display:block;font-size:13.5px}
+.toggle .tt small{display:block;font-size:11.5px;color:var(--muted)}
 #map{height:58vh;min-height:330px;border-radius:15px;border:1px solid var(--line);
   box-shadow:var(--shadow);margin-bottom:10px;z-index:1}
 .hint{background:var(--teal-soft);border:1px solid var(--teal);border-radius:12px;padding:11px 13px;
@@ -84,6 +96,13 @@ select:focus,input:focus{border-color:var(--teal);background:var(--paper)}
   border-radius:12px;padding:8px 14px;font-family:'JetBrains Mono',monospace;font-size:15px;
   font-weight:700;z-index:800;display:none}
 .livearea.on{display:block}
+.loading{position:fixed;inset:0;background:rgba(245,248,247,.94);display:grid;place-items:center;z-index:1000}
+.loading.off{display:none}
+.lbox{text-align:center}
+.spin{width:52px;height:52px;border:5px solid var(--line);border-top-color:var(--teal);
+  border-radius:50%;margin:0 auto 14px;animation:sp .9s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ltxt{font-size:14px;color:var(--muted);font-weight:600}
 
 /* دوائر النتيجة */
 .rings{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:12px}
@@ -176,6 +195,8 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
 </div></div>
 
 <div class="livearea" id="live"></div>
+<div class="loading" id="loading"><div class="lbox">
+  <div class="spin"></div><div class="ltxt" id="ltxt">عم نحمّل الخريطة...</div></div></div>
 
 <div class="wrap">
   <div class="prog" id="prog"></div>
@@ -224,7 +245,8 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
   <!-- 2 الرسم -->
   <section class="scr" data-k="2">
     <h1>ارسم السطح</h1>
-    <div class="hint">اضغط على زوايا السطح وحدة وحدة. كبّر الخريطة لآخرها لتطلع الأبعاد أدق.</div>
+    <div class="hint"><b>للدقة:</b> كبّر الخريطة لآخرها قبل ما تحدد الزوايا.
+      وبعد ما تحط النقطة، فيك <b>تسحبها</b> بإصبعك لتظبّطها بالضبط على الزاوية.</div>
     <div class="mapwrap">
       <div class="msearch">
         <input id="mq" placeholder="🔍 دوّر عن منطقة أو الصق إحداثيات..." autocomplete="off">
@@ -232,6 +254,11 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
       </div>
       <div class="mres" id="mres"></div>
       <div id="map"></div>
+      <div class="toggle">
+        <label class="sw"><input type="checkbox" id="addOn" checked><span class="sl"></span></label>
+        <div class="tt"><b id="tgTxt">وضع التحديد مفتوح</b>
+          <small id="tgSub">اضغط على زوايا السطح لتضيف نقاط</small></div>
+      </div>
     </div>
     <div class="brow">
       <button class="btn" id="undoBtn">↩️ تراجع</button>
@@ -307,10 +334,18 @@ if(typeof L === 'undefined'){
   $('map').outerHTML = '<div class="alert"><b>الخريطة ما حمّلت:</b> افتح الأداة من رابط الموقع '
     + 'بالمتصفح مباشرة — المعاينة داخل التطبيقات بتحجب مكتبة الخرائط.</div>';
 } else {
-  map = L.map('map',{center:[33.8938,35.5018],zoom:18});
+  map = L.map('map',{center:[33.8938,35.5018],zoom:18,zoomSnap:.5,wheelPxPerZoomLevel:80});
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    {maxZoom:22,maxNativeZoom:19,attribution:'Esri · Maxar'}).addTo(map);
-  map.on('click', e => { pts.push([e.latlng.lat,e.latlng.lng]); redraw(); });
+    {maxZoom:23,maxNativeZoom:19,attribution:'Esri · Maxar',
+     keepBuffer:4, updateWhenIdle:false, crossOrigin:true}).addTo(map);
+  map.whenReady(() => { setTimeout(()=>$('loading').classList.add('off'), 400); });
+  setTimeout(()=>$('loading').classList.add('off'), 6000);
+  /* التحديد بيشتغل بس لما القفل مفتوح */
+  map.on('click', e => {
+    if(!$('addOn').checked) return;
+    pts.push([e.latlng.lat, e.latlng.lng]); redraw();
+  });
+
   /* بوصلة ثابتة */
   const C = L.control({position:'topright'});
   C.onAdd = () => { const d = L.DomUtil.create('div');
@@ -333,13 +368,29 @@ function redraw(){
   if(poly){ map.removeLayer(poly); poly = null; }
   marks.forEach(m=>map.removeLayer(m)); marks = [];
   layers.forEach(l=>map.removeLayer(l)); layers = [];
-  pts.forEach((p,i)=>marks.push(L.circleMarker(p,{radius:6,color:'#0E8F6E',fillColor:'#fff',fillOpacity:1,weight:3})
-    .addTo(map).bindTooltip(String(i+1),{permanent:true,direction:'top',offset:[0,-6]})));
+  pts.forEach((p,i)=>{
+    const mk = L.marker(p,{draggable:true, icon:L.divIcon({className:'',iconSize:[22,22],
+      html:'<div style="width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid #0E8F6E;'
+        + 'box-shadow:0 1px 5px rgba(0,0,0,.3);margin:3px"></div>'})}).addTo(map);
+    mk.bindTooltip(String(i+1),{permanent:true,direction:'top',offset:[0,-4]});
+    mk.on('drag', e => { pts[i] = [e.latlng.lat, e.latlng.lng];
+      if(poly) poly.setLatLngs(pts);
+      const A = area(pts); $('live').textContent = A>1 ? A.toFixed(0)+' م²' : ''; });
+    mk.on('dragend', redraw);
+    marks.push(mk);
+  });
   if(pts.length>=2) poly = L.polygon(pts,{color:'#0E8F6E',weight:3,fillColor:'#22C79B',fillOpacity:.3}).addTo(map);
   const A = area(pts);
   $('live').classList.toggle('on', A>1);
   $('live').textContent = A>1 ? A.toFixed(0)+' م²' : '';
 }
+$('addOn').onchange = () => {
+  const on = $('addOn').checked;
+  document.querySelector('.toggle').classList.toggle('off', !on);
+  $('tgTxt').textContent = on ? 'وضع التحديد مفتوح' : 'وضع التحديد مقفول';
+  $('tgSub').textContent = on ? 'اضغط على زوايا السطح لتضيف نقاط' : 'فيك تحرّك وتكبّر الخريطة بأمان';
+  if(map) map.getContainer().style.cursor = on ? 'crosshair' : '';
+};
 $('undoBtn').onclick = () => { pts.pop(); redraw(); };
 $('clearBtn').onclick = () => { pts=[]; redraw(); };
 
@@ -528,10 +579,21 @@ $('goBtn').onclick = async () => {
 $('results').onclick = e => { const b = e.target.closest('[data-la]'); if(!b||!map) return;
   map.setView([+b.dataset.la,+b.dataset.lo],20); $('results').innerHTML='';
   fetchElev(+b.dataset.la,+b.dataset.lo); go(2); };
-$('meBtn').onclick = () => { if(!navigator.geolocation||!map) return say('ما بيدعم تحديد الموقع');
-  navigator.geolocation.getCurrentPosition(p=>{ map.setView([p.coords.latitude,p.coords.longitude],20);
-    fetchElev(p.coords.latitude,p.coords.longitude); go(2); },
-    ()=>say('ما قدرنا نحدّد موقعك'),{enableHighAccuracy:true,timeout:10000}); };
+$('meBtn').onclick = () => {
+  if(!navigator.geolocation||!map) return say('ما بيدعم تحديد الموقع');
+  say('عم نحدّد موقعك...');
+  /* أول قراءة سريعة (تقريبية) لننتقل فوراً */
+  navigator.geolocation.getCurrentPosition(p=>{
+    map.setView([p.coords.latitude,p.coords.longitude],19);
+    fetchElev(p.coords.latitude,p.coords.longitude); go(2);
+    /* وبعدها قراءة دقيقة بتزبّط المكان */
+    navigator.geolocation.getCurrentPosition(q=>{
+      map.setView([q.coords.latitude,q.coords.longitude],20);
+      say('ضبطنا الموقع بدقة '+Math.round(q.coords.accuracy)+' م');
+    }, ()=>{}, {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+  }, ()=>say('ما قدرنا نحدّد موقعك — اكتب المنطقة أو الصق الإحداثيات'),
+     {enableHighAccuracy:false, timeout:5000, maximumAge:60000});
+};
 
 /* ─── ساعات الشمس الفعّالة (تقدير) ─── */
 function sunHours(lat, tilt){
