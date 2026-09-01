@@ -4,27 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>قياس السطح | MrElectroAI</title>
-<meta name="description" content="قيس سطح أي بناية من القمر الصناعي واحسب عدد الألواح الشمسية قبل ما تزورها.">
+<meta name="description" content="قيس سطح أي بناية من القمر الصناعي واحسب توزيع الألواح الشمسية.">
 <meta name="theme-color" content="#F5F8F7">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#F5F8F7;--paper:#FFFFFF;--soft:#EDF3F1;--line:#DCE6E3;--ink:#0D1A17;--muted:#5E7370;
-  --teal:#0E8F6E;--teal-2:#0B7A5E;--teal-soft:#E4F4EF;--warn:#9A6A12;--warn-soft:#FCF3E3;--danger:#B03A3A;
+:root{--bg:#F5F8F7;--paper:#FFF;--soft:#EDF3F1;--line:#DCE6E3;--ink:#0D1A17;--muted:#5E7370;
+  --teal:#0E8F6E;--teal-2:#0B7A5E;--teal-soft:#E4F4EF;--blue:#2B6CB0;--blue-soft:#E6EFF8;
+  --amber:#B7791F;--amber-soft:#FBF3E3;--danger:#B03A3A;--danger-soft:#FCEAEA;
   --shadow:0 2px 8px rgba(13,26,23,.05),0 12px 28px rgba(13,26,23,.06)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
-  font-size:15px;line-height:1.65}
+  font-size:15px;line-height:1.65;padding-bottom:84px}
 :where(a,button,input,select):focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
 .bar{background:var(--paper);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:900}
-.bar-in{max-width:660px;margin:0 auto;padding:11px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bar-in{max-width:660px;margin:0 auto;padding:11px 15px;display:flex;align-items:center;justify-content:space-between}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
 .logo span{width:34px;height:34px;border-radius:10px;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:17px}
 .logo b{font-family:'JetBrains Mono',monospace;font-size:13px;display:block;line-height:1.25}
 .logo small{font-size:10px;color:var(--muted);display:block}
-.wrap{max-width:660px;margin:0 auto;padding:18px 15px 40px}
-h1{font-family:'Readex Pro',sans-serif;font-size:clamp(22px,5.6vw,28px);font-weight:700;margin-bottom:5px}
+.step{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted)}
+
+.wrap{max-width:660px;margin:0 auto;padding:16px 15px 20px}
+.prog{display:flex;gap:5px;margin-bottom:15px}
+.prog i{flex:1;height:3px;border-radius:3px;background:var(--line);transition:background .3s}
+.prog i.on{background:var(--teal)}
+.scr{display:none;animation:f .25s}.scr.on{display:block}
+@keyframes f{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+h1{font-family:'Readex Pro',sans-serif;font-size:clamp(21px,5.4vw,26px);font-weight:700;margin-bottom:5px}
 .lede{color:var(--muted);font-size:13.5px;margin-bottom:15px}
+
 .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px;
   margin-bottom:12px;box-shadow:var(--shadow)}
 .card>h2{font-family:'Readex Pro',sans-serif;font-size:15px;font-weight:600;margin-bottom:12px;
@@ -34,56 +44,83 @@ select,input{width:100%;font-family:inherit;font-size:15px;color:var(--ink);back
   border:1px solid var(--line);border-radius:11px;padding:12px 13px}
 select:focus,input:focus{border-color:var(--teal);background:var(--paper)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mb{margin-bottom:12px}
+.opt{font-size:11px;color:var(--muted);font-weight:400}
+
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;
   border-radius:11px;font-family:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);
   background:var(--soft);color:var(--ink);cursor:pointer;margin-top:8px;text-decoration:none}
 .btn.main{background:var(--teal);color:#fff;border-color:var(--teal)}
 .brow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-#map{height:62vh;min-height:340px;border-radius:15px;border:1px solid var(--line);
-  box-shadow:var(--shadow);margin-bottom:11px;z-index:1}
-.hint{background:var(--teal-soft);border:1px solid var(--teal);border-radius:12px;padding:12px 14px;
-  font-size:12.5px;color:var(--teal-2);line-height:1.75;margin-bottom:11px}
-.hint b{font-weight:700}
-.big{background:var(--teal-soft);border:2px solid var(--teal);border-radius:14px;padding:17px 13px;
-  text-align:center;margin-bottom:10px}
-.big .l{font-size:12px;color:var(--teal-2);font-weight:600}
-.big .v{font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:700;color:var(--teal-2);line-height:1.1}
-.big .n{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.6}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+#map{height:58vh;min-height:330px;border-radius:15px;border:1px solid var(--line);
+  box-shadow:var(--shadow);margin-bottom:10px;z-index:1}
+.hint{background:var(--teal-soft);border:1px solid var(--teal);border-radius:12px;padding:11px 13px;
+  font-size:12.5px;color:var(--teal-2);line-height:1.7;margin-bottom:10px}
+.livearea{position:fixed;top:78px;inset-inline-start:24px;background:rgba(13,26,23,.85);color:#fff;
+  border-radius:12px;padding:8px 14px;font-family:'JetBrains Mono',monospace;font-size:15px;
+  font-weight:700;z-index:800;display:none}
+.livearea.on{display:block}
+
+/* دوائر النتيجة */
+.rings{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:12px}
+.ring{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 8px;
+  text-align:center;box-shadow:var(--shadow)}
+.ring.wide{grid-column:1/-1}
+.ring svg{width:100%;max-width:170px;height:auto;display:block;margin:0 auto}
+.ring .cap{font-size:12px;color:var(--muted);margin-top:6px}
+.rv{font-family:'JetBrains Mono',monospace;font-weight:700}
+
 .row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
 .row .k{font-size:13.5px;flex:1}
 .row .k small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 .row .v{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--teal-2);
   background:var(--teal-soft);border:1px solid var(--teal);border-radius:9px;padding:6px 12px;white-space:nowrap}
-.alert{font-size:13px;color:#7A1F1F;background:#FCEAEA;border:1px solid #E9B7B7;
+.alert{font-size:13px;color:#7A1F1F;background:var(--danger-soft);border:1px solid #E9B7B7;
   border-inline-start:4px solid var(--danger);border-radius:12px;padding:12px 14px;line-height:1.8;margin-top:10px}
 .alert b{color:var(--danger)}
-.note{font-size:12.5px;color:var(--muted);background:var(--warn-soft);border:1px solid #EBD8AE;
+.note{font-size:12.5px;color:var(--muted);background:var(--amber-soft);border:1px solid #EBD8AE;
   border-radius:12px;padding:12px 13px;line-height:1.8;margin-top:10px}
-.note b{color:var(--warn)}
-.cta{display:flex;align-items:center;gap:12px;justify-content:space-between;background:var(--teal);
-  color:#fff;border-radius:14px;padding:15px 16px;margin-top:13px;text-decoration:none;box-shadow:var(--shadow)}
-.cta .t{font-size:13px;line-height:1.65}
-.cta .b{font-size:13px;font-weight:700;background:rgba(255,255,255,.18);border-radius:999px;padding:7px 14px;white-space:nowrap}
-footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;
+.note b{color:var(--amber)}
+.plan{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:12px;
+  box-shadow:var(--shadow);margin-bottom:12px}
+.plan svg{width:100%;height:auto;display:block}
+
+.jobs .j{display:flex;align-items:center;gap:11px;background:var(--paper);border:1px solid var(--line);
+  border-radius:13px;padding:12px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow)}
+.jobs .j:hover{border-color:var(--teal)}
+.jobs .jm{flex:1;min-width:0}
+.jobs .jm b{display:block;font-size:14px}
+.jobs .jm small{display:block;color:var(--muted);font-size:11.5px}
+.jobs .jv{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal-2);
+  background:var(--teal-soft);border:1px solid var(--teal);border-radius:8px;padding:5px 9px;white-space:nowrap}
+.jobs .x{background:none;border:0;color:var(--danger);font-size:19px;cursor:pointer;padding:0 4px}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px;line-height:1.9}
+
+.nav{position:fixed;inset-inline:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);
+  padding:10px 15px calc(10px + env(safe-area-inset-bottom));display:flex;gap:9px;z-index:950}
+.nav .btn{margin:0}.nav .back{flex:0 0 50px;padding:12px 0}
+.toast{position:fixed;bottom:88px;left:50%;transform:translate(-50%,90px);background:var(--ink);
+  color:#fff;font-size:13.5px;font-weight:600;padding:10px 19px;border-radius:999px;
+  transition:transform .3s;z-index:960;max-width:88%;text-align:center}
+.toast.on{transform:translate(-50%,0)}
+footer{margin-top:18px;padding-top:15px;border-top:1px solid var(--line);font-size:12.5px;
   color:var(--muted);text-align:center;line-height:1.9}
 footer b{color:var(--ink)}
 footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',monospace;font-weight:700}
-.visit{display:block;background:var(--teal);color:#fff!important;border-radius:12px;padding:12px;
-  margin-top:13px;font-size:14px;font-weight:700;text-decoration:none;font-family:'IBM Plex Sans Arabic',sans-serif}
 .leaflet-container{font-family:'IBM Plex Sans Arabic',sans-serif}
+
 #sheet{display:none}
 @media print{
   body>*:not(#sheet){display:none!important}
   #sheet{display:block!important;color:#000;font-size:13px}
   #sheet .hd{border-bottom:3px solid #0E8F6E;padding-bottom:9px;margin-bottom:12px}
-  #sheet .hd h2{font-family:'JetBrains Mono',monospace;font-size:21px;letter-spacing:.03em}
+  #sheet .hd h2{font-family:'JetBrains Mono',monospace;font-size:21px}
   #sheet .hd .ar{font-size:13px;color:#333}
   #sheet .hd .ph{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin-top:3px}
   #sheet h3{font-size:16px;margin-bottom:8px}
   #sheet .meta{font-size:12px;color:#333;margin-bottom:12px;line-height:1.9}
-  #sheet svg{border:1px solid #999;border-radius:6px}
+  #sheet svg{border:1px solid #999;border-radius:6px;width:100%;height:auto}
   #sheet table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:12px}
   #sheet th,#sheet td{border:1px solid #999;padding:6px 9px;text-align:right}
   #sheet th{background:#eee}
@@ -96,301 +133,453 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
 
 <div class="bar"><div class="bar-in">
   <a class="logo" href="../../"><span>⚡</span><b>MrElectroAI<small>أنور الحسن الجاسم</small></b></a>
+  <span class="step" id="stepTxt"></span>
 </div></div>
 
+<div class="livearea" id="live"></div>
+
 <div class="wrap">
-  <h1>قياس السطح من القمر الصناعي</h1>
-  <p class="lede">حدّد موقع البناية، ارسم حدود السطح بإصبعك، وبتطلعلك المساحة وعدد الألواح — قبل ما تزور الموقع.</p>
+  <div class="prog" id="prog"></div>
 
-  <div class="card">
-    <h2>📍 الموقع</h2>
-    <label class="lbl">الصق إحداثيات أو رابط من خرائط غوغل</label>
-    <input id="loc" class="mb" placeholder="33.8938, 35.5018 أو رابط الموقع">
-    <div class="brow">
-      <button class="btn" id="goBtn">🔍 روح عالموقع</button>
-      <button class="btn" id="meBtn">📍 موقعي الحالي</button>
+  <!-- 0 الورشة -->
+  <section class="scr on" data-k="0">
+    <h1>ورشة جديدة</h1>
+    <p class="lede">اسم الورشة بس — والباقي بيجي خطوة خطوة.</p>
+    <div class="card">
+      <label class="lbl">اسم الورشة أو الزبون</label>
+      <input id="jName" placeholder="بناية أبو خالد — صيدا">
     </div>
-  </div>
-
-  <div class="hint" id="hint"><b>كيف ترسم:</b> اضغط على زوايا السطح وحدة وحدة (٣ نقاط على الأقل)، وبتشوف المساحة بتتحدّث فوراً. اضغط «تراجع» لتشيل آخر نقطة.</div>
-  <div id="map"></div>
-  <div class="brow">
-    <button class="btn" id="undoBtn">↩️ تراجع</button>
-    <button class="btn" id="clearBtn">🗑️ مسح</button>
-  </div>
-
-  <div class="card">
-    <h2>☀️ إعدادات الألواح</h2>
-    <div class="two mb">
-      <div><label class="lbl">قدرة اللوح</label>
-        <select id="pw">
-          <option value="450|1.90|1.13">450 واط — 1.90 × 1.13 م</option>
-          <option value="550|2.28|1.13" selected>550 واط — 2.28 × 1.13 م</option>
-          <option value="600|2.38|1.13">600 واط — 2.38 × 1.13 م</option>
-          <option value="700|2.38|1.30">700 واط — 2.38 × 1.30 م</option>
-        </select></div>
-      <div><label class="lbl">طريقة التركيب</label>
-        <select id="mount">
-          <option value="1.15">مسطّح على السطح</option>
-          <option value="1.9" selected>مائل بحوامل (صفوف)</option>
-          <option value="1.0">على القرميد / السقف المائل</option>
-        </select></div>
+    <div class="card">
+      <h2>📁 ورش محفوظة</h2>
+      <div class="jobs" id="jobs"></div>
     </div>
-    <div>
-      <label class="lbl">نسبة المساحة الصالحة</label>
-      <select id="usable">
-        <option value="0.85">85% — سطح فاضي ونظيف</option>
-        <option value="0.7" selected>70% — عادي (خزانات ودرج ومداخن)</option>
-        <option value="0.55">55% — سطح مزحوم</option>
+  </section>
+
+  <!-- 1 الموقع -->
+  <section class="scr" data-k="1">
+    <h1>وين البناية؟</h1>
+    <p class="lede">اكتب اسم المنطقة، أو الصق الإحداثيات من الخرائط.</p>
+    <div class="card">
+      <label class="lbl">المنطقة أو الإحداثيات</label>
+      <input id="loc" class="mb" placeholder="الحمرا بيروت — أو 33.8956, 35.5025">
+      <div class="brow">
+        <button class="btn main" id="goBtn">🔍 روح عالموقع</button>
+        <button class="btn" id="meBtn">📍 موقعي</button>
+      </div>
+      <div id="results"></div>
+    </div>
+    <div class="card">
+      <label class="lbl">عدد الطوابق <span class="opt">(اختياري — بيحدد دقة القياس)</span></label>
+      <select id="floors">
+        <option value="">— ما بعرف —</option>
+        <option value="1">أرضي أو طابق</option>
+        <option value="3">2 – 3 طوابق</option>
+        <option value="6">4 – 6 طوابق</option>
+        <option value="10">7 طوابق أو أكتر</option>
       </select>
+      <div id="accNote"></div>
     </div>
-  </div>
+  </section>
 
-  <div class="card">
-    <h2>📋 بيانات المخطط</h2>
-    <div class="two mb">
-      <div><label class="lbl">اسم الزبون / البناية</label><input id="cName" placeholder="بناية أبو خالد"></div>
-      <div><label class="lbl">المنطقة</label><input id="cArea" placeholder="صيدا"></div>
+  <!-- 2 الرسم -->
+  <section class="scr" data-k="2">
+    <h1>ارسم السطح</h1>
+    <div class="hint">اضغط على زوايا السطح وحدة وحدة. كبّر الخريطة لآخرها لتطلع الأبعاد أدق.</div>
+    <div id="map"></div>
+    <div class="brow">
+      <button class="btn" id="undoBtn">↩️ تراجع</button>
+      <button class="btn" id="clearBtn">🗑️ مسح</button>
     </div>
-    <div><label class="lbl">زاوية ميل الألواح (درجة من الشمال)</label>
-      <input id="azim" type="number" min="0" max="359" value="190">
-      <p class="lede" style="margin:7px 0 0">180 = جنوب تماماً · 190 = جنوب مائل غرب شوي (الأنسب عادةً بلبنان)</p></div>
-  </div>
+  </section>
 
-  <div id="out"></div>
-
-  <footer>
-    <b>MrElectroAI</b> — أنور الحسن الجاسم<br>
-    <a href="tel:+96179434479" dir="ltr">+961 79 434 479</a>
-    <a class="visit" href="https://mrelectroai-spec.github.io/mrelectroai/" target="_blank" rel="noopener">🌐 اقرأ عنّا وزور موقعنا الرسمي</a>
-  </footer>
+  <!-- 3 النتيجة -->
+  <section class="scr" data-k="3">
+    <h1 id="resTitle">النتيجة</h1>
+    <p class="lede" id="resSub"></p>
+    <div class="card mb">
+      <label class="lbl">قياس اللوح</label>
+      <select id="pw">
+        <option value="450|1.90|1.13">450 واط — 1.90 × 1.13 م</option>
+        <option value="550|2.28|1.13" selected>550 واط — 2.28 × 1.13 م</option>
+        <option value="600|2.38|1.13">600 واط — 2.38 × 1.13 م</option>
+        <option value="700|2.38|1.30">700 واط — 2.38 × 1.30 م</option>
+        <option value="0|0|0">قياس مخصّص</option>
+      </select>
+      <div class="two" id="customBox" style="display:none;margin-top:10px">
+        <div><label class="lbl">طول اللوح (م)</label><input id="cl" type="number" step="0.01" value="2.28"></div>
+        <div><label class="lbl">عرض اللوح (م)</label><input id="cw" type="number" step="0.01" value="1.13"></div>
+      </div>
+      <div class="two" style="margin-top:10px">
+        <div><label class="lbl">قدرة اللوح (واط)</label><input id="cp" type="number" value="550"></div>
+        <div><label class="lbl">اتجاه الصفوف</label>
+          <select id="orient"><option value="auto" selected>مع الضلع الأطول</option>
+            <option value="ns">شمال ← جنوب</option></select></div>
+      </div>
+    </div>
+    <div id="out"></div>
+  </section>
 </div>
 
+<div class="nav">
+  <button class="btn back" id="back">→</button>
+  <button class="btn main" id="next">التالي</button>
+</div>
+<div class="toast" id="toast"></div>
+
 <div id="sheet">
-  <div class="hd">
-    <h2>MrElectroAI</h2>
+  <div class="hd"><h2>MrElectroAI</h2>
     <div class="ar">أنور الحسن الجاسم — كهرباء وطاقة شمسية</div>
-    <div class="ph" dir="ltr">+961 79 434 479</div>
-  </div>
+    <div class="ph" dir="ltr">+961 79 434 479</div></div>
   <h3 id="shTitle"></h3>
   <div class="meta" id="shMeta"></div>
   <div id="shSvg"></div>
   <div id="shTable"></div>
-  <div class="ft">
-    <b>تنبيه:</b> هذا المخطط تقدير أوّلي مبني على صور الأقمار الصناعية. الأبعاد الفعلية قد تختلف
-    بنسبة ±10% (وأكثر في المباني العالية)، ولا يشمل ارتفاع الجدران أو الظل أو عوائق السطح.
-    القياس النهائي يتطلب زيارة ميدانية.<br><br>
-    صادر عن <b>MrElectroAI</b> — أنور الحسن الجاسم · +961 79 434 479 · mrelectroai@gmail.com<br>
-    mrelectroai-spec.github.io/mrelectroai
-  </div>
+  <div class="ft" id="shFt"></div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const WA = "96179434479";
+const WA = "96179434479", SITE = "https://mrelectroai-spec.github.io/mrelectroai/";
+const GAP = 0.02, PATH = 0.40;          /* 2 سم بين الألواح · 40 سم ممر */
+const PATTERN = [2,4];                   /* أول مجموعة صفّين، وبعدها كل 4 صفوف ممر */
 const $ = i => document.getElementById(i);
+let scr = 0, pts = [], poly = null, marks = [], map = null, layers = [], job = null;
+let db = load();
 
+function load(){ try{ return JSON.parse(localStorage.getItem('roof_jobs')||'[]'); }catch(e){ return []; } }
+function save(){ try{ localStorage.setItem('roof_jobs', JSON.stringify(db)); }catch(e){} }
+function say(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2400); }
+
+/* ─── الخريطة ─── */
 if(typeof L === 'undefined'){
-  document.getElementById('map').outerHTML =
-    '<div class="alert" style="margin-bottom:11px"><b>الخريطة ما حمّلت:</b> '
-    + 'يا إنو ما في إنترنت، يا إنك عم تفتح الأداة من مكان بيحجب المكتبات الخارجية (متل معاينة داخل تطبيق). '
-    + 'افتحها من رابط الموقع مباشرة بالمتصفح وبتشتغل.</div>';
-  throw new Error('Leaflet not loaded');
+  $('map').outerHTML = '<div class="alert"><b>الخريطة ما حمّلت:</b> افتح الأداة من رابط الموقع '
+    + 'بالمتصفح مباشرة — المعاينة داخل التطبيقات بتحجب مكتبة الخرائط.</div>';
+} else {
+  map = L.map('map',{center:[33.8938,35.5018],zoom:18});
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {maxZoom:22,maxNativeZoom:19,attribution:'Esri · Maxar'}).addTo(map);
+  map.on('click', e => { pts.push([e.latlng.lat,e.latlng.lng]); redraw(); });
+  /* بوصلة ثابتة */
+  const C = L.control({position:'topright'});
+  C.onAdd = () => { const d = L.DomUtil.create('div');
+    d.innerHTML = '<div style="background:#fff;border:1px solid #DCE6E3;border-radius:11px;padding:7px;'
+      + 'box-shadow:0 2px 8px rgba(0,0,0,.15);text-align:center;width:56px">'
+      + '<svg viewBox="0 0 44 44" style="width:40px;height:40px">'
+      + '<circle cx="22" cy="22" r="19" fill="#fff" stroke="#DCE6E3" stroke-width="1.5"/>'
+      + '<polygon points="22,5 18,15 26,15" fill="#0D1A17"/>'
+      + '<text x="22" y="13" text-anchor="middle" font-size="7" font-family="monospace" fill="#fff">N</text>'
+      + '<line x1="22" y1="22" x2="22" y2="38" stroke="#E2622C" stroke-width="3.5" stroke-linecap="round"/>'
+      + '<circle cx="22" cy="38" r="3.5" fill="#E2622C"/>'
+      + '<circle cx="22" cy="22" r="3" fill="#0D1A17"/></svg>'
+      + '<div style="font-family:monospace;font-size:9.5px;color:#E2622C;font-weight:700;margin-top:2px">S 180°</div></div>';
+    return d; };
+  C.addTo(map);
 }
-const map = L.map('map', { center:[33.8938,35.5018], zoom:18, zoomControl:true });
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  { maxZoom:21, maxNativeZoom:19, attribution:'صور: Esri, Maxar, Earthstar Geographics' }).addTo(map);
 
-let pts = [], poly = null, marks = [];
-function draw(){
+function redraw(){
+  if(!map) return;
   if(poly){ map.removeLayer(poly); poly = null; }
-  marks.forEach(m => map.removeLayer(m)); marks = [];
-  pts.forEach((p,i) => marks.push(L.circleMarker(p,{radius:6,color:'#0E8F6E',fillColor:'#fff',
-    fillOpacity:1,weight:3}).addTo(map).bindTooltip(String(i+1),{permanent:true,direction:'top',offset:[0,-6]})));
-  if(pts.length >= 2) poly = L.polygon(pts,{color:'#0E8F6E',weight:3,fillColor:'#22C79B',fillOpacity:.32}).addTo(map);
-  calc();
+  marks.forEach(m=>map.removeLayer(m)); marks = [];
+  layers.forEach(l=>map.removeLayer(l)); layers = [];
+  pts.forEach((p,i)=>marks.push(L.circleMarker(p,{radius:6,color:'#0E8F6E',fillColor:'#fff',fillOpacity:1,weight:3})
+    .addTo(map).bindTooltip(String(i+1),{permanent:true,direction:'top',offset:[0,-6]})));
+  if(pts.length>=2) poly = L.polygon(pts,{color:'#0E8F6E',weight:3,fillColor:'#22C79B',fillOpacity:.3}).addTo(map);
+  const A = area(pts);
+  $('live').classList.toggle('on', A>1);
+  $('live').textContent = A>1 ? A.toFixed(0)+' م²' : '';
 }
-map.on('click', e => { pts.push([e.latlng.lat, e.latlng.lng]); draw(); });
-$('undoBtn').onclick = () => { pts.pop(); draw(); };
-$('clearBtn').onclick = () => { pts = []; draw(); };
+$('undoBtn').onclick = () => { pts.pop(); redraw(); };
+$('clearBtn').onclick = () => { pts=[]; redraw(); };
 
-/* مساحة المضلّع بالمتر المربّع */
+/* ─── هندسة ─── */
 function area(p){
-  if(p.length < 3) return 0;
-  const R = 6378137, rad = Math.PI/180;
-  let s = 0;
-  for(let i=0;i<p.length;i++){
-    const [y1,x1] = p[i], [y2,x2] = p[(i+1)%p.length];
-    s += (x2-x1)*rad * (2 + Math.sin(y1*rad) + Math.sin(y2*rad));
-  }
-  return Math.abs(s * R * R / 2);
+  if(p.length<3) return 0;
+  const R=6378137, rad=Math.PI/180; let s=0;
+  for(let i=0;i<p.length;i++){ const[y1,x1]=p[i],[y2,x2]=p[(i+1)%p.length];
+    s += (x2-x1)*rad*(2+Math.sin(y1*rad)+Math.sin(y2*rad)); }
+  return Math.abs(s*R*R/2);
 }
-/* أطوال الأضلاع */
-function sides(p){
-  const out = [];
-  for(let i=0;i<p.length;i++){
-    const a = L.latLng(p[i]), b = L.latLng(p[(i+1)%p.length]);
-    out.push(a.distanceTo(b));
+function sides(p){ const o=[];
+  for(let i=0;i<p.length;i++){ o.push(L.latLng(p[i]).distanceTo(L.latLng(p[(i+1)%p.length]))); } return o; }
+function toXY(p){
+  const lat0 = p.reduce((a,q)=>a+q[0],0)/p.length, lng0 = p.reduce((a,q)=>a+q[1],0)/p.length;
+  return { lat0, lng0, xy: p.map(q => [ (q[1]-lng0)*111320*Math.cos(lat0*Math.PI/180), (q[0]-lat0)*110540 ]) };
+}
+function inPoly(x,y,poly){
+  let c = false;
+  for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+    const [xi,yi]=poly[i],[xj,yj]=poly[j];
+    if(((yi>y)!=(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi)) c = !c;
   }
-  return out;
+  return c;
 }
 
-['pw','mount','usable'].forEach(i => $(i).addEventListener('change', calc));
+/* ─── توزيع الألواح ─── */
+function layout(XY, pl, pwd){
+  /* اتجاه الصفوف: مع الضلع الأطول أو شمال-جنوب */
+  let ang = 0;
+  if($('orient').value === 'auto'){
+    let best = 0;
+    for(let i=0;i<XY.length;i++){
+      const a=XY[i], b=XY[(i+1)%XY.length];
+      const d=Math.hypot(b[0]-a[0], b[1]-a[1]);
+      if(d>best){ best=d; ang=Math.atan2(b[1]-a[1], b[0]-a[0]); }
+    }
+  }
+  const cos=Math.cos(-ang), sin=Math.sin(-ang);
+  const rot = p => [p[0]*cos - p[1]*sin, p[0]*sin + p[1]*cos];
+  const inv = p => [p[0]*Math.cos(ang) - p[1]*Math.sin(ang), p[0]*Math.sin(ang) + p[1]*Math.cos(ang)];
+  const R = XY.map(rot);
+  const xs=R.map(p=>p[0]), ys=R.map(p=>p[1]);
+  const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
+
+  const panels = [];
+  let y = y0, rowIdx = 0, groupIdx = 0, inGroup = 0;
+  const limit = () => (groupIdx===0 ? PATTERN[0] : PATTERN[1]);
+  while(y + pl <= y1 + .001){
+    for(let x=x0; x + pwd <= x1 + .001; x += pwd + GAP){
+      const c = [[x,y],[x+pwd,y],[x+pwd,y+pl],[x,y+pl]];
+      if(c.every(q => inPoly(q[0],q[1],R))) panels.push(c.map(inv));
+    }
+    y += pl; inGroup++; rowIdx++;
+    if(inGroup >= limit()){ y += PATH; inGroup = 0; groupIdx++; }
+  }
+  return panels;
+}
+
+/* ─── التنقّل ─── */
+const FLOW = [0,1,2,3];
+function go(k){
+  scr = k;
+  document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('on', +s.dataset.k===k));
+  $('prog').innerHTML = FLOW.map((_,i)=>'<i class="'+(i<=k?'on':'')+'"></i>').join('');
+  $('stepTxt').textContent = (k+1)+' / '+FLOW.length;
+  $('back').style.visibility = k ? 'visible' : 'hidden';
+  $('next').textContent = k===0?'التالي ←' : k===1?'ارسم السطح ←' : k===2?'شوف النتيجة ←' : '🖨️ مخطط PDF';
+  $('live').classList.toggle('on', k===2 && area(pts)>1);
+  if(k===2 && map) setTimeout(()=>map.invalidateSize(),120);
+  if(k===3) calc();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('back').onclick = () => { if(scr) go(scr-1); };
+$('next').onclick = () => {
+  if(scr===0){ if(!$('jName').value.trim()) return say('اكتب اسم الورشة'); go(1); }
+  else if(scr===1) go(2);
+  else if(scr===2){ if(pts.length<3) return say('ارسم 3 نقاط على الأقل'); saveJob(); go(3); }
+  else printPlan();
+};
+
+/* ─── الورش المحفوظة ─── */
+function drawJobs(){
+  $('jobs').innerHTML = db.length ? db.slice().reverse().map(j =>
+    '<div class="j" data-id="'+j.id+'"><span class="jm"><b>'+j.name+'</b>'
+    + '<small>'+j.date+' · '+j.pts.length+' نقاط</small></span>'
+    + '<span class="jv">'+j.area.toFixed(0)+' م²</span>'
+    + '<button class="x" data-del="'+j.id+'">×</button></div>').join('')
+    : '<div class="empty">ما في ورش محفوظة بعد.</div>';
+}
+$('jobs').onclick = e => {
+  const d = e.target.closest('[data-del]');
+  if(d){ db = db.filter(x=>x.id!==d.dataset.del); save(); drawJobs(); return; }
+  const j = e.target.closest('.j'); if(!j) return;
+  const o = db.find(x=>x.id===j.dataset.id); if(!o) return;
+  job = o.id; $('jName').value = o.name; pts = o.pts.slice();
+  if(o.floors) $('floors').value = o.floors;
+  redraw(); if(map) map.fitBounds(L.polygon(pts).getBounds(),{padding:[30,30]});
+  go(3);
+};
+function saveJob(){
+  const A = area(pts);
+  const rec = { id: job || 'r'+Date.now().toString(36), name:$('jName').value.trim(),
+    date:new Date().toLocaleDateString('ar-LB'), pts:pts.slice(), area:A, floors:$('floors').value };
+  const i = db.findIndex(x=>x.id===rec.id);
+  if(i>=0) db[i]=rec; else db.push(rec);
+  job = rec.id; save(); drawJobs();
+}
+
+/* ─── دقة حسب الطوابق ─── */
+const ACC = { '':10, '1':4, '3':8, '6':15, '10':25 };
+$('floors').onchange = () => {
+  const e = ACC[$('floors').value];
+  $('accNote').innerHTML = $('floors').value
+    ? (e>=15 ? '<div class="alert"><b>بناية عالية:</b> نسبة الخطأ بتوصل ±'+e+'% لأن البناية بتبيّن مايلة بصورة القمر الصناعي. الزيارة ضرورية قبل أي التزام بسعر.</div>'
+             : '<div class="note"><b>نسبة الخطأ المتوقعة:</b> ±'+e+'%</div>')
+    : '';
+};
+
+/* ─── البحث عن موقع ─── */
+$('goBtn').onclick = async () => {
+  let t = $('loc').value.trim().replace(/،/g,',');
+  const dec = t.replace(/(\d),(\d)/g,'$1.$2');
+  let m = dec.match(/(-?\d{1,3}\.\d+)[,\s]+(-?\d{1,3}\.\d+)/);
+  if(m && map){ map.setView([+m[1],+m[2]],20); $('results').innerHTML=''; return say('وصلنا'); }
+  if(!t) return say('اكتب اسم المنطقة');
+  $('results').innerHTML = '<div class="note">عم ندوّر...</div>';
+  try{
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&q='+encodeURIComponent(t));
+    const d = await r.json();
+    $('results').innerHTML = d.length ? d.map(x =>
+      '<button class="btn" data-la="'+x.lat+'" data-lo="'+x.lon+'" style="text-align:right;justify-content:flex-start">'
+      + '📍 '+x.display_name.split(',').slice(0,3).join('،')+'</button>').join('')
+      : '<div class="note">ما لقينا المكان — جرّب اسم أوضح أو الصق الإحداثيات.</div>';
+  }catch(e){ $('results').innerHTML = '<div class="note">ما قدرنا ندوّر — الصق الإحداثيات بدل الاسم.</div>'; }
+};
+$('results').onclick = e => { const b = e.target.closest('[data-la]'); if(!b||!map) return;
+  map.setView([+b.dataset.la,+b.dataset.lo],20); $('results').innerHTML=''; go(2); };
+$('meBtn').onclick = () => { if(!navigator.geolocation||!map) return say('ما بيدعم تحديد الموقع');
+  navigator.geolocation.getCurrentPosition(p=>{ map.setView([p.coords.latitude,p.coords.longitude],20); go(2); },
+    ()=>say('ما قدرنا نحدّد موقعك'),{enableHighAccuracy:true,timeout:10000}); };
+
+/* ─── دائرة ─── */
+function ring(val, sub, color, pct){
+  const r=52, c=2*Math.PI*r, off=c*(1-Math.min(1,pct));
+  return '<svg viewBox="0 0 140 140">'
+    + '<circle cx="70" cy="70" r="'+r+'" fill="none" stroke="#EDF3F1" stroke-width="13"/>'
+    + '<circle cx="70" cy="70" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="13" stroke-linecap="round"'
+    + ' stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 70 70)"/>'
+    + '<text x="70" y="68" text-anchor="middle" font-family="monospace" font-size="27" font-weight="700" fill="'+color+'">'+val+'</text>'
+    + '<text x="70" y="88" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#5E7370">'+sub+'</text>'
+    + '</svg>';
+}
+
+/* ─── الحساب والرسم ─── */
+let LAST = null;
+$('pw').onchange = () => {
+  const v = $('pw').value.split('|').map(Number);
+  $('customBox').style.display = v[0]===0 ? 'grid' : 'none';
+  if(v[0]){ $('cl').value=v[1]; $('cw').value=v[2]; $('cp').value=v[0]; }
+  calc();
+};
+['cl','cw','cp','orient'].forEach(i=>$(i).addEventListener('input',calc));
+['orient'].forEach(i=>$(i).addEventListener('change',calc));
 
 function calc(){
   const A = area(pts);
-  if(A < 1){ $('out').innerHTML =
-    '<div class="card" style="text-align:center;color:var(--muted);font-size:13.5px;padding:26px 17px">'
-    + '👆 ارسم حدود السطح على الخريطة (٣ نقاط على الأقل) والنتيجة بتطلع هون.</div>'; return; }
-
-  const [w,pl,pwd] = $('pw').value.split('|').map(Number);
-  const spacing = parseFloat($('mount').value);
-  const uf = parseFloat($('usable').value);
-  const usable = A * uf;
-  const panelArea = pl * pwd * spacing;
-  const n = Math.floor(usable / panelArea);
-  const kwp = n * w / 1000;
-  const dayKWh = kwp * 4.5;
+  if(A<1 || !map){ $('out').innerHTML = '<div class="card"><div class="empty">ارسم السطح أول.</div></div>'; return; }
+  const pl = parseFloat($('cl').value)||2.28, pwd = parseFloat($('cw').value)||1.13, w = parseFloat($('cp').value)||550;
+  const {lat0,lng0,xy} = toXY(pts);
+  const P = layout(xy, pl, pwd);
+  const n = P.length, kwp = n*w/1000;
   const S = sides(pts);
-  const per = S.reduce((a,b)=>a+b,0);
+  const err = ACC[$('floors').value||''];
+  const lo = Math.round(n*(1-err/100)), hi = Math.round(n*(1+err/100));
 
-  const row = (k,s,v) => '<div class="row"><span class="k">'+k+(s?'<small>'+s+'</small>':'')
-    + '</span><span class="v">'+v+'</span></div>';
+  /* رسم الألواح على الخريطة */
+  layers.forEach(l=>map.removeLayer(l)); layers = [];
+  P.forEach(c => layers.push(L.polygon(c.map(q => [
+      lat0 + q[1]/110540, lng0 + q[0]/(111320*Math.cos(lat0*Math.PI/180))
+    ]), {color:'#1B4F72',weight:1,fillColor:'#2B6CB0',fillOpacity:.62}).addTo(map)));
 
-  let h = '<div class="card"><h2>📊 النتيجة</h2>'
-    + '<div class="grid2">'
-    + '<div class="big"><div class="l">مساحة السطح</div><div class="v">'+A.toFixed(0)+'</div>'
-      + '<div class="n">م² — من الرسم على الخريطة</div></div>'
-    + '<div class="big"><div class="l">عدد الألواح</div><div class="v">≈ '+n+'</div>'
-      + '<div class="n">لوح '+w+' واط — تقديري</div></div></div>'
-    + '<div class="big"><div class="l">القدرة المتوقعة</div><div class="v">'+kwp.toFixed(1)+' kWp</div>'
-      + '<div class="n">إنتاج تقريبي '+dayKWh.toFixed(0)+' kWh باليوم (4.5 ساعة شمس)</div></div>'
-    + row('محيط السطح','مجموع الأضلاع', per.toFixed(1)+' م')
-    + row('المساحة الصالحة','بعد خصم الخزانات والدرج', usable.toFixed(0)+' م²')
-    + row('مساحة اللوح مع المسافات','', panelArea.toFixed(2)+' م²')
-    + '<div style="margin-top:12px"><div class="lbl">أطوال الأضلاع</div>'
-    + '<div style="font-family:\'JetBrains Mono\',monospace;font-size:13px;color:var(--teal-2);line-height:2">'
-    + S.map((s,i) => 'ضلع '+(i+1)+': '+s.toFixed(1)+' م').join('  ·  ') + '</div></div>'
+  $('resTitle').textContent = $('jName').value.trim() || 'النتيجة';
+  $('resSub').textContent = 'المساحة ' + A.toFixed(0) + ' م² · نسبة الخطأ ±' + err + '%';
+
+  let h = '<div class="rings">'
+    + '<div class="ring">'+ring(A.toFixed(0),'م² مساحة','#0E8F6E',Math.min(1,A/500))
+      + '<div class="cap">من ' + (A*(1-err/100)).toFixed(0) + ' لـ ' + (A*(1+err/100)).toFixed(0) + ' م²</div></div>'
+    + '<div class="ring">'+ring(kwp.toFixed(1),'kWp قدرة','#B7791F',Math.min(1,kwp/30))
+      + '<div class="cap">إنتاج ~' + (kwp*4.5).toFixed(0) + ' kWh باليوم</div></div>'
+    + '<div class="ring wide">'+ring(n,'لوح '+w+'W','#2B6CB0',Math.min(1,n/60))
+      + '<div class="cap">المدى المتوقع: ' + lo + ' – ' + hi + ' لوح</div></div>'
+    + '</div>';
+
+  h += '<div class="plan" id="planBox"></div>';
+
+  h += '<div class="card"><h2>📐 التفاصيل</h2>'
+    + '<div class="row"><span class="k">المساحة</span><span class="v">'+A.toFixed(0)+' م²</span></div>'
+    + '<div class="row"><span class="k">المحيط</span><span class="v">'+S.reduce((a,b)=>a+b,0).toFixed(1)+' م</span></div>'
+    + '<div class="row"><span class="k">قياس اللوح</span><span class="v">'+pl+' × '+pwd+' م</span></div>'
+    + '<div class="row"><span class="k">بين لوح ولوح</span><span class="v">2 سم</span></div>'
+    + '<div class="row"><span class="k">ممر التنظيف</span><span class="v">40 سم</span></div>'
+    + '<div class="row"><span class="k">نمط الصفوف<small>صفّين، ممر، وبعدها كل 4 صفوف ممر</small></span><span class="v">2 · 4 · 4</span></div>'
+    + '<div class="row"><span class="k">أطوال الأضلاع</span><span class="v">'+S.map(s=>s.toFixed(1)).join(' · ')+' م</span></div>'
     + '</div>';
 
   h += '<div class="card"><h2>⚠️ انتبه</h2>'
-    + '<div class="alert"><b>هذا تقدير أوّلي — مش بديل عن الزيارة:</b> '
-    + 'صور الأقمار الصناعية ممكن تكون قديمة، والبنايات العالية بتبيّن مايلة بالصورة فبتغلط المساحة. '
-    + 'وما بتشوف: ارتفاع الجدران، الظل من بناية جارة، وضع السطح، ولا مكان الإنفرتر.</div>'
-    + '<div class="note"><b>استعملو لـ:</b> تعطي الزبون فكرة أولية وسعر تقريبي على التلفون، '
-    + 'وتعرف إذا المشروع يستاهل زيارة أصلاً. وقبل التنفيذ، الزيارة إجبارية.</div>'
-    + '<div class="note"><b>دقّق بالرسم:</b> كبّر الخريطة لآخرها قبل ما تحدد الزوايا — '
-    + 'كل ما كبّرت، كل ما صارت المساحة أدق.</div></div>';
+    + (err>=15 ? '<div class="alert"><b>بناية عالية — الخطأ ±'+err+'%:</b> صورة القمر الصناعي بتبيّن البناية مايلة، فحواف السطح مزحوطة عن مكانها الحقيقي.</div>' : '')
+    + '<div class="alert"><b>تقدير أوّلي:</b> الأداة ما بتشوف ارتفاع الجدران ولا الظل من بناية جارة ولا وضع السطح. الزيارة ضرورية قبل التنفيذ.</div>'
+    + '<div class="note"><b>التوزيع محسوب على:</b> ألواح نايمة على منصّة موحّدة فوق كل العوائق، بدون هامش حافة.</div>'
+    + '</div>';
 
-  const c = pts.length ? pts.reduce((a,p)=>[a[0]+p[0]/pts.length, a[1]+p[1]/pts.length],[0,0]) : [0,0];
-  const msg = 'مرحبا، قست سطح بأداة MrElectroAI:\n'
-    + '• المساحة: '+A.toFixed(0)+' م²\n'
-    + '• الألواح: ≈ '+n+' لوح '+w+' واط ('+kwp.toFixed(1)+' kWp)\n'
-    + '• الموقع: https://maps.google.com/?q='+c[0].toFixed(6)+','+c[1].toFixed(6)+'\n\n'
-    + 'بدي رأيك بالتوزيع قبل الزيارة.';
-  h += '<button class="btn main" id="planBtn">📐 توليد مخطط بالأبعاد (PDF)</button>';
-  h += '<a class="cta" href="https://wa.me/'+WA+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">'
-    + '<span class="t">ابعتلي القياس والموقع، وبقلّك إذا في مشاكل ظل أو توزيع قبل ما تروح.</span>'
-    + '<span class="b">راسلني 💬</span></a>';
+  const msg = 'قياس سطح — ' + ($('jName').value.trim()||'ورشة') + '\n'
+    + '• المساحة: ' + A.toFixed(0) + ' م² (±' + err + '%)\n'
+    + '• الألواح: ' + n + ' لوح ' + w + 'W (' + kwp.toFixed(1) + ' kWp)\n'
+    + '• الموقع: https://maps.google.com/?q=' + lat0.toFixed(6) + ',' + lng0.toFixed(6);
+  h += '<a class="btn main" href="https://wa.me/'+WA+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">📲 ابعت القياس</a>';
 
   $('out').innerHTML = h;
-  if($('planBtn')) $('planBtn').onclick = () => makePlan(A, S, n, w, kwp, usable);
+  LAST = { A, S, n, w, kwp, err, lo, hi, P, xy, lat0, lng0, pl, pwd };
+  $('planBox').innerHTML = planSVG(true);
 }
 
-/* ═══ توليد المخطط بالأبعاد ═══ */
-function makePlan(A, S, n, w, kwp, usable){
-  const lat0 = pts.reduce((a,p)=>a+p[0],0)/pts.length;
-  const lng0 = pts.reduce((a,p)=>a+p[1],0)/pts.length;
-  const mx = p => (p[1]-lng0) * 111320 * Math.cos(lat0*Math.PI/180);
-  const my = p => (p[0]-lat0) * 110540;
-  const XY = pts.map(p => [mx(p), my(p)]);
+/* ─── مخطط SVG ─── */
+function planSVG(screen){
+  const { A, S, n, w, kwp, err, P, xy } = LAST;
+  const all = xy.concat(...P);
+  const xs = all.map(p=>p[0]), ys = all.map(p=>p[1]);
+  const minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys);
+  const PAD=58, W=680, H=470;
+  const sc = Math.min((W-PAD*2)/((maxX-minX)||1), (H-PAD*2)/((maxY-minY)||1));
+  const px = p => PAD + (p[0]-minX)*sc, py = p => H-PAD - (p[1]-minY)*sc;
 
-  const xs = XY.map(p=>p[0]), ys = XY.map(p=>p[1]);
-  const minX = Math.min(...xs), maxX = Math.max(...xs);
-  const minY = Math.min(...ys), maxY = Math.max(...ys);
-  const wM = maxX-minX, hM = maxY-minY;
-  const PAD = 70, W = 700, H = 520;
-  const sc = Math.min((W-PAD*2)/(wM||1), (H-PAD*2)/(hM||1));
-  const px = p => PAD + (p[0]-minX)*sc;
-  const py = p => H - PAD - (p[1]-minY)*sc;
-
-  const poly = XY.map(p => px(p).toFixed(1)+','+py(p).toFixed(1)).join(' ');
-  let labels = '', dots = '';
-  XY.forEach((p,i) => {
-    const q = XY[(i+1)%XY.length];
-    const cx = (px(p)+px(q))/2, cy = (py(p)+py(q))/2;
-    const ox = (cx - (W/2)) * .09, oy = (cy - (H/2)) * .09;
-    labels += '<text x="'+(cx+ox).toFixed(1)+'" y="'+(cy+oy).toFixed(1)+'" text-anchor="middle" '
-      + 'font-family="monospace" font-size="15" font-weight="700" fill="#0B7A5E">'+S[i].toFixed(1)+' م</text>';
-    dots += '<circle cx="'+px(p).toFixed(1)+'" cy="'+py(p).toFixed(1)+'" r="5" fill="#fff" stroke="#0E8F6E" stroke-width="3"/>'
-      + '<text x="'+(px(p)+9).toFixed(1)+'" y="'+(py(p)-9).toFixed(1)+'" font-family="monospace" font-size="12" fill="#5E7370">'+(i+1)+'</text>';
+  const roof = xy.map(p=>px(p).toFixed(1)+','+py(p).toFixed(1)).join(' ');
+  let pan = P.map(c => '<polygon points="'+c.map(q=>px(q).toFixed(1)+','+py(q).toFixed(1)).join(' ')
+    + '" fill="#2B6CB0" fill-opacity="0.55" stroke="#1B4F72" stroke-width="0.7"/>').join('');
+  let lab = '', dots = '';
+  xy.forEach((p,i)=>{
+    const q = xy[(i+1)%xy.length];
+    const cx=(px(p)+px(q))/2, cy=(py(p)+py(q))/2;
+    const ox=(cx-W/2)*.1, oy=(cy-H/2)*.1;
+    lab += '<text x="'+(cx+ox).toFixed(1)+'" y="'+(cy+oy).toFixed(1)+'" text-anchor="middle" '
+      + 'font-family="monospace" font-size="14" font-weight="700" fill="#0B7A5E">'+S[i].toFixed(1)+' م</text>';
+    dots += '<circle cx="'+px(p).toFixed(1)+'" cy="'+py(p).toFixed(1)+'" r="4.5" fill="#fff" stroke="#0E8F6E" stroke-width="2.5"/>';
   });
+  const cx0=W-52, cy0=54, r=26;
+  const comp = '<circle cx="'+cx0+'" cy="'+cy0+'" r="'+r+'" fill="#fff" stroke="#DCE6E3" stroke-width="1.5"/>'
+    + '<polygon points="'+cx0+','+(cy0-r+3)+' '+(cx0-4.5)+','+(cy0-r+13)+' '+(cx0+4.5)+','+(cy0-r+13)+'" fill="#0D1A17"/>'
+    + '<text x="'+cx0+'" y="'+(cy0-r-5)+'" text-anchor="middle" font-family="monospace" font-size="11" font-weight="700">N</text>'
+    + '<line x1="'+cx0+'" y1="'+cy0+'" x2="'+cx0+'" y2="'+(cy0+r-3)+'" stroke="#E2622C" stroke-width="3" stroke-linecap="round"/>'
+    + '<text x="'+cx0+'" y="'+(cy0+r+14)+'" text-anchor="middle" font-family="monospace" font-size="10" fill="#E2622C">S 180°</text>';
+  let wm='';
+  if(!screen) for(let y=50;y<H;y+=105) for(let x=-40;x<W;x+=205)
+    wm += '<text x="'+x+'" y="'+y+'" font-family="sans-serif" font-size="14" fill="#0E8F6E" opacity="0.07" '
+       + 'transform="rotate(-28 '+x+' '+y+')">MrElectroAI · 79 434 479</text>';
 
-  /* بوصلة: الشمال لفوق، وسهم زاوية الميل */
-  const az = parseFloat($('azim').value)||190;
-  const cx0 = W-60, cy0 = 66, r = 30;
-  const ax = cx0 + r*Math.sin(az*Math.PI/180), ay = cy0 - r*Math.cos(az*Math.PI/180);
-  const compass =
-      '<circle cx="'+cx0+'" cy="'+cy0+'" r="'+r+'" fill="#fff" stroke="#DCE6E3" stroke-width="2"/>'
-    + '<line x1="'+cx0+'" y1="'+(cy0+r-4)+'" x2="'+cx0+'" y2="'+(cy0-r+4)+'" stroke="#B9C6C2" stroke-width="1.5"/>'
-    + '<polygon points="'+cx0+','+(cy0-r+2)+' '+(cx0-5)+','+(cy0-r+13)+' '+(cx0+5)+','+(cy0-r+13)+'" fill="#0D1A17"/>'
-    + '<text x="'+cx0+'" y="'+(cy0-r-6)+'" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#0D1A17">N</text>'
-    + '<line x1="'+cx0+'" y1="'+cy0+'" x2="'+ax.toFixed(1)+'" y2="'+ay.toFixed(1)+'" stroke="#E2622C" stroke-width="3.5" stroke-linecap="round"/>'
-    + '<circle cx="'+ax.toFixed(1)+'" cy="'+ay.toFixed(1)+'" r="4.5" fill="#E2622C"/>'
-    + '<text x="'+cx0+'" y="'+(cy0+r+16)+'" text-anchor="middle" font-family="monospace" font-size="11" fill="#E2622C">'+az+'°</text>';
-
-  /* علامة مائية */
-  let wm = '';
-  for(let y=60; y<H; y+=110) for(let x=-40; x<W; x+=210)
-    wm += '<text x="'+x+'" y="'+y+'" font-family="sans-serif" font-size="15" fill="#0E8F6E" '
-       + 'opacity="0.07" transform="rotate(-28 '+x+' '+y+')">MrElectroAI · 79 434 479</text>';
-
-  const svg = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">'
-    + '<rect width="'+W+'" height="'+H+'" fill="#FFFFFF"/>' + wm
-    + '<polygon points="'+poly+'" fill="#22C79B" fill-opacity="0.16" stroke="#0E8F6E" stroke-width="3" stroke-linejoin="round"/>'
-    + dots + labels + compass
-    + '<text x="'+(W/2)+'" y="'+(H-22)+'" text-anchor="middle" font-family="monospace" font-size="17" '
-      + 'font-weight="700" fill="#0B7A5E">المساحة ≈ '+A.toFixed(0)+' م²</text>'
-    + '<text x="24" y="'+(H-22)+'" font-family="monospace" font-size="11" fill="#5E7370">'
-      + 'مقياس تقريبي · 1 م ≈ '+sc.toFixed(1)+' بكسل</text>'
+  return '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'
+    + '<rect width="'+W+'" height="'+H+'" fill="#fff"/>' + wm
+    + '<polygon points="'+roof+'" fill="#22C79B" fill-opacity="0.12" stroke="#0E8F6E" stroke-width="2.5" stroke-linejoin="round"/>'
+    + pan + dots + lab + comp
+    + '<text x="'+(W/2)+'" y="'+(H-18)+'" text-anchor="middle" font-family="monospace" font-size="15" font-weight="700" fill="#0B7A5E">'
+      + A.toFixed(0)+' م² · '+n+' لوح · '+kwp.toFixed(1)+' kWp</text>'
     + '</svg>';
+}
 
-  const cN = $('cName').value.trim() || '—', cA = $('cArea').value.trim() || '—';
-  const c = [lat0, lng0];
-  $('shTitle').textContent = 'مخطط قياس سطح — تقدير أوّلي';
-  $('shMeta').innerHTML = 'الزبون / البناية: <b>'+cN+'</b><br>المنطقة: '+cA
-    + '<br>الإحداثيات: <span dir="ltr">'+c[0].toFixed(6)+', '+c[1].toFixed(6)+'</span>'
-    + '<br>التاريخ: '+new Date().toLocaleDateString('ar-LB');
-  $('shSvg').innerHTML = svg;
-  $('shTable').innerHTML =
-      '<table><tbody>'
-    + '<tr><td>مساحة السطح الإجمالية</td><td>'+A.toFixed(0)+' م²</td></tr>'
-    + '<tr><td>المساحة الصالحة للتركيب</td><td>'+usable.toFixed(0)+' م²</td></tr>'
-    + '<tr><td>عدد الألواح التقديري</td><td>≈ '+n+' لوح '+w+' واط</td></tr>'
-    + '<tr><td>القدرة المتوقعة</td><td>'+kwp.toFixed(1)+' kWp</td></tr>'
-    + '<tr><td>زاوية توجيه الألواح</td><td>'+az+'° من الشمال</td></tr>'
+function printPlan(){
+  if(!LAST) return say('ما في نتيجة بعد');
+  const { A, S, n, w, kwp, err, lo, hi, lat0, lng0, pl, pwd } = LAST;
+  $('shTitle').textContent = 'مخطط قياس سطح وتوزيع ألواح — تقدير أوّلي';
+  $('shMeta').innerHTML = 'الورشة: <b>'+($('jName').value.trim()||'—')+'</b>'
+    + '<br>الإحداثيات: <span dir="ltr">'+lat0.toFixed(6)+', '+lng0.toFixed(6)+'</span>'
+    + '<br>التاريخ: '+new Date().toLocaleDateString('ar-LB')
+    + '<br>نسبة الخطأ المتوقعة: ±'+err+'%';
+  $('shSvg').innerHTML = planSVG(false);
+  $('shTable').innerHTML = '<table><tbody>'
+    + '<tr><td>مساحة السطح</td><td>'+A.toFixed(0)+' م² (من '+(A*(1-err/100)).toFixed(0)+' لـ '+(A*(1+err/100)).toFixed(0)+')</td></tr>'
+    + '<tr><td>عدد الألواح</td><td>'+n+' لوح (المدى '+lo+' – '+hi+')</td></tr>'
+    + '<tr><td>قدرة اللوح</td><td>'+w+' واط · '+pl+' × '+pwd+' م</td></tr>'
+    + '<tr><td>القدرة الإجمالية</td><td>'+kwp.toFixed(1)+' kWp</td></tr>'
+    + '<tr><td>التوزيع</td><td>ألواح نايمة · 2 سم بين لوح ولوح · ممر 40 سم (2 صف ثم كل 4 صفوف)</td></tr>'
     + '</tbody></table>'
     + '<table><thead><tr><th>الضلع</th><th>الطول</th></tr></thead><tbody>'
-    + S.map((s,i)=>'<tr><td>ضلع '+(i+1)+' (من نقطة '+(i+1)+' لنقطة '+((i+1)%S.length+1)+')</td><td>'+s.toFixed(2)+' م</td></tr>').join('')
+    + S.map((s,i)=>'<tr><td>ضلع '+(i+1)+'</td><td>'+s.toFixed(2)+' م</td></tr>').join('')
     + '</tbody></table>';
+  $('shFt').innerHTML = '<b>تنبيه:</b> هذا المخطط تقدير أوّلي من صور الأقمار الصناعية. '
+    + 'الأبعاد قد تختلف بنسبة ±'+err+'%، ولا يشمل ارتفاع الجدران أو الظل أو وضع السطح. '
+    + 'القياس النهائي يتطلب زيارة ميدانية.<br><br>'
+    + 'صادر عن <b>MrElectroAI</b> — أنور الحسن الجاسم · +961 79 434 479 · mrelectroai@gmail.com<br>' + SITE;
   window.print();
 }
 
-/* الذهاب لموقع */
-$('goBtn').onclick = () => {
-  const t = $('loc').value.trim();
-  let m = t.match(/(-?\d{1,3}\.\d+)[,\s]+(-?\d{1,3}\.\d+)/);
-  if(!m) m = t.match(/@(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)/);
-  if(!m) return alert('ما لقينا إحداثيات. الصق هيك: 33.8938, 35.5018\nأو من خرائط غوغل: شارك ← نسخ الرابط، وافتحو مرة ليصير فيه أرقام.');
-  map.setView([+m[1], +m[2]], 20);
-};
-$('meBtn').onclick = () => {
-  if(!navigator.geolocation) return alert('المتصفح ما بيدعم تحديد الموقع');
-  navigator.geolocation.getCurrentPosition(
-    p => map.setView([p.coords.latitude, p.coords.longitude], 20),
-    () => alert('ما قدرنا نحدّد موقعك'), { enableHighAccuracy:true, timeout:10000 });
-};
-calc();
+drawJobs(); go(0);
 </script>
 </body>
 </html>
