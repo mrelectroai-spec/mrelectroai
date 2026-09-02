@@ -28,6 +28,8 @@ body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',sy
 .bar{background:var(--ink);color:#fff;position:sticky;top:0;z-index:20;border-bottom:3px solid var(--yellow)}
 .bar-in{max-width:660px;margin:0 auto;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{display:flex;align-items:center;gap:11px}
+.barlogo{width:96px;height:31px;flex-shrink:0}
+.hdi{font-size:11px;opacity:.62;border-inline-start:1px solid rgba(255,255,255,.25);padding-inline-start:11px}
 .logo .m{width:38px;height:38px;border-radius:10px;background:var(--yellow);display:grid;place-items:center;flex-shrink:0}
 .logo .m svg{width:20px;height:20px;fill:none;stroke:#2E3846;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .logo b{font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:.14em;display:block;line-height:1.2;color:var(--yellow)}
@@ -86,6 +88,8 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 .emp .em small{display:block;color:var(--muted);font-size:11.5px}
 .dot{width:9px;height:9px;border-radius:50%;background:#C3CCD8;flex-shrink:0}
 .dot.on{background:var(--ok);box-shadow:0 0 0 4px rgba(31,138,85,.16)}
+.uid{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  background:var(--ink);color:var(--yellow);border-radius:6px;padding:2px 7px;margin-inline-start:7px}
 .ext{display:inline-block;font-size:9.5px;font-weight:700;background:var(--warn-soft);
   color:var(--warn);border:1px solid #EBD8AE;border-radius:6px;padding:1px 6px;margin-inline-start:6px}
 .mp{text-decoration:none;font-size:17px;padding:0 4px}
@@ -122,19 +126,29 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 .nav button i{display:block;font-size:19px;font-style:normal;margin-bottom:2px}
 .nav button.on{color:var(--ink);background:var(--brand-soft);font-weight:700}
 
-.lock{position:fixed;inset:0;background:var(--ink);display:grid;place-items:center;padding:22px;z-index:80}
-.lockbox{background:var(--paper);border-radius:20px;padding:28px 22px;width:100%;max-width:340px;text-align:center}
-.lockbox .m{width:60px;height:60px;border-radius:15px;background:var(--yellow);margin:0 auto 14px;display:grid;place-items:center}
-.lockbox .m svg{width:32px;height:32px;fill:none;stroke:#2E3846;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.lockbox h2{font-family:'JetBrains Mono',monospace;font-size:24px;letter-spacing:.16em;color:var(--ink)}
-.lockbox p{font-size:12px;color:var(--muted);margin-bottom:18px}
-#pin{text-align:center;font-size:18px;letter-spacing:3px;font-family:'JetBrains Mono',monospace;padding:14px}
-.perr{font-size:12.5px;color:var(--danger);min-height:20px;margin-top:8px}
-.roles{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
-.roles button{background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:13px 8px;
-  font-family:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
-.roles button.on{border-color:var(--yellow);background:var(--brand-soft);color:var(--ink);font-weight:700}
-
+.lock{position:fixed;inset:0;background:var(--ink);display:grid;place-items:center;padding:20px;z-index:80;
+  background-image:radial-gradient(circle at 50% 8%,rgba(245,225,26,.10),transparent 55%)}
+.lockbox{width:100%;max-width:360px;text-align:center}
+.biglogo{width:min(280px,74vw);height:auto;aspect-ratio:300/96;display:block;margin:0 auto 10px}
+.tagline{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.14em;
+  color:rgba(255,255,255,.55);line-height:1.9;margin-bottom:30px}
+.hello{font-family:'Readex Pro',sans-serif;font-size:19px;color:#fff;margin-bottom:16px}
+.fpbtn{width:104px;height:104px;border-radius:50%;background:rgba(245,225,26,.10);
+  border:2px solid var(--yellow);display:grid;place-items:center;margin:0 auto 12px;cursor:pointer;
+  transition:transform .15s,background .2s}
+.fpbtn:active{transform:scale(.94);background:rgba(245,225,26,.2)}
+.fpbtn svg{width:48px;height:48px;fill:none;stroke:var(--yellow);stroke-width:1.8;stroke-linecap:round}
+.fptxt{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:18px}
+#idbox{text-align:right}
+#idbox .lbl{color:rgba(255,255,255,.6)}
+#uid{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:#fff;
+  text-align:center;font-family:'JetBrains Mono',monospace;font-size:20px;letter-spacing:.12em;padding:15px}
+#uid::placeholder{color:rgba(255,255,255,.28)}
+#uid:focus{border-color:var(--yellow);background:rgba(255,255,255,.11)}
+.perr{font-size:12.5px;color:#FF8B8B;min-height:20px;margin-top:8px}
+.linkbtn{background:none;border:0;color:rgba(255,255,255,.55);font-family:inherit;font-size:12.5px;
+  cursor:pointer;padding:10px;margin-top:6px;text-decoration:underline;width:100%}
+.about-l{color:var(--yellow);opacity:.85;margin-top:22px;font-size:13px}
 .about{background:var(--ink);color:#fff;border-radius:16px;padding:20px;margin-top:20px}
 .about .ah{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .about .ai{width:44px;height:44px;border-radius:12px;background:#22C79B;color:#04140F;
@@ -148,9 +162,10 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
   border-radius:11px;padding:12px;margin-top:11px;text-decoration:none;font-size:13.5px}
 .about .ab2{background:transparent;color:#22C79B;border:1px solid #22C79B}
 
-.toast{position:fixed;bottom:86px;left:50%;transform:translate(-50%,90px);background:var(--ink);
-  color:#fff;font-size:13.5px;font-weight:600;padding:11px 20px;border-radius:999px;
-  transition:transform .3s;z-index:90;max-width:88%;text-align:center}
+.toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-140%);background:var(--ink);
+  color:#fff;font-size:13.5px;font-weight:600;padding:11px 20px;border-radius:14px;
+  transition:transform .28s;z-index:99;max-width:90%;text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.12)}
 .toast.on{transform:translate(-50%,0)}
 .modal{position:fixed;inset:0;background:rgba(46,56,70,.6);display:none;place-items:center;padding:18px;z-index:95}
 .modal.on{display:grid}
@@ -192,6 +207,21 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 <div class="wm" id="wm"></div>
 
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<symbol id="i-logo" viewBox="0 0 300 96">
+  <g fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="square">
+    <path d="M14 74 H44 L64 26 L84 74"/><path d="M56 52 H74"/>
+    <path d="M128 26 H176 M128 50 H166 M128 74 H176 M128 26 V74"/>
+    <path d="M190 26 H238 M190 50 H228 M190 74 H238 M190 26 V74"/>
+    <path d="M252 26 H288 M252 26 V74 M252 74 H288"/>
+  </g>
+  <g fill="#F5E11A">
+    <circle cx="14" cy="74" r="4"/><circle cx="64" cy="26" r="4"/><circle cx="84" cy="74" r="4"/>
+    <circle cx="176" cy="26" r="4"/><circle cx="176" cy="74" r="4"/><circle cx="166" cy="50" r="4"/>
+    <circle cx="238" cy="26" r="4"/><circle cx="238" cy="74" r="4"/><circle cx="228" cy="50" r="4"/>
+    <circle cx="288" cy="26" r="4"/><circle cx="288" cy="74" r="4"/>
+    <path d="M112 8 L86 54 h16 L96 92 L124 44 h-16 z"/>
+  </g>
+</symbol>
 <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></symbol>
 <symbol id="i-fp" viewBox="0 0 24 24">
   <path d="M12 3a9 9 0 0 0-9 9v3"/><path d="M21 15v-3a9 9 0 0 0-4.5-7.8"/>
@@ -202,26 +232,32 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 <!-- الدخول -->
 <div class="lock" id="lock">
   <div class="lockbox">
-    <div class="m"><svg><use href="#i-bolt"/></svg></div>
-    <h2>AZEEC</h2>
-    <p style="font-size:10.5px;letter-spacing:.06em;line-height:1.7">ANTHONY ZEIDAN FOR ELECTRICAL<br>ENGINEERING AND CONTRACTING</p><p style="margin-bottom:16px">نظام الحضور والانصراف</p>
-    <div class="roles">
-      <button data-r="emp" class="on">👷 موظف</button>
-      <button data-r="mgr">👔 مدير</button>
+    <svg class="biglogo"><use href="#i-logo"/></svg>
+    <div class="tagline">ANTHONY ZEIDAN FOR ELECTRICAL<br>ENGINEERING AND CONTRACTING</div>
+
+    <!-- الحالة أ: دخول بالبصمة (مسجّل من قبل) -->
+    <div id="quick" style="display:none">
+      <div class="hello" id="helloName">—</div>
+      <button class="fpbtn" id="quickBio"><svg><use href="#i-fp"/></svg></button>
+      <div class="fptxt" id="quickTxt">المس البصمة للدخول</div>
+      <button class="linkbtn" id="useId">دخول بالـ ID بدل البصمة</button>
     </div>
-    <div id="empPick"></div>
-    <div id="pinBox" style="display:none">
-      <label class="lbl">كود المدير</label>
-      <input id="pin" type="password" maxlength="24" placeholder="كود المدير" autocomplete="off">
+
+    <!-- الحالة ب: إدخال ID -->
+    <div id="idbox">
+      <label class="lbl">رقم الدخول (ID)</label>
+      <input id="uid" placeholder="AZ-1000" autocomplete="off" autocapitalize="characters">
+      <div class="perr" id="perr"></div>
+      <button class="btn main" id="enter">دخول</button>
     </div>
-    <div class="perr" id="perr"></div>
-    <button class="btn main" id="enter">دخول</button>
+
+    <button class="linkbtn about-l" id="aboutLink">نبذة عنّا</button>
   </div>
 </div>
 
 <div class="bar"><div class="bar-in">
-  <div class="logo"><span class="m"><svg><use href="#i-bolt"/></svg></span>
-    <b>AZEEC<small id="hdSub">نظام الحضور</small></b></div>
+  <div class="logo"><svg class="barlogo"><use href="#i-logo"/></svg>
+    <span class="hdi" id="hdSub">نظام الحضور</span></div>
   <button class="hbtn" id="lockBtn">🔒 خروج</button>
 </div></div>
 
@@ -310,6 +346,15 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
     </div>
     <div class="card"><h2>📍 المواقع المسجّلة</h2><div id="locList"></div></div>
 
+    <div class="card">
+      <h2>🗄️ البيانات والتخزين</h2>
+      <div id="dataInfo"></div>
+      <div class="note" style="margin-top:0"><b>تنظيف تلقائي:</b> صور التحقق بتنمسح لحالها بعد
+        <b>شهرين</b> من تاريخها. سجلّات الحضور والساعات بتضل محفوظة ما بتنمسح.</div>
+      <button class="btn" id="expBtn">⬇️ تصدير نسخة احتياطية</button>
+      <button class="btn dang" id="wipeBtn">🗑️ مسح كل البيانات</button>
+    </div>
+
     <div class="about" id="about">
       <div class="ah"><span class="ai">⚡</span>
         <span><b>MrElectroAI</b><small>أنور الحسن الجاسم — مؤسس ومطوّر النظام</small></span></div>
@@ -339,6 +384,28 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
     <input id="siteNew" placeholder="أو اكتب اسم ورشة جديدة" class="mb">
     <button class="btn main" id="siteGo">متابعة</button>
     <button class="btn" id="siteX">إلغاء</button>
+  </div>
+</div>
+
+<!-- تأكيد المسح -->
+<div class="modal" id="wipeM">
+  <div class="mbox">
+    <h3 style="color:var(--danger)">⚠️ مسح كل البيانات</h3>
+    <div class="alert" style="margin-top:0">
+      <b>انتبه — هالخطوة ما بترجع:</b><br>
+      رح ينمسح <b>كل شي</b>: الموظفين، سجلّات الحضور، الساعات، الأجور، الصور، والورش المحفوظة.
+      ما في طريقة تسترجعهن إلا من نسخة احتياطية.
+    </div>
+    <div id="wipeStats" class="note"></div>
+    <p style="margin:12px 0 6px;font-size:13px"><b>خطوتين للتأكيد:</b></p>
+    <label class="lbl">1) اكتب كلمة <b style="color:var(--danger)">مسح</b> للتأكيد</label>
+    <input id="wipeWord" placeholder="اكتب: مسح" class="mb" autocomplete="off">
+    <label class="lbl">2) كود المدير</label>
+    <input id="wipePin" type="password" placeholder="كود المدير" class="mb" autocomplete="off">
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px">
+      وبعدها رح يطلب منك <b>بصمة أو Face ID</b> كخطوة أخيرة.</p>
+    <button class="btn dang" id="wipeGo">🗑️ متابعة المسح</button>
+    <button class="btn" id="wipeX">إلغاء</button>
   </div>
 </div>
 
@@ -373,6 +440,7 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 const CO = {
   name:"AZEEC",
   full:"Anthony Zeidan for Electrical Engineering and Contracting",
+  mgrId:"AZ-ADMIN",
   mgrPin:"71941921Azeec",
   lunch:1,                                   /* ساعة غدا بتنخصم */
   radius:500,                                /* نطاق التسجيل بالمتر */
@@ -391,6 +459,16 @@ function load(){ try{ const r = localStorage.getItem(KEY);
     return { emps:d.emps||[], logs:d.logs||[], locs:d.locs||[CO.home] };
   }catch(e){ return { emps:[], logs:[], locs:[CO.home] }; } }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(db)); }catch(e){} }
+/* ─── تنظيف تلقائي: شيل صور أقدم من شهرين ─── */
+function autoClean(){
+  const limit = Date.now() - 60*24*3600*1000;   /* شهرين */
+  let n = 0;
+  db.logs.forEach(l => { if(l.photo && new Date(l.in).getTime() < limit){ delete l.photo; n++; } });
+  if(n){ db.lastClean = new Date().toISOString(); save(); }
+  return n;
+}
+autoClean();
+
 if(navigator.storage && navigator.storage.persist)
   navigator.storage.persisted().then(p=>{ if(!p) navigator.storage.persist(); });
 
@@ -408,33 +486,96 @@ const dayName = d => ['الأحد','الإثنين','الثلاثاء','الأر
   $('wm').innerHTML = s;
 })();
 
-/* ─── الدخول ─── */
-document.querySelectorAll('.roles button').forEach(b => b.onclick = () => {
-  document.querySelectorAll('.roles button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on'); role = b.dataset.r;
-  $('pinBox').style.display = role==='mgr' ? 'block' : 'none';
-  $('empPick').style.display = role==='emp' ? 'block' : 'none';
-  drawEmpPick();
-});
-function drawEmpPick(){
-  $('empPick').innerHTML = db.emps.length
-    ? '<label class="lbl">مين أنت؟</label><select id="whoSel">'
-      + db.emps.map(e=>'<option value="'+e.id+'">'+e.name+'</option>').join('') + '</select>'
-    : '<div class="note" style="margin:0 0 12px"><b>ما في موظفين بعد.</b> المدير لازم يضيفهم أول.</div>';
+/* ─── الجلسة والدخول ─── */
+const SKEY = 'azeec_session';
+function sess(){ try{ return JSON.parse(localStorage.getItem(SKEY)||'null'); }catch(e){ return null; } }
+function setSess(s){ try{ localStorage.setItem(SKEY, JSON.stringify(s)); }catch(e){} }
+
+function idOf(v){
+  v = (v||'').trim().toUpperCase();
+  if(!v) return null;
+  if(v === CO.mgrId.toUpperCase() || v === CO.mgrPin.toUpperCase()) return { role:'mgr' };
+  const e = db.emps.find(x => (x.uid||'').toUpperCase() === v);
+  return e ? { role:'emp', id:e.id, name:e.name } : null;
 }
-$('enter').onclick = () => {
-  if(role === 'mgr'){
-    if($('pin').value.trim() !== CO.mgrPin){ $('perr').textContent='الكود غلط'; $('pin').value=''; return; }
-    $('lock').style.display='none'; $('hdSub').textContent='لوحة المدير'; buildNav(true); go(1);
-  } else {
-    if(!db.emps.length) return say('ما في موظفين — المدير لازم يضيفهم');
-    me = $('whoSel').value; $('lock').style.display='none';
-    const e = emp(me); $('hdSub').textContent = e ? e.name : 'موظف';
-    buildNav(false); go(0);
+
+function showQuick(s){
+  $('quick').style.display = 'block';
+  $('idbox').style.display = 'none';
+  $('helloName').textContent = s.role==='mgr' ? 'أهلاً بالمدير' : 'أهلاً ' + (s.name||'');
+}
+function showId(){
+  $('quick').style.display = 'none';
+  $('idbox').style.display = 'block';
+  setTimeout(()=>$('uid').focus(), 200);
+}
+$('useId').onclick = showId;
+$('aboutLink').onclick = () => window.open(DEV.site, '_blank');
+
+/* WebAuthn — تسجيل ثم تحقق */
+async function bioRegister(label){
+  if(!window.PublicKeyCredential) return { ok:true, skip:true };
+  try{
+    const ch = new Uint8Array(32); crypto.getRandomValues(ch);
+    const c = await navigator.credentials.create({ publicKey:{
+      challenge: ch, rp:{ name:CO.name },
+      user:{ id:new TextEncoder().encode(label), name:label, displayName:label },
+      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection:{ authenticatorAttachment:'platform', userVerification:'required', residentKey:'preferred' },
+      timeout:45000 }});
+    const raw = new Uint8Array(c.rawId);
+    return { ok:true, cred: btoa(String.fromCharCode(...raw)) };
+  }catch(e){ return { ok:false }; }
+}
+async function bioVerify(cred){
+  if(!window.PublicKeyCredential) return { ok:true, skip:true };
+  try{
+    const ch = new Uint8Array(32); crypto.getRandomValues(ch);
+    const pk = { challenge: ch, timeout:45000, userVerification:'required' };
+    if(cred){
+      const raw = Uint8Array.from(atob(cred), c=>c.charCodeAt(0));
+      pk.allowCredentials = [{ type:'public-key', id: raw, transports:['internal'] }];
+    }
+    await navigator.credentials.get({ publicKey: pk });
+    return { ok:true };
+  }catch(e){ return { ok:false }; }
+}
+
+async function enterAs(s, firstTime){
+  if(firstTime){
+    say('فعّل البصمة ليصير الدخول أسرع');
+    const r = await bioRegister(s.role==='mgr' ? 'AZEEC-MGR' : s.name || s.id);
+    if(r.ok && r.cred) s.cred = r.cred;
+    setSess(s);
   }
+  $('lock').style.display = 'none';
+  if(s.role === 'mgr'){ role='mgr'; me=null; $('hdSub').textContent='لوحة المدير'; buildNav(true); go(1); }
+  else { role='emp'; me=s.id; $('hdSub').textContent = s.name || 'موظف'; buildNav(false); go(0); }
+}
+
+$('quickBio').onclick = async () => {
+  const s = sess(); if(!s) return showId();
+  $('quickTxt').textContent = 'عم نتحقق...';
+  const r = await bioVerify(s.cred);
+  if(!r.ok){ $('quickTxt').textContent = 'ما زبطت — جرّب مرة تانية أو استعمل الـ ID'; return; }
+  $('quickTxt').textContent = 'المس البصمة للدخول';
+  enterAs(s, false);
 };
-$('lockBtn').onclick = () => { me=null; $('pin').value=''; $('perr').textContent='';
-  $('lock').style.display='grid'; drawEmpPick(); };
+
+$('enter').onclick = async () => {
+  const v = $('uid').value.trim();
+  const r = idOf(v);
+  if(!r){ $('perr').textContent = 'رقم الدخول غلط'; $('uid').value=''; return; }
+  $('perr').textContent = '';
+  await enterAs(r, true);
+};
+$('uid').addEventListener('keydown', e => { if(e.key==='Enter') $('enter').click(); });
+
+$('lockBtn').onclick = () => {
+  me = null; $('uid').value=''; $('perr').textContent='';
+  $('lock').style.display='grid';
+  const s = sess(); if(s) showQuick(s); else showId();
+};
 
 function buildNav(isMgr){
   $('nav').innerHTML = isMgr
@@ -450,7 +591,7 @@ function go(k){ scr=k;
   if(k===0) drawPunch();
   if(k===1) drawMgr();
   if(k===2) drawEmps();
-  if(k===3) drawLocs();
+  if(k===3){ drawLocs(); drawData(); }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -671,16 +812,18 @@ $('addEmp').onclick = () => {
   const n = $('eName').value.trim(), w = parseFloat($('eWage').value)||0;
   if(!n) return say('اكتب الاسم');
   if(!w) return say('حدّد اليومية');
-  db.emps.push({ id:'e'+Date.now().toString(36), name:n, wage:w,
+  const uid = 'AZ-' + (1000 + db.emps.length + 1);
+  db.emps.push({ id:'e'+Date.now().toString(36), uid, name:n, wage:w,
     start:+$('eStart').value, end:+$('eEnd').value, phone:$('ePhone').value.trim() });
+  say('ID الموظف: ' + uid);
   $('eName').value=''; $('eWage').value=''; $('ePhone').value='';
   save(); drawEmps(); say('انضاف الموظف');
 };
 function drawEmps(){
   $('empList').innerHTML = db.emps.length ? db.emps.map(e =>
     '<div class="emp"><span class="av">'+(e.name[0]||'?')+'</span>'
-    + '<span class="em"><b>'+e.name+'</b><small>يومية '+money(e.wage)+' · دوام '
-    + e.start+':00 – '+(e.end>12?e.end-12:e.end)+':00 · ساعة غدا</small></span>'
+    + '<span class="em"><b>'+e.name+'<span class="uid">'+(e.uid||'—')+'</span></b><small>يومية '+money(e.wage)
+    + ' · دوام '+e.start+':00 – '+(e.end>12?e.end-12:e.end)+':00</small></span>'
     + '<button class="x" data-del="'+e.id+'">×</button></div>').join('')
     : '<div class="empty">ما في موظفين.</div>';
 }
@@ -747,6 +890,47 @@ $('pdfBtn').onclick = () => {
   window.print();
 };
 
+/* ─── البيانات ─── */
+function drawData(){
+  if(!$('dataInfo')) return;
+  const photos = db.logs.filter(l=>l.photo).length;
+  const size = Math.round(JSON.stringify(db).length/1024);
+  $('dataInfo').innerHTML =
+      '<div class="line"><span class="lm"><b>الموظفين</b></span><span class="lv">'+db.emps.length+'</span></div>'
+    + '<div class="line"><span class="lm"><b>سجلّات الحضور</b></span><span class="lv">'+db.logs.length+'</span></div>'
+    + '<div class="line"><span class="lm"><b>الصور المحفوظة</b><small>بتنمسح تلقائياً بعد شهرين</small></span>'
+      + '<span class="lv">'+photos+'</span></div>'
+    + '<div class="line"><span class="lm"><b>حجم البيانات</b></span><span class="lv">'+size+' KB</span></div>'
+    + (db.lastClean ? '<div class="line"><span class="lm"><b>آخر تنظيف تلقائي</b></span>'
+      + '<span class="lv">'+new Date(db.lastClean).toLocaleDateString('ar-LB')+'</span></div>' : '');
+}
+
+$('expBtn').onclick = () => {
+  const blob = new Blob([JSON.stringify(db,null,1)],{type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'azeec-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+  say('تم التصدير — احفظ الملف بمكان أمان');
+};
+
+$('wipeBtn').onclick = () => {
+  const photos = db.logs.filter(l=>l.photo).length;
+  $('wipeStats').innerHTML = '<b>اللي رح ينمسح:</b> '+db.emps.length+' موظف · '
+    + db.logs.length+' سجل حضور · '+photos+' صورة · '+(db.sites||[]).length+' ورشة محفوظة.';
+  $('wipeWord').value=''; $('wipePin').value='';
+  $('wipeM').classList.add('on');
+};
+$('wipeX').onclick = () => $('wipeM').classList.remove('on');
+$('wipeGo').onclick = async () => {
+  if($('wipeWord').value.trim() !== 'مسح') return say('اكتب كلمة «مسح» بالضبط');
+  if($('wipePin').value.trim() !== CO.mgrPin) return say('كود المدير غلط');
+  say('⏳ تأكيد أخير بالبصمة...');
+  const b = await bio();
+  if(!b.ok) return say('ما تأكدنا من البصمة — ما انمسح شي');
+  db = { emps:[], logs:[], locs:[CO.home], sites:[] };
+  save(); $('wipeM').classList.remove('on');
+  say('انمسحت كل البيانات'); drawData(); drawEmps(); drawLocs(); drawMgr();
+};
+
 function bigPhoto(src){
   const d = document.createElement('div');
   d.className = 'modal on'; d.style.zIndex = 99;
@@ -759,7 +943,11 @@ function bigPhoto(src){
 
 $('devWa').href = 'https://wa.me/'+DEV.wa+'?text='+encodeURIComponent('مرحبا، بدي نظام متل تبع AZEEC لشركتي.');
 $('devSite').href = DEV.site;
-drawEmpPick();
+(function init(){
+  const s = sess();
+  if(s && (s.role==='mgr' || db.emps.some(e=>e.id===s.id))) showQuick(s);
+  else { localStorage.removeItem(SKEY); showId(); }
+})();
 </script>
 </body>
 </html>
