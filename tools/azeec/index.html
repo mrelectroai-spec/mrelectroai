@@ -9,11 +9,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F4F6FA;--paper:#FFF;--soft:#EBF0F7;--line:#D7DFEA;--ink:#0B1F3A;--muted:#5B6B80;
-  --brand:#1B6FD4;--brand-2:#14549F;--brand-soft:#E4EEFB;
+  --bg:#F3F5F8;--paper:#FFF;--soft:#EDF0F4;--line:#D6DCE4;--ink:#2E3846;--muted:#5F6B7A;
+  --brand:#C9A800;--brand-2:#8F7700;--brand-soft:#FDF7DC;--yellow:#F5E11A;
   --ok:#1F8A55;--ok-soft:#E4F4EC;--warn:#B7791F;--warn-soft:#FBF3E3;
   --danger:#B03A3A;--danger-soft:#FBEAEA;
-  --shadow:0 2px 8px rgba(11,31,58,.05),0 12px 30px rgba(11,31,58,.07);
+  --shadow:0 2px 8px rgba(46,56,70,.06),0 12px 30px rgba(46,56,70,.08);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
@@ -21,16 +21,16 @@ body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',sy
 :where(a,button,input,select):focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
 /* علامة مائية */
-.wm{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;opacity:.045}
+.wm{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;opacity:.05}
 .wm span{position:absolute;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;
-  color:var(--brand);white-space:nowrap;transform:rotate(-28deg)}
+  color:var(--ink);white-space:nowrap;transform:rotate(-28deg)}
 
-.bar{background:var(--ink);color:#fff;position:sticky;top:0;z-index:20;border-bottom:3px solid var(--brand)}
+.bar{background:var(--ink);color:#fff;position:sticky;top:0;z-index:20;border-bottom:3px solid var(--yellow)}
 .bar-in{max-width:660px;margin:0 auto;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{display:flex;align-items:center;gap:11px}
-.logo .m{width:38px;height:38px;border-radius:10px;background:var(--brand);display:grid;place-items:center;flex-shrink:0}
-.logo .m svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.logo b{font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:.1em;display:block;line-height:1.2}
+.logo .m{width:38px;height:38px;border-radius:10px;background:var(--yellow);display:grid;place-items:center;flex-shrink:0}
+.logo .m svg{width:20px;height:20px;fill:none;stroke:#2E3846;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.logo b{font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:.14em;display:block;line-height:1.2;color:var(--yellow)}
 .logo small{font-size:10px;opacity:.7;display:block}
 .hbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;
   border-radius:9px;padding:7px 11px;font-family:inherit;font-size:12px;cursor:pointer}
@@ -54,7 +54,7 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;
   border-radius:12px;font-family:inherit;font-size:14.5px;font-weight:600;border:1px solid var(--line);
   background:var(--soft);color:var(--ink);cursor:pointer;margin-top:9px;text-decoration:none}
-.btn.main{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn.main{background:var(--yellow);color:var(--ink);border-color:#DCC800;font-weight:700}
 .btn.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
 .btn.dang{color:var(--danger);border-color:#E7C3C3;background:var(--danger-soft)}
 .btn.sm{width:auto;padding:9px 14px;font-size:13px;margin:0}
@@ -63,10 +63,10 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 
 /* البصمة */
 .punch{text-align:center;padding:26px 16px}
-.fp{width:120px;height:120px;border-radius:50%;background:var(--brand-soft);border:3px solid var(--brand);
+.fp{width:120px;height:120px;border-radius:50%;background:var(--brand-soft);border:3px solid var(--yellow);
   display:grid;place-items:center;margin:0 auto 16px;cursor:pointer;transition:transform .15s}
 .fp:active{transform:scale(.95)}
-.fp svg{width:58px;height:58px;fill:none;stroke:var(--brand);stroke-width:1.8;stroke-linecap:round}
+.fp svg{width:58px;height:58px;fill:none;stroke:var(--ink);stroke-width:1.8;stroke-linecap:round}
 .fp.in{background:var(--ok-soft);border-color:var(--ok)}
 .fp.in svg{stroke:var(--ok)}
 .punch h3{font-family:'Readex Pro',sans-serif;font-size:19px;margin-bottom:4px}
@@ -86,6 +86,9 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 .emp .em small{display:block;color:var(--muted);font-size:11.5px}
 .dot{width:9px;height:9px;border-radius:50%;background:#C3CCD8;flex-shrink:0}
 .dot.on{background:var(--ok);box-shadow:0 0 0 4px rgba(31,138,85,.16)}
+.ext{display:inline-block;font-size:9.5px;font-weight:700;background:var(--warn-soft);
+  color:var(--warn);border:1px solid #EBD8AE;border-radius:6px;padding:1px 6px;margin-inline-start:6px}
+.mp{text-decoration:none;font-size:17px;padding:0 4px}
 .emp .x{background:none;border:0;color:var(--danger);font-size:19px;cursor:pointer;padding:0 4px}
 
 .sum{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:12px}
@@ -117,20 +120,20 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 .nav button{flex:1;background:none;border:0;font-family:inherit;font-size:11px;color:var(--muted);
   padding:7px 3px;cursor:pointer;border-radius:10px}
 .nav button i{display:block;font-size:19px;font-style:normal;margin-bottom:2px}
-.nav button.on{color:var(--brand);background:var(--brand-soft);font-weight:700}
+.nav button.on{color:var(--ink);background:var(--brand-soft);font-weight:700}
 
 .lock{position:fixed;inset:0;background:var(--ink);display:grid;place-items:center;padding:22px;z-index:80}
 .lockbox{background:var(--paper);border-radius:20px;padding:28px 22px;width:100%;max-width:340px;text-align:center}
-.lockbox .m{width:60px;height:60px;border-radius:15px;background:var(--brand);margin:0 auto 14px;display:grid;place-items:center}
-.lockbox .m svg{width:32px;height:32px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.lockbox h2{font-family:'JetBrains Mono',monospace;font-size:20px;letter-spacing:.12em}
+.lockbox .m{width:60px;height:60px;border-radius:15px;background:var(--yellow);margin:0 auto 14px;display:grid;place-items:center}
+.lockbox .m svg{width:32px;height:32px;fill:none;stroke:#2E3846;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lockbox h2{font-family:'JetBrains Mono',monospace;font-size:24px;letter-spacing:.16em;color:var(--ink)}
 .lockbox p{font-size:12px;color:var(--muted);margin-bottom:18px}
-#pin{text-align:center;font-size:26px;letter-spacing:12px;font-family:'JetBrains Mono',monospace;padding:14px}
+#pin{text-align:center;font-size:18px;letter-spacing:3px;font-family:'JetBrains Mono',monospace;padding:14px}
 .perr{font-size:12.5px;color:var(--danger);min-height:20px;margin-top:8px}
 .roles{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
 .roles button{background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:13px 8px;
   font-family:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
-.roles button.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-2);font-weight:700}
+.roles button.on{border-color:var(--yellow);background:var(--brand-soft);color:var(--ink);font-weight:700}
 
 .about{background:var(--ink);color:#fff;border-radius:16px;padding:20px;margin-top:20px}
 .about .ah{display:flex;align-items:center;gap:12px;margin-bottom:12px}
@@ -149,12 +152,26 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
   color:#fff;font-size:13.5px;font-weight:600;padding:11px 20px;border-radius:999px;
   transition:transform .3s;z-index:90;max-width:88%;text-align:center}
 .toast.on{transform:translate(-50%,0)}
+.modal{position:fixed;inset:0;background:rgba(46,56,70,.6);display:none;place-items:center;padding:18px;z-index:95}
+.modal.on{display:grid}
+.mbox{background:var(--paper);border-radius:18px;padding:20px;width:100%;max-width:400px;
+  max-height:92vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.mbox h3{font-family:'Readex Pro',sans-serif;font-size:17px;margin-bottom:5px}
+.mbox p{font-size:12.5px;color:var(--muted);margin-bottom:13px;line-height:1.7}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.chip{font-size:12.5px;color:var(--muted);background:var(--soft);border:1px solid var(--line);
+  border-radius:999px;padding:8px 14px;cursor:pointer}
+.chip.on{background:var(--yellow);border-color:#DCC800;color:var(--ink);font-weight:700}
+.camwrap{background:#000;border-radius:14px;overflow:hidden;margin-bottom:12px;aspect-ratio:3/4}
+.camwrap video,.camwrap img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb{width:38px;height:38px;border-radius:9px;object-fit:cover;border:1px solid var(--line);flex-shrink:0}
 
 #sheet{display:none}
 @media print{
   body>*:not(#sheet){display:none!important}
   #sheet{display:block!important;color:#000;font-size:13px}
-  #sheet .hd{border-bottom:3px solid #1B6FD4;padding-bottom:10px;margin-bottom:14px}
+  #sheet .hd{border-bottom:4px solid #F5E11A;padding-bottom:10px;margin-bottom:14px}
+  #sheet .hd .en{font-size:9.5px;letter-spacing:.08em;color:#666;margin-top:2px}
   #sheet .hd h2{font-family:'JetBrains Mono',monospace;font-size:23px;letter-spacing:.1em}
   #sheet .hd .sv{font-size:12px;color:#444;margin-top:2px}
   #sheet h3{font-size:16px;margin:0 0 10px}
@@ -162,10 +179,10 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
   #sheet table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px}
   #sheet th,#sheet td{border:1px solid #999;padding:6px 8px;text-align:right}
   #sheet th{background:#eee}
-  #sheet tr.grp td{background:#E4EEFB;font-weight:700}
+  #sheet tr.grp td{background:#FDF7DC;font-weight:700}
   #sheet tr.tot td{background:#F0F4F9;font-weight:700;font-size:13px}
-  #sheet .ft{margin-top:16px;padding-top:10px;border-top:2px solid #1B6FD4;font-size:11px;line-height:1.85;color:#333}
-  #sheet .sig .sn{font-size:15px;font-weight:700;color:#0B1F3A}
+  #sheet .ft{margin-top:16px;padding-top:10px;border-top:3px solid #F5E11A;font-size:11px;line-height:1.85;color:#333}
+  #sheet .sig .sn{font-size:15px;font-weight:700;color:#2E3846}
   @page{margin:12mm}
 }
 </style>
@@ -187,7 +204,7 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
   <div class="lockbox">
     <div class="m"><svg><use href="#i-bolt"/></svg></div>
     <h2>AZEEC</h2>
-    <p>نظام الحضور والانصراف</p>
+    <p style="font-size:10.5px;letter-spacing:.06em;line-height:1.7">ANTHONY ZEIDAN FOR ELECTRICAL<br>ENGINEERING AND CONTRACTING</p><p style="margin-bottom:16px">نظام الحضور والانصراف</p>
     <div class="roles">
       <button data-r="emp" class="on">👷 موظف</button>
       <button data-r="mgr">👔 مدير</button>
@@ -195,7 +212,7 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
     <div id="empPick"></div>
     <div id="pinBox" style="display:none">
       <label class="lbl">كود المدير</label>
-      <input id="pin" type="tel" inputmode="numeric" maxlength="8" placeholder="••••">
+      <input id="pin" type="password" maxlength="24" placeholder="كود المدير" autocomplete="off">
     </div>
     <div class="perr" id="perr"></div>
     <button class="btn main" id="enter">دخول</button>
@@ -217,6 +234,7 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
       <h3 id="pName">—</h3>
       <div class="clock" id="clock">--:--</div>
       <p id="pHint">اضغط البصمة لتسجيل الدخول</p>
+  <p style="font-size:11.5px;color:var(--muted);margin-top:6px">الدخول بدو: ورشة + بصمة + صورة + موقع</p>
       <div class="state out" id="pState">خارج الدوام</div>
       <div id="pMsg"></div>
     </div>
@@ -278,7 +296,8 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
   <!-- 3 المواقع -->
   <section class="scr" data-k="3">
     <h1>مواقع العمل</h1>
-    <p class="lede">الموظف بيقدر يسجّل من أي موقع مسجّل هون — ضمن 500 متر.</p>
+    <p class="lede">الموظف بيسجّل من أي مكان بلبنان. المواقع هون بس لتسمية المكان بالكشف —
+      إذا كان قريب من وحدة منهن بيطلع اسمها، وإلا بيطلع «موقع خارجي» مع المسافة.</p>
     <div class="card">
       <h2>➕ إضافة موقع</h2>
       <div class="mb"><label class="lbl">اسم الموقع</label><input id="lName" placeholder="ورشة الزلقا"></div>
@@ -311,8 +330,38 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 <div class="nav" id="nav"></div>
 <div class="toast" id="toast"></div>
 
+<!-- اختيار الورشة -->
+<div class="modal" id="siteM">
+  <div class="mbox">
+    <h3>ب أي ورشة عم تشتغل؟</h3>
+    <p>اختار من اللائحة أو اكتب ورشة جديدة — بتنحفظ للكل.</p>
+    <div class="chips" id="siteChips"></div>
+    <input id="siteNew" placeholder="أو اكتب اسم ورشة جديدة" class="mb">
+    <button class="btn main" id="siteGo">متابعة</button>
+    <button class="btn" id="siteX">إلغاء</button>
+  </div>
+</div>
+
+<!-- الكاميرا -->
+<div class="modal" id="camM">
+  <div class="mbox">
+    <h3>صورة التحقق</h3>
+    <p>صوّر حالك لتأكيد الحضور — الصورة بتنحفظ مع التسجيل.</p>
+    <div class="camwrap"><video id="vid" autoplay playsinline muted></video>
+      <canvas id="cnv" style="display:none"></canvas>
+      <img id="shot" style="display:none">
+    </div>
+    <button class="btn main" id="snapBtn">📸 التقاط</button>
+    <button class="btn" id="retakeBtn" style="display:none">🔄 إعادة</button>
+    <button class="btn ok" id="camOk" style="display:none">✅ تأكيد وتسجيل</button>
+    <button class="btn" id="camX">إلغاء</button>
+  </div>
+</div>
+
 <div id="sheet">
-  <div class="hd"><h2>AZEEC</h2><div class="sv">كشف الحضور الأسبوعي</div></div>
+  <div class="hd"><h2>AZEEC</h2>
+    <div class="en">ANTHONY ZEIDAN FOR ELECTRICAL ENGINEERING AND CONTRACTING</div>
+    <div class="sv">كشف الحضور والانصراف الأسبوعي</div></div>
   <h3 id="shTitle"></h3>
   <div class="meta" id="shMeta"></div>
   <div id="shBody"></div>
@@ -323,7 +372,8 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 /* ═════════ للتخصيص ═════════ */
 const CO = {
   name:"AZEEC",
-  mgrPin:"1234",
+  full:"Anthony Zeidan for Electrical Engineering and Contracting",
+  mgrPin:"71941921Azeec",
   lunch:1,                                   /* ساعة غدا بتنخصم */
   radius:500,                                /* نطاق التسجيل بالمتر */
   home:{ name:"مقر الشركة — خلف مخفر النبعة", lat:33.8864259, lng:35.5441350 }
@@ -414,7 +464,9 @@ setInterval(()=>{ const n=new Date();
 function dist(a,b,c,d){ const R=6371000,p=Math.PI/180;
   const x=Math.sin((c-a)*p/2)**2 + Math.cos(a*p)*Math.cos(c*p)*Math.sin((d-b)*p/2)**2;
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x)); }
+const fmtD = m => m >= 1000 ? (m/1000).toFixed(1)+' كم' : Math.round(m)+' م';
 function nearest(lat,lng){
+  if(!db.locs.length) return { loc:null, d:Infinity };
   let best=null, bd=Infinity;
   db.locs.forEach(l => { const d = dist(lat,lng,l.lat,l.lng); if(d<bd){ bd=d; best=l; } });
   return { loc:best, d:bd };
@@ -444,30 +496,100 @@ function geo(){
 }
 const openLog = () => db.logs.find(l => l.emp===me && !l.out);
 
-$('fpBtn').onclick = async () => {
+let pending = null;   /* بيانات التسجيل قيد التنفيذ */
+
+/* ─── مسار التسجيل: ورشة ← بصمة ← موقع ← صورة ← حفظ ─── */
+$('fpBtn').onclick = () => {
   if(!me) return;
+  if(openLog()) return doPunch(null);      /* الخروج ما بدو ورشة ولا صورة */
+  drawSiteChips(); $('siteNew').value=''; pending = { site:null };
+  $('siteM').classList.add('on');
+};
+function drawSiteChips(){
+  db.sites = db.sites || [];
+  $('siteChips').innerHTML = db.sites.length
+    ? db.sites.map(s=>'<span class="chip" data-s="'+s+'">'+s+'</span>').join('')
+    : '<span style="font-size:12.5px;color:var(--muted)">ما في ورش محفوظة — اكتب وحدة تحت.</span>';
+}
+$('siteChips').onclick = e => { const c = e.target.closest('[data-s]'); if(!c) return;
+  document.querySelectorAll('#siteChips .chip').forEach(x=>x.classList.remove('on'));
+  c.classList.add('on'); pending.site = c.dataset.s; $('siteNew').value=''; };
+$('siteNew').addEventListener('input', () => {
+  document.querySelectorAll('#siteChips .chip').forEach(x=>x.classList.remove('on'));
+  pending.site = $('siteNew').value.trim() || null; });
+$('siteX').onclick = () => { $('siteM').classList.remove('on'); pending=null; };
+$('siteGo').onclick = async () => {
+  const s = ($('siteNew').value.trim() || pending.site || '').trim();
+  if(!s) return say('اختار ورشة أو اكتب وحدة');
+  pending.site = s;
+  db.sites = db.sites || [];
+  if(!db.sites.includes(s)){ db.sites.push(s); save(); }
+  $('siteM').classList.remove('on');
+  openCam();
+};
+
+/* ─── الكاميرا ─── */
+let stream = null;
+async function openCam(){
+  $('camM').classList.add('on');
+  $('shot').style.display='none'; $('vid').style.display='block';
+  $('snapBtn').style.display='flex'; $('retakeBtn').style.display='none'; $('camOk').style.display='none';
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:640, height:854 }, audio:false });
+    $('vid').srcObject = stream;
+  }catch(e){
+    closeCam();
+    say('ما قدرنا نفتح الكاميرا — لازم تسمح فيها');
+  }
+}
+function closeCam(){
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+  $('camM').classList.remove('on');
+}
+$('snapBtn').onclick = () => {
+  const v = $('vid'), c = $('cnv');
+  c.width = 480; c.height = Math.round(480 * v.videoHeight / v.videoWidth || 640);
+  c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+  $('shot').src = c.toDataURL('image/jpeg', 0.55);
+  $('shot').style.display='block'; $('vid').style.display='none';
+  $('snapBtn').style.display='none'; $('retakeBtn').style.display='flex'; $('camOk').style.display='flex';
+};
+$('retakeBtn').onclick = () => { $('shot').style.display='none'; $('vid').style.display='block';
+  $('snapBtn').style.display='flex'; $('retakeBtn').style.display='none'; $('camOk').style.display='none'; };
+$('camX').onclick = () => { closeCam(); pending=null; };
+$('camOk').onclick = () => { const img = $('shot').src; closeCam(); doPunch(img); };
+
+/* ─── التنفيذ ─── */
+async function doPunch(photo){
   const isIn = !!openLog();
   $('pMsg').innerHTML = '<div class="note" style="margin-top:14px">⏳ عم نتحقق من البصمة والموقع...</div>';
   const b = await bio();
-  if(!b.ok){ $('pMsg').innerHTML = '<div class="alert">❌ '+b.note+' — جرّب مرة تانية.</div>'; return; }
+  if(!b.ok){ $('pMsg').innerHTML = '<div class="alert">❌ '+b.note+' — جرّب مرة تانية.</div>'; pending=null; return; }
   const g = await geo();
-  if(!g){ $('pMsg').innerHTML = '<div class="alert"><b>ما قدرنا نحدّد موقعك.</b> فعّل الموقع وجرّب مرة تانية.</div>'; return; }
+  if(!g){ $('pMsg').innerHTML = '<div class="alert"><b>ما قدرنا نحدّد موقعك.</b> فعّل الموقع وجرّب مرة تانية.</div>'; pending=null; return; }
+
   const nr = nearest(g.lat,g.lng);
-  if(nr.d > CO.radius){
-    $('pMsg').innerHTML = '<div class="alert"><b>أنت برّا نطاق العمل.</b><br>'
-      + 'أقرب موقع: '+nr.loc.name+' — بعيد '+Math.round(nr.d)+' متر (المسموح '+CO.radius+' م).</div>';
-    return;
-  }
+  const near = nr.loc && nr.d <= CO.radius ? nr.loc.name : null;
+  const coords = g.lat.toFixed(6)+','+g.lng.toFixed(6);
   const now = new Date().toISOString();
+
   if(isIn){
-    const l = openLog(); l.out = now; l.outLoc = nr.loc.name; save();
-    $('pMsg').innerHTML = '<div class="okbox">✅ تم تسجيل <b>الخروج</b> الساعة '+hhmm(now)+' من '+nr.loc.name+'</div>';
+    const l = openLog(); l.out = now; l.outXY = coords;
+    l.outLoc = near || 'موقع خارجي'; save();
+    $('pMsg').innerHTML = '<div class="okbox">✅ تم تسجيل <b>الخروج</b> الساعة '+hhmm(now)
+      + '<br><span style="font-size:12px;opacity:.85">📍 '+l.outLoc+'</span></div>';
   } else {
-    db.logs.push({ id:'l'+Date.now().toString(36), emp:me, in:now, out:null, inLoc:nr.loc.name }); save();
-    $('pMsg').innerHTML = '<div class="okbox">✅ تم تسجيل <b>الدخول</b> الساعة '+hhmm(now)+' من '+nr.loc.name+'</div>';
+    db.logs.push({ id:'l'+Date.now().toString(36), emp:me, in:now, out:null,
+      site: pending ? pending.site : '—', inXY:coords, inLoc: near || 'موقع خارجي',
+      photo: photo || null, acc: Math.round(g.acc||0) });
+    save();
+    $('pMsg').innerHTML = '<div class="okbox">✅ تم تسجيل <b>الدخول</b> الساعة '+hhmm(now)
+      + '<br><span style="font-size:12px;opacity:.85">🏗️ '+(pending?pending.site:'—')
+      + ' · 📍 دقة '+Math.round(g.acc||0)+' م</span></div>';
   }
+  pending = null;
   drawPunch();
-};
+}
 
 function drawPunch(){
   const e = emp(me); if(!e) return;
@@ -481,7 +603,8 @@ function drawPunch(){
   $('wDays').textContent = w.days; $('wHours').textContent = w.hours.toFixed(1);
   $('wPay').textContent = w.pay.toFixed(0);
   $('myLog').innerHTML = w.rows.length ? w.rows.map(r =>
-    '<div class="line"><span class="lm"><b>'+r.day+' '+r.date+'</b>'
+    '<div class="line">'+(r.photo?'<img class="thumb" src="'+r.photo+'">':'')
+    + '<span class="lm"><b>'+r.day+' '+r.date+(r.site?' · '+r.site:'')+'</b>'
     + '<small>'+r.in+' → '+(r.out||'—')+' · '+r.loc+'</small></span>'
     + '<span class="lv">'+r.h.toFixed(1)+' س</span></div>').join('')
     : '<div class="empty">ما في تسجيلات هالأسبوع.</div>';
@@ -505,7 +628,8 @@ function weekOf(empId, ref){
       const h = l.out ? Math.max(0,(new Date(l.out)-new Date(l.in))/3600000 - CO.lunch) : 0;
       hours += h; days.add(new Date(l.in).toDateString());
       rows.push({ day:dayName(l.in), date:new Date(l.in).toLocaleDateString('ar-LB',{day:'numeric',month:'numeric'}),
-        in:hhmm(l.in), out:l.out?hhmm(l.out):null, h, loc:l.inLoc||'—' });
+        in:hhmm(l.in), out:l.out?hhmm(l.out):null, h, loc:l.inLoc||'—',
+        site:l.site||'', photo:l.photo||null, xy:l.inXY||'' });
     });
   return { rows, hours, days:days.size, pay:hours*rate, start:s, end:e2 };
 }
@@ -523,9 +647,12 @@ function drawMgr(){
   $('liveList').innerHTML = db.emps.length ? db.emps.map(e => {
     const l = db.logs.find(x=>x.emp===e.id && !x.out);
     return '<div class="emp'+(l?' on':'')+'"><span class="dot'+(l?' on':'')+'"></span>'
-      + '<span class="av">'+(e.name[0]||'?')+'</span>'
-      + '<span class="em"><b>'+e.name+'</b><small>'
-      + (l ? 'داخل منذ '+hhmm(l.in)+' · '+(l.inLoc||'—') : 'خارج الدوام')+'</small></span></div>';
+      + (l && l.photo ? '<img class="thumb" src="'+l.photo+'" onclick="bigPhoto(this.src)">'
+                      : '<span class="av">'+(e.name[0]||'?')+'</span>')
+      + '<span class="em"><b>'+e.name+(l && l.site ? '<span class="ext">'+l.site+'</span>' : '')+'</b>'
+      + '<small>' + (l ? 'داخل منذ '+hhmm(l.in)+' · '+(l.inLoc||'—') : 'خارج الدوام')+'</small></span>'
+      + (l && l.inXY ? '<a class="mp" href="https://maps.google.com/?q='+l.inXY+'" target="_blank" rel="noopener" title="شوف الموقع">📍</a>' : '')
+      + '</div>';
   }).join('') : '<div class="empty">ما في موظفين — ضيفهم من تبويب الموظفين.</div>';
 
   $('weekTable').innerHTML = db.emps.length ? db.emps.map(e => {
@@ -599,17 +726,18 @@ $('pdfBtn').onclick = () => {
   let b = '', gt=0, gh=0;
   db.emps.forEach(e => {
     const w = weekOf(e.id); gt += w.pay; gh += w.hours;
-    b += '<table><thead><tr><th colspan="4" style="background:#E4EEFB">'+e.name
+    b += '<table><thead><tr><th colspan="5" style="background:#FDF7DC">'+e.name
       + ' — يومية '+money(e.wage)+'</th></tr>'
-      + '<tr><th>اليوم</th><th>دخول</th><th>خروج</th><th>ساعات</th></tr></thead><tbody>';
+      + '<tr><th>اليوم</th><th>الورشة</th><th>دخول</th><th>خروج</th><th>ساعات</th></tr></thead><tbody>';
     if(w.rows.length) w.rows.forEach(r =>
-      b += '<tr><td>'+r.day+' '+r.date+'</td><td>'+r.in+'</td><td>'+(r.out||'—')+'</td><td>'+r.h.toFixed(1)+'</td></tr>');
-    else b += '<tr><td colspan="4">لا يوجد تسجيلات</td></tr>';
+      b += '<tr><td>'+r.day+' '+r.date+'</td><td>'+(r.site||'—')+'</td><td>'+r.in+'</td>'
+        + '<td>'+(r.out||'—')+'</td><td>'+r.h.toFixed(1)+'</td></tr>');
+    else b += '<tr><td colspan="5">لا يوجد تسجيلات</td></tr>';
     b += '<tr class="tot"><td>'+w.days+' يوم</td><td colspan="2">مجموع الساعات '+w.hours.toFixed(1)+'</td>'
-      + '<td>'+money(w.pay)+'</td></tr></tbody></table>';
+      + '<td colspan="2">'+money(w.pay)+'</td></tr></tbody></table>';
   });
   b += '<table><tbody><tr class="tot"><td>الإجمالي العام</td><td>'+gh.toFixed(1)+' ساعة</td>'
-    + '<td>'+money(gt)+'</td></tr></tbody></table>';
+    + '<td colspan="3">'+money(gt)+'</td></tr></tbody></table>';
   $('shBody').innerHTML = b;
 
   $('shFt').innerHTML = '<div class="sig"><div class="sn">'+CO.name+'</div>'
@@ -618,6 +746,16 @@ $('pdfBtn').onclick = () => {
     + '<span dir="ltr">'+DEV.phone+'</span> · '+DEV.site.replace('https://','')+'</div>';
   window.print();
 };
+
+function bigPhoto(src){
+  const d = document.createElement('div');
+  d.className = 'modal on'; d.style.zIndex = 99;
+  d.innerHTML = '<div class="mbox" style="max-width:340px"><h3>صورة التحقق</h3>'
+    + '<img src="'+src+'" style="width:100%;border-radius:12px;margin-bottom:10px">'
+    + '<button class="btn">إغلاق</button></div>';
+  d.onclick = () => d.remove();
+  document.body.appendChild(d);
+}
 
 $('devWa').href = 'https://wa.me/'+DEV.wa+'?text='+encodeURIComponent('مرحبا، بدي نظام متل تبع AZEEC لشركتي.');
 $('devSite').href = DEV.site;
