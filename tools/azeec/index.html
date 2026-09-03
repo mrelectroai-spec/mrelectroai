@@ -34,6 +34,11 @@ body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',sy
 .logo .m svg{width:20px;height:20px;fill:none;stroke:#2E3846;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .logo b{font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:.14em;display:block;line-height:1.2;color:var(--yellow)}
 .logo small{font-size:10px;opacity:.7;display:block}
+.sdot{width:9px;height:9px;border-radius:50%;background:#8A94A0;display:block;flex-shrink:0}
+.sdot.ok{background:#4ADE80;box-shadow:0 0 0 3px rgba(74,222,128,.2)}
+.sdot.sync{background:#F5E11A;animation:pulse 1s infinite}
+.sdot.off{background:#FF7A7A}
+@keyframes pulse{50%{opacity:.35}}
 .hbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;
   border-radius:9px;padding:7px 11px;font-family:inherit;font-size:12px;cursor:pointer}
 
@@ -258,7 +263,10 @@ select:focus,input:focus{border-color:var(--brand);background:var(--paper)}
 <div class="bar"><div class="bar-in">
   <div class="logo"><svg class="barlogo"><use href="#i-logo"/></svg>
     <span class="hdi" id="hdSub">نظام الحضور</span></div>
-  <button class="hbtn" id="lockBtn">🔒 خروج</button>
+  <div style="display:flex;align-items:center;gap:9px">
+    <i class="sdot off" id="sdot" title="حالة المزامنة"></i>
+    <button class="hbtn" id="lockBtn">🔒 خروج</button>
+  </div>
 </div></div>
 
 <div class="wrap">
@@ -450,6 +458,10 @@ const DEV = { name:"MrElectroAI", person:"أنور الحسن الجاسم",
   wa:"96179434479", phone:"+961 79 434 479", site:"https://mrelectroai-spec.github.io/mrelectroai/" };
 /* ═════════ نهاية التخصيص ═════════ */
 
+/* ═════ Supabase — نفس مشروعك ═════ */
+const SB_URL = "https://utjpvjnhffapbwpbkkuc.supabase.co";
+const SB_KEY = "sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
+
 const $ = i => document.getElementById(i);
 const KEY = 'azeec_v1';
 let db = load(), role = 'emp', me = null, scr = 0;
@@ -458,7 +470,54 @@ function load(){ try{ const r = localStorage.getItem(KEY);
     const d = r ? JSON.parse(r) : {};
     return { emps:d.emps||[], logs:d.logs||[], locs:d.locs||[CO.home] };
   }catch(e){ return { emps:[], logs:[], locs:[CO.home] }; } }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(db)); }catch(e){} }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(db)); }catch(e){} cloudPush(); }
+
+/* ═════ المزامنة مع السحابة ═════ */
+let syncing = false, dirty = false;
+async function api(path, opts={}){
+  const r = await fetch(SB_URL+'/rest/v1/'+path, { ...opts,
+    headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json',
+      Prefer:'return=representation,resolution=merge-duplicates', ...(opts.headers||{}) }});
+  if(!r.ok) throw new Error(await r.text());
+  return r.status===204 ? null : r.json();
+}
+function setDot(s){ const d=$('sdot'); if(d) d.className='sdot '+s; }
+
+async function cloudPull(){
+  try{
+    setDot('sync');
+    const [emps, logs, meta] = await Promise.all([
+      api('az_emps?select=*'), api('az_logs?select=*&order=tin.desc&limit=800'), api('az_meta?select=*')
+    ]);
+    db.emps = emps.map(e=>({ id:e.id, uid:e.uid, name:e.name, wage:+e.wage,
+      start:e.wstart, end:e.wend, phone:e.phone||'' }));
+    db.logs = logs.map(l=>({ id:l.id, emp:l.emp, in:l.tin, out:l.tout, site:l.site,
+      inLoc:l.inloc, outLoc:l.outloc, inXY:l.inxy, outXY:l.outxy, photo:l.photo, acc:l.acc }));
+    const m = meta[0];
+    if(m){ db.locs = m.locs || db.locs; db.sites = m.sites || db.sites || []; }
+    try{ localStorage.setItem(KEY, JSON.stringify(db)); }catch(e){}
+    setDot('ok'); return true;
+  }catch(e){ setDot('off'); return false; }
+}
+async function cloudPush(){
+  if(syncing){ dirty = true; return; }
+  syncing = true;
+  try{
+    setDot('sync');
+    await api('az_emps', { method:'POST', body: JSON.stringify(db.emps.map(e=>({
+      id:e.id, uid:e.uid, name:e.name, wage:e.wage, wstart:e.start, wend:e.end, phone:e.phone||'' }))) });
+    if(db.logs.length) await api('az_logs', { method:'POST', body: JSON.stringify(db.logs.map(l=>({
+      id:l.id, emp:l.emp, tin:l.in, tout:l.out, site:l.site||null, inloc:l.inLoc||null,
+      outloc:l.outLoc||null, inxy:l.inXY||null, outxy:l.outXY||null, photo:l.photo||null, acc:l.acc||null }))) });
+    await api('az_meta', { method:'POST', body: JSON.stringify([{ id:1, locs:db.locs, sites:db.sites||[] }]) });
+    setDot('ok');
+  }catch(e){ setDot('off'); }
+  syncing = false;
+  if(dirty){ dirty = false; cloudPush(); }
+}
+async function cloudDelete(table, id){
+  try{ await api(table+'?id=eq.'+id, { method:'DELETE' }); }catch(e){}
+}
 /* ─── تنظيف تلقائي: شيل صور أقدم من شهرين ─── */
 function autoClean(){
   const limit = Date.now() - 60*24*3600*1000;   /* شهرين */
@@ -564,6 +623,11 @@ $('quickBio').onclick = async () => {
 
 $('enter').onclick = async () => {
   const v = $('uid').value.trim();
+  if(!v) return;
+  $('perr').textContent = '';
+  $('enter').disabled = true; $('enter').textContent = 'عم نتحقق...';
+  await cloudPull();
+  $('enter').disabled = false; $('enter').textContent = 'دخول';
   const r = idOf(v);
   if(!r){ $('perr').textContent = 'رقم الدخول غلط'; $('uid').value=''; return; }
   $('perr').textContent = '';
@@ -828,8 +892,11 @@ function drawEmps(){
     : '<div class="empty">ما في موظفين.</div>';
 }
 $('empList').onclick = e => { const b = e.target.closest('[data-del]'); if(!b) return;
-  db.emps = db.emps.filter(x=>x.id!==b.dataset.del);
-  db.logs = db.logs.filter(x=>x.emp!==b.dataset.del); save(); drawEmps(); };
+  const id = b.dataset.del;
+  db.logs.filter(x=>x.emp===id).forEach(l=>cloudDelete('az_logs', l.id));
+  cloudDelete('az_emps', id);
+  db.emps = db.emps.filter(x=>x.id!==id);
+  db.logs = db.logs.filter(x=>x.emp!==id); save(); drawEmps(); };
 
 /* ─── المواقع ─── */
 $('hereBtn').onclick = async () => {
@@ -926,6 +993,10 @@ $('wipeGo').onclick = async () => {
   say('⏳ تأكيد أخير بالبصمة...');
   const b = await bio();
   if(!b.ok) return say('ما تأكدنا من البصمة — ما انمسح شي');
+  try{
+    await api('az_logs?id=not.is.null', { method:'DELETE' });
+    await api('az_emps?id=not.is.null', { method:'DELETE' });
+  }catch(e){}
   db = { emps:[], logs:[], locs:[CO.home], sites:[] };
   save(); $('wipeM').classList.remove('on');
   say('انمسحت كل البيانات'); drawData(); drawEmps(); drawLocs(); drawMgr();
@@ -943,10 +1014,21 @@ function bigPhoto(src){
 
 $('devWa').href = 'https://wa.me/'+DEV.wa+'?text='+encodeURIComponent('مرحبا، بدي نظام متل تبع AZEEC لشركتي.');
 $('devSite').href = DEV.site;
-(function init(){
+(async function init(){
   const s = sess();
-  if(s && (s.role==='mgr' || db.emps.some(e=>e.id===s.id))) showQuick(s);
-  else { localStorage.removeItem(SKEY); showId(); }
+  if(s) showQuick(s); else showId();
+  await cloudPull();
+  if(s && s.role!=='mgr' && !db.emps.some(e=>e.id===s.id)){
+    localStorage.removeItem(SKEY); showId(); say('حسابك مش موجود — تواصل مع المدير');
+  }
+  /* تحديث كل نصف دقيقة طالما التطبيق مفتوح */
+  setInterval(async () => {
+    if($('lock').style.display === 'none'){
+      await cloudPull();
+      if(scr===0) drawPunch(); else if(scr===1) drawMgr();
+      else if(scr===2) drawEmps(); else if(scr===3){ drawLocs(); drawData(); }
+    }
+  }, 30000);
 })();
 </script>
 </body>
