@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>وصّلني — الإدارة</title>
+<meta name="theme-color" content="#14261B">
+<meta name="robots" content="noindex,nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#0E7C3A;--g2:#0A5F2C;--gs:#E3F3E8;--y:#F5B301;--ys:#FDF6E3;--ink:#14261B;--muted:#6B7C72;
+  --line:#E2E8E3;--soft:#F3F6F4;--paper:#FFF;--bg:#F6F7F5;--danger:#C0392B;--ds:#FDEDEA;
+  --sh:0 2px 8px rgba(20,38,27,.06),0 12px 28px rgba(20,38,27,.07)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px;line-height:1.65;padding-bottom:80px}
+:where(button,input,select):focus-visible{outline:2px solid var(--g);outline-offset:2px}
+.bar{background:var(--ink);color:#fff;position:sticky;top:0;z-index:30;padding-top:env(safe-area-inset-top)}
+.bar-in{max-width:680px;margin:0 auto;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bar b{font-family:'Readex Pro',sans-serif;font-size:18px;display:block;line-height:1.2}
+.bar small{font-size:10.5px;opacity:.7;display:block}
+.dot{width:9px;height:9px;border-radius:50%;background:#9AA6A0;display:block}
+.dot.ok{background:#7BE8A5}.dot.sync{background:var(--y)}.dot.off{background:#FF8B8B}
+.wrap{max-width:680px;margin:0 auto;padding:16px 15px 30px}
+.scr{display:none}.scr.on{display:block}
+h1{font-family:'Readex Pro',sans-serif;font-size:24px;margin-bottom:4px}
+.lede{color:var(--muted);font-size:13.5px;margin-bottom:15px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px;
+  margin-bottom:12px;box-shadow:var(--sh)}
+.card>h2{font-family:'Readex Pro',sans-serif;font-size:15.5px;margin-bottom:13px;padding-bottom:10px;
+  border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.badge{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--gs);color:var(--g2);
+  border-radius:8px;padding:3px 9px}
+.badge.hot{background:var(--ys);color:#8A6100}
+.stat{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:13px}
+.stat div{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:12px 5px;
+  text-align:center;box-shadow:var(--sh)}
+.stat b{display:block;font-family:'JetBrains Mono',monospace;font-size:19px}
+.stat span{font-size:10px;color:var(--muted)}
+.stat .a{color:var(--g2)}.stat .b{color:var(--y)}.stat .c{color:var(--danger)}
+.row{display:flex;align-items:center;gap:12px;background:var(--soft);border:1px solid var(--line);
+  border-radius:14px;padding:12px;margin-bottom:9px}
+.row img{width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0;cursor:pointer}
+.row .av{width:52px;height:52px;border-radius:12px;background:var(--gs);display:grid;place-items:center;
+  font-size:24px;flex-shrink:0}
+.row .ri{flex:1;min-width:0}
+.row .ri b{display:block;font-size:14.5px}
+.row .ri small{display:block;font-size:11.5px;color:var(--muted)}
+.chip{display:inline-block;font-size:10.5px;font-weight:700;border-radius:7px;padding:2px 8px;margin-inline-end:5px}
+.chip.g{background:var(--gs);color:var(--g2)}
+.chip.y{background:var(--ys);color:#8A6100}
+.chip.r{background:var(--ds);color:var(--danger)}
+.thumbs{display:flex;gap:6px;margin-top:8px}
+.thumbs img{width:56px;height:44px;border-radius:8px;object-fit:cover;cursor:pointer}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;
+  border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;border:0;
+  background:var(--soft);color:var(--ink);cursor:pointer;margin-top:8px}
+.btn.main{background:var(--g);color:#fff}
+.btn.dang{background:var(--ds);color:var(--danger)}
+.btn.line{background:var(--paper);border:1.5px solid var(--line)}
+.btn.sm{width:auto;padding:9px 15px;font-size:13px;margin:0}
+.brow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px;line-height:1.9}
+.note{font-size:12.5px;color:var(--muted);background:var(--ys);border-radius:12px;padding:12px;line-height:1.8}
+.note b{color:#8A6100}
+input{width:100%;font-family:inherit;font-size:16px;background:var(--soft);border:1.5px solid transparent;
+  border-radius:13px;padding:14px;color:var(--ink)}
+input:focus{border-color:var(--g);background:#fff}
+.nav{position:fixed;inset-inline:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);
+  padding:8px 12px calc(8px + env(safe-area-inset-bottom));display:flex;gap:6px;z-index:30}
+.nav button{flex:1;background:none;border:0;font-family:inherit;font-size:10.5px;color:var(--muted);
+  padding:7px 3px;cursor:pointer;border-radius:11px}
+.nav button i{display:block;font-size:19px;font-style:normal;margin-bottom:2px}
+.nav button.on{color:var(--g);background:var(--gs);font-weight:700}
+.lock{position:fixed;inset:0;background:var(--ink);display:grid;place-items:center;padding:22px;z-index:80}
+.lockbox{width:100%;max-width:330px;text-align:center}
+.lockbox .ic{font-size:52px;margin-bottom:12px}
+.lockbox h2{font-family:'Readex Pro',sans-serif;font-size:21px;color:#fff;margin-bottom:4px}
+.lockbox p{font-size:12.5px;color:rgba(255,255,255,.6);margin-bottom:20px}
+#pin{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;text-align:center;
+  font-family:'JetBrains Mono',monospace;letter-spacing:2px}
+.perr{font-size:12.5px;color:#FF8B8B;min-height:20px;margin-top:8px}
+.toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translate(-50%,-160%);
+  background:var(--ink);color:#fff;font-size:13.5px;font-weight:600;padding:12px 20px;border-radius:14px;
+  transition:transform .3s;z-index:900;max-width:90%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.toast.on{transform:translate(-50%,0)}
+.tr{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.tr:last-child{border:0}
+.tr b{font-family:'JetBrains Mono',monospace;color:var(--g2)}
+</style>
+</head>
+<body>
+
+<div class="lock" id="lock">
+  <div class="lockbox">
+    <div class="ic">🛡️</div>
+    <h2>لوحة الإدارة</h2>
+    <p>وصّلني — توكتوك وسيارات عكار</p>
+    <input id="pin" type="password" placeholder="كود الإدارة" autocomplete="off">
+    <div class="perr" id="perr"></div>
+    <button class="btn main" id="enter">دخول</button>
+  </div>
+</div>
+
+<div class="bar"><div class="bar-in">
+  <span><b>الإدارة</b><small>وصّلني</small></span>
+  <span style="display:flex;align-items:center;gap:10px">
+    <i class="dot off" id="dot"></i>
+    <button class="btn sm line" id="out">خروج</button></span>
+</div></div>
+
+<div class="wrap">
+  <div class="stat">
+    <div><b class="a" id="s1">0</b><span>متاح</span></div>
+    <div><b class="b" id="s2">0</b><span>طلب مفتوح</span></div>
+    <div><b class="a" id="s3">0</b><span>رحلة اليوم</span></div>
+    <div><b class="c" id="s4">0</b><span>بلاغ</span></div>
+  </div>
+
+  <section class="scr on" data-k="0">
+    <div class="card"><h2>⏳ طلبات التسجيل <span class="badge hot" id="b1">0</span></h2><div id="pend"></div></div>
+    <div class="card"><h2>🚕 الرحلات الجارية</h2><div id="live"></div></div>
+  </section>
+
+  <section class="scr" data-k="1">
+    <div class="card"><h2>🛺 السائقين <span class="badge" id="b2">0</span></h2><div id="drvs"></div></div>
+  </section>
+
+  <section class="scr" data-k="2">
+    <div class="card"><h2>📊 الرحلات</h2><div id="rides"></div></div>
+    <div class="card"><h2>💰 متوسط الأسعار الحقيقية</h2><div id="prices"></div></div>
+  </section>
+
+  <section class="scr" data-k="3">
+    <div class="card"><h2>🚨 البلاغات</h2><div id="reps"></div></div>
+  </section>
+</div>
+
+<div class="nav">
+  <button data-k="0" class="on"><i>🏠</i>الرئيسية</button>
+  <button data-k="1"><i>🛺</i>السائقين</button>
+  <button data-k="2"><i>📊</i>الرحلات</button>
+  <button data-k="3"><i>🚨</i>البلاغات</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
+const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
+const PIN="71736401ANWAR";
+const VEH={tuktuk:{n:'توكتوك',i:'🛺'},car:{n:'سيارة',i:'🚗'}};
+const ST={searching:['عم يدوّر','y'],accepted:['رايح عالزبون','g'],arrived:['وصل للزبون','g'],
+  onboard:['بالطريق','g'],done:['خلصت','g'],cancelled:['ملغاة','r']};
+
+const $=i=>document.getElementById(i);
+let poll=null;
+const money=n=>Math.round(n||0).toLocaleString('en-US');
+function say(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500);}
+function dot(s){$('dot').className='dot '+s;}
+async function api(p,o={}){const r=await fetch(SB_URL+'/rest/v1/'+p,{...o,headers:{apikey:SB_KEY,
+  Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'return=representation',...(o.headers||{})}});
+  if(!r.ok)throw new Error(await r.text()); return r.status===204?null:r.json();}
+const sb=async fn=>{try{dot('sync');const r=await fn();dot('ok');return r}catch(e){dot('off');return null}};
+
+$('enter').onclick=()=>{ if($('pin').value.trim()!==PIN){$('perr').textContent='كود غلط';$('pin').value='';return;}
+  sessionStorage.setItem('w_adm','1'); $('lock').style.display='none'; go(0); load(); poll=setInterval(load,8000); };
+$('pin').addEventListener('keydown',e=>{if(e.key==='Enter')$('enter').click()});
+$('out').onclick=()=>{sessionStorage.removeItem('w_adm');location.reload()};
+if(sessionStorage.getItem('w_adm')){$('lock').style.display='none';load();poll=setInterval(load,8000);}
+
+document.querySelector('.nav').addEventListener('click',e=>{
+  const b=e.target.closest('[data-k]');if(!b)return;
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); go(+b.dataset.k);});
+function go(k){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('on',+s.dataset.k===k));
+  window.scrollTo({top:0,behavior:'smooth'});}
+
+async function load(){
+  const [D,R,P]=await Promise.all([
+    sb(()=>api('w_drivers?select=*&order=created_at.desc')),
+    sb(()=>api('w_rides?select=*&order=created_at.desc&limit=300')),
+    sb(()=>api('w_reports?select=*&order=created_at.desc&limit=60'))
+  ]);
+  if(!D)return;
+  const today=R.filter(r=>new Date(r.created_at).toDateString()===new Date().toDateString());
+  const openR=R.filter(r=>['searching','accepted','arrived','onboard'].includes(r.status));
+  $('s1').textContent=D.filter(d=>d.online&&d.status==='approved').length;
+  $('s2').textContent=R.filter(r=>r.status==='searching').length;
+  $('s3').textContent=today.length;
+  $('s4').textContent=P.filter(r=>r.status==='open').length;
+
+  /* طلبات التسجيل */
+  const pend=D.filter(d=>d.status==='pending');
+  $('b1').textContent=pend.length;
+  $('pend').innerHTML=pend.length?pend.map(d=>
+    '<div class="row"><img src="'+d.photo+'" onclick="big(this.src)">'
+    +'<div class="ri"><b>'+d.name+'</b><small>'+d.phone+'</small>'
+    +'<small><span class="chip g">'+VEH[d.vtype||'tuktuk'].i+' '+VEH[d.vtype||'tuktuk'].n+'</span>'
+    +'<span class="chip y">'+d.color+'</span>'+(d.plate?'<span class="chip g">'+d.plate+'</span>':'')+'</small>'
+    +'<div class="thumbs"><img src="'+d.vehicle+'" onclick="big(this.src)">'
+    +'<img src="'+d.idcard+'" onclick="big(this.src)"></div></div></div>'
+    +'<div class="brow" style="margin-bottom:14px">'
+    +'<button class="btn main" onclick="setSt(\''+d.id+'\',\'approved\')">✅ موافقة</button>'
+    +'<button class="btn dang" onclick="setSt(\''+d.id+'\',\'blocked\')">✖️ رفض</button></div>'
+  ).join(''):'<div class="empty">ما في طلبات جديدة.</div>';
+
+  /* الرحلات الجارية */
+  $('live').innerHTML=openR.length?openR.map(r=>{
+    const d=D.find(x=>x.id===r.driver);
+    return '<div class="row"><span class="av">'+VEH[r.vtype||'tuktuk'].i+'</span>'
+    +'<div class="ri"><b>'+r.fromtxt+' ← '+r.totxt+'</b>'
+    +'<small>'+r.cname+' · '+r.cphone+(d?' · السائق: '+d.name:'')+'</small>'
+    +'<small><span class="chip '+ST[r.status][1]+'">'+ST[r.status][0]+'</span>'
+    +'<span class="chip g">'+money(r.est)+' ألف</span></small></div></div>';
+  }).join(''):'<div class="empty">ما في رحلات جارية.</div>';
+
+  /* السائقين */
+  const app=D.filter(d=>d.status!=='pending');
+  $('b2').textContent=app.length;
+  $('drvs').innerHTML=app.length?app.map(d=>
+    '<div class="row"><img src="'+d.photo+'" onclick="big(this.src)">'
+    +'<div class="ri"><b>'+d.name+'</b><small>'+d.phone+'</small>'
+    +'<small><span class="chip '+(d.status==='blocked'?'r':(d.online?'g':'y'))+'">'
+    +(d.status==='blocked'?'موقوف':(d.online?'متاح الآن':'غير متاح'))+'</span>'
+    +'<span class="chip g">'+VEH[d.vtype||'tuktuk'].i+' '+d.color+'</span>'
+    +(d.trips?'<span class="chip y">⭐ '+(+d.rating).toFixed(1)+' · '+d.trips+' رحلة</span>':'<span class="chip y">جديد</span>')
+    +'</small></div>'
+    +'<button class="btn sm '+(d.status==='blocked'?'main':'dang')+'" onclick="setSt(\''+d.id+'\',\''
+      +(d.status==='blocked'?'approved':'blocked')+'\')">'+(d.status==='blocked'?'تفعيل':'إيقاف')+'</button></div>'
+  ).join(''):'<div class="empty">ما في سائقين.</div>';
+
+  /* الرحلات */
+  const done=R.filter(r=>r.status==='done');
+  const paid=done.filter(r=>r.paid);
+  $('rides').innerHTML=
+     '<div class="tr"><span>إجمالي الرحلات</span><b>'+R.length+'</b></div>'
+    +'<div class="tr"><span>مكتملة</span><b>'+done.length+'</b></div>'
+    +'<div class="tr"><span>ملغاة</span><b>'+R.filter(r=>r.status==='cancelled').length+'</b></div>'
+    +'<div class="tr"><span>رحلات اليوم</span><b>'+today.length+'</b></div>'
+    +'<div class="tr"><span>مجموع اليوم</span><b>'+money(today.reduce((a,r)=>a+(r.paid||r.est||0),0))+' ألف</b></div>'
+    +'<div class="tr"><span>متوسط الرحلة</span><b>'+(paid.length?money(paid.reduce((a,r)=>a+r.paid,0)/paid.length):'—')+' ألف</b></div>';
+
+  const rt={};
+  paid.forEach(r=>{const k=r.fromtxt+' ← '+r.totxt;rt[k]=rt[k]||{s:0,n:0,e:0};
+    rt[k].s+=r.paid;rt[k].n++;rt[k].e+=r.est;});
+  const ks=Object.entries(rt).sort((a,b)=>b[1].n-a[1].n).slice(0,15);
+  $('prices').innerHTML=ks.length?ks.map(([k,v])=>{
+    const avg=v.s/v.n, est=v.e/v.n, diff=((avg-est)/est*100);
+    return '<div class="tr"><span>'+k+'<br><small style="color:var(--muted)">'+v.n+' رحلة · العدّاد '+money(est)
+      +'</small></span><b>'+money(avg)+(Math.abs(diff)>8?'<br><small style="color:'
+      +(diff>0?'var(--danger)':'var(--g2)')+'">'+(diff>0?'+':'')+diff.toFixed(0)+'%</small>':'')+'</b></div>';
+  }).join('')+'<div class="note" style="margin-top:12px"><b>ملاحظة:</b> إذا الفرق كبير بين العدّاد والمدفوع فعلياً، عدّل التسعيرة بملف <code>index.html</code> عند <code>TAR</code>.</div>'
+    :'<div class="empty">لسا ما في أسعار مسجّلة.<br>بتظهر بعد ما يكتب الزباين كم دفعوا.</div>';
+
+  /* البلاغات */
+  $('reps').innerHTML=P.length?P.map(r=>
+    '<div class="row"><span class="av">'+(r.who==='driver'?'🛺':'🙋')+'</span>'
+    +'<div class="ri"><b>'+(r.name||'—')+'</b><small>'+r.body+'</small>'
+    +'<small><span class="chip '+(r.status==='open'?'r':'g')+'">'+(r.status==='open'?'مفتوح':'مغلق')+'</span>'
+    +(r.phone?'<span class="chip g">'+r.phone+'</span>':'')
+    +'<span class="chip y">'+new Date(r.created_at).toLocaleDateString('ar-LB')+'</span></small></div>'
+    +(r.status==='open'?'<button class="btn sm line" onclick="closeRep(\''+r.id+'\')">إغلاق</button>':'')+'</div>'
+  ).join(''):'<div class="empty">ما في بلاغات.</div>';
+}
+async function setSt(id,s){ await sb(()=>api('w_drivers?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:s})}));
+  say(s==='approved'?'انقبل السائق ✅':'انوقف'); load(); }
+async function closeRep(id){ await sb(()=>api('w_reports?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'closed'})}));
+  load(); }
+function big(src){const d=document.createElement('div');
+  d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:999;display:grid;place-items:center;padding:16px';
+  d.innerHTML='<img src="'+src+'" style="max-width:100%;max-height:92vh;border-radius:14px">';
+  d.onclick=()=>d.remove();document.body.appendChild(d);}
+</script>
+</body>
+</html>
