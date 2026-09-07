@@ -132,6 +132,9 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 .vcard b{display:block;font-size:14.5px;margin:5px 0 1px}
 .vcard .p{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;color:var(--g2)}
 .vcard small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+.conf{background:var(--gs);border:1px solid #A9D9BB;border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.conf .cf{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;padding:3px 0}
+.conf .cf span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .meta{display:flex;gap:8px;margin-bottom:12px}
 .meta div{flex:1;background:var(--soft);border-radius:13px;padding:11px 8px;text-align:center}
 .meta b{display:block;font-family:'JetBrains Mono',monospace;font-size:17px;color:var(--g2)}
@@ -250,7 +253,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
       <div class="st"><i>4</i><span>تابعو على الخريطة وهو جاي</span></div>
     </div>
     <div class="gf">الدفع نقداً للسائق<br>
-      <a href="../../privacy/">سياسة الخصوصية</a> · <span id="admLink" style="cursor:pointer;opacity:.45">·</span><br>
+      <a href="../../privacy/">سياسة الخصوصية</a> · <span id="admLink" style="cursor:pointer;text-decoration:underline">🛡️ الإدارة</span><br>
       <a class="dev" href="https://mrelectroai-spec.github.io/mrelectroai/" target="_blank" rel="noopener">
         ⚡ تصميم وبرمجة <b>MrElectroAI</b></a></div>
   </div>
@@ -392,9 +395,9 @@ function drvExtra(){
     +'<div class="two mb"><div><label class="lbl">اللون</label><select id="aColor">'
       +['أحمر','أزرق','أصفر','أخضر','أبيض','أسود','رمادي','غير ذلك'].map(c=>'<option>'+c+'</option>').join('')+'</select></div>'
       +'<div><label class="lbl">رقم اللوحة</label><input id="aPlate" placeholder="اختياري"></div></div>'
-    +'<label class="up" id="u1"><span class="ui">📷</span><span><b>صورتك الشخصية</b><small>ليعرفك الزبون</small></span><input type="file" accept="image/*" capture="user" hidden></label>'
-    +'<label class="up" id="u2"><span class="ui">'+TAR[vt].ic+'</span><span><b>صورة المركبة</b><small>واضحة من الأمام</small></span><input type="file" accept="image/*" hidden></label>'
-    +'<label class="up" id="u3"><span class="ui">🪪</span><span><b>صورة الهوية</b><small>للإدارة فقط</small></span><input type="file" accept="image/*" hidden></label>';
+    +'<label class="up" id="u1"><span class="ui">📷</span><span><b>صورتك الشخصية</b><small>اختياري — بس بتزيد ثقة الزبون</small></span><input type="file" accept="image/*" capture="user" hidden></label>'
+    +'<label class="up" id="u2"><span class="ui">'+TAR[vt].ic+'</span><span><b>صورة المركبة</b><small>اختياري</small></span><input type="file" accept="image/*" hidden></label>'
+    +'<label class="up" id="u3"><span class="ui">🪪</span><span><b>صورة الهوية</b><small>اختياري — للإدارة فقط</small></span><input type="file" accept="image/*" hidden></label>';
 }
 function bindUp(){
   [['u1','photo'],['u2','vehicle'],['u3','idcard']].forEach(([id,k])=>{
@@ -420,8 +423,6 @@ async function doSignup(){
   if(ph.length<7) return $('aErr').textContent='رقم غير صحيح';
   if(p.length<4) return $('aErr').textContent='كلمة السر 4 خانات على الأقل';
   if(p!==p2) return $('aErr').textContent='كلمتا السر مش متطابقتين';
-  if(role==='drv'&&(!photos.photo||!photos.vehicle||!photos.idcard))
-    return $('aErr').textContent='ارفع الصور التلاتة';
   $('aGo').disabled=true;
   const ex=await sb(()=>api(tbl()+'?phone=eq.'+ph+'&select=phone'));
   if(ex&&ex.length){$('aGo').disabled=false;return $('aErr').textContent='هالرقم مسجّل — استعمل «دخول»';}
@@ -473,16 +474,24 @@ function enter(){
 }
 $('drvOut').onclick=()=>{localStorage.removeItem('w_drv');toGate();};
 $('cMenu').onclick=()=>{
-  const c=prompt('1) رحلاتي\n2) إبلاغ عن مشكلة\n3) تسجيل الخروج\n\nاكتب الرقم:');
-  if(c==='1')myTrips(); else if(c==='2')report(); else if(c==='3'){localStorage.removeItem('w_cust');toGate();}
+  $('sheet').innerHTML='<div class="grab"></div><h2>'+(me?me.name:'حسابي')+'</h2>'
+    +'<div class="sub">'+(me?me.phone:'')+'</div>'
+    +'<button class="btn line" id="m1">🧾 رحلاتي</button>'
+    +'<button class="btn line" id="m2">🚨 إبلاغ عن مشكلة</button>'
+    +'<a class="btn line" href="../../privacy/">🔒 سياسة الخصوصية</a>'
+    +'<button class="btn dang" id="m3">تسجيل الخروج</button>'
+    +'<button class="btn main" id="m4">← رجوع</button>';
+  $('m1').onclick=myTrips; $('m2').onclick=report;
+  $('m3').onclick=()=>{localStorage.removeItem('w_cust');toGate();};
+  $('m4').onclick=()=>{ $('sheet').dataset.v=''; render(); };
 };
 
 function initMap(){
   if(map){setTimeout(()=>map.invalidateSize(),150);return;}
   if(typeof L==='undefined'){$('sheet').innerHTML='<div class="grab"></div><div class="empty">ما قدرنا نحمّل الخريطة — تفقّد الإنترنت.</div>';return;}
   map=L.map('map',{zoomControl:false,attributionControl:false}).setView(CENTER,14);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:20}).addTo(map);
-  L.control.attribution({position:'bottomright',prefix:false}).addAttribution('© OSM · Carto').addTo(map);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+  L.control.attribution({position:'bottomright',prefix:false}).addAttribution('© OpenStreetMap').addTo(map);
   navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>{
     const c=[p.coords.latitude,p.coords.longitude];map.setView(c,16);
     if(!A)setPt('a',{lat:c[0],lng:c[1],name:'موقعي الحالي'});},()=>{},{enableHighAccuracy:true,timeout:8000});
@@ -512,30 +521,62 @@ function quoteRide(){if(!A||!B)return;const d=km(A,B);
 function openSearch(k){picking=k;$('sp').classList.add('on');$('spq').value='';
   $('spq').placeholder=k==='a'?'من وين؟':'لوين رايح؟';$('spr').innerHTML=quickList();
   setTimeout(()=>$('spq').focus(),150);}
+const PLACES=[
+  ['مفرق ببنين',34.5145,36.0075],['ببنين',34.5203,36.0122],['جديدة ببنين',34.5265,36.0180],
+  ['جديدة القيطع',34.4930,35.9880],['المنية',34.4700,35.9560],['بحنين',34.4790,35.9700],
+  ['المحمرة',34.4980,35.9600],['دوار العبدة',34.5320,35.9930],['العبدة',34.5310,35.9915],
+  ['جوار الجاموس',34.5060,36.0230],['برقايل',34.5410,36.0400],['حلبا',34.5470,36.0790],
+  ['القبيات',34.5960,36.2350],['مشحة',34.5560,36.0930],['بيت ملات',34.5390,36.0640],
+  ['العريضة',34.6270,36.0180],['الشيخ عياش',34.5230,35.9770],['خان العبدة',34.5290,35.9880],
+  ['المرج',34.5180,36.0490],['تكريت',34.5100,36.0350],['وادي الجاموس',34.5010,36.0290],
+  ['البيرة',34.5590,36.1300],['رحبة',34.5730,36.1080],['منجز',34.6430,36.2000],
+  ['العبودية',34.6480,36.0230],['طرابلس',34.4360,35.8330]
+];
+function localHits(q){
+  return PLACES.filter(p=>p[0].includes(q)).slice(0,6).map(p=>({lat:p[1],lng:p[2],name:p[0],full:'عكار'}));
+}
 function quickList(){
   const rec=JSON.parse(localStorage.getItem('w_recent')||'[]');
   return '<div class="res" id="useMap"><span class="ri">🗺️</span><span class="rt"><b>حدّد على الخريطة</b><small>حرّك الدبوس عالمكان</small></span></div>'
     +'<div class="res" id="useGps"><span class="ri">📍</span><span class="rt"><b>موقعي الحالي</b><small>استعمل GPS</small></span></div>'
-    +rec.map(r=>'<div class="res" data-r=\''+JSON.stringify(r)+'\'><span class="ri">🕘</span><span class="rt"><b>'+r.name+'</b><small>زيارة سابقة</small></span></div>').join('');
+    +'<div class="res" id="useLink"><span class="ri">🔗</span><span class="rt"><b>الصق رابط من الخرائط</b><small>رابط غوغل ماب أو إحداثيات</small></span></div>'
+    +rec.map(r=>'<div class="res" data-r=\''+JSON.stringify(r)+'\'><span class="ri">🕘</span><span class="rt"><b>'+r.name+'</b><small>زيارة سابقة</small></span></div>').join('')
+    +'<div style="font-size:12px;color:var(--muted);padding:12px 10px 6px">مناطق قريبة</div>'
+    +PLACES.slice(0,10).map(p=>'<div class="res" data-r=\''+JSON.stringify({lat:p[1],lng:p[2],name:p[0],full:'عكار'})+'\'>'
+      +'<span class="ri">📌</span><span class="rt"><b>'+p[0]+'</b><small>عكار</small></span></div>').join('');
 }
 let tmr;
 $('spq').addEventListener('input',()=>{clearTimeout(tmr);
   const q=$('spq').value.trim();
   if(q.length<2){$('spr').innerHTML=quickList();return;}
+  const loc=localHits(q);
+  const locHtml=loc.map(p=>'<div class="res" data-r=\''+JSON.stringify(p)+'\'><span class="ri">📌</span>'
+    +'<span class="rt"><b>'+p.name+'</b><small>عكار</small></span></div>').join('');
+  $('spr').innerHTML=locHtml+'<div class="res"><span class="rt"><b>عم ندوّر بالخرائط...</b></span></div>';
   tmr=setTimeout(async()=>{
-    $('spr').innerHTML='<div class="res"><span class="rt"><b>عم ندوّر...</b></span></div>';
     try{const c=map.getCenter();
       const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=8&accept-language=ar&countrycodes=lb&q='
         +encodeURIComponent(q)+'&viewbox='+(c.lng-.6)+','+(c.lat+.4)+','+(c.lng+.6)+','+(c.lat-.4));
       const d=await r.json();
-      $('spr').innerHTML=d.length?d.map(x=>{
+      const web=d.map(x=>{
         const p={lat:+x.lat,lng:+x.lon,name:x.display_name.split(',')[0],full:x.display_name.split(',').slice(0,3).join('، ')};
-        return '<div class="res" data-r=\''+JSON.stringify(p)+'\'><span class="ri">📌</span><span class="rt"><b>'+p.name+'</b><small>'+p.full+'</small></span></div>';
-      }).join(''):'<div class="res"><span class="rt"><b>ما لقينا</b><small>جرّب اسم تاني أو حدّد على الخريطة</small></span></div>';
-    }catch(e){$('spr').innerHTML='<div class="res"><span class="rt"><b>ما قدرنا ندوّر</b></span></div>';}
+        return '<div class="res" data-r=\''+JSON.stringify(p)+'\'><span class="ri">🌍</span><span class="rt"><b>'+p.name+'</b><small>'+p.full+'</small></span></div>';
+      }).join('');
+      $('spr').innerHTML = (locHtml+web) || '<div class="res" id="useMap"><span class="ri">🗺️</span>'
+        +'<span class="rt"><b>ما لقينا «'+q+'»</b><small>حدّدو على الخريطة</small></span></div>';
+    }catch(e){$('spr').innerHTML=locHtml||'<div class="res"><span class="rt"><b>ما قدرنا ندوّر</b></span></div>';}
   },450);});
 $('spr').onclick=e=>{
   if(e.target.closest('#useMap')){$('sp').classList.remove('on');startPin();return;}
+  if(e.target.closest('#useLink')){
+    const t=prompt('الصق رابط الموقع من خرائط غوغل، أو الإحداثيات:');
+    if(!t)return;
+    const dec=t.replace(/،/g,',').replace(/(\d),(\d)/g,'$1.$2');
+    const m=dec.match(/(-?\d{1,3}\.\d{3,})[,\s@]+(-?\d{1,3}\.\d{3,})/);
+    if(!m)return say('ما لقينا إحداثيات — افتح الرابط بالمتصفح وانسخو من شريط العنوان');
+    $('sp').classList.remove('on');
+    setPt(picking,{lat:+m[1],lng:+m[2],name:'موقع من رابط'});
+    map.setView([+m[1],+m[2]],17); return;}
   if(e.target.closest('#useGps')){$('sp').classList.remove('on');
     navigator.geolocation.getCurrentPosition(p=>{setPt(picking,{lat:p.coords.latitude,lng:p.coords.longitude,name:'موقعي الحالي'});
       map.setView([p.coords.latitude,p.coords.longitude],16);},()=>say('ما قدرنا نحدّد موقعك'),{enableHighAccuracy:true,timeout:8000});
@@ -572,6 +613,8 @@ function render(){
   const q=quote||{d:km(A,B),t:fare('tuktuk',km(A,B),pax),c:fare('car',km(A,B),pax)};
   const f=veh==='tuktuk'?q.t:q.c;
   s.innerHTML='<div class="grab"></div>'
+    +'<div class="conf"><div class="cf"><i class="sdot a"></i><span>'+A.name+'</span></div>'
+    +'<div class="cf"><i class="sdot b"></i><span>'+B.name+'</span></div></div>'
     +'<div class="meta"><div><b>'+q.d.toFixed(1)+'</b><small>كم</small></div>'
       +'<div><b>'+f.mins+'</b><small>دقيقة</small></div><div><b>'+pax+'</b><small>راكب</small></div></div>'
     +'<div class="veh">'+Object.entries(TAR).map(([k,c])=>{const ff=k==='tuktuk'?q.t:q.c;
@@ -580,7 +623,8 @@ function render(){
     +'<label class="lbl">كم شخص؟</label><div class="pax" id="paxB">'
       +[1,2,3,4].map(n=>'<button data-p="'+n+'"'+(pax===n?' class="on"':'')+'>'+(n===4?'4+':n)+'</button>').join('')+'</div>'
     +'<button class="btn main" id="go">'+TAR[veh].ic+' اطلب '+TAR[veh].name+' · '+money(f.v)+' ألف</button>'
-    +'<div class="note">السعر تقديري بالعدّاد — الدفع نقداً للسائق.</div>';
+    +'<div class="note"><b>السعر تقديري بالعدّاد.</b> بعد ما يقبل السائق بيوصلك رقمه، '
+    +'وبتتفقوا على السعر النهائي معه. الدفع نقداً.</div>';
   bindVeh();
   $('paxB').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;pax=+b.dataset.p;quoteRide();render();};
   $('go').onclick=order;
@@ -875,6 +919,15 @@ function big(src){const d=document.createElement('div');
   d.innerHTML='<img src="'+src+'" style="max-width:100%;max-height:92vh;border-radius:14px">';
   d.onclick=()=>d.remove();document.body.appendChild(d);}
 
+/* دخول تلقائي إذا مسجّل من قبل */
+(function boot(){
+  const c=localStorage.getItem('w_cust'), d=localStorage.getItem('w_drv');
+  if(c){ role='cust'; const s=JSON.parse(c); $('gate').style.display='none';
+    $('pAuth').classList.add('on'); autoLogin(s.phone,s.pass); }
+  else if(d){ role='drv'; const s=JSON.parse(d); $('gate').style.display='none';
+    $('pAuth').classList.add('on'); autoLogin(s.phone,s.pass); }
+})();
+
 let dp=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('inst').classList.add('on');});
 $('inst').onclick=async()=>{if(!dp)return alert('من قائمة المتصفح اختار «إضافة إلى الشاشة الرئيسية»');
@@ -883,4 +936,3 @@ if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.se
 </script>
 </body>
 </html>
-
