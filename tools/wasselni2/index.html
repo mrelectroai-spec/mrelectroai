@@ -118,7 +118,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 .pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);z-index:350;
   pointer-events:none;font-size:40px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.3));transition:transform .12s;display:none}
 .pin.on{display:block}.pin.up{transform:translate(-50%,-118%)}
-.sheet{position:absolute;inset-inline:0;bottom:0;z-index:500;background:#fff;
+.sheet{position:fixed;inset-inline:0;bottom:0;z-index:550;background:#fff;
   border-radius:26px 26px 0 0;box-shadow:var(--sh);padding:8px 16px calc(16px + env(safe-area-inset-bottom));
   max-height:84vh;overflow-y:auto}
 .grab{width:42px;height:5px;border-radius:5px;background:#D7DEDA;margin:0 auto 12px}
@@ -507,7 +507,9 @@ function setPt(k,p){
     if(mB)map.removeLayer(mB);mB=L.marker([p.lat,p.lng],{icon:icon('📍',34)}).addTo(map);}
   if(A&&B){if(line)map.removeLayer(line);
     line=L.polyline([[A.lat,A.lng],[B.lat,B.lng]],{color:'#0E7C3A',weight:4,dashArray:'8 7'}).addTo(map);
-    map.fitBounds(line.getBounds().pad(.35));quoteRide();}
+    const sh=$('sheet').offsetHeight||300;
+    map.fitBounds(line.getBounds(),{paddingTopLeft:[40,120],paddingBottomRight:[40,sh+40]});
+    quoteRide();}
   render();
 }
 function km(a,b){const R=6371,p=Math.PI/180;
@@ -666,7 +668,8 @@ async function vDriver(r){
   const d=(await sb(()=>api('w_drivers?phone=eq.'+r.driver+'&select=*')))?.[0];
   if(d&&d.lat){const p=[d.lat,d.lng];
     if(mDrv)mDrv.setLatLng(p);else mDrv=L.marker(p,{icon:icon(TAR[r.vtype].ic,40)}).addTo(map);
-    if(r.status==='accepted'&&mA)map.fitBounds(L.latLngBounds([mA.getLatLng(),p]).pad(.4));}
+    if(r.status==='accepted'&&mA){const sh=$('sheet').offsetHeight||300;
+      map.fitBounds(L.latLngBounds([mA.getLatLng(),p]),{paddingTopLeft:[40,120],paddingBottomRight:[40,sh+40]});}}
   if($('sheet').dataset.v===r.status)return;$('sheet').dataset.v=r.status;
   const st={accepted:['السائق جاي 🛺','عم يوصل لعندك'],arrived:['السائق وصل! 🎉','هو مستنيك برّا'],
     onboard:['بالطريق 🚀','رحلة سعيدة']}[r.status]||['',''];
