@@ -44,7 +44,10 @@ input:focus,select:focus{border-color:var(--g);background:#fff}
 .st-top h3{font-family:'Readex Pro',sans-serif;font-size:9vw;line-height:1.1;margin-top:1vw}
 .st-top p{font-size:3.6vw;opacity:.85;margin-top:.5vw}
 .qrbox{background:#fff;border-radius:4vw;padding:3.5vw;box-shadow:0 4px 20px rgba(0,0,0,.2)}
-.qrbox img,.qrbox canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
+.qrbox img{display:block;width:100%;height:auto}
+.qrerr{display:none;font-size:11px;color:#B03A3A;text-align:center;padding:14px;line-height:1.6}
+.qrbox.fail img{display:none}
+.qrbox.fail .qrerr{display:block}
 .st-bot .a{font-size:4.6vw;font-weight:700}
 .st-bot .b{font-size:3.2vw;opacity:.8;margin-top:.6vw;font-family:'JetBrains Mono',monospace}
 @media(min-width:560px){
@@ -94,7 +97,7 @@ footer b{color:var(--ink)}
     <div class="sticker" id="st">
       <div class="st-top"><div class="em" id="pEm">🛺</div>
         <h3 id="pT1">وصّلني</h3><p id="pT2">توكتوك وسيارات — عكار</p></div>
-      <div class="qrbox"><canvas id="qr"></canvas></div>
+      <div class="qrbox"><img id="qr" alt="QR"><div id="qrErr" class="qrerr">⚠️ الـQR بيحتاج إنترنت — افتح الصفحة من رابط الموقع</div></div>
       <div class="st-bot"><div class="a" id="pT3">امسح الكود واطلب</div>
         <div class="b" id="pT4">@wasselni</div></div>
     </div>
@@ -116,95 +119,6 @@ footer b{color:var(--ink)}
 
 <script>
 
-/* ═══ مولّد QR محلي — بدون إنترنت ═══ */
-(function(){
-const EC={L:1,M:0,Q:3,H:2};
-const G=(function(){const E=new Array(256),L=new Array(256);let x=1;
-  for(let i=0;i<255;i++){E[i]=x;L[x]=i;x<<=1;if(x&256)x^=0x11d;}
-  E[255]=E[0];return{E,L,mul:(a,b)=>(a===0||b===0)?0:E[(L[a]+L[b])%255]};})();
-function rsPoly(n){let p=[1];for(let i=0;i<n;i++){const q=[1,G.E[i]],r=new Array(p.length+1).fill(0);
-  for(let j=0;j<p.length;j++)for(let k=0;k<2;k++)r[j+k]^=G.mul(p[j],q[k]);p=r;}return p;}
-function rsEnc(data,ec){const gen=rsPoly(ec),res=new Array(data.length+ec).fill(0);
-  data.forEach((v,i)=>res[i]=v);
-  for(let i=0;i<data.length;i++){const f=res[i];if(f!==0)for(let j=0;j<gen.length;j++)res[i+j]^=G.mul(gen[j],f);}
-  return res.slice(data.length);}
-const CAP={1:[19,16,13,9],2:[34,28,22,16],3:[55,44,34,26],4:[80,64,48,36],5:[108,86,62,46],
-  6:[136,108,76,60],7:[156,124,88,66],8:[194,154,110,86],9:[232,182,132,100],10:[274,216,154,122],
-  11:[324,254,180,140],12:[370,290,206,158],13:[428,334,244,180],14:[461,365,261,197]};
-const ECB={1:[[1,26,19],[1,26,16],[1,26,13],[1,26,9]],2:[[1,44,34],[1,44,28],[1,44,22],[1,44,16]],
-  3:[[1,70,55],[1,70,44],[2,35,17],[2,35,13]],4:[[1,100,80],[2,50,32],[2,50,24],[4,25,9]],
-  5:[[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12]],
-  6:[[2,86,68],[4,43,27],[4,43,19],[4,43,15]],7:[[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14]],
-  8:[[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15]],
-  9:[[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13]],
-  10:[[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16]]};
-function ver(len,ecl){for(let v=1;v<=10;v++)if(len<=CAP[v][ecl])return v;return 10;}
-function make(text,ecName){
-  const ecl=EC[ecName]||0;
-  const bytes=new TextEncoder().encode(text);
-  const v=ver(bytes.length,ecl), size=v*4+17;
-  /* بناء البتات */
-  let bits=[];const put=(n,l)=>{for(let i=l-1;i>=0;i--)bits.push((n>>i)&1);};
-  put(4,4);put(bytes.length,v<10?8:16);bytes.forEach(b=>put(b,8));
-  const blocks=ECB[v][ecl], total=CAP[v][ecl];
-  put(0,Math.min(4,total*8-bits.length));
-  while(bits.length%8)bits.push(0);
-  const data=[];for(let i=0;i<bits.length;i+=8)data.push(parseInt(bits.slice(i,i+8).join(''),2));
-  const pad=[0xEC,0x11];let pi=0;while(data.length<total)data.push(pad[pi++%2]);
-  /* تقسيم البلوكات */
-  const groups=[];let idx=0;
-  for(let g=0;g<blocks.length;g+=3){
-    const cnt=blocks[g],tot=blocks[g+1],dc=blocks[g+2];
-    for(let c=0;c<cnt;c++){const d=data.slice(idx,idx+dc);idx+=dc;
-      groups.push({d,e:rsEnc(d,tot-dc)});}
-  }
-  let final=[];const maxD=Math.max(...groups.map(g=>g.d.length));
-  for(let i=0;i<maxD;i++)groups.forEach(g=>{if(i<g.d.length)final.push(g.d[i]);});
-  const maxE=Math.max(...groups.map(g=>g.e.length));
-  for(let i=0;i<maxE;i++)groups.forEach(g=>{if(i<g.e.length)final.push(g.e[i]);});
-  /* المصفوفة */
-  const m=Array.from({length:size},()=>new Array(size).fill(null));
-  const setF=(r,c,v)=>{if(r>=0&&r<size&&c>=0&&c<size)m[r][c]=v;};
-  const finder=(r,c)=>{for(let i=-1;i<8;i++)for(let j=-1;j<8;j++){
-    const on=(i>=0&&i<7&&(j===0||j===6))||(j>=0&&j<7&&(i===0||i===6))||(i>=2&&i<=4&&j>=2&&j<=4);
-    setF(r+i,c+j,on?1:0);}};
-  finder(0,0);finder(0,size-7);finder(size-7,0);
-  for(let i=8;i<size-8;i++){m[6][i]=i%2===0?1:0;m[i][6]=i%2===0?1:0;}
-  if(v>1){const ap=[6,size-7];ap.forEach(r=>ap.forEach(c=>{
-    if((r===6&&c===6)||(r===6&&c===size-7)||(r===size-7&&c===6))return;
-    for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++)
-      setF(r+i,c+j,(Math.abs(i)===2||Math.abs(j)===2||(i===0&&j===0))?1:0);}));}
-  m[size-8][8]=1;
-  /* البيانات */
-  let bi=0;const dbits=[];final.forEach(b=>{for(let i=7;i>=0;i--)dbits.push((b>>i)&1);});
-  let up=true;
-  for(let c=size-1;c>0;c-=2){ if(c===6)c--;
-    for(let k=0;k<size;k++){ const r=up?size-1-k:k;
-      for(let cc=0;cc<2;cc++){ const col=c-cc;
-        if(m[r][col]!==null)continue;
-        let bit=bi<dbits.length?dbits[bi++]:0;
-        if(((r+col)%2)===0)bit^=1;
-        m[r][col]=bit; } }
-    up=!up; }
-  /* معلومات التنسيق (mask 0) */
-  const fmtBits={0:0x77C4,1:0x72F3,2:0x7DAA,3:0x789D}[ecl];
-  for(let i=0;i<15;i++){const b=(fmtBits>>i)&1;
-    if(i<6)m[i][8]=b; else if(i<8)m[i+1][8]=b; else m[size-15+i][8]=b;
-    if(i<8)m[8][size-1-i]=b; else if(i<9)m[8][15-i]=b; else m[8][15-i-1]=b;}
-  return m;
-}
-window.drawQR=function(cv,text,px){
-  const m=make(text,'M'),n=m.length,q=4,sc=Math.floor(px/(n+q*2))||4;
-  const S=(n+q*2)*sc;
-  cv.width=S;cv.height=S;
-  const x=cv.getContext('2d');
-  x.fillStyle='#fff';x.fillRect(0,0,S,S);
-  x.fillStyle='#000';
-  for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(m[r][c])x.fillRect((c+q)*sc,(r+q)*sc,sc,sc);
-  return cv;
-};
-})();
-
 const $=i=>document.getElementById(i);
 const LINKS=[
   ['وصّلني','https://mrelectroai-spec.github.io/mrelectroai/tools/wasselni/'],
@@ -218,8 +132,14 @@ $('quick').onclick=e=>{const b=e.target.closest('[data-u]');if(!b)return;
   document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');
   $('url').value=b.dataset.u;draw();};
 
+const QRSRC=(u,s)=>'https://api.qrserver.com/v1/create-qr-code/?size='+s+'x'+s
+  +'&margin=0&ecc=M&format=png&data='+encodeURIComponent(u);
 function draw(){
-  try{ drawQR($('qr'), $('url').value.trim()||'https://', 560); }catch(e){ console.log(e); }
+  const u=$('url').value.trim()||'https://';
+  const im=$('qr');
+  im.onerror=()=>im.parentElement.classList.add('fail');
+  im.onload=()=>im.parentElement.classList.remove('fail');
+  im.src=QRSRC(u,600);
   $('pEm').textContent=$('em').value;
   $('pT1').textContent=$('t1').value;
   $('pT2').textContent=$('t2').value;
@@ -230,9 +150,7 @@ function draw(){
 ['url','t1','t2','t3','t4','em','bg'].forEach(i=>{
   $(i).addEventListener('input',draw);$(i).addEventListener('change',draw);});
 
-$('dlQr').onclick=()=>{ const c=document.createElement('canvas');
-  drawQR(c,$('url').value.trim(),1000);
-  const a=document.createElement('a');a.download='qr.png';a.href=c.toDataURL('image/png');a.click(); };
+$('dlQr').onclick=()=>{ window.open(QRSRC($('url').value.trim(),1200),'_blank'); };
 
 $('dl').onclick=async()=>{
   const W=900,H=1200,c=document.createElement('canvas');c.width=W;c.height=H;
@@ -246,19 +164,20 @@ $('dl').onclick=async()=>{
   x.font='700 92px "Readex Pro",sans-serif';x.fillText($('t1').value,W/2,285);
   x.font='36px "IBM Plex Sans Arabic",sans-serif';
   x.globalAlpha=.85;x.fillText($('t2').value,W/2,345);x.globalAlpha=1;
-  const qc=document.createElement('canvas');
-  drawQR(qc,$('url').value.trim(),520);
-  {
+  const img=new Image();img.crossOrigin='anonymous';
+  img.onerror=()=>alert('ما قدرنا نحمّل الـQR — لازم إنترنت. افتح الصفحة من رابط الموقع.');
+  img.onload=()=>{
     const s=520,px=(W-s)/2,py=420;
     x.fillStyle='#fff';
     if(x.roundRect){x.beginPath();x.roundRect(px-34,py-34,s+68,s+68,34);x.fill();}
     else x.fillRect(px-34,py-34,s+68,s+68);
-    x.drawImage(qc,px,py,s,s);
+    x.drawImage(img,px,py,s,s);
     x.fillStyle=fg;x.textAlign='center';
     x.font='700 50px "IBM Plex Sans Arabic",sans-serif';x.fillText($('t3').value,W/2,1075);
     x.font='700 36px "JetBrains Mono",monospace';x.globalAlpha=.8;x.fillText($('t4').value,W/2,1130);
     const a=document.createElement('a');a.download='wasselni-qr.png';a.href=c.toDataURL('image/png');a.click();
-  }
+  };
+  img.src=QRSRC($('url').value.trim(),600);
 };
 draw();
 </script>
