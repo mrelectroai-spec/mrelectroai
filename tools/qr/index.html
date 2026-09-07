@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مولّد QR | وصّلني</title>
+<meta name="theme-color" content="#0E7C3A">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#0E7C3A;--g2:#0A5F2C;--gs:#E3F3E8;--y:#F5B301;--ink:#14261B;--muted:#6B7C72;
+  --line:#E2E8E3;--soft:#F3F6F4;--paper:#FFF;--bg:#F6F7F5;
+  --sh:0 2px 8px rgba(20,38,27,.06),0 12px 28px rgba(20,38,27,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px;line-height:1.7;padding:20px 15px 50px}
+.wrap{max-width:600px;margin:0 auto}
+h1{font-family:'Readex Pro',sans-serif;font-size:25px;margin-bottom:5px}
+.lede{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:17px;padding:17px;
+  margin-bottom:13px;box-shadow:var(--sh)}
+.card h2{font-family:'Readex Pro',sans-serif;font-size:16px;margin-bottom:13px;
+  padding-bottom:10px;border-bottom:1px solid var(--line)}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}
+input,select{width:100%;font-family:inherit;font-size:15px;background:var(--soft);border:1.5px solid transparent;
+  border-radius:12px;padding:13px;color:var(--ink)}
+input:focus,select:focus{border-color:var(--g);background:#fff}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mb{margin-bottom:12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;
+  border-radius:13px;font-family:inherit;font-size:15px;font-weight:700;border:0;
+  background:var(--soft);color:var(--ink);cursor:pointer;margin-top:9px}
+.btn.main{background:var(--g);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.chip{font-size:12.5px;background:var(--soft);border:1.5px solid transparent;border-radius:999px;
+  padding:8px 14px;cursor:pointer;font-family:inherit;color:var(--muted)}
+.chip.on{background:var(--gs);border-color:var(--g);color:var(--g2);font-weight:700}
+
+/* الملصق */
+.sticker{width:100%;aspect-ratio:3/4;border-radius:18px;overflow:hidden;position:relative;
+  background:var(--g);display:flex;flex-direction:column;align-items:center;
+  justify-content:space-between;padding:7% 6%;text-align:center;color:#fff}
+.sticker.dark{background:#14261B}
+.sticker.white{background:#fff;color:var(--ink)}
+.st-top .em{font-size:12vw;line-height:1}
+.st-top h3{font-family:'Readex Pro',sans-serif;font-size:9vw;line-height:1.1;margin-top:1vw}
+.st-top p{font-size:3.6vw;opacity:.85;margin-top:.5vw}
+.qrbox{background:#fff;border-radius:4vw;padding:3.5vw;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.qrbox img,.qrbox canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
+.st-bot .a{font-size:4.6vw;font-weight:700}
+.st-bot .b{font-size:3.2vw;opacity:.8;margin-top:.6vw;font-family:'JetBrains Mono',monospace}
+@media(min-width:560px){
+  .st-top .em{font-size:66px}.st-top h3{font-size:50px}.st-top p{font-size:20px}
+  .qrbox{border-radius:22px;padding:19px}.st-bot .a{font-size:26px}.st-bot .b{font-size:18px}
+}
+.note{font-size:12.5px;color:var(--muted);background:#FDF6E3;border-radius:12px;padding:13px;line-height:1.8;margin-top:11px}
+.note b{color:#8A6100}
+.step{display:flex;gap:11px;margin-bottom:10px;font-size:13.5px;line-height:1.7}
+.step i{width:25px;height:25px;border-radius:50%;background:var(--g);color:#fff;flex-shrink:0;
+  display:grid;place-items:center;font-style:normal;font-size:12.5px;font-weight:700}
+footer{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;
+  color:var(--muted);text-align:center}
+footer b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>مولّد QR</h1>
+  <p class="lede">ملصق جاهز تطبعه وتلزقه على ظهر التوكتوك.</p>
+
+  <div class="card">
+    <h2>🔗 الرابط</h2>
+    <div class="chips" id="quick"></div>
+    <label class="lbl">الرابط</label>
+    <input id="url" class="mb" value="https://mrelectroai-spec.github.io/mrelectroai/tools/wasselni/">
+    <div class="two mb">
+      <div><label class="lbl">العنوان</label><input id="t1" value="وصّلني"></div>
+      <div><label class="lbl">تحت العنوان</label><input id="t2" value="توكتوك وسيارات — عكار"></div>
+    </div>
+    <div class="two mb">
+      <div><label class="lbl">النص السفلي</label><input id="t3" value="امسح الكود واطلب"></div>
+      <div><label class="lbl">الرقم / الحساب</label><input id="t4" value="@wasselni"></div>
+    </div>
+    <div class="two">
+      <div><label class="lbl">الأيقونة</label>
+        <select id="em"><option>🛺</option><option>📱</option><option>🚗</option>
+          <option>⚡</option><option>📲</option><option>🔧</option></select></div>
+      <div><label class="lbl">اللون</label>
+        <select id="bg"><option value="">أخضر</option><option value="dark">أسود</option>
+          <option value="white">أبيض</option></select></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>👁️ المعاينة</h2>
+    <div class="sticker" id="st">
+      <div class="st-top"><div class="em" id="pEm">🛺</div>
+        <h3 id="pT1">وصّلني</h3><p id="pT2">توكتوك وسيارات — عكار</p></div>
+      <div class="qrbox"><canvas id="qr"></canvas></div>
+      <div class="st-bot"><div class="a" id="pT3">امسح الكود واطلب</div>
+        <div class="b" id="pT4">@wasselni</div></div>
+    </div>
+    <button class="btn main" id="dl">⬇️ نزّل الملصق</button>
+    <button class="btn" id="dlQr">⬇️ نزّل الـQR لحاله</button>
+  </div>
+
+  <div class="card">
+    <h2>🖨️ للطباعة</h2>
+    <div class="step"><i>1</i><span>نزّل الملصق وابعتو لمحل طباعة.</span></div>
+    <div class="step"><i>2</i><span>المقاس المناسب: <b>15×20 سم</b> على ستيكر لاصق مقاوم للمي.</span></div>
+    <div class="step"><i>3</i><span>الزقو على ظهر التوكتوك بمكان واضح بمستوى النظر.</span></div>
+    <div class="note"><b>مهم:</b> جرّب تمسح الكود من موبايل تاني قبل ما تطبع كمية.
+      وخلّي الملصق نظيف من الغبار ليضل الكود مقروء.</div>
+  </div>
+
+  <footer><b>MrElectroAI</b> — أنور الحسن الجاسم</footer>
+</div>
+
+<script>
+
+/* ═══ مولّد QR محلي — بدون إنترنت ═══ */
+(function(){
+const EC={L:1,M:0,Q:3,H:2};
+const G=(function(){const E=new Array(256),L=new Array(256);let x=1;
+  for(let i=0;i<255;i++){E[i]=x;L[x]=i;x<<=1;if(x&256)x^=0x11d;}
+  E[255]=E[0];return{E,L,mul:(a,b)=>(a===0||b===0)?0:E[(L[a]+L[b])%255]};})();
+function rsPoly(n){let p=[1];for(let i=0;i<n;i++){const q=[1,G.E[i]],r=new Array(p.length+1).fill(0);
+  for(let j=0;j<p.length;j++)for(let k=0;k<2;k++)r[j+k]^=G.mul(p[j],q[k]);p=r;}return p;}
+function rsEnc(data,ec){const gen=rsPoly(ec),res=new Array(data.length+ec).fill(0);
+  data.forEach((v,i)=>res[i]=v);
+  for(let i=0;i<data.length;i++){const f=res[i];if(f!==0)for(let j=0;j<gen.length;j++)res[i+j]^=G.mul(gen[j],f);}
+  return res.slice(data.length);}
+const CAP={1:[19,16,13,9],2:[34,28,22,16],3:[55,44,34,26],4:[80,64,48,36],5:[108,86,62,46],
+  6:[136,108,76,60],7:[156,124,88,66],8:[194,154,110,86],9:[232,182,132,100],10:[274,216,154,122],
+  11:[324,254,180,140],12:[370,290,206,158],13:[428,334,244,180],14:[461,365,261,197]};
+const ECB={1:[[1,26,19],[1,26,16],[1,26,13],[1,26,9]],2:[[1,44,34],[1,44,28],[1,44,22],[1,44,16]],
+  3:[[1,70,55],[1,70,44],[2,35,17],[2,35,13]],4:[[1,100,80],[2,50,32],[2,50,24],[4,25,9]],
+  5:[[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12]],
+  6:[[2,86,68],[4,43,27],[4,43,19],[4,43,15]],7:[[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14]],
+  8:[[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15]],
+  9:[[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13]],
+  10:[[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16]]};
+function ver(len,ecl){for(let v=1;v<=10;v++)if(len<=CAP[v][ecl])return v;return 10;}
+function make(text,ecName){
+  const ecl=EC[ecName]||0;
+  const bytes=new TextEncoder().encode(text);
+  const v=ver(bytes.length,ecl), size=v*4+17;
+  /* بناء البتات */
+  let bits=[];const put=(n,l)=>{for(let i=l-1;i>=0;i--)bits.push((n>>i)&1);};
+  put(4,4);put(bytes.length,v<10?8:16);bytes.forEach(b=>put(b,8));
+  const blocks=ECB[v][ecl], total=CAP[v][ecl];
+  put(0,Math.min(4,total*8-bits.length));
+  while(bits.length%8)bits.push(0);
+  const data=[];for(let i=0;i<bits.length;i+=8)data.push(parseInt(bits.slice(i,i+8).join(''),2));
+  const pad=[0xEC,0x11];let pi=0;while(data.length<total)data.push(pad[pi++%2]);
+  /* تقسيم البلوكات */
+  const groups=[];let idx=0;
+  for(let g=0;g<blocks.length;g+=3){
+    const cnt=blocks[g],tot=blocks[g+1],dc=blocks[g+2];
+    for(let c=0;c<cnt;c++){const d=data.slice(idx,idx+dc);idx+=dc;
+      groups.push({d,e:rsEnc(d,tot-dc)});}
+  }
+  let final=[];const maxD=Math.max(...groups.map(g=>g.d.length));
+  for(let i=0;i<maxD;i++)groups.forEach(g=>{if(i<g.d.length)final.push(g.d[i]);});
+  const maxE=Math.max(...groups.map(g=>g.e.length));
+  for(let i=0;i<maxE;i++)groups.forEach(g=>{if(i<g.e.length)final.push(g.e[i]);});
+  /* المصفوفة */
+  const m=Array.from({length:size},()=>new Array(size).fill(null));
+  const setF=(r,c,v)=>{if(r>=0&&r<size&&c>=0&&c<size)m[r][c]=v;};
+  const finder=(r,c)=>{for(let i=-1;i<8;i++)for(let j=-1;j<8;j++){
+    const on=(i>=0&&i<7&&(j===0||j===6))||(j>=0&&j<7&&(i===0||i===6))||(i>=2&&i<=4&&j>=2&&j<=4);
+    setF(r+i,c+j,on?1:0);}};
+  finder(0,0);finder(0,size-7);finder(size-7,0);
+  for(let i=8;i<size-8;i++){m[6][i]=i%2===0?1:0;m[i][6]=i%2===0?1:0;}
+  if(v>1){const ap=[6,size-7];ap.forEach(r=>ap.forEach(c=>{
+    if((r===6&&c===6)||(r===6&&c===size-7)||(r===size-7&&c===6))return;
+    for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++)
+      setF(r+i,c+j,(Math.abs(i)===2||Math.abs(j)===2||(i===0&&j===0))?1:0);}));}
+  m[size-8][8]=1;
+  /* البيانات */
+  let bi=0;const dbits=[];final.forEach(b=>{for(let i=7;i>=0;i--)dbits.push((b>>i)&1);});
+  let up=true;
+  for(let c=size-1;c>0;c-=2){ if(c===6)c--;
+    for(let k=0;k<size;k++){ const r=up?size-1-k:k;
+      for(let cc=0;cc<2;cc++){ const col=c-cc;
+        if(m[r][col]!==null)continue;
+        let bit=bi<dbits.length?dbits[bi++]:0;
+        if(((r+col)%2)===0)bit^=1;
+        m[r][col]=bit; } }
+    up=!up; }
+  /* معلومات التنسيق (mask 0) */
+  const fmtBits={0:0x77C4,1:0x72F3,2:0x7DAA,3:0x789D}[ecl];
+  for(let i=0;i<15;i++){const b=(fmtBits>>i)&1;
+    if(i<6)m[i][8]=b; else if(i<8)m[i+1][8]=b; else m[size-15+i][8]=b;
+    if(i<8)m[8][size-1-i]=b; else if(i<9)m[8][15-i]=b; else m[8][15-i-1]=b;}
+  return m;
+}
+window.drawQR=function(cv,text,px){
+  const m=make(text,'M'),n=m.length,q=4,sc=Math.floor(px/(n+q*2))||4;
+  const S=(n+q*2)*sc;
+  cv.width=S;cv.height=S;
+  const x=cv.getContext('2d');
+  x.fillStyle='#fff';x.fillRect(0,0,S,S);
+  x.fillStyle='#000';
+  for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(m[r][c])x.fillRect((c+q)*sc,(r+q)*sc,sc,sc);
+  return cv;
+};
+})();
+
+const $=i=>document.getElementById(i);
+const LINKS=[
+  ['وصّلني','https://mrelectroai-spec.github.io/mrelectroai/tools/wasselni/'],
+  ['موقعي','https://mrelectroai-spec.github.io/mrelectroai/'],
+  ['الجردة','https://mrelectroai-spec.github.io/mrelectroai/tools/jarde/'],
+  ['الإنفرترات','https://mrelectroai-spec.github.io/mrelectroai/tools/inverters/'],
+  ['واتساب','https://wa.me/96179434479']
+];
+$('quick').innerHTML=LINKS.map((l,i)=>'<button class="chip'+(i===0?' on':'')+'" data-u="'+l[1]+'">'+l[0]+'</button>').join('');
+$('quick').onclick=e=>{const b=e.target.closest('[data-u]');if(!b)return;
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  $('url').value=b.dataset.u;draw();};
+
+function draw(){
+  try{ drawQR($('qr'), $('url').value.trim()||'https://', 560); }catch(e){ console.log(e); }
+  $('pEm').textContent=$('em').value;
+  $('pT1').textContent=$('t1').value;
+  $('pT2').textContent=$('t2').value;
+  $('pT3').textContent=$('t3').value;
+  $('pT4').textContent=$('t4').value;
+  $('st').className='sticker '+$('bg').value;
+}
+['url','t1','t2','t3','t4','em','bg'].forEach(i=>{
+  $(i).addEventListener('input',draw);$(i).addEventListener('change',draw);});
+
+$('dlQr').onclick=()=>{ const c=document.createElement('canvas');
+  drawQR(c,$('url').value.trim(),1000);
+  const a=document.createElement('a');a.download='qr.png';a.href=c.toDataURL('image/png');a.click(); };
+
+$('dl').onclick=async()=>{
+  const W=900,H=1200,c=document.createElement('canvas');c.width=W;c.height=H;
+  const x=c.getContext('2d');
+  const mode=$('bg').value;
+  const bg = mode==='dark' ? '#14261B' : mode==='white' ? '#FFFFFF' : '#0E7C3A';
+  const fg = mode==='white' ? '#14261B' : '#FFFFFF';
+  x.fillStyle=bg;x.fillRect(0,0,W,H);
+  x.textAlign='center';x.fillStyle=fg;
+  x.font='120px sans-serif';x.fillText($('em').value,W/2,170);
+  x.font='700 92px "Readex Pro",sans-serif';x.fillText($('t1').value,W/2,285);
+  x.font='36px "IBM Plex Sans Arabic",sans-serif';
+  x.globalAlpha=.85;x.fillText($('t2').value,W/2,345);x.globalAlpha=1;
+  const qc=document.createElement('canvas');
+  drawQR(qc,$('url').value.trim(),520);
+  {
+    const s=520,px=(W-s)/2,py=420;
+    x.fillStyle='#fff';
+    if(x.roundRect){x.beginPath();x.roundRect(px-34,py-34,s+68,s+68,34);x.fill();}
+    else x.fillRect(px-34,py-34,s+68,s+68);
+    x.drawImage(qc,px,py,s,s);
+    x.fillStyle=fg;x.textAlign='center';
+    x.font='700 50px "IBM Plex Sans Arabic",sans-serif';x.fillText($('t3').value,W/2,1075);
+    x.font='700 36px "JetBrains Mono",monospace';x.globalAlpha=.8;x.fillText($('t4').value,W/2,1130);
+    const a=document.createElement('a');a.download='wasselni-qr.png';a.href=c.toDataURL('image/png');a.click();
+  }
+};
+draw();
+</script>
+</body>
+</html>
