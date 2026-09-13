@@ -201,7 +201,6 @@ $('enter').onclick=()=>{if($('pin').value.trim()!==PIN){$('perr').textContent='�
 $('pin').addEventListener('keydown',e=>{if(e.key==='Enter')$('enter').click()});
 $('out').onclick=()=>{sessionStorage.removeItem('mea_adm');location.reload()};
 if(sessionStorage.getItem('mea_adm')){$('lock').style.display='none';load();}
-drawPkgs();
 
 let pkg='y';
 function drawPkgs(){
@@ -371,6 +370,8 @@ async function conv(id,name,phone){
 }
 async function delTr(id){if(!confirm('حذف هالتجربة؟'))return;
   await sb(()=>api('trials?id=eq.'+id,{method:'DELETE'}));loadTrials();}
+
+drawPkgs();
 
 async function tog(c,v){await sb(()=>api('licenses?code=eq.'+c,{method:'PATCH',body:JSON.stringify({active:v})}));
   say(v?'انفعّل':'انوقف');load();}
