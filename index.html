@@ -176,6 +176,8 @@ a.tool.live{border-inline-start-color:var(--volt)}
 a.tool.live:hover{transform:translateY(-3px);border-color:var(--volt)}
 .live-tag{position:absolute;top:12px;inset-inline-end:12px;background:var(--volt);color:var(--volt-ink);
   font-size:10px;font-weight:700;border-radius:999px;padding:3px 9px}
+.live-tag.pro{background:var(--warn);color:#241700;font-size:9.5px}
+.live-tag.beta{background:var(--panel-2);color:var(--muted);border:1px solid var(--line)}
 .tool p b{color:var(--warn)}
 .tool.pin{border-inline-start-color:var(--volt);background:var(--panel-2)}
 .work{border-inline-start:2px solid var(--arc)}
@@ -281,7 +283,7 @@ footer b{color:var(--text);font-weight:600}
         <a href="https://whatsapp.com/channel/0029VbAeAnT7z4kXbxvH2H1U" target="_blank" rel="noopener" aria-label="WhatsApp Channel" title="قناة واتساب — Voltage Lab"><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-channel"/></svg></i></a>
       </div>
       <div class="specs">
-        <div class="spec"><b>5</b><span data-en="Free tools, live now">أدوات مجانية شغّالة الآن</span></div>
+        <div class="spec"><b>8</b><span data-en="Tools, live now">أدوات شغّالة الآن</span></div>
         <div class="spec"><b data-en="Custom built">حسب الطلب</b><span data-en="Any tool, online or on site">أي أداة، أونلاين أو على الأرض</span></div>
         <div class="spec"><b>10K+</b><span data-en="Followers on TikTok @mrelectroai">متابع على تيك توك @mrelectroai</span></div>
       </div>
@@ -302,59 +304,74 @@ footer b{color:var(--text);font-weight:600}
 
   <!-- ═══ الأدوات ═══ -->
   <section id="tools">
-    <div class="head rise"><h2 data-en="Tools for technicians">أدوات الفنيين</h2><hr><em>5 أدوات شغّالة</em></div>
+    <div class="head rise"><h2 data-en="Tools for technicians">أدوات الفنيين</h2><hr><em>8 أدوات شغّالة</em></div>
     <div class="grid g3">
-      <a class="card tool live rise" href="tools/load/">
-        <span class="live-tag">جرّبها الآن</span>
-        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-solar-panel"/></svg></i><span data-en="System sizing calculator">حساب المنظومة الشمسية</span></h3>
-        <p data-en="Enter your home appliances and get the inverter, battery and panel sizes you need.">حطّ أجهزة بيتك وبتطلعلك قدرة الإنفرتر وسعة البطاريات وعدد الألواح.</p>
-        <div class="tags"><span class="tag">Load Sizing</span><span class="tag">Battery</span><span class="tag">PV</span></div>
-      </a>
-
-      <a class="card tool live rise" href="tools/inverters/">
-        <span class="live-tag">جرّبها الآن</span>
-        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-microchip"/></svg></i><span data-en="Inverter settings guide">إعدادات الإنفرترات</span></h3>
-        <p data-en="Felicity, Growatt and Voltronic — which program number to open and what value to set.">Felicity وGrowatt وVoltronic — على أي رقم برنامج تفوت وشو تحط فيه، خطوة خطوة.</p>
-        <div class="tags"><span class="tag">Felicity</span><span class="tag">Growatt</span><span class="tag">Voltronic</span></div>
-      </a>
-
-      <a class="card tool live rise" href="tools/deye/">
-        <span class="live-tag">جرّبها الآن</span>
-        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-sliders"/></svg></i><span data-en="Deye inverter settings">إعدادات إنفرتر Deye</span></h3>
-        <p data-en="Charging currents, protection sizes and fault codes for Deye hybrid inverters.">تيارات الشحن وقياسات الحماية وأكواد الأعطال لإنفرترات Deye الهجينة.</p>
-        <div class="tags"><span class="tag">Deye</span><span class="tag">Fault Codes</span></div>
-      </a>
-
       <a class="card tool live rise" href="tools/jarde/">
-        <span class="live-tag">جرّبها الآن</span>
+        <span class="live-tag">مجانية</span>
         <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-diagram-project"/></svg></i><span data-en="Materials take-off">الجردة — جرد المواد</span></h3>
-        <p data-en="Sawad or bayad take-off, then send the order straight to the nearest shop on WhatsApp.">جردة سواد أو بياض، وبتوصل للمحل الأقرب على واتساب جاهزة مع PDF.</p>
+        <p>جردة سواد أو بياض، وبتوصل للمحل الأقرب على واتساب جاهزة مع PDF.</p>
         <div class="tags"><span class="tag">Take-off</span><span class="tag">PDF</span><span class="tag">WhatsApp</span></div>
       </a>
 
+      <a class="card tool live rise" href="tools/roof/">
+        <span class="live-tag pro">🎁 جرّبها 3 أيام</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-solar-panel"/></svg></i><span data-en="Roof measurement">قياس السطح من القمر الصناعي</span></h3>
+        <p>ارسم السطح على الخريطة وبتطلعلك المساحة وعدد الألواح والقدرة — قبل ما تزور الموقع.</p>
+        <div class="tags"><span class="tag">Satellite</span><span class="tag">PDF</span><span class="tag">Solar</span></div>
+      </a>
+
+      <a class="card tool live rise" href="tools/load/">
+        <span class="live-tag pro">🎁 جرّبها 3 أيام</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-gauge-high"/></svg></i><span data-en="System sizing">حساب المنظومة الشمسية</span></h3>
+        <p>حطّ أجهزة بيتك وبتطلعلك قدرة الإنفرتر وسعة البطاريات وعدد الألواح.</p>
+        <div class="tags"><span class="tag">Load</span><span class="tag">Battery</span><span class="tag">PV</span></div>
+      </a>
+
+      <a class="card tool live rise" href="tools/inverters/">
+        <span class="live-tag pro">🎁 جرّبها 3 أيام</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-microchip"/></svg></i><span data-en="Inverter settings">إعدادات الإنفرترات</span></h3>
+        <p>Felicity وGrowatt وVoltronic — على أي رقم برنامج تفوت وشو تحط فيه، خطوة خطوة.</p>
+        <div class="tags"><span class="tag">Felicity</span><span class="tag">Growatt</span><span class="tag">Voltronic</span></div>
+      </a>
+
+      <a class="card tool live rise" href="tools/transformer/">
+        <span class="live-tag pro">🎁 جرّبها 3 أيام</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-wave-square"/></svg></i><span data-en="Transformer calculator">حاسبة المحوّلات</span></h3>
+        <p>من القدرة أو الأمبير: مقطع القالب، عدد اللفات، سلك النحاس، ونقاط التقاط للمنظّم.</p>
+        <div class="tags"><span class="tag">Winding</span><span class="tag">Stabilizer</span></div>
+      </a>
+
       <a class="card tool live rise" href="tools/wirephase/">
-        <span class="live-tag">جرّبها الآن</span>
-        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-wave-square"/></svg></i><span data-en="Phase distribution helper">توزيع الفازات</span></h3>
-        <p data-en="Which phase each circuit goes on, with three colour-coding standards.">أي دارة على أي فاز، مع تلات معايير ترميز لوني.</p>
+        <span class="live-tag pro">🎁 جرّبها 3 أيام</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-sliders"/></svg></i><span data-en="Phase distribution">توزيع الفازات</span></h3>
+        <p>أي دارة على أي فاز، مع تلات معايير ترميز لوني.</p>
         <div class="tags"><span class="tag">L1 · L2 · L3</span><span class="tag">IEC</span></div>
       </a>
 
+      <a class="card tool live rise" href="tools/deye/">
+        <span class="live-tag beta">قيد التجربة</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-sliders"/></svg></i><span data-en="Deye settings">إعدادات إنفرتر Deye</span></h3>
+        <p>تيارات الشحن وقياسات الحماية وأكواد الأعطال لإنفرترات Deye الهجينة.</p>
+        <div class="tags"><span class="tag">Deye</span><span class="tag">Fault Codes</span></div>
+      </a>
+
+      <a class="card tool live rise" href="tools/qr/">
+        <span class="live-tag beta">قيد التجربة</span>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-code"/></svg></i><span data-en="QR generator">مولّد QR</span></h3>
+        <p>ملصق QR جاهز للطباعة لأي رابط — لمحلك أو لمركبتك.</p>
+        <div class="tags"><span class="tag">QR</span><span class="tag">Print</span></div>
+      </a>
+
       <article class="card tool rise">
-        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-gauge-high"/></svg></i><span data-en="Cable sizing calculator">حاسبة الكابلات</span></h3>
-        <p data-en="Cable sizing to international standards: load, length, voltage drop and the right section.">قياس الكابل حسب المواصفات العالمية: الحمل، الطول، هبوط الجهد، والمقطع المناسب. <b>قريباً</b></p>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-toolbox"/></svg></i><span data-en="Cable sizing">حاسبة الكابلات</span></h3>
+        <p>قياس الكابل حسب المواصفات العالمية: الحمل، الطول، هبوط الجهد، والمقطع المناسب. <b>قريباً</b></p>
         <div class="tags"><span class="tag">قريباً</span></div>
       </article>
 
-      <article class="card tool rise">
-        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-code"/></svg></i><span data-en="Profile sites &amp; CVs">مواقع تعريفية وسير ذاتية</span></h3>
-        <p data-en="A professional page that presents you and your work — like this site you're on.">صفحة احترافية بتعرّف عنك وعن شغلك — زي هالموقع اللي أنت عليه هلق.</p>
-        <div class="tags"><span class="tag">Personal site</span><span class="tag">CV</span></div>
-      </article>
-
       <article class="card tool pin rise">
-        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-toolbox"/></svg></i><span data-en="Your own tool, on request">أداة حسب طلبك</span></h3>
-        <p data-en="Tell me the task that wastes your time and I build the tool for it — or your own branded copy of any tool here.">قلّي شو الشغلة اللي بتضيّع وقتك وبصنعلك أداتها — أو نسختك أنت من أي أداة هون باسمك ورقمك.</p>
-        <div class="tags"><span class="tag">Online</span><span class="tag">On-site</span><span class="tag">Any trade</span></div>
+        <h3><i class="ic"><svg viewBox="0 0 24 24"><use href="#i-toolbox"/></svg></i><span data-en="Custom systems">أنظمة وتطبيقات حسب الطلب</span></h3>
+        <p>أنظمة حضور وفواتير وإدارة زباين، مواقع تعريفية، وأدوات مخصّصة باسمك ورقمك — لأي مهنة وبأي بلد.</p>
+        <div class="tags"><span class="tag">Systems</span><span class="tag">Web</span><span class="tag">Custom</span></div>
       </article>
 
     <a class="btn btn-main" style="margin-top:16px" href="https://wa.me/96179434479?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%20%D8%A3%D9%86%D9%88%D8%B1%D8%8C%20%D8%A8%D8%AF%D9%8A%20%D8%A3%D8%B3%D8%A3%D9%84%20%D8%B9%D9%86%20%D8%A3%D8%AF%D9%88%D8%A7%D8%AA%20%D8%A7%D9%84%D9%81%D9%86%D9%8A%D9%8A%D9%86" target="_blank" rel="noopener">
