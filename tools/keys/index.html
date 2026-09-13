@@ -75,6 +75,15 @@ input:focus,select:focus{border-color:var(--volt)}
   border-radius:13px;transition:transform .3s;z-index:900;max-width:90%;text-align:center}
 .toast.on{transform:translate(-50%,0)}
 .search{margin-bottom:11px}
+.pkgs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.pk{background:var(--panel-2);border:1.5px solid var(--line);border-radius:12px;padding:12px 8px;
+  cursor:pointer;text-align:center;font-family:inherit;color:var(--text)}
+.pk.on{border-color:var(--volt);background:var(--glow)}
+.pk.life{grid-column:1/-1;border-color:rgba(232,163,61,.5)}
+.pk.life.on{border-color:var(--warn);background:rgba(232,163,61,.12)}
+.pk b{display:block;font-size:12.5px;color:var(--muted);margin-bottom:2px}
+.pk .v{font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:700;color:var(--volt)}
+.pk.life .v{color:var(--warn)}
 .tabs{display:flex;gap:7px;margin-bottom:13px}
 .tabs button{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;
   padding:11px 6px;font-family:inherit;font-size:13.5px;cursor:pointer;color:var(--muted)}
@@ -119,18 +128,18 @@ input:focus,select:focus{border-color:var(--volt)}
       <div><label class="lbl">اسم المشترك</label><input id="nName" placeholder="أبو علي — كهربائي"></div>
       <div><label class="lbl">رقم التلفون</label><input id="nPhone" type="tel" placeholder="70xxxxxx"></div>
     </div>
-    <div class="two mb">
-      <div><label class="lbl">المدة</label>
-        <select id="nDur"><option value="30">شهر</option><option value="90">3 أشهر</option>
-          <option value="180">6 أشهر</option><option value="365" selected>سنة</option>
-          <option value="0">بدون انتهاء</option></select></div>
-      <div><label class="lbl">الأدوات</label>
-        <select id="nTools"><option value="all" selected>كل الأدوات</option>
-          <option value="roof">قياس السطح فقط</option>
-          <option value="transformer">المحوّلات فقط</option>
-          <option value="inverters">الإنفرترات فقط</option>
-          <option value="load">حساب المنظومة فقط</option></select></div>
-    </div>
+    <div class="mb"><label class="lbl">الأداة</label>
+      <select id="nTools">
+        <option value="all" selected>🎁 كل الأدوات</option>
+        <option value="roof">قياس السطح</option>
+        <option value="load">حساب المنظومة</option>
+        <option value="inverters">إعدادات الإنفرترات</option>
+        <option value="transformer">حاسبة المحوّلات</option>
+        <option value="wirephase">توزيع الفازات</option>
+      </select></div>
+    <label class="lbl">الباقة</label>
+    <div class="pkgs" id="pkgs"></div>
+    <input type="hidden" id="nDur" value="365">
     <div class="two mb">
       <div><label class="lbl">المبلغ المدفوع ($)</label><input id="nPaid" type="number" inputmode="decimal" placeholder="80"></div>
       <div><label class="lbl">طريقة الدفع</label>
@@ -172,6 +181,12 @@ const PIN="71736401ANWAR";
 const WA="96179434479";
 const TOOLS={all:'كل الأدوات',roof:'قياس السطح',transformer:'المحوّلات',
   inverters:'الإنفرترات',load:'حساب المنظومة',wirephase:'توزيع الفازات'};
+const PRICE={
+  roof:{m:10,q:25,y:80,L:200}, load:{m:10,q:25,y:80,L:200},
+  inverters:{m:8,q:20,y:60,L:150}, transformer:{m:8,q:20,y:60,L:150},
+  wirephase:{m:5,q:12,y:35,L:90}, all:{m:25,q:60,y:180,L:450}
+};
+const PKG={m:['شهر',30],q:['3 شهور',90],y:['سنة',365],L:['مدى الحياة',0]};
 
 const $=i=>document.getElementById(i);
 let DB=[];
@@ -186,6 +201,20 @@ $('enter').onclick=()=>{if($('pin').value.trim()!==PIN){$('perr').textContent='�
 $('pin').addEventListener('keydown',e=>{if(e.key==='Enter')$('enter').click()});
 $('out').onclick=()=>{sessionStorage.removeItem('mea_adm');location.reload()};
 if(sessionStorage.getItem('mea_adm')){$('lock').style.display='none';load();}
+drawPkgs();
+
+let pkg='y';
+function drawPkgs(){
+  const t=$('nTools').value, P=PRICE[t]||PRICE.all;
+  $('pkgs').innerHTML=['m','q','y'].map(k=>'<button class="pk'+(pkg===k?' on':'')+'" data-k="'+k+'">'
+    +'<b>'+PKG[k][0]+'</b><span class="v">'+P[k]+'$</span></button>').join('')
+    +'<button class="pk life'+(pkg==='L'?' on':'')+'" data-k="L"><b>💎 مدى الحياة</b>'
+    +'<span class="v">'+P.L+'$</span></button>';
+  $('nPaid').value=P[pkg];
+  $('nDur').value=PKG[pkg][1];
+}
+$('pkgs').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;pkg=b.dataset.k;drawPkgs();};
+$('nTools').onchange=drawPkgs;
 
 function newCode(){
   const C='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -230,7 +259,7 @@ function waMsg(L){
   m+='*المفتاح:* '+L.code+'\n';
   m+='الأدوات: '+t+'\n';
   m+='الصلاحية: '+(L.expires?'حتى '+L.expires:'دائم — بدون انتهاء')+'\n';
-  if(L.paid) m+='المدفوع: '+L.paid+'$ · '+(L.pay||'')+'\n';
+  if(L.paid) m+='الباقة: '+L.paid+'$ · '+(L.pay||'')+'\n';
   m+='━━━━━━━━━━━━━━━\n';
   m+='*كيف تفعّل؟*\n';
   m+='1. افتح رابط الأداة\n';
