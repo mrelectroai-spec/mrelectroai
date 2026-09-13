@@ -75,6 +75,11 @@ input:focus,select:focus{border-color:var(--volt)}
   border-radius:13px;transition:transform .3s;z-index:900;max-width:90%;text-align:center}
 .toast.on{transform:translate(-50%,0)}
 .search{margin-bottom:11px}
+.tabs{display:flex;gap:7px;margin-bottom:13px}
+.tabs button{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;
+  padding:11px 6px;font-family:inherit;font-size:13.5px;cursor:pointer;color:var(--muted)}
+.tabs button.on{background:var(--volt);color:var(--volt-ink);border-color:var(--volt);font-weight:700}
+.pg{display:none}.pg.on{display:block}
 </style>
 </head>
 <body>
@@ -96,6 +101,10 @@ input:focus,select:focus{border-color:var(--volt)}
 </div></div>
 
 <div class="wrap">
+  <div class="tabs" id="tabs">
+    <button data-t="k" class="on">🔑 المفاتيح</button>
+    <button data-t="t">🎁 التجارب</button>
+  </div>
   <div class="stat">
     <div><b id="s1">0</b><span>مفتاح</span></div>
     <div><b id="s2">0</b><span>نشط</span></div>
@@ -103,6 +112,7 @@ input:focus,select:focus{border-color:var(--volt)}
     <div><b id="s4">0</b><span>موقوف</span></div>
   </div>
 
+  <div class="pg on" id="pgK">
   <div class="card">
     <h2>➕ مفتاح جديد</h2>
     <div class="two mb">
@@ -121,7 +131,13 @@ input:focus,select:focus{border-color:var(--volt)}
           <option value="inverters">الإنفرترات فقط</option>
           <option value="load">حساب المنظومة فقط</option></select></div>
     </div>
-    <div class="mb"><label class="lbl">ملاحظة (اختياري)</label><input id="nNote" placeholder="دفع 80$ — تحويل OMT"></div>
+    <div class="two mb">
+      <div><label class="lbl">المبلغ المدفوع ($)</label><input id="nPaid" type="number" inputmode="decimal" placeholder="80"></div>
+      <div><label class="lbl">طريقة الدفع</label>
+        <select id="nPay"><option>OMT</option><option>Whish</option><option>نقداً</option>
+          <option>تحويل بنكي</option><option>لسا ما دفع</option></select></div>
+    </div>
+    <div class="mb"><label class="lbl">ملاحظة (اختياري)</label><input id="nNote" placeholder="أي تفاصيل إضافية"></div>
     <button class="btn main" id="gen">🔑 ولّد المفتاح</button>
     <div id="genOut"></div>
   </div>
@@ -130,6 +146,20 @@ input:focus,select:focus{border-color:var(--volt)}
     <h2>📋 المفاتيح <span class="chip m" id="cnt">0</span></h2>
     <input id="q" class="search" placeholder="دوّر بالاسم أو الرقم أو المفتاح...">
     <div id="list"></div>
+  </div>
+  </div>
+
+  <div class="pg" id="pgT">
+    <div class="stat">
+      <div><b id="t1">0</b><span>تجربة</span></div>
+      <div><b id="t2">0</b><span>شغّالة</span></div>
+      <div><b id="t3">0</b><span>خلصت</span></div>
+      <div><b id="t4">0</b><span>صاروا مشتركين</span></div>
+    </div>
+    <div class="card"><h2>🎁 التجارب المجانية</h2>
+      <div class="note" style="margin:0 0 12px"><b>تابعهم:</b> اللي خلصت تجربته وما تواصلت معه بيطلع بالأحمر.
+        اضغط 📲 لتحكيه، وبعدين علّمه كـ«تواصلت».</div>
+      <div id="tlist"></div></div>
   </div>
 </div>
 
@@ -169,23 +199,49 @@ $('gen').onclick=async()=>{
   const exp=days?new Date(Date.now()+days*864e5).toISOString().slice(0,10):null;
   const code=newCode();
   $('gen').disabled=true;
+  const paid=$('nPaid').value.trim(), pay=$('nPay').value;
+  const note=[paid?paid+'$ · '+pay:pay, $('nNote').value.trim()].filter(Boolean).join(' · ');
   const r=await sb(()=>api('licenses',{method:'POST',body:JSON.stringify([{code,name:n,
-    phone:$('nPhone').value.trim(),note:$('nNote').value.trim(),tools:$('nTools').value,
+    phone:$('nPhone').value.trim(),note,tools:$('nTools').value,
     expires:exp,active:true}])}));
   $('gen').disabled=false;
   if(!r)return;
-  $('nName').value='';$('nPhone').value='';$('nNote').value='';
+  const ph=$('nPhone').value.trim();
+  const msg=waMsg({code,name:n,expires:exp,tools:$('nTools').value,paid,pay});
+  $('nName').value='';$('nPhone').value='';$('nNote').value='';$('nPaid').value='';
   $('genOut').innerHTML='<div class="note" style="border-color:var(--volt);border-style:solid">'
-    +'<b style="color:var(--volt)">✅ المفتاح جاهز:</b><br>'
-    +'<span class="code" onclick="cp(\''+code+'\')" style="display:inline-block;margin:8px 0">'+code+'</span><br>'
-    +'اضغط على المفتاح لتنسخه، أو ابعتو مباشرة:</div>'
-    +'<a class="btn main" target="_blank" href="https://wa.me/?text='
-    +encodeURIComponent('مفتاح تفعيل أدوات MrElectroAI 🔑\n\n'+code
-      +'\n\nالمشترك: '+n+(exp?'\nصالح حتى: '+exp:'\nبدون تاريخ انتهاء')
-      +'\n\nحطّه بأي أداة مقفولة وبيفتح لعندك.\nالأدوات: https://mrelectroai-spec.github.io/mrelectroai/')
-    +'">📲 ابعت المفتاح على واتساب</a>';
+    +'<b style="color:var(--volt)">✅ المفتاح جاهز</b><br>'
+    +'<span class="code" onclick="cp(\''+code+'\')" style="display:inline-block;margin:9px 0;font-size:18px">'+code+'</span><br>'
+    +(ph?'رح ينفتح واتساب على رقم <b style="color:var(--text)">'+ph+'</b> والرسالة معبّاية — بس اضغط إرسال.'
+       :'⚠️ ما حطّيت رقم — انسخ المفتاح وابعتو يدوياً.')+'</div>'
+    +'<a class="btn main" target="_blank" href="'+waLink(ph,msg)+'">📲 '+(ph?'ابعت لـ '+ph:'ابعت على واتساب')+'</a>';
   load();
 };
+function waLink(phone,msg){
+  const p=(phone||'').replace(/\D/g,'').replace(/^0/,'');
+  const full=p?('961'+p):'';
+  return 'https://wa.me/'+full+'?text='+encodeURIComponent(msg);
+}
+function waMsg(L){
+  const t=TOOLS[L.tools]||L.tools;
+  let m='🔑 *مفتاح تفعيل أدوات MrElectroAI*\n';
+  m+='━━━━━━━━━━━━━━━\n';
+  m+='المشترك: '+L.name+'\n';
+  m+='*المفتاح:* '+L.code+'\n';
+  m+='الأدوات: '+t+'\n';
+  m+='الصلاحية: '+(L.expires?'حتى '+L.expires:'دائم — بدون انتهاء')+'\n';
+  if(L.paid) m+='المدفوع: '+L.paid+'$ · '+(L.pay||'')+'\n';
+  m+='━━━━━━━━━━━━━━━\n';
+  m+='*كيف تفعّل؟*\n';
+  m+='1. افتح رابط الأداة\n';
+  m+='2. بتطلعلك شاشة التفعيل\n';
+  m+='3. حطّ المفتاح واضغط تفعيل\n';
+  m+='4. خلص — بيضل مفتوح لعندك\n\n';
+  m+='⚠️ المفتاح بينربط بجهازك الأول. إذا بدّلت موبايل تواصل معي وبفكّو.\n\n';
+  m+='🔗 الأدوات:\nhttps://mrelectroai-spec.github.io/mrelectroai/\n\n';
+  m+='أي سؤال أنا جاهز 👍\nأنور الحسن الجاسم — MrElectroAI\n+961 79 434 479';
+  return m;
+}
 function cp(t){navigator.clipboard.writeText(t).then(()=>say('انتسخ المفتاح'));}
 
 $('q').addEventListener('input',draw);
@@ -223,12 +279,70 @@ function draw(){
       +'<button class="btn sm" onclick="tog(\''+x.code+'\','+(!x.active)+')">'+(x.active?'⏸️ إيقاف':'▶️ تفعيل')+'</button>'
       +'<button class="btn sm" onclick="unbind(\''+x.code+'\')">🔓 فكّ الجهاز</button>'
       +'<button class="btn sm" onclick="extend(\''+x.code+'\')">📅 تمديد سنة</button>'
-      +'<a class="btn sm" target="_blank" href="https://wa.me/'+(x.phone?'961'+x.phone.replace(/\D/g,''):'')
-        +'?text='+encodeURIComponent('مفتاحك: '+x.code)+'">📲</a>'
+      +'<a class="btn sm" target="_blank" href="'+waLink(x.phone,waMsg(x))+'">📲 ابعت</a>'
       +'<button class="btn sm dang" onclick="del(\''+x.code+'\')">🗑️</button>'
       +'</div></div>';
   }).join(''):'<div class="empty">ما في مفاتيح بعد.</div>';
 }
+let TR=[], tab='k';
+$('tabs').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;
+  tab=b.dataset.t;[...$('tabs').children].forEach(x=>x.classList.toggle('on',x===b));
+  $('pgK').classList.toggle('on',tab==='k');$('pgT').classList.toggle('on',tab==='t');
+  document.querySelectorAll('.stat')[0].style.display = tab==='k'?'grid':'none';
+  if(tab==='t')loadTrials();};
+
+async function loadTrials(){
+  const r=await sb(()=>api('trials?select=*&order=started.desc&limit=200'));
+  if(!r)return; TR=r; drawTrials();
+}
+function drawTrials(){
+  const now=new Date();
+  const live=TR.filter(t=>new Date(t.ends)>now);
+  $('t1').textContent=TR.length;
+  $('t2').textContent=live.length;
+  $('t3').textContent=TR.length-live.length;
+  $('t4').textContent=TR.filter(t=>t.converted).length;
+  $('tlist').innerHTML=TR.length?TR.map(t=>{
+    const on=new Date(t.ends)>now;
+    const days=Math.ceil((new Date(t.ends)-now)/864e5);
+    const need=!on&&!t.contacted&&!t.converted;
+    return '<div class="lic'+(need?' exp':'')+(t.converted?'':'')+'">'
+      +'<div class="lh"><b>'+t.name+'</b>'
+      +'<span class="chip '+(t.converted?'g':on?'g':need?'r':'m')+'">'
+        +(t.converted?'✅ مشترك':on?'شغّالة · '+days+' يوم':need?'⚠️ محتاج متابعة':'خلصت')+'</span></div>'
+      +'<div class="lm">📱 '+t.phone+' · '+(TOOLS[t.tool]||t.tool||'—')
+      +'<br>بلّشت: '+new Date(t.started).toLocaleDateString('ar-LB')
+      +' · بتخلص: '+new Date(t.ends).toLocaleDateString('ar-LB')
+      +(t.note?'<br>'+t.note:'')+'</div>'
+      +'<div class="acts">'
+      +'<a class="btn sm" target="_blank" href="'+waLink(t.phone,followMsg(t))+'">📲 حكيه</a>'
+      +(!t.contacted?'<button class="btn sm" onclick="mark(\''+t.id+'\',\'contacted\')">✅ تواصلت</button>':'')
+      +(!t.converted?'<button class="btn sm main" onclick="conv(\''+t.id+'\',\''+t.name+'\',\''+t.phone+'\')">🔑 اعملو مفتاح</button>':'')
+      +'<button class="btn sm dang" onclick="delTr(\''+t.id+'\')">🗑️</button>'
+      +'</div></div>';
+  }).join(''):'<div class="empty">ما في تجارب بعد.<br>لما حدا يجرّب أداة، بيطلع هون باسمه ورقمه.</div>';
+}
+function followMsg(t){
+  const on=new Date(t.ends)>new Date();
+  return 'مرحبا '+t.name+' 👋\n\nأنا أنور من MrElectroAI.\n'
+    +(on?'شفت إنك عم تجرّب '+(TOOLS[t.tool]||'الأداة')+' — كيف لاقيتها؟'
+        :'خلصت تجربتك المجانية لـ'+(TOOLS[t.tool]||'الأداة')+'. كيف كانت معك؟')
+    +'\n\nإذا عجبتك، بقدر أعطيك مفتاح كامل يفتحلك كل الأدوات.\n'
+    +'وإذا في شي ناقص أو مزعج، احكيلي وبعدّلو 👍';
+}
+async function mark(id,f){await sb(()=>api('trials?id=eq.'+id,{method:'PATCH',body:JSON.stringify({[f]:true})}));
+  say('انعلّم');loadTrials();}
+async function conv(id,name,phone){
+  await sb(()=>api('trials?id=eq.'+id,{method:'PATCH',body:JSON.stringify({converted:true,contacted:true})}));
+  $('nName').value=name;$('nPhone').value=phone;
+  tab='k';[...$('tabs').children].forEach((x,i)=>x.classList.toggle('on',i===0));
+  $('pgK').classList.add('on');$('pgT').classList.remove('on');
+  document.querySelectorAll('.stat')[0].style.display='grid';
+  say('عبّينالك بياناتو — ولّد المفتاح');window.scrollTo({top:0,behavior:'smooth'});
+}
+async function delTr(id){if(!confirm('حذف هالتجربة؟'))return;
+  await sb(()=>api('trials?id=eq.'+id,{method:'DELETE'}));loadTrials();}
+
 async function tog(c,v){await sb(()=>api('licenses?code=eq.'+c,{method:'PATCH',body:JSON.stringify({active:v})}));
   say(v?'انفعّل':'انوقف');load();}
 async function unbind(c){await sb(()=>api('licenses?code=eq.'+c,{method:'PATCH',body:JSON.stringify({device:null})}));
