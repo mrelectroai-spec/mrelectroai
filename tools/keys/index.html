@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مفاتيح التفعيل | MrElectroAI</title>
+<meta name="theme-color" content="#081311">
+<meta name="robots" content="noindex,nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--void:#081311;--panel:#0F1D1A;--panel-2:#152724;--line:#223B36;
+  --volt:#22C79B;--volt-ink:#04140F;--arc:#63E3C2;--text:#E4F0EC;--muted:#7D948E;
+  --glow:rgba(34,199,155,.13);--warn:#E8A33D;--danger:#E06B6B;--ok:#4ADE80}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--void);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px;line-height:1.65;padding-bottom:40px;
+  background-image:linear-gradient(to bottom,var(--glow),transparent 320px)}
+:where(button,input,select):focus-visible{outline:2px solid var(--arc);outline-offset:2px}
+.bar{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;
+  padding-top:env(safe-area-inset-top)}
+.bar-in{max-width:680px;margin:0 auto;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lg{display:flex;align-items:center;gap:10px}
+.lg span{width:34px;height:34px;border-radius:10px;background:var(--volt);color:var(--volt-ink);
+  display:grid;place-items:center;font-size:17px}
+.lg b{font-family:'JetBrains Mono',monospace;font-size:13px;display:block;line-height:1.2}
+.lg small{font-size:10px;color:var(--muted);display:block}
+.wrap{max-width:680px;margin:0 auto;padding:18px 15px}
+h1{font-family:'Readex Pro',sans-serif;font-size:24px;margin-bottom:4px}
+.lede{color:var(--muted);font-size:13.5px;margin-bottom:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.card h2{font-family:'Readex Pro',sans-serif;font-size:15px;margin-bottom:13px;padding-bottom:10px;
+  border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:500}
+input,select{width:100%;font-family:inherit;font-size:15px;color:var(--text);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:11px;padding:12px 13px}
+input:focus,select:focus{border-color:var(--volt)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mb{margin-bottom:11px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;
+  border-radius:12px;font-family:inherit;font-size:14.5px;font-weight:700;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--text);cursor:pointer;margin-top:9px;text-decoration:none}
+.btn.main{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
+.btn.dang{color:var(--danger);border-color:rgba(224,107,107,.35)}
+.btn.sm{width:auto;padding:8px 13px;font-size:12.5px;margin:0}
+.stat{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:13px}
+.stat div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 5px;text-align:center}
+.stat b{display:block;font-family:'JetBrains Mono',monospace;font-size:19px;color:var(--volt)}
+.stat span{font-size:10px;color:var(--muted)}
+.lic{background:var(--panel-2);border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:9px}
+.lic.off{opacity:.55;border-style:dashed}
+.lic.exp{border-color:var(--warn)}
+.lh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.code{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--volt);
+  background:var(--void);border:1px solid var(--volt);border-radius:9px;padding:6px 11px;cursor:pointer}
+.lh b{font-size:14.5px}
+.lm{font-size:12px;color:var(--muted);line-height:1.8}
+.chip{display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 8px;margin-inline-end:5px}
+.chip.g{background:rgba(74,222,128,.14);color:var(--ok)}
+.chip.y{background:rgba(232,163,61,.14);color:var(--warn)}
+.chip.r{background:rgba(224,107,107,.14);color:var(--danger)}
+.chip.m{background:var(--panel);color:var(--muted);border:1px solid var(--line)}
+.acts{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px;line-height:1.9}
+.note{font-size:12.5px;color:var(--muted);background:var(--panel-2);border:1px dashed var(--warn);
+  border-radius:11px;padding:12px;line-height:1.8;margin-top:10px}
+.note b{color:var(--warn)}
+.lock{position:fixed;inset:0;background:var(--void);display:grid;place-items:center;padding:22px;z-index:80}
+.lockbox{width:100%;max-width:330px;text-align:center}
+.lockbox .ic{font-size:50px;margin-bottom:12px}
+.lockbox h2{font-family:'Readex Pro',sans-serif;font-size:21px;margin-bottom:4px}
+.lockbox p{font-size:12.5px;color:var(--muted);margin-bottom:18px}
+#pin{text-align:center;font-family:'JetBrains Mono',monospace;letter-spacing:2px}
+.perr{font-size:12.5px;color:var(--danger);min-height:20px;margin-top:8px}
+.toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translate(-50%,-160%);
+  background:var(--volt);color:var(--volt-ink);font-size:13.5px;font-weight:700;padding:11px 20px;
+  border-radius:13px;transition:transform .3s;z-index:900;max-width:90%;text-align:center}
+.toast.on{transform:translate(-50%,0)}
+.search{margin-bottom:11px}
+</style>
+</head>
+<body>
+
+<div class="lock" id="lock">
+  <div class="lockbox">
+    <div class="ic">🔑</div>
+    <h2>مفاتيح التفعيل</h2>
+    <p>MrElectroAI — لوحة الإدارة</p>
+    <input id="pin" type="password" placeholder="كود الإدارة" autocomplete="off">
+    <div class="perr" id="perr"></div>
+    <button class="btn main" id="enter">دخول</button>
+  </div>
+</div>
+
+<div class="bar"><div class="bar-in">
+  <div class="lg"><span>🔑</span><b>مفاتيح التفعيل<small>MrElectroAI</small></b></div>
+  <button class="btn sm" id="out">خروج</button>
+</div></div>
+
+<div class="wrap">
+  <div class="stat">
+    <div><b id="s1">0</b><span>مفتاح</span></div>
+    <div><b id="s2">0</b><span>نشط</span></div>
+    <div><b id="s3">0</b><span>منتهي</span></div>
+    <div><b id="s4">0</b><span>موقوف</span></div>
+  </div>
+
+  <div class="card">
+    <h2>➕ مفتاح جديد</h2>
+    <div class="two mb">
+      <div><label class="lbl">اسم المشترك</label><input id="nName" placeholder="أبو علي — كهربائي"></div>
+      <div><label class="lbl">رقم التلفون</label><input id="nPhone" type="tel" placeholder="70xxxxxx"></div>
+    </div>
+    <div class="two mb">
+      <div><label class="lbl">المدة</label>
+        <select id="nDur"><option value="30">شهر</option><option value="90">3 أشهر</option>
+          <option value="180">6 أشهر</option><option value="365" selected>سنة</option>
+          <option value="0">بدون انتهاء</option></select></div>
+      <div><label class="lbl">الأدوات</label>
+        <select id="nTools"><option value="all" selected>كل الأدوات</option>
+          <option value="roof">قياس السطح فقط</option>
+          <option value="transformer">المحوّلات فقط</option>
+          <option value="inverters">الإنفرترات فقط</option>
+          <option value="load">حساب المنظومة فقط</option></select></div>
+    </div>
+    <div class="mb"><label class="lbl">ملاحظة (اختياري)</label><input id="nNote" placeholder="دفع 80$ — تحويل OMT"></div>
+    <button class="btn main" id="gen">🔑 ولّد المفتاح</button>
+    <div id="genOut"></div>
+  </div>
+
+  <div class="card">
+    <h2>📋 المفاتيح <span class="chip m" id="cnt">0</span></h2>
+    <input id="q" class="search" placeholder="دوّر بالاسم أو الرقم أو المفتاح...">
+    <div id="list"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
+const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
+const PIN="71736401ANWAR";
+const WA="96179434479";
+const TOOLS={all:'كل الأدوات',roof:'قياس السطح',transformer:'المحوّلات',
+  inverters:'الإنفرترات',load:'حساب المنظومة',wirephase:'توزيع الفازات'};
+
+const $=i=>document.getElementById(i);
+let DB=[];
+function say(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500);}
+async function api(p,o={}){const r=await fetch(SB_URL+'/rest/v1/'+p,{...o,headers:{apikey:SB_KEY,
+  Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'return=representation',...(o.headers||{})}});
+  if(!r.ok)throw new Error(await r.text());return r.status===204?null:r.json();}
+const sb=async fn=>{try{return await fn()}catch(e){say('ما قدرنا نتصل');return null}};
+
+$('enter').onclick=()=>{if($('pin').value.trim()!==PIN){$('perr').textContent='كود غلط';$('pin').value='';return;}
+  sessionStorage.setItem('mea_adm','1');$('lock').style.display='none';load();};
+$('pin').addEventListener('keydown',e=>{if(e.key==='Enter')$('enter').click()});
+$('out').onclick=()=>{sessionStorage.removeItem('mea_adm');location.reload()};
+if(sessionStorage.getItem('mea_adm')){$('lock').style.display='none';load();}
+
+function newCode(){
+  const C='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const p=n=>Array.from({length:n},()=>C[Math.floor(Math.random()*C.length)]).join('');
+  return 'MEA-'+p(4)+'-'+p(4);
+}
+$('gen').onclick=async()=>{
+  const n=$('nName').value.trim();
+  if(!n)return say('اكتب اسم المشترك');
+  const days=+$('nDur').value;
+  const exp=days?new Date(Date.now()+days*864e5).toISOString().slice(0,10):null;
+  const code=newCode();
+  $('gen').disabled=true;
+  const r=await sb(()=>api('licenses',{method:'POST',body:JSON.stringify([{code,name:n,
+    phone:$('nPhone').value.trim(),note:$('nNote').value.trim(),tools:$('nTools').value,
+    expires:exp,active:true}])}));
+  $('gen').disabled=false;
+  if(!r)return;
+  $('nName').value='';$('nPhone').value='';$('nNote').value='';
+  $('genOut').innerHTML='<div class="note" style="border-color:var(--volt);border-style:solid">'
+    +'<b style="color:var(--volt)">✅ المفتاح جاهز:</b><br>'
+    +'<span class="code" onclick="cp(\''+code+'\')" style="display:inline-block;margin:8px 0">'+code+'</span><br>'
+    +'اضغط على المفتاح لتنسخه، أو ابعتو مباشرة:</div>'
+    +'<a class="btn main" target="_blank" href="https://wa.me/?text='
+    +encodeURIComponent('مفتاح تفعيل أدوات MrElectroAI 🔑\n\n'+code
+      +'\n\nالمشترك: '+n+(exp?'\nصالح حتى: '+exp:'\nبدون تاريخ انتهاء')
+      +'\n\nحطّه بأي أداة مقفولة وبيفتح لعندك.\nالأدوات: https://mrelectroai-spec.github.io/mrelectroai/')
+    +'">📲 ابعت المفتاح على واتساب</a>';
+  load();
+};
+function cp(t){navigator.clipboard.writeText(t).then(()=>say('انتسخ المفتاح'));}
+
+$('q').addEventListener('input',draw);
+async function load(){
+  const r=await sb(()=>api('licenses?select=*&order=created_at.desc'));
+  if(!r)return; DB=r; draw();
+}
+function status(L){
+  if(!L.active)return['موقوف','r'];
+  if(L.expires&&new Date(L.expires)<new Date(new Date().toDateString()))return['منتهي','y'];
+  return['نشط','g'];
+}
+function draw(){
+  const q=$('q').value.trim();
+  let L=DB;
+  if(q)L=DB.filter(x=>(x.code+' '+x.name+' '+(x.phone||'')+' '+(x.note||'')).includes(q));
+  $('s1').textContent=DB.length;
+  $('s2').textContent=DB.filter(x=>status(x)[0]==='نشط').length;
+  $('s3').textContent=DB.filter(x=>status(x)[0]==='منتهي').length;
+  $('s4').textContent=DB.filter(x=>!x.active).length;
+  $('cnt').textContent=L.length;
+  $('list').innerHTML=L.length?L.map(x=>{
+    const [st,cl]=status(x);
+    return '<div class="lic'+(!x.active?' off':'')+(st==='منتهي'?' exp':'')+'">'
+      +'<div class="lh"><b>'+x.name+'</b>'
+      +'<span class="code" onclick="cp(\''+x.code+'\')">'+x.code+'</span></div>'
+      +'<div class="lm"><span class="chip '+cl+'">'+st+'</span>'
+      +'<span class="chip m">'+(TOOLS[x.tools]||x.tools)+'</span>'
+      +(x.expires?'<span class="chip m">حتى '+x.expires+'</span>':'<span class="chip m">دائم</span>')
+      +(x.device?'<span class="chip m">🔒 مربوط بجهاز</span>':'<span class="chip m">لسا ما انفعّل</span>')
+      +'<br>'+(x.phone||'—')+(x.note?' · '+x.note:'')
+      +(x.last_seen?'<br>آخر استعمال: '+new Date(x.last_seen).toLocaleDateString('ar-LB')+' · '+(x.uses||0)+' مرة':'')
+      +'</div>'
+      +'<div class="acts">'
+      +'<button class="btn sm" onclick="tog(\''+x.code+'\','+(!x.active)+')">'+(x.active?'⏸️ إيقاف':'▶️ تفعيل')+'</button>'
+      +'<button class="btn sm" onclick="unbind(\''+x.code+'\')">🔓 فكّ الجهاز</button>'
+      +'<button class="btn sm" onclick="extend(\''+x.code+'\')">📅 تمديد سنة</button>'
+      +'<a class="btn sm" target="_blank" href="https://wa.me/'+(x.phone?'961'+x.phone.replace(/\D/g,''):'')
+        +'?text='+encodeURIComponent('مفتاحك: '+x.code)+'">📲</a>'
+      +'<button class="btn sm dang" onclick="del(\''+x.code+'\')">🗑️</button>'
+      +'</div></div>';
+  }).join(''):'<div class="empty">ما في مفاتيح بعد.</div>';
+}
+async function tog(c,v){await sb(()=>api('licenses?code=eq.'+c,{method:'PATCH',body:JSON.stringify({active:v})}));
+  say(v?'انفعّل':'انوقف');load();}
+async function unbind(c){await sb(()=>api('licenses?code=eq.'+c,{method:'PATCH',body:JSON.stringify({device:null})}));
+  say('انفكّ من الجهاز — بيقدر يفعّلو من جهاز تاني');load();}
+async function extend(c){
+  const L=DB.find(x=>x.code===c);
+  const base=L.expires&&new Date(L.expires)>new Date()?new Date(L.expires):new Date();
+  const exp=new Date(base.getTime()+365*864e5).toISOString().slice(0,10);
+  await sb(()=>api('licenses?code=eq.'+c,{method:'PATCH',body:JSON.stringify({expires:exp,active:true})}));
+  say('تمدّد حتى '+exp);load();}
+async function del(c){if(!confirm('متأكد بدك تحذف المفتاح '+c+'؟'))return;
+  await sb(()=>api('licenses?code=eq.'+c,{method:'DELETE'}));say('انحذف');load();}
+</script>
+</body>
+</html>
