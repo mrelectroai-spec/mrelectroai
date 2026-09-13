@@ -14,6 +14,16 @@
   const WA     = "96179434479";
   const SITE   = "https://mrelectroai-spec.github.io/mrelectroai/";
 
+  /* ══ الأسعار — عدّلها من هون ══ */
+  const PRICE = {
+    roof:        { n:'قياس السطح',        m:10, q:25, y:80,  L:200 },
+    load:        { n:'حساب المنظومة',     m:10, q:25, y:80,  L:200 },
+    inverters:   { n:'إعدادات الإنفرترات', m:8,  q:20, y:60,  L:150 },
+    transformer: { n:'حاسبة المحوّلات',    m:8,  q:20, y:60,  L:150 },
+    wirephase:   { n:'توزيع الفازات',      m:5,  q:12, y:35,  L:90  },
+    all:         { n:'كل الأدوات',         m:25, q:60, y:180, L:450 }
+  };
+
   const me   = document.currentScript;
   const TOOL = (me && me.dataset.tool) || 'tool';
   const KEY  = 'mea_lic_' + TOOL;
@@ -58,6 +68,27 @@
   #meaLock .wa{background:rgba(255,255,255,.09);color:#E4F0EC;border:1px solid rgba(255,255,255,.18)}
   #meaLock .ft{margin-top:22px;font-size:11.5px;color:#5E7370;line-height:1.9}
   #meaLock .ft a{color:#22C79B;text-decoration:none}
+  #meaLock .box{max-height:92vh;overflow-y:auto}
+  #meaLock .plans{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px}
+  #meaLock .pl{position:relative;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.14);
+    border-radius:14px;padding:15px 10px;text-decoration:none;color:#E4F0EC;display:block}
+  #meaLock .pl .pn{display:block;font-size:13px;color:#7D948E;margin-bottom:3px}
+  #meaLock .pl .pp{display:block;font-family:'JetBrains Mono',monospace;font-size:25px;font-weight:700;color:#22C79B}
+  #meaLock .pl .ps{display:block;font-size:10.5px;color:#7D948E;margin-top:3px}
+  #meaLock .pl.best{border-color:#22C79B;background:rgba(34,199,155,.11)}
+  #meaLock .pl.life{grid-column:1/-1;border-color:#E8A33D;background:rgba(232,163,61,.1)}
+  #meaLock .pl.life .pp{color:#F0B85C;font-size:29px}
+  #meaLock .tagx{position:absolute;top:-9px;inset-inline-start:50%;transform:translateX(50%);
+    background:#22C79B;color:#04140F;font-size:9.5px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
+  #meaLock .tagx.gold{background:#E8A33D}
+  #meaLock .bundle{display:block;background:rgba(34,199,155,.1);border:1.5px dashed #22C79B;
+    border-radius:14px;padding:13px;margin-bottom:13px;text-decoration:none;color:#E4F0EC;text-align:center}
+  #meaLock .bundle b{display:block;font-size:14.5px;color:#22C79B;margin-bottom:3px}
+  #meaLock .bundle span{font-size:12px;color:#7D948E;line-height:1.7}
+  #meaLock .bundle span b{display:inline;color:#22C79B;font-size:13px}
+  #meaLock .life-feat{background:rgba(232,163,61,.07);border:1px solid rgba(232,163,61,.3);
+    border-radius:13px;padding:13px;font-size:12px;color:#C9D6D0;line-height:2;text-align:right;margin-bottom:6px}
+  #meaLock .life-feat b{color:#F0B85C}
   #meaLock .or{display:flex;align-items:center;gap:12px;margin:16px 0 4px;color:#5E7370;font-size:12px}
   #meaLock .or:before,#meaLock .or:after{content:'';flex:1;height:1px;background:rgba(255,255,255,.13)}
   #meaLock .tr{background:rgba(232,163,61,.14);color:#F0B85C;border:1px solid rgba(232,163,61,.4)}
@@ -78,19 +109,67 @@
       <button class="go" id="meaGo">تفعيل</button>
       <div class="or"><span>أو</span></div>
       <button class="tr" id="meaTrial">🎁 جرّبها مجاناً 3 أيام</button>
-      <a class="btn wa" id="meaWa" target="_blank" rel="noopener">💬 بدي مفتاح</a>
+      <button class="btn wa" id="meaPrice">💵 شوف الأسعار</button>
       <div class="ft"><b style="color:#E4F0EC">MrElectroAI</b> — أنور الحسن الجاسم<br>
         <a href="${SITE}" target="_blank">زور موقعنا</a></div>
     </div>`;
     document.body.appendChild(d);
-    document.getElementById('meaWa').href = 'https://wa.me/'+WA+'?text='+
-      encodeURIComponent('مرحبا، بدي مفتاح تفعيل لأدوات MrElectroAI.');
+    document.getElementById('meaPrice').onclick = priceView;
     document.getElementById('meaTrial').onclick = trialForm;
     const inp = document.getElementById('meaKey');
     inp.addEventListener('keydown', e=>{ if(e.key==='Enter') check(); });
     document.getElementById('meaGo').onclick = check;
     setTimeout(()=>inp.focus(), 300);
   }
+  const ask=(pkg,per,price)=>'https://wa.me/'+WA+'?text='+encodeURIComponent(
+    'مرحبا أنور 👋\n\nبدي أشترك:\n▸ '+pkg+'\n▸ '+per+'\n▸ '+price+'$\n\nكيف بدفع؟');
+
+  function priceView(){
+    const P=PRICE[TOOL]||PRICE.all, ALL=PRICE.all;
+    const box=document.querySelector('#meaLock .box');
+    box.innerHTML=`
+      <div class="ic">💵</div>
+      <h2>${P.n}</h2>
+      <p>اختار الباقة اللي بتناسبك — والمفتاح بيوصلك بدقايق.</p>
+
+      <div class="plans">
+        <a class="pl" target="_blank" href="${ask(P.n,'شهر',P.m)}">
+          <span class="pn">شهر</span><span class="pp">${P.m}$</span></a>
+        <a class="pl" target="_blank" href="${ask(P.n,'3 شهور',P.q)}">
+          <span class="pn">3 شهور</span><span class="pp">${P.q}$</span></a>
+        <a class="pl best" target="_blank" href="${ask(P.n,'سنة',P.y)}">
+          <span class="tagx">الأكثر طلباً</span>
+          <span class="pn">سنة</span><span class="pp">${P.y}$</span>
+          <span class="ps">وفّر ${P.m*12-P.y}$</span></a>
+        <a class="pl life" target="_blank" href="${ask(P.n,'مدى الحياة',P.L)}">
+          <span class="tagx gold">الأوفر</span>
+          <span class="pn">💎 مدى الحياة</span><span class="pp">${P.L}$</span>
+          <span class="ps">دفعة وحدة وخلص</span></a>
+      </div>
+
+      ${TOOL!=='all' ? `<a class="bundle" target="_blank" href="${ask('كل الأدوات','سنة',ALL.y)}">
+        <b>🎁 خد كل الأدوات</b>
+        <span>5 أدوات بمفتاح واحد — بالسنة <b>${ALL.y}$</b> بدل ${P.y*5}$</span></a>` : ''}
+
+      <div class="life-feat">
+        <b>💎 باقة مدى الحياة بتشمل:</b>
+        ✅ كل الأدوات الحالية<br>
+        ✅ <b>وكل أداة جديدة بتنزل — مجاناً للأبد</b><br>
+        ✅ أولوية بالدعم والاستشارات<br>
+        ✅ اقتراحاتك بتنفّذ أول<br>
+        ✅ سعر ثابت — ما بيتأثر بأي زيادة
+      </div>
+
+      <button class="btn wa" id="meaBack2">← رجوع</button>
+      <div class="ft">الدفع: OMT · Whish · نقداً<br>
+        <b style="color:#E4F0EC">أنور الحسن الجاسم</b> — +961 79 434 479</div>`;
+    document.getElementById('meaBack2').onclick=()=>{ reset(); ui(); };
+  }
+  function reset(){
+    const el=document.getElementById('meaLock'); if(el) el.remove();
+    document.querySelectorAll('style').forEach(s=>{ if(s.textContent.includes('#meaLock')) s.remove(); });
+  }
+
   function trialForm(){
     document.querySelector('#meaLock .box').innerHTML = `
       <div class="ic">🎁</div>
@@ -104,8 +183,7 @@
       <button class="btn wa" id="meaBack">← رجوع</button>
       <div class="ft">رقمك بيوصلني لأتابع معك بس تخلص التجربة — وما بينشارك مع حدا.</div>`;
     document.getElementById('meaTGo').onclick = startTrial;
-    document.getElementById('meaBack').onclick = ()=>{ document.getElementById('meaLock').remove();
-      document.querySelectorAll('style').forEach(s=>{ if(s.textContent.includes('#meaLock')) s.remove(); }); ui(); };
+    document.getElementById('meaBack').onclick = ()=>{ reset(); ui(); };
     setTimeout(()=>document.getElementById('meaTN').focus(),200);
   }
 
@@ -190,10 +268,10 @@
       +'color:#04140F;font-family:IBM Plex Sans Arabic,sans-serif;font-size:12.5px;font-weight:700;'
       +'padding:9px 14px calc(9px + env(safe-area-inset-bottom));text-align:center;direction:rtl;'
       +'display:flex;align-items:center;justify-content:center;gap:10px';
+    const P=PRICE[TOOL]||PRICE.all;
     b.innerHTML='🎁 تجربة مجانية — باقي '+days+' '+(days===1?'يوم':'أيام')
-      +' <a href="https://wa.me/'+WA+'?text='+encodeURIComponent('مرحبا، بدي مفتاح تفعيل للأدوات.')
-      +'" target="_blank" style="background:#04140F;color:#22C79B;border-radius:8px;'
-      +'padding:5px 12px;text-decoration:none">بدي مفتاح</a>';
+      +' <a href="'+ask(P.n,'سنة',P.y)+'" target="_blank" style="background:#04140F;color:#22C79B;'
+      +'border-radius:8px;padding:5px 12px;text-decoration:none">اشترك بـ'+P.y+'$</a>';
     document.body.appendChild(b);
   }
 
