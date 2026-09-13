@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الأدوات | MrElectroAI</title>
+<meta name="description" content="أدوات فنية للكهربائيين وفنيي الطاقة الشمسية — بتشتغل من الموبايل.">
+<meta name="theme-color" content="#081311">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--void:#070F0D;--panel:#0E1A17;--panel-2:#14241F;--line:#1E332D;
+  --volt:#22C79B;--arc:#63E3C2;--volt-ink:#031310;--text:#E8F2EE;--muted:#7B928C;
+  --glow:rgba(34,199,155,.1);--warn:#E8A33D;--warn-s:rgba(232,163,61,.13);--r:20px}
+[data-theme="light"]{--void:#F7F9F8;--panel:#FFF;--panel-2:#F0F5F3;--line:#E1EAE6;
+  --volt:#0E8F6E;--arc:#0B7A5E;--volt-ink:#FFF;--text:#0B1613;--muted:#5A6D67;
+  --glow:rgba(14,143,110,.09);--warn:#9A6A12;--warn-s:rgba(154,106,18,.1)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--void);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:16px;line-height:1.7}
+a{color:inherit;text-decoration:none}
+:where(a,button):focus-visible{outline:2px solid var(--arc);outline-offset:3px}
+.wrap{max-width:940px;margin:0 auto;padding:0 20px}
+
+.nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(18px);
+  background:color-mix(in srgb,var(--void) 82%,transparent);border-bottom:1px solid var(--line)}
+.nav-in{max-width:940px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo .m{width:34px;height:34px;border-radius:11px;background:var(--volt);color:var(--volt-ink);display:grid;place-items:center}
+.logo .m svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linejoin:round}
+.logo b{font-family:'JetBrains Mono',monospace;font-size:14px}
+.nav-r{display:flex;align-items:center;gap:8px}
+.ghost{background:none;border:1px solid var(--line);color:var(--muted);width:36px;height:36px;
+  border-radius:11px;cursor:pointer;display:grid;place-items:center;font-size:14px}
+.back{font-size:13.5px;color:var(--muted);border:1px solid var(--line);border-radius:11px;padding:9px 15px}
+.back:hover{color:var(--volt);border-color:var(--volt)}
+
+header{padding:clamp(34px,7vw,60px) 0 26px}
+h1{font-family:'Readex Pro',sans-serif;font-size:clamp(29px,6.2vw,46px);font-weight:700;
+  letter-spacing:-.03em;line-height:1.15;margin-bottom:12px}
+h1 .g{background:linear-gradient(110deg,var(--volt),var(--arc));-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+.lede{color:var(--muted);font-size:15.5px;max-width:54ch;line-height:1.85}
+
+.filters{display:flex;gap:8px;margin:26px 0 22px;flex-wrap:wrap;position:sticky;top:64px;z-index:50;
+  background:var(--void);padding:8px 0}
+.f{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:999px;
+  padding:9px 17px;font-family:inherit;font-size:13.5px;cursor:pointer;transition:.16s}
+.f.on{background:var(--volt);color:var(--volt-ink);border-color:var(--volt);font-weight:700}
+
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:16px;padding-bottom:20px}
+.t{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:24px;
+  position:relative;display:flex;flex-direction:column;transition:border-color .2s,transform .2s}
+.t:hover{border-color:var(--volt);transform:translateY(-3px)}
+.t.soon{opacity:.62;pointer-events:none}
+.badge{position:absolute;top:16px;inset-inline-end:16px;font-size:10px;font-weight:700;
+  border-radius:999px;padding:4px 10px;letter-spacing:.01em}
+.badge.free{background:var(--volt);color:var(--volt-ink)}
+.badge.try{background:var(--warn-s);color:var(--warn);border:1px solid var(--warn)}
+.badge.beta{background:var(--panel-2);color:var(--muted);border:1px solid var(--line)}
+.t .ic{width:50px;height:50px;border-radius:15px;background:var(--glow);color:var(--volt);
+  display:grid;place-items:center;margin-bottom:17px}
+.t .ic svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.t h3{font-family:'Readex Pro',sans-serif;font-size:18.5px;margin-bottom:8px;letter-spacing:-.01em;padding-inline-end:60px}
+.t p{color:var(--muted);font-size:13.8px;line-height:1.8;margin-bottom:16px;flex:1}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:15px}
+.tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);
+  background:var(--panel-2);border:1px solid var(--line);border-radius:7px;padding:3px 9px}
+.open{display:inline-flex;align-items:center;gap:7px;color:var(--volt);font-weight:700;font-size:14px}
+.open span{transition:transform .18s}
+.t:hover .open span{transform:translateX(-4px)}
+
+.pricing{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:clamp(24px,5vw,40px);margin:34px 0;position:relative;overflow:hidden}
+.pricing:before{content:"";position:absolute;top:-60%;inset-inline-end:-10%;width:60%;aspect-ratio:1;
+  background:radial-gradient(circle,var(--glow),transparent 68%)}
+.pricing h2{font-family:'Readex Pro',sans-serif;font-size:clamp(22px,4.4vw,31px);
+  margin-bottom:9px;position:relative;letter-spacing:-.02em}
+.pricing .ps{color:var(--muted);font-size:14.5px;margin-bottom:24px;position:relative;max-width:48ch}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;position:relative}
+.pl{background:var(--panel-2);border:1.5px solid var(--line);border-radius:16px;padding:20px 14px;
+  text-align:center;position:relative;transition:.18s}
+.pl:hover{border-color:var(--volt);transform:translateY(-3px)}
+.pl .n{font-size:13px;color:var(--muted);margin-bottom:4px}
+.pl .v{font-family:'JetBrains Mono',monospace;font-size:29px;font-weight:700;color:var(--volt);line-height:1.1}
+.pl .s{font-size:11px;color:var(--muted);margin-top:5px}
+.pl.life{border-color:var(--warn)}
+.pl.life .v{color:var(--warn)}
+.pl .tag2{position:absolute;top:-9px;inset-inline-start:50%;transform:translateX(50%);
+  background:var(--volt);color:var(--volt-ink);font-size:9.5px;font-weight:700;
+  border-radius:999px;padding:2px 10px;white-space:nowrap}
+.pl.life .tag2{background:var(--warn);color:#231700}
+.pnote{margin-top:20px;background:var(--warn-s);border:1px solid var(--warn);border-radius:14px;
+  padding:16px;font-size:13px;line-height:2;position:relative}
+.pnote b{color:var(--warn)}
+.btn{display:inline-flex;align-items:center;gap:9px;border-radius:14px;padding:14px 24px;
+  font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;border:1px solid transparent;margin-top:18px}
+.btn-p{background:var(--volt);color:var(--volt-ink);position:relative}
+.btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+footer{border-top:1px solid var(--line);padding:30px 0;text-align:center;font-size:12.5px;color:var(--muted);line-height:2;margin-top:20px}
+footer b{color:var(--text)}
+footer .n{font-family:'JetBrains Mono',monospace;color:var(--volt);font-weight:700}
+.rise{opacity:0;transform:translateY(18px);transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)}
+.rise.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}.rise{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></symbol>
+<symbol id="i-sys" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="i-solar" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="12" rx="1"/><path d="M2 10h20M9 4v12M15 4v12M12 16v4M8 20h8"/></symbol>
+<symbol id="i-gauge" viewBox="0 0 24 24"><path d="M3.5 16a9 9 0 1 1 17 0"/><path d="M12 16l4.5-5"/></symbol>
+<symbol id="i-chip" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></symbol>
+<symbol id="i-wave" viewBox="0 0 24 24"><path d="M2 12h4V6h6v12h6v-6h4"/></symbol>
+<symbol id="i-slid" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+<symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM19 19h2v2h-2z"/></symbol>
+<symbol id="i-cable" viewBox="0 0 24 24"><path d="M4 4v7a4 4 0 0 0 4 4h8a4 4 0 0 1 4 4v2"/><rect x="2" y="2" width="4" height="3" rx="1"/><rect x="18" y="19" width="4" height="3" rx="1"/></symbol>
+<symbol id="i-wa" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M2 12h20"/><path d="M12 8S9 3 7 5s5 3 5 3zM12 8s3-5 5-3-5 3-5 3z"/></symbol>
+</svg>
+
+<nav class="nav"><div class="nav-in">
+  <a class="logo" href="../"><span class="m"><svg><use href="#i-bolt"/></svg></span><b>MrElectroAI</b></a>
+  <div class="nav-r">
+    <button class="ghost" id="theme" aria-label="تبديل الثيم">☾</button>
+    <a class="back" href="../">← الرئيسية</a>
+  </div>
+</div></nav>
+
+<header><div class="wrap">
+  <h1>أدوات <span class="g">الفنيين</span></h1>
+  <p class="lede">كل أداة بتحل مشكلة بتواجهها بالشغل الفعلي. بتشتغل من المتصفح،
+     بدون تحميل ولا تسجيل. المقفولة إلها تجربة مجانية ٣ أيام.</p>
+</div></header>
+
+<div class="wrap">
+  <div class="filters">
+    <button class="f on" data-f="all">الكل</button>
+    <button class="f" data-f="free">مجانية</button>
+    <button class="f" data-f="solar">طاقة شمسية</button>
+    <button class="f" data-f="elec">كهربا</button>
+  </div>
+
+  <div class="tools" id="grid"></div>
+
+  <div class="pricing rise">
+    <h2>الأسعار</h2>
+    <p class="ps">مفتاح واحد بيفتحلك كل الأدوات. أو اشترك بأداة وحدة بس — أنت بتقرّر.</p>
+    <div class="plans">
+      <div class="pl"><div class="n">شهر</div><div class="v">25$</div><div class="s">كل الأدوات</div></div>
+      <div class="pl"><div class="n">3 شهور</div><div class="v">60$</div><div class="s">كل الأدوات</div></div>
+      <div class="pl"><span class="tag2">الأكثر طلباً</span>
+        <div class="n">سنة</div><div class="v">180$</div><div class="s">وفّر 120$</div></div>
+      <div class="pl life"><span class="tag2">الأوفر</span>
+        <div class="n">💎 مدى الحياة</div><div class="v">450$</div><div class="s">دفعة وحدة وخلص</div></div>
+    </div>
+    <div class="pnote">
+      <b>💎 باقة مدى الحياة بتشمل:</b><br>
+      ✅ كل الأدوات الحالية · ✅ <b>وكل أداة جديدة بتنزل — مجاناً للأبد</b><br>
+      ✅ أولوية بالدعم · ✅ اقتراحاتك بتنفّذ أول · ✅ سعر ثابت ما بيتأثر بأي زيادة
+    </div>
+    <a class="btn btn-p" href="https://wa.me/96179434479?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C%20%D8%A8%D8%AF%D9%8A%20%D8%A7%D8%B4%D8%AA%D8%B1%D9%83%20%D8%A8%D8%A7%D9%84%D8%A3%D8%AF%D9%88%D8%A7%D8%AA" target="_blank" rel="noopener">
+      <svg><use href="#i-wa"/></svg> اشترك الآن</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <b>MrElectroAI</b> — أنور الحسن الجاسم<br>
+  <span class="n" dir="ltr">+961 79 434 479</span> · <a href="../privacy/">سياسة الخصوصية</a>
+</div></footer>
+
+<script>
+const TOOLS=[
+ {u:'jarde/',i:'sys',t:'الجردة — جرد المواد',
+  d:'جردة سواد أو بياض بالتفصيل، وبتوصل للمحل الأقرب على واتساب جاهزة مع PDF.',
+  g:['Take-off','PDF','WhatsApp'],b:'free',c:['elec']},
+ {u:'roof/',i:'solar',t:'قياس السطح من القمر الصناعي',
+  d:'ارسم السطح على الخريطة وبتطلعلك المساحة وعدد الألواح والقدرة — قبل ما تزور الموقع.',
+  g:['Satellite','PDF','Solar'],b:'try',c:['solar']},
+ {u:'load/',i:'gauge',t:'حساب المنظومة الشمسية',
+  d:'حطّ أجهزة بيتك وبتطلعلك قدرة الإنفرتر وسعة البطاريات وعدد الألواح.',
+  g:['Load','Battery','PV'],b:'try',c:['solar']},
+ {u:'inverters/',i:'chip',t:'إعدادات الإنفرترات',
+  d:'Felicity · Growatt · Voltronic — على أي رقم برنامج تفوت وشو تحط فيه، خطوة خطوة.',
+  g:['Felicity','Growatt','Voltronic'],b:'try',c:['solar','elec']},
+ {u:'transformer/',i:'wave',t:'حاسبة المحوّلات',
+  d:'من القدرة أو الأمبير: مقطع القالب، عدد اللفات، سلك النحاس، ونقاط التقاط للمنظّم.',
+  g:['Winding','Stabilizer'],b:'try',c:['elec']},
+ {u:'wirephase/',i:'slid',t:'توزيع الفازات',
+  d:'أي دارة على أي فاز، مع تلات معايير ترميز لوني.',
+  g:['L1 · L2 · L3','IEC'],b:'try',c:['elec']},
+ {u:'deye/',i:'chip',t:'إعدادات إنفرتر Deye',
+  d:'تيارات الشحن وقياسات الحماية وأكواد الأعطال لإنفرترات Deye الهجينة.',
+  g:['Deye','Fault Codes'],b:'beta',c:['solar']},
+ {u:'qr/',i:'qr',t:'مولّد QR',
+  d:'ملصق QR جاهز للطباعة لأي رابط — لمحلك أو لمركبتك.',
+  g:['QR','Print'],b:'beta',c:['elec']},
+ {u:'',i:'cable',t:'حاسبة الكابلات',
+  d:'مقطع الكابل حسب الحمل والطول وهبوط الجهد — حسب المواصفات العالمية.',
+  g:['قريباً'],b:'soon',c:['elec']}
+];
+const B={free:['مجانية','free'],try:['🎁 جرّبها 3 أيام','try'],beta:['قيد التجربة','beta'],soon:['قريباً','beta']};
+const $=i=>document.getElementById(i);
+let filt='all';
+function draw(){
+  $('grid').innerHTML=TOOLS.filter(t=>filt==='all'||(filt==='free'?t.b==='free':t.c.includes(filt)))
+   .map((t,i)=>{
+    const [txt,cl]=B[t.b], soon=t.b==='soon';
+    const el=soon?'div':'a', href=soon?'':' href="'+t.u+'"';
+    return '<'+el+' class="t rise'+(soon?' soon':'')+'"'+href+' style="transition-delay:'+(i%3*55)+'ms">'
+      +'<span class="badge '+cl+'">'+txt+'</span>'
+      +'<span class="ic"><svg><use href="#i-'+t.i+'"/></svg></span>'
+      +'<h3>'+t.t+'</h3><p>'+t.d+'</p>'
+      +'<div class="tags">'+t.g.map(g=>'<span class="tag">'+g+'</span>').join('')+'</div>'
+      +(soon?'':'<div class="open">افتح الأداة <span>←</span></div>')
+      +'</'+el+'>';
+  }).join('');
+  obs();
+}
+document.querySelector('.filters').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;
+  filt=b.dataset.f;document.querySelectorAll('.f').forEach(x=>x.classList.toggle('on',x===b));draw();};
+
+let io;
+function obs(){
+  if(io)io.disconnect();
+  io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),
+    {threshold:.1,rootMargin:'0px 0px -30px'});
+  document.querySelectorAll('.rise').forEach(el=>io.observe(el));
+}
+const th=$('theme');
+const set=m=>{document.documentElement.dataset.theme=m;th.textContent=m==='light'?'☀':'☾';
+  try{localStorage.setItem('mea_theme',m)}catch(e){}};
+try{const s=localStorage.getItem('mea_theme');if(s)set(s);}catch(e){}
+th.onclick=()=>set(document.documentElement.dataset.theme==='light'?'dark':'light');
+draw();
+</script>
+</body>
+</html>
