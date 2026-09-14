@@ -253,7 +253,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
       <div class="st"><i>4</i><span>تابعو على الخريطة وهو جاي</span></div>
     </div>
     <div class="gf">الدفع نقداً للسائق<br>
-      <a href="../../privacy/">سياسة الخصوصية</a> · <span id="admLink" style="cursor:pointer;text-decoration:underline">🛡️ الإدارة</span><br>
+      <a href="https://mrelectroai-spec.github.io/mrelectroai/privacy/" target="_blank" rel="noopener">سياسة الخصوصية</a> · <span id="admLink" style="cursor:pointer;text-decoration:underline">🛡️ الإدارة</span><br>
       <a class="dev" href="https://mrelectroai-spec.github.io/mrelectroai/" target="_blank" rel="noopener">
         ⚡ تصميم وبرمجة <b>MrElectroAI</b></a></div>
   </div>
@@ -339,9 +339,33 @@ async function hash(s){
   const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('wasselni:'+s));
   return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
 }
-function getPos(){return new Promise(r=>{if(!navigator.geolocation)return r(null);
-  navigator.geolocation.getCurrentPosition(p=>r({lat:p.coords.latitude,lng:p.coords.longitude}),
-    ()=>r(null),{enableHighAccuracy:true,timeout:9000});});}
+function getPos(){return new Promise(r=>{
+  if(!navigator.geolocation){ say('جهازك ما بيدعم تحديد الموقع'); return r(null); }
+  navigator.geolocation.getCurrentPosition(
+    p=>r({lat:p.coords.latitude,lng:p.coords.longitude}),
+    err=>{
+      if(err.code===1) locHelp();
+      else if(err.code===3) say('الموقع بطيء — جرّب تطلع لمكان مفتوح');
+      else say('ما قدرنا نحدّد موقعك');
+      r(null);
+    },{enableHighAccuracy:true,timeout:15000,maximumAge:30000});});}
+
+function locHelp(){
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;inset:0;background:rgba(20,38,27,.75);z-index:980;display:grid;'
+    +'place-items:center;padding:22px;font-family:inherit;direction:rtl';
+  d.innerHTML='<div style="background:#fff;border-radius:20px;padding:22px;max-width:340px;text-align:center">'
+    +'<div style="font-size:44px;margin-bottom:10px">📍</div>'
+    +'<h3 style="font-size:18px;margin-bottom:8px">فعّل الموقع</h3>'
+    +'<p style="font-size:13px;color:#6B7C72;line-height:1.9;margin-bottom:16px">'
+    +'التطبيق بيحتاج موقعك ليعرف السائق وين تجي.<br><br>'
+    +'<b style="color:#14261B">من إعدادات موبايلك:</b><br>'
+    +'الإعدادات ← التطبيقات ← <b>وصّلني</b><br>← الأذونات ← الموقع ← <b>السماح</b></p>'
+    +'<button style="width:100%;padding:14px;border:0;border-radius:13px;background:#0E7C3A;color:#fff;'
+    +'font-family:inherit;font-size:15px;font-weight:700;cursor:pointer">فهمت</button></div>';
+  d.onclick=()=>d.remove();
+  document.body.appendChild(d);
+}
 
 function toGate(){
   clearInterval(poll); document.body.classList.remove('mapmode');
@@ -383,7 +407,7 @@ function drawAuth(){
       +(role==='drv'?drvExtra():'')
       +'<div class="err" id="aErr"></div>'
       +'<button class="btn main" id="aGo">إنشاء الحساب</button>'
-      +'<div class="note">بإنشائك الحساب أنت موافق على <a href="../../privacy/" style="color:#8A6100">سياسة الخصوصية</a>.</div>';
+      +'<div class="note">بإنشائك الحساب أنت موافق على <a href="https://mrelectroai-spec.github.io/mrelectroai/privacy/" target="_blank" rel="noopener" style="color:#8A6100">سياسة الخصوصية</a>.</div>';
     $('aGo').onclick=doSignup;
     if(role==='drv'){ document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{vt=b.dataset.v;drawAuth();}); bindUp(); }
   }
@@ -403,16 +427,35 @@ function bindUp(){
   [['u1','photo'],['u2','vehicle'],['u3','idcard']].forEach(([id,k])=>{
     const el=$(id); if(!el)return; const inp=el.querySelector('input');
     if(photos[k]){ el.classList.add('done'); const ui=el.querySelector('.ui'); if(ui) ui.outerHTML='<img src="'+photos[k]+'">'; }
-    inp.onchange=()=>{const f=inp.files[0];if(!f)return;
+    inp.onchange=()=>{
+      const f=inp.files[0];
+      if(!f) return say('ما اخترت صورة');
+      if(!f.type.startsWith('image/')) return say('لازم تختار صورة');
+      say('عم نحضّر الصورة...');
       const rd=new FileReader();
-      rd.onload=()=>{const im=new Image();
-        im.onload=()=>{const c=document.createElement('canvas');
-          const w=Math.min(380,im.width);c.width=w;c.height=Math.round(im.height*w/im.width);
-          const x=c.getContext('2d');x.imageSmoothingQuality='high';
-          x.drawImage(im,0,0,c.width,c.height);
-          photos[k]=c.toDataURL('image/jpeg',.42);
-          el.classList.add('done'); const ui=el.querySelector('.ui'); if(ui) ui.outerHTML='<img src="'+photos[k]+'">';
-        };im.src=rd.result;};
+      rd.onerror=()=>say('ما قدرنا نقرأ الصورة — جرّب وحدة تانية');
+      rd.onload=()=>{
+        const im=new Image();
+        im.onerror=()=>say('الصورة مش مدعومة — جرّب JPG أو PNG');
+        im.onload=()=>{
+          try{
+            const c=document.createElement('canvas');
+            const w=Math.min(380,im.width||380);
+            c.width=w; c.height=Math.round((im.height||380)*w/(im.width||380));
+            const x=c.getContext('2d');
+            x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height);
+            x.imageSmoothingQuality='high';
+            x.drawImage(im,0,0,c.width,c.height);
+            photos[k]=c.toDataURL('image/jpeg',.42);
+            el.classList.add('done');
+            const ui=el.querySelector('.ui');
+            if(ui) ui.outerHTML='<img src="'+photos[k]+'">';
+            else { const old=el.querySelector('img'); if(old) old.src=photos[k]; }
+            say('✅ انرفعت الصورة');
+          }catch(e){ say('ما قدرنا نحضّر الصورة'); }
+        };
+        im.src=rd.result;
+      };
       rd.readAsDataURL(f);};
   });
 }
@@ -488,7 +531,7 @@ $('cMenu').onclick=()=>{
     +'<div class="sub">'+(me?me.phone:'')+'</div>'
     +'<button class="btn line" id="m1">🧾 رحلاتي</button>'
     +'<button class="btn line" id="m2">🚨 إبلاغ عن مشكلة</button>'
-    +'<a class="btn line" href="../../privacy/">🔒 سياسة الخصوصية</a>'
+    +'<a class="btn line" href="https://mrelectroai-spec.github.io/mrelectroai/privacy/" target="_blank" rel="noopener">🔒 سياسة الخصوصية</a>'
     +'<button class="btn dang" id="m3">تسجيل الخروج</button>'
     +'<button class="btn main" id="m4">← رجوع</button>';
   $('m1').onclick=myTrips; $('m2').onclick=report;
