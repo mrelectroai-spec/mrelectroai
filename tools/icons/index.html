@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مولّد أيقونات التطبيق | MrElectroAI</title>
+<meta name="theme-color" content="#0E7C3A">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#0E7C3A;--g2:#0A5F2C;--gs:#E3F3E8;--ink:#14261B;--muted:#6B7C72;
+  --line:#E2E8E3;--soft:#F3F6F4;--paper:#FFF;--bg:#F6F7F5;--y:#F5B301;
+  --sh:0 2px 8px rgba(20,38,27,.06),0 12px 28px rgba(20,38,27,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  font-size:15px;line-height:1.7;padding:20px 15px 50px}
+.wrap{max-width:620px;margin:0 auto}
+h1{font-family:'Readex Pro',sans-serif;font-size:25px;margin-bottom:5px}
+.lede{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:17px;padding:17px;
+  margin-bottom:13px;box-shadow:var(--sh)}
+.card h2{font-family:'Readex Pro',sans-serif;font-size:16px;margin-bottom:12px;
+  padding-bottom:10px;border-bottom:1px solid var(--line)}
+.drop{border:2px dashed var(--line);border-radius:16px;padding:32px 16px;text-align:center;
+  cursor:pointer;background:var(--soft);transition:.2s}
+.drop:hover,.drop.on{border-color:var(--g);background:var(--gs)}
+.drop .ic{font-size:44px;margin-bottom:8px}
+.drop b{display:block;font-size:15px}
+.drop small{display:block;font-size:12.5px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin-top:14px}
+.out{text-align:center}
+.out canvas{width:100%;border-radius:14px;border:1px solid var(--line);display:block;background:#fff}
+.out b{display:block;font-family:'JetBrains Mono',monospace;font-size:11.5px;margin-top:7px;color:var(--g2)}
+.out small{display:block;font-size:10px;color:var(--muted);line-height:1.5}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;
+  border-radius:13px;font-family:inherit;font-size:15px;font-weight:700;border:0;
+  background:var(--soft);color:var(--ink);cursor:pointer;margin-top:9px;text-decoration:none}
+.btn.main{background:var(--g);color:#fff}
+.btn:disabled{opacity:.4;pointer-events:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:11px}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}
+input[type=color]{width:100%;height:48px;border:1px solid var(--line);border-radius:12px;background:none;cursor:pointer}
+input[type=range]{width:100%}
+.note{font-size:12.5px;color:var(--muted);background:#FDF6E3;border-radius:12px;padding:13px;line-height:1.8}
+.note b{color:#8A6100}
+.step{display:flex;gap:11px;margin-bottom:11px;font-size:13.5px;line-height:1.75}
+.step i{width:26px;height:26px;border-radius:50%;background:var(--g);color:#fff;flex-shrink:0;
+  display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700}
+code{background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:2px 7px;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--g2)}
+footer{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;
+  color:var(--muted);text-align:center}
+footer b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>مولّد أيقونات التطبيق</h1>
+  <p class="lede">ارفع صورة وحدة — وبتطلعلك التلات أيقونات جاهزة بالأسماء الصحيحة.</p>
+
+  <div class="card">
+    <label class="drop" id="drop">
+      <div class="ic">🖼️</div>
+      <b>اضغط لترفع الصورة</b>
+      <small>الأفضل صورة مربّعة 1024×1024</small>
+      <input type="file" accept="image/*" hidden id="file">
+    </label>
+  </div>
+
+  <div class="card" id="opts" style="display:none">
+    <h2>⚙️ الإعدادات</h2>
+    <div class="two">
+      <div><label class="lbl">لون الخلفية</label><input type="color" id="bg" value="#0E7C3A"></div>
+      <div><label class="lbl">هامش النسخة المقصوصة: <span id="pv">20</span>%</label>
+        <input type="range" id="pad" min="10" max="30" value="20"></div>
+    </div>
+    <div class="note"><b>الهامش:</b> أندرويد بيقص الأيقونة بأشكال مختلفة (دائرة، مربع مدوّر).
+      الهامش بيمنع قص الرسمة. 20% مناسبة لأغلب الحالات.</div>
+  </div>
+
+  <div class="card" id="res" style="display:none">
+    <h2>✅ الأيقونات جاهزة</h2>
+    <div class="grid">
+      <div class="out"><canvas id="c1"></canvas><b>192×192</b><small>icon-192.png</small></div>
+      <div class="out"><canvas id="c2"></canvas><b>512×512</b><small>icon-512.png</small></div>
+      <div class="out"><canvas id="c3"></canvas><b>512 maskable</b><small>icon-512-maskable.png</small></div>
+    </div>
+    <button class="btn main" id="dl">⬇️ نزّل الثلاثة</button>
+    <div class="note" style="margin-top:11px"><b>بعد التنزيل:</b> ارفعهن على GitHub بفولدر
+      <code>tools/wasselni/</code> بنفس الأسماء بالظبط.</div>
+  </div>
+
+  <div class="card">
+    <h2>📋 الخطوات</h2>
+    <div class="step"><i>1</i><span>ولّد صورة الأيقونة من جيميني (البرومبت عند أنور).</span></div>
+    <div class="step"><i>2</i><span>ارفعها هون واضبط اللون والهامش.</span></div>
+    <div class="step"><i>3</i><span>نزّل التلات ملفات.</span></div>
+    <div class="step"><i>4</i><span>ارفعهن بفولدر التطبيق على GitHub.</span></div>
+    <div class="step"><i>5</i><span>افتح <code>pwabuilder.com</code> وحط رابط تطبيقك ← بيطلّعلك APK.</span></div>
+  </div>
+
+  <footer><b>MrElectroAI</b> — أنور الحسن الجاسم</footer>
+</div>
+
+<script>
+const $=i=>document.getElementById(i);
+let img=null;
+$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('on')});
+$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('on'));
+$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('on');
+  if(e.dataTransfer.files[0]) read(e.dataTransfer.files[0]);});
+$('file').onchange=()=>{ if($('file').files[0]) read($('file').files[0]); };
+function read(f){
+  const r=new FileReader();
+  r.onload=()=>{ const i=new Image();
+    i.onload=()=>{ img=i; $('opts').style.display='block'; $('res').style.display='block'; draw();
+      $('drop').querySelector('b').textContent='✅ الصورة جاهزة — اضغط لتبدّلها';
+      $('res').scrollIntoView({behavior:'smooth'}); };
+    i.src=r.result; };
+  r.readAsDataURL(f);
+}
+['bg','pad'].forEach(i=>$(i).addEventListener('input',()=>{ $('pv').textContent=$('pad').value; draw(); }));
+
+function one(cv,size,padPct){
+  cv.width=size; cv.height=size;
+  const x=cv.getContext('2d');
+  x.fillStyle=$('bg').value; x.fillRect(0,0,size,size);
+  const pad=size*padPct/100, box=size-pad*2;
+  const s=Math.min(box/img.width, box/img.height);
+  const w=img.width*s, h=img.height*s;
+  x.imageSmoothingQuality='high';
+  x.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+}
+function draw(){
+  const p=+$('pad').value;
+  one($('c1'),192,0);
+  one($('c2'),512,0);
+  one($('c3'),512,p);
+}
+$('dl').onclick=()=>{
+  [['c1','icon-192.png'],['c2','icon-512.png'],['c3','icon-512-maskable.png']].forEach(([id,nm],k)=>{
+    setTimeout(()=>{ const a=document.createElement('a');
+      a.href=$(id).toDataURL('image/png'); a.download=nm; a.click(); }, k*450);
+  });
+};
+</script>
+</body>
+</html>
