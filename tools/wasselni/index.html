@@ -115,6 +115,14 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 .sfield span{flex:1;font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sfield span.has{color:var(--ink);font-weight:600}
 .sline{height:1px;background:var(--line);margin:0 11px}
+.gps{position:absolute;inset-inline-end:14px;bottom:calc(50vh - 20px);z-index:450;
+  width:52px;height:52px;border-radius:50%;background:#fff;border:0;box-shadow:var(--sh2);
+  display:grid;place-items:center;cursor:pointer;color:var(--g);transition:transform .15s}
+.gps:active{transform:scale(.92)}
+.gps svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.gps.on{background:var(--g);color:#fff}
+.gps.busy{animation:sp2 1s linear infinite}
+@keyframes sp2{to{transform:rotate(360deg)}}
 .pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);z-index:350;
   pointer-events:none;font-size:40px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.3));transition:transform .12s;display:none}
 .pin.on{display:block}.pin.up{transform:translate(-50%,-118%)}
@@ -283,6 +291,10 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
       <div class="sfield" data-f="b"><i class="sdot b"></i><span id="toTxt">لوين رايح؟</span></div>
     </div>
   </div>
+  <button class="gps" id="gpsBtn" title="موقعي">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+      <path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg>
+  </button>
   <div class="sheet" id="sheet"></div>
   <div class="searchpage" id="sp">
     <div class="sp-top"><button class="tbtn" id="spBack">→</button>
@@ -326,7 +338,7 @@ const CENTER=[34.5145,36.0075];
 
 const $=i=>document.getElementById(i);
 let me=null, role=null, map=null, A=null,B=null, mA=null,mB=null,line=null,mDrv=null;
-let veh='tuktuk', pax=1, picking=null, ride=null, poll=null, quote=null, photos={}, vt='tuktuk', wake=null;
+let mMe=null, veh='tuktuk', pax=1, picking=null, ride=null, poll=null, quote=null, photos={}, vt='tuktuk', wake=null;
 const money=n=>Math.round(n||0).toLocaleString('en-US');
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const norm=p=>(p||'').replace(/\D/g,'').replace(/^961/,'').replace(/^0/,'');
@@ -550,6 +562,20 @@ function initMap(){
     if(!A)setPt('a',{lat:c[0],lng:c[1],name:'موقعي الحالي'});},()=>{},{enableHighAccuracy:true,timeout:8000});
   document.querySelectorAll('.sfield').forEach(f=>f.onclick=()=>openSearch(f.dataset.f));
   $('spBack').onclick=()=>$('sp').classList.remove('on');
+
+  $('gpsBtn').onclick=async()=>{
+    const b=$('gpsBtn'); b.classList.add('busy');
+    const g=await getPos();
+    b.classList.remove('busy');
+    if(!g) return;
+    b.classList.add('on'); setTimeout(()=>b.classList.remove('on'),1500);
+    map.setView([g.lat,g.lng],17);
+    if(mMe) mMe.setLatLng([g.lat,g.lng]);
+    else mMe=L.circleMarker([g.lat,g.lng],{radius:8,color:'#fff',weight:3,
+      fillColor:'#1B6FD4',fillOpacity:1}).addTo(map).bindTooltip('أنت هون');
+    if(!A) setPt('a',{lat:g.lat,lng:g.lng,name:'موقعي الحالي'});
+    say('📍 هيدا موقعك');
+  };
 }
 const icon=(e,s)=>L.divIcon({className:'',iconSize:[s,s],
   html:'<div style="font-size:'+(s-8)+'px;line-height:1;text-align:center;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))">'+e+'</div>'});
@@ -643,7 +669,7 @@ $('spr').onclick=e=>{
   setPt(picking,p);$('sp').classList.remove('on');map.setView([p.lat,p.lng],16);};
 const pinUp=()=>$('pin').classList.add('up'), pinDown=()=>$('pin').classList.remove('up');
 function startPin(){
-  $('pin').classList.add('on');
+  $('pin').classList.add('on'); $('gpsBtn').style.display='none';
   $('sheet').innerHTML='<div class="grab"></div><h2>حدّد المكان</h2><div class="sub">حرّك الخريطة لتصير النقطة على المكان</div>'
     +'<button class="btn main" id="pinOk">تأكيد الموقع</button><button class="btn line" id="pinX">إلغاء</button>';
   map.on('movestart',pinUp);map.on('moveend',pinDown);
@@ -653,7 +679,7 @@ function startPin(){
     endPin();setPt(picking,{lat:c.lat,lng:c.lng,name:nm});};
   $('pinX').onclick=()=>{endPin();render();};
 }
-function endPin(){$('pin').classList.remove('on');map.off('movestart',pinUp);map.off('moveend',pinDown);}
+function endPin(){$('pin').classList.remove('on');$('gpsBtn').style.display='grid';map.off('movestart',pinUp);map.off('moveend',pinDown);}
 
 function render(){
   if(ride)return;
