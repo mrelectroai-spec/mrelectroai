@@ -363,8 +363,10 @@ const sb=async fn=>{try{return await fn()}catch(e){return null}};
 
 /* ===== إشعارات Push (OneSignal عبر median) ===== */
 function syncPush(){
-  if(!(window.median&&median.onesignal&&median.onesignal.info))return;
-  median.onesignal.info().then(info=>{
+  if(!(window.median&&median.onesignal))return;
+  const fn = median.onesignal.onesignalInfo || median.onesignal.info;
+  if(!fn)return;
+  fn.call(median.onesignal).then(info=>{
     const oid=info&&info.oneSignalUserId;
     if(oid&&me&&role==='drv'&&me.onesignal_id!==oid){
       me.onesignal_id=oid;
@@ -571,7 +573,7 @@ function enter(){
     initMap();const open=localStorage.getItem('w_ride');
     if(open){ride=open;watch();}else render();}
   else{$('pDrv').classList.add('on');$('drvName').textContent=me.name;
-    syncPush();setTimeout(syncPush,4000);
+    syncPush();setTimeout(syncPush,3000);setTimeout(syncPush,8000);setTimeout(syncPush,15000);
     drvTick();clearInterval(poll);poll=setInterval(drvTick,5000);}
 }
 $('drvOut').onclick=()=>{localStorage.removeItem('w_drv');toGate();};
