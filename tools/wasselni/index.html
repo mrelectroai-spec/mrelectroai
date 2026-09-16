@@ -93,6 +93,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 .err{font-size:13px;color:var(--danger);min-height:20px;margin-top:7px}
 .note{font-size:12.5px;color:var(--muted);background:var(--ys);border-radius:12px;padding:12px;line-height:1.75;margin-top:10px}
 .note b{color:#8A6100}
+.note.warn{background:#FEF3E8}
 .empty{text-align:center;color:var(--muted);font-size:13px;padding:24px;line-height:1.9}
 .tabs{display:flex;gap:6px;margin-bottom:13px}
 .tabs button{flex:1;background:var(--soft);border:1.5px solid transparent;border-radius:12px;
@@ -143,6 +144,11 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 .conf{background:var(--gs);border:1px solid #A9D9BB;border-radius:14px;padding:12px 14px;margin-bottom:12px}
 .conf .cf{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;padding:3px 0}
 .conf .cf span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.conf .cf.stop{color:#8A6100}
+.conf .cf.stop i{background:var(--y)}
+.stopx{background:none;border:0;color:var(--muted);font-size:15px;cursor:pointer;flex-shrink:0;padding:2px 4px}
+.addstop{width:100%;background:none;border:1.5px dashed var(--line);border-radius:13px;padding:10px;
+  font-family:inherit;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:12px}
 .meta{display:flex;gap:8px;margin-bottom:12px}
 .meta div{flex:1;background:var(--soft);border-radius:13px;padding:11px 8px;text-align:center}
 .meta b{display:block;font-family:'JetBrains Mono',monospace;font-size:17px;color:var(--g2)}
@@ -232,6 +238,10 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 .tr{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
 .tr:last-child{border:0}
 .tr b{font-family:'JetBrains Mono',monospace;color:var(--g2)}
+.trip{background:var(--soft);border-radius:13px;padding:12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start}
+.trip .ti{flex:1;min-width:0;text-align:right}
+.trip .ti b{display:block;font-size:14px}
+.trip .ti small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
 .toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translate(-50%,-160%);
   background:var(--ink);color:#fff;font-size:13.5px;font-weight:600;padding:12px 20px;border-radius:14px;
   transition:transform .3s;z-index:950;max-width:90%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)}
@@ -337,8 +347,9 @@ const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:1
 const CENTER=[34.5145,36.0075];
 
 const $=i=>document.getElementById(i);
-let me=null, role=null, map=null, A=null,B=null, mA=null,mB=null,line=null,mDrv=null;
+let me=null, role=null, map=null, A=null,B=null, mA=null,mB=null,line=null,mDrv=null,mStop=null;
 let mMe=null, veh='tuktuk', pax=1, picking=null, ride=null, poll=null, quote=null, photos={}, vt='tuktuk', wake=null;
+let stops=[];
 const money=n=>Math.round(n||0).toLocaleString('en-US');
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const norm=p=>(p||'').replace(/\D/g,'').replace(/^961/,'').replace(/^0/,'');
@@ -579,28 +590,89 @@ function initMap(){
 }
 const icon=(e,s)=>L.divIcon({className:'',iconSize:[s,s],
   html:'<div style="font-size:'+(s-8)+'px;line-height:1;text-align:center;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))">'+e+'</div>'});
+
+/* ===== نقطة توقف: إضافة/حذف ===== */
+function addStop(p){ stops=[p]; quoteRide(); }
+function removeStop(){ stops=[]; if(mStop){map.removeLayer(mStop);mStop=null;} quoteRide(); }
+function commitPoint(k,p){
+  if(k==='stop'){ addStop(p); $('sp').classList.remove('on'); render(); return; }
+  setPt(k,p);
+}
+
 function setPt(k,p){
+  stops=[]; if(mStop){map.removeLayer(mStop);mStop=null;}
   if(k==='a'){A=p;$('fromTxt').textContent=p.name;$('fromTxt').classList.add('has');
     if(mA)map.removeLayer(mA);mA=L.marker([p.lat,p.lng],{icon:icon('🟢',30)}).addTo(map);}
   else{B=p;$('toTxt').textContent=p.name;$('toTxt').classList.add('has');
     if(mB)map.removeLayer(mB);mB=L.marker([p.lat,p.lng],{icon:icon('📍',34)}).addTo(map);}
-  if(A&&B){if(line)map.removeLayer(line);
-    line=L.polyline([[A.lat,A.lng],[B.lat,B.lng]],{color:'#0E7C3A',weight:4,dashArray:'8 7'}).addTo(map);
-    const sh=$('sheet').offsetHeight||300;
-    map.fitBounds(line.getBounds(),{paddingTopLeft:[40,120],paddingBottomRight:[40,sh+40]});
-    quoteRide();}
-  render();
+  if(A&&B){ quoteRide(); } else { render(); }
 }
+
+/* ===== حساب مسافة خط مستقيم (احتياطي فقط إذا فشل OSRM) ===== */
 function km(a,b){const R=6371,p=Math.PI/180;
   const s=Math.sin((b.lat-a.lat)*p/2)**2+Math.cos(a.lat*p)*Math.cos(b.lat*p)*Math.sin((b.lng-a.lng)*p/2)**2;
   return Math.max(.5,R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s))*1.3);}
-function fare(t,d,n){const c=TAR[t],mins=Math.max(3,Math.round(d*2.6));
+
+/* ===== فك تشفير polyline من OSRM ===== */
+function decodePoly(str){
+  let index=0,lat=0,lng=0,coords=[];
+  while(index<str.length){
+    let b,shift=0,result=0;
+    do{b=str.charCodeAt(index++)-63;result|=(b&0x1f)<<shift;shift+=5;}while(b>=0x20);
+    const dlat=(result&1)?~(result>>1):(result>>1); lat+=dlat;
+    shift=0;result=0;
+    do{b=str.charCodeAt(index++)-63;result|=(b&0x1f)<<shift;shift+=5;}while(b>=0x20);
+    const dlng=(result&1)?~(result>>1):(result>>1); lng+=dlng;
+    coords.push([lat/1e5,lng/1e5]);
+  }
+  return coords;
+}
+/* ===== جلب الطريق الحقيقي من OSRM (مجاني) ===== */
+async function fetchRoute(pts){
+  try{
+    const coordsStr=pts.map(p=>p.lng+','+p.lat).join(';');
+    const r=await fetch('https://router.project-osrm.org/route/v1/driving/'+coordsStr+'?overview=full&geometries=polyline',{signal:AbortSignal.timeout(7000)});
+    const d=await r.json();
+    if(d.code!=='Ok'||!d.routes||!d.routes[0]) return null;
+    const rt=d.routes[0];
+    return {d:rt.distance/1000, mins:Math.max(3,Math.round(rt.duration/60)), coords:decodePoly(rt.geometry)};
+  }catch(e){ return null; }
+}
+function fareCalc(t,d,mins,n){const c=TAR[t];
   let v=c.base+d*c.km+mins*c.min+(n>1?c.extraPax:0);
   return {v:Math.max(c.minFare,Math.round(v/25)*25),mins};}
-function quoteRide(){if(!A||!B)return;const d=km(A,B);
-  quote={d,t:fare('tuktuk',d,pax),c:fare('car',d,pax)};}
+function requoteFare(){
+  if(!quote)return;
+  quote.t=fareCalc('tuktuk',quote.d,quote.mins,pax);
+  quote.c=fareCalc('car',quote.d,quote.mins,pax);
+}
+function drawRoute(coords){
+  if(line){map.removeLayer(line);line=null;}
+  if(coords&&coords.length>1){ line=L.polyline(coords,{color:'#0E7C3A',weight:4}).addTo(map); }
+  else if(A&&B){ line=L.polyline([[A.lat,A.lng],[B.lat,B.lng]],{color:'#0E7C3A',weight:4,dashArray:'8 7'}).addTo(map); }
+  if(stops[0]){
+    if(mStop)map.removeLayer(mStop);
+    mStop=L.marker([stops[0].lat,stops[0].lng],{icon:icon('🛑',30)}).addTo(map);
+  }
+  if(line){
+    const sh=$('sheet').offsetHeight||300;
+    map.fitBounds(line.getBounds(),{paddingTopLeft:[40,120],paddingBottomRight:[40,sh+40]});
+  }
+}
+async function quoteRide(){
+  if(!A||!B)return;
+  render();
+  const pts=[A,...stops,B];
+  const rt=await fetchRoute(pts);
+  let d,mins,coords;
+  if(rt){ d=rt.d; mins=rt.mins; coords=rt.coords; }
+  else { d=km(A,B); mins=Math.max(3,Math.round(d*2.6)); coords=null; }
+  quote={d,mins,t:fareCalc('tuktuk',d,mins,pax),c:fareCalc('car',d,mins,pax)};
+  drawRoute(coords);
+  render();
+}
 function openSearch(k){picking=k;$('sp').classList.add('on');$('spq').value='';
-  $('spq').placeholder=k==='a'?'من وين؟':'لوين رايح؟';$('spr').innerHTML=quickList();
+  $('spq').placeholder=k==='stop'?'وين بدك توقف؟':(k==='a'?'من وين؟':'لوين رايح؟');$('spr').innerHTML=quickList();
   setTimeout(()=>$('spq').focus(),150);}
 const PLACES=[
   ['مفرق ببنين',34.5145,36.0075],['ببنين',34.5203,36.0122],['جديدة ببنين',34.5265,36.0180],
@@ -656,17 +728,17 @@ $('spr').onclick=e=>{
     const m=dec.match(/(-?\d{1,3}\.\d{3,})[,\s@]+(-?\d{1,3}\.\d{3,})/);
     if(!m)return say('ما لقينا إحداثيات — افتح الرابط بالمتصفح وانسخو من شريط العنوان');
     $('sp').classList.remove('on');
-    setPt(picking,{lat:+m[1],lng:+m[2],name:'موقع من رابط'});
+    commitPoint(picking,{lat:+m[1],lng:+m[2],name:'موقع من رابط'});
     map.setView([+m[1],+m[2]],17); return;}
   if(e.target.closest('#useGps')){$('sp').classList.remove('on');
-    navigator.geolocation.getCurrentPosition(p=>{setPt(picking,{lat:p.coords.latitude,lng:p.coords.longitude,name:'موقعي الحالي'});
+    navigator.geolocation.getCurrentPosition(p=>{commitPoint(picking,{lat:p.coords.latitude,lng:p.coords.longitude,name:'موقعي الحالي'});
       map.setView([p.coords.latitude,p.coords.longitude],16);},()=>say('ما قدرنا نحدّد موقعك'),{enableHighAccuracy:true,timeout:8000});
     return;}
   const r=e.target.closest('[data-r]');if(!r)return;
   const p=JSON.parse(r.dataset.r);
   const rec=JSON.parse(localStorage.getItem('w_recent')||'[]');
   localStorage.setItem('w_recent',JSON.stringify([p,...rec.filter(x=>x.name!==p.name)].slice(0,5)));
-  setPt(picking,p);$('sp').classList.remove('on');map.setView([p.lat,p.lng],16);};
+  commitPoint(picking,p);$('sp').classList.remove('on');map.setView([p.lat,p.lng],16);};
 const pinUp=()=>$('pin').classList.add('up'), pinDown=()=>$('pin').classList.remove('up');
 function startPin(){
   $('pin').classList.add('on'); $('gpsBtn').style.display='none';
@@ -676,7 +748,7 @@ function startPin(){
   $('pinOk').onclick=async()=>{const c=map.getCenter();let nm='موقع محدّد';
     try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&accept-language=ar&lat='+c.lat+'&lon='+c.lng);
       const d=await r.json();nm=(d.name||d.display_name||'').split(',')[0]||nm;}catch(e){}
-    endPin();setPt(picking,{lat:c.lat,lng:c.lng,name:nm});};
+    endPin();commitPoint(picking,{lat:c.lat,lng:c.lng,name:nm});};
   $('pinX').onclick=()=>{endPin();render();};
 }
 function endPin(){$('pin').classList.remove('on');$('gpsBtn').style.display='grid';map.off('movestart',pinUp);map.off('moveend',pinDown);}
@@ -691,11 +763,19 @@ function render(){
       +'<button class="btn main" onclick="document.querySelector(\'[data-f=b]\').click()">حدّد وجهتك</button>';
     bindVeh();return;
   }
-  const q=quote||{d:km(A,B),t:fare('tuktuk',km(A,B),pax),c:fare('car',km(A,B),pax)};
+  if(!quote){
+    s.innerHTML='<div class="grab"></div><div class="empty">⏳ عم نحسب أفضل طريق...</div>';
+    return;
+  }
+  const q=quote;
   const f=veh==='tuktuk'?q.t:q.c;
+  const directMins=Math.max(3,Math.round(km(A,B)*2.6));
+  const warn = stops.length && q.mins>directMins*1.3+8;
   s.innerHTML='<div class="grab"></div>'
     +'<div class="conf"><div class="cf"><i class="sdot a"></i><span>'+A.name+'</span></div>'
+    +(stops[0]?'<div class="cf stop"><i class="sdot"></i><span>🛑 '+stops[0].name+'</span><button class="stopx" id="rmStop">✕</button></div>':'')
     +'<div class="cf"><i class="sdot b"></i><span>'+B.name+'</span></div></div>'
+    +(stops.length?'':'<button class="addstop" id="addStopBtn">+ إضافة نقطة توقف بالطريق</button>')
     +'<div class="meta"><div><b>'+q.d.toFixed(1)+'</b><small>كم</small></div>'
       +'<div><b>'+f.mins+'</b><small>دقيقة</small></div><div><b>'+pax+'</b><small>راكب</small></div></div>'
     +'<div class="veh">'+Object.entries(TAR).map(([k,c])=>{const ff=k==='tuktuk'?q.t:q.c;
@@ -703,20 +783,24 @@ function render(){
         +'<b>'+c.name+'</b><div class="p">'+money(ff.v)+'</div><small>ألف ل.ل.</small></button>';}).join('')+'</div>'
     +'<label class="lbl">كم شخص؟</label><div class="pax" id="paxB">'
       +[1,2,3,4].map(n=>'<button data-p="'+n+'"'+(pax===n?' class="on"':'')+'>'+(n===4?'4+':n)+'</button>').join('')+'</div>'
+    +(warn?'<div class="note warn">⚠️ <b>بسبب نقطة التوقف، الرحلة رح تطول شوي</b> ('+q.mins+' دقيقة تقريباً) — بلا أي زيادة بالسعر.</div>':'')
     +'<button class="btn main" id="go">'+TAR[veh].ic+' اطلب '+TAR[veh].name+' · '+money(f.v)+' ألف</button>'
     +'<div class="note"><b>السعر تقديري بالعدّاد.</b> بعد ما يقبل السائق بيوصلك رقمه، '
     +'وبتتفقوا على السعر النهائي معه. الدفع نقداً.</div>';
   bindVeh();
-  $('paxB').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;pax=+b.dataset.p;quoteRide();render();};
+  $('paxB').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;pax=+b.dataset.p;requoteFare();render();};
   $('go').onclick=order;
+  if($('addStopBtn'))$('addStopBtn').onclick=()=>openSearch('stop');
+  if($('rmStop'))$('rmStop').onclick=removeStop;
 }
 function bindVeh(){document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{veh=b.dataset.v;render();});}
 
 async function order(){
   const q=quote,f=veh==='tuktuk'?q.t:q.c,id=uid('r');
   $('go').disabled=true;
+  const toTxt = B.name + (stops[0]?(' — عبر '+stops[0].name):'');
   const r=await sb(()=>api('w_rides',{method:'POST',body:JSON.stringify([{id,cphone:me.phone,cname:me.name,
-    vtype:veh,fromtxt:A.name,totxt:B.name,flat:A.lat,flng:A.lng,tlat:B.lat,tlng:B.lng,pax,
+    vtype:veh,fromtxt:A.name,totxt:toTxt,flat:A.lat,flng:A.lng,tlat:B.lat,tlng:B.lng,pax,
     km:+q.d.toFixed(2),mins:f.mins,est:f.v,status:'searching'}])}));
   $('go').disabled=false;
   if(!r)return say('ما قدرنا نبعت الطلب');
@@ -726,7 +810,11 @@ function watch(){
   clearInterval(poll);
   const tick=async()=>{
     const rows=await sb(()=>api('w_rides?id=eq.'+ride+'&select=*'));
-    if(!rows||!rows[0])return;const r=rows[0];
+    if(!rows||!rows[0]){
+      /* الرحلة محذوفة أو غير موجودة — نرجع لصفحة الاختيار بدل ما نعلق */
+      clearInterval(poll);localStorage.removeItem('w_ride');ride=null;$('sheet').dataset.v='';render();return;
+    }
+    const r=rows[0];
     if(r.status==='searching')vSearch(r);
     else if(r.status==='cancelled'){clearInterval(poll);localStorage.removeItem('w_ride');ride=null;
       $('sheet').dataset.v='';say('انلغى الطلب');render();}
@@ -793,11 +881,19 @@ function vRate(r){
 async function myTrips(){
   const rows=await sb(()=>api('w_rides?cphone=eq.'+me.phone+'&select=*&order=created_at.desc&limit=15'));
   $('sheet').innerHTML='<div class="grab"></div><h2>رحلاتي</h2>'
-    +((rows&&rows.length)?rows.map(r=>'<div class="status" style="text-align:right;margin-bottom:8px">'
+    +((rows&&rows.length)?rows.map(r=>'<div class="trip"><div class="ti">'
       +'<b>'+r.fromtxt+' ← '+r.totxt+'</b><small>'+new Date(r.created_at).toLocaleDateString('ar-LB')
-      +' · '+money(r.paid||r.est)+' ألف · '+({done:'خلصت',cancelled:'ملغاة'}[r.status]||'جارية')+'</small></div>').join('')
+      +' · '+money(r.paid||r.est)+' ألف · '+({done:'خلصت',cancelled:'ملغاة',searching:'عم تدوّر'}[r.status]||'جارية')+'</small></div>'
+      +'<button class="stopx" onclick="deleteTrip(\''+r.id+'\')" title="حذف">🗑️</button></div>').join('')
       :'<div class="empty">ما في رحلات بعد.</div>')
     +'<button class="btn main" onclick="render()">رجوع</button>';
+}
+async function deleteTrip(id){
+  if(!confirm('حذف هاي الرحلة نهائياً من السجل؟'))return;
+  await sb(()=>api('w_rides?id=eq.'+id,{method:'DELETE'}));
+  if(id===ride){clearInterval(poll);localStorage.removeItem('w_ride');ride=null;$('sheet').dataset.v='';}
+  say('انحذفت 🗑️');
+  myTrips();
 }
 async function report(){
   const b=prompt('شو المشكلة؟');if(!b)return;
