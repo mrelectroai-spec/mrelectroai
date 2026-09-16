@@ -217,6 +217,9 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
   #sheet th,#sheet td{border:1px solid #999;padding:6px 9px;text-align:right}
   #sheet th{background:#eee}
   #sheet .ft{margin-top:14px;padding-top:9px;border-top:1px solid #999;font-size:11px;line-height:1.85;color:#333}
+  #sheet .elev-wrap{display:flex;gap:10px;margin-top:10px}
+  #sheet .elev-wrap>div{flex:1}
+  #sheet .elev-cap{text-align:center;font-size:11px;color:#555;margin-top:4px}
   @page{margin:12mm}
 }
 </style>
@@ -330,6 +333,22 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
             <option value="45">مايلة 45°</option>
           </select></div>
       </div>
+      <div class="two" style="margin-top:10px" id="orientBox">
+        <div>
+          <label class="lbl">اتجاه ميل الألواح <span class="opt">(البوصلة)</span></label>
+          <select id="orient">
+            <option value="auto" selected>تلقائي — أكبر عدد ألواح</option>
+            <option value="180">جنوب ↓</option>
+            <option value="0">شمال ↑</option>
+            <option value="90">شرق →</option>
+            <option value="270">غرب ←</option>
+            <option value="135">جنوب-شرقي ↘</option>
+            <option value="225">جنوب-غربي ↙</option>
+            <option value="45">شمال-شرقي ↗</option>
+            <option value="315">شمال-غربي ↖</option>
+          </select>
+        </div>
+      </div>
     </div>
     <div id="out"></div>
   </section>
@@ -364,6 +383,7 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
   <h3 id="shTitle"></h3>
   <div class="meta" id="shMeta"></div>
   <div id="shSvg"></div>
+  <div id="shElev"></div>
   <div id="shTable"></div>
   <div class="ft" id="shFt"></div>
 </div>
@@ -514,8 +534,12 @@ function shadowGap(pl, tilt){
 }
 
 /* ─── توزيع الألواح ─── */
-function layout(XY, pl, pwd, tilt){
-  /* منجرّب اتجاهات الأضلاع كلها + دوران دقيق، ومنختار اللي بيدخل أكتر ألواح */
+function layout(XY, pl, pwd, tilt, fixedAng){
+  /* لو محددين اتجاه بوصلة ثابت (fixedAng بالراديان) منستعملو هوّي بس،
+     غير هيك منجرّب اتجاهات الأضلاع كلها + دوران دقيق، ومنختار اللي بيدخل أكتر ألواح */
+  if(fixedAng !== null && fixedAng !== undefined){
+    return fill(XY, pl, pwd, tilt, fixedAng);
+  }
   const cands = [];
   for(let i=0;i<XY.length;i++){
     const a=XY[i], b=XY[(i+1)%XY.length];
@@ -721,16 +745,20 @@ $('pw').onchange = () => {
 };
 ['cl','cw','cp'].forEach(i=>$(i).addEventListener('input',calc));
 $('tilt').addEventListener('change',()=>{ $('tilt').dataset.touched='1'; calc(); });
+$('orient').addEventListener('change', calc);
 
 function calc(){
   const A = area(pts);
   if(A<1 || !map){ $('out').innerHTML = '<div class="card"><div class="empty">ارسم السطح أول.</div></div>'; return; }
   const pl = parseFloat($('cl').value)||2.27, pwd = parseFloat($('cw').value)||1.13, w = parseFloat($('cp').value)||550;
   const tilt = parseFloat($('tilt').value)||0;
+  const orientVal = $('orient').value;
+  /* زاوية البوصلة (0°=شمال، 90°=شرق...) → زاوية دوران الصفوف بنظام toXY (x=شرق, y=شمال): ang = -az */
+  const fixedAng = orientVal === 'auto' ? null : (-(+orientVal) * Math.PI/180);
   const {lat0,lng0,xy} = toXY(pts);
 
-  const P = layout(xy, pl, pwd, tilt);
-  const flatP = tilt ? layout(xy, pl, pwd, 0) : P;
+  const P = layout(xy, pl, pwd, tilt, fixedAng);
+  const flatP = tilt ? layout(xy, pl, pwd, 0, fixedAng) : P;
   const n = P.length, kwp = n*w/1000;
   const nFlat = flatP.length, kwFlat = nFlat*w/1000;
   const S = sides(pts);
@@ -818,7 +846,7 @@ function calc(){
   h2 += '<a class="btn main" href="https://wa.me/'+WA+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">📲 ابعت القياس</a>';
 
   $('out').innerHTML = h2;
-  LAST = { A, S, n, w, kwp, err, lo, hi, P, xy, lat0, lng0, pl, pwd, tilt, nFlat, kwFlat };
+  LAST = { A, S, n, w, kwp, err, lo, hi, P, xy, lat0, lng0, pl, pwd, tilt, nFlat, kwFlat, orientDeg: orientVal==='auto'?null:(+orientVal) };
   $('planBox').innerHTML = planSVG(true, 'measure');
 }
 
@@ -827,7 +855,7 @@ function planSVG(screen, mode){
   const { A, S, n, w, kwp, P, xy, pl, pwd, tilt } = LAST;
   const W=680, H=470, PAD=58;
 
-  /* ── المقطع الجانبي ── */
+  /* ── المقطع الجانبي (تخطيطي عام) ── */
   if(mode === 'side'){
     const t = tilt||0, scl = 150;
     const len = pl*scl/2.28, hgt = len*Math.sin(t*Math.PI/180), prj = len*Math.cos(t*Math.PI/180);
@@ -931,6 +959,66 @@ function planSVG(screen, mode){
     + '<text x="22" y="'+(H-16)+'" font-family="monospace" font-size="10.5" fill="#8A9A97">الأرقام بالمتر · الرقم الصغير = رقم الضلع</text>'
     + '</svg>';
 }
+
+/* ─── مقاطع شرقي/شمالي حقيقية (زي مخططات Metrix) ───
+   xy: إحداثيات السقف محلياً (م) — x=شرق موجب, y=شمال موجب (نفس نظام toXY)
+   P : مصفوفة الألواح [[x,y],...] أربع زوايا لكل لوح
+   نحسب لكل لوح ارتفاعه (z) بالاعتماد على زاوية الميل tilt واتجاه البوصلة orientDeg،
+   وبعدين نسقط ("نطل") من الشرق (يمين) أو من الشمال. */
+function elevationSVG(dir, screen){
+  /* dir: 'east' (من اليمين) أو 'north' (من الشمال) */
+  const { P, xy, pl, tilt, orientDeg } = LAST;
+  const W=680, H=300, PAD=56;
+  const az = (orientDeg==null ? 180 : orientDeg) * Math.PI/180;
+  const dx = Math.sin(az), dy = Math.cos(az);   /* شعاع باتجاه الميل: 0°=شمال (0,1)، 90°=شرق (1,0) */
+  /* نسقط كل زوايا السقف على اتجاه الميل لنعرف مدى الإسقاط الكامل (القاعدة=أدنى قيمة، القمة=أعلى قيمة) */
+  const projAll = xy.map(p => p[0]*dx + p[1]*dy);
+  const minProj = Math.min(...projAll), maxProj = Math.max(...projAll);
+  const spanProj = (maxProj-minProj) || 1;
+  const rise = tilt ? pl*Math.sin(tilt*Math.PI/180) : 0;   /* أعلى ارتفاع ممكن للوح الواحد */
+
+  /* لكل لوح: مركزه + ارتفاع قاعدته (تقريب مسطّح لتمثيل ميل السقف بالمشهد) */
+  const items = P.map(c => {
+    const cx = (c[0][0]+c[1][0]+c[2][0]+c[3][0])/4, cy = (c[0][1]+c[1][1]+c[2][1]+c[3][1])/4;
+    const t = ((cx*dx + cy*dy) - minProj) / spanProj;       /* 0 = أوطى نقطة بالسقف، 1 = أعلاها */
+    const base = t * rise;
+    const thick = tilt ? rise*0.12 : 0.12;                   /* سماكة رمزية بسيطة لظهور اللوح بالمسقط */
+    /* عرض اللوح الظاهري بهالمسقط = امتداده على المحور العمودي على اتجاه النظر */
+    const half = tilt ? (pl*Math.cos(tilt*Math.PI/180))/2 * 0.55 : 0.55;
+    const pos = dir==='east' ? cy : cx;   /* من الشرق: نشوف امتداد شمال-جنوب. من الشمال: نشوف امتداد شرق-غرب */
+    return { pos, h: base+thick, half };
+  });
+  const xs2 = items.map(i=>i.pos-i.half).concat(items.map(i=>i.pos+i.half));
+  const hs = items.map(i=>i.h);
+  const lo = xs2.length ? Math.min(...xs2) : 0, hiX = xs2.length ? Math.max(...xs2) : 1;
+  const hMax = hs.length ? Math.max(...hs, 0.3) : 0.3;
+  const spanX = (hiX-lo)||1;
+  const baseY = H-70;
+  const scX = (W-PAD*2)/spanX;
+  const scY = 120/hMax;
+  const px = p => PAD + (p-lo)*scX;
+  const py = h => baseY - h*scY;
+
+  let g = '';
+  items.forEach(it => {
+    const x1 = px(it.pos-it.half), x2 = px(it.pos+it.half);
+    const y1 = py(it.h), y2 = baseY;
+    g += '<rect x="'+Math.min(x1,x2).toFixed(1)+'" y="'+y1.toFixed(1)+'" width="'+Math.abs(x2-x1).toFixed(1)
+       + '" height="'+Math.max(3,(y2-y1)).toFixed(1)+'" fill="#2B6CB0" fill-opacity="0.75" stroke="#1B4F72" stroke-width="0.7"/>';
+  });
+  /* المنصّة والسطح */
+  g += '<rect x="'+PAD+'" y="'+baseY+'" width="'+(W-PAD*2)+'" height="10" fill="#D8DEE4" stroke="#9AA5B1" stroke-width="1.2"/>'
+     + '<rect x="'+PAD+'" y="'+(baseY+10)+'" width="'+(W-PAD*2)+'" height="14" fill="#EDE7DD" stroke="#B8AE9E" stroke-width="1.2"/>';
+
+  const cap = dir==='east' ? 'منظر من اليمين (شرق ⟶ غرب)' : 'منظر من الشمال (شمال ⟶ جنوب)';
+  return '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'
+    + '<rect width="'+W+'" height="'+H+'" fill="#fff"/>' + wmark(screen,W,H)
+    + g
+    + '<text x="'+(W/2)+'" y="26" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#0D1A17">'+cap+'</text>'
+    + '<text x="22" y="'+(H-16)+'" font-family="monospace" font-size="10" fill="#8A9A97">مسقط تقريبي حسب الميل والاتجاه — ليس بديلاً عن الزيارة الميدانية</text>'
+    + '</svg>';
+}
+
 function wmark(screen,W,H){
   if(screen) return '';
   let s='';
@@ -956,8 +1044,9 @@ $('askX').onclick = () => $('ask').classList.remove('on');
 
 function printPlan(withPanels){
   if(!LAST) return say('ما في نتيجة بعد');
-  const { A, S, n, w, kwp, err, lo, hi, lat0, lng0, pl, pwd, tilt } = LAST;
+  const { A, S, n, w, kwp, err, lo, hi, lat0, lng0, pl, pwd, tilt, orientDeg } = LAST;
   const per = S.reduce((a,b)=>a+b,0);
+  const ORIENT_NAMES = {0:'شمال',45:'شمال-شرقي',90:'شرق',135:'جنوب-شرقي',180:'جنوب',225:'جنوب-غربي',270:'غرب',315:'شمال-غربي'};
 
   $('shTitle').innerHTML = 'مخطط قياس سطح'
     + (withPanels ? ' وحساب ألواح' : '') + ' — <span class="tag">تقدير أوّلي</span>';
@@ -967,9 +1056,21 @@ function printPlan(withPanels){
     + '<tr><td>الإحداثيات</td><td><span dir="ltr">'+lat0.toFixed(6)+', '+lng0.toFixed(6)+'</span></td></tr>'
     + '<tr><td>التاريخ</td><td>'+new Date().toLocaleDateString('ar-LB')+'</td></tr>'
     + '<tr><td>نسبة الخطأ المتوقعة</td><td>±'+err+'%</td></tr>'
+    + (withPanels && tilt ? '<tr><td>اتجاه ميل الألواح</td><td>'+(orientDeg==null?'تلقائي (أكبر عدد)':ORIENT_NAMES[orientDeg])+'</td></tr>' : '')
     + '</tbody></table>';
 
-  $('shSvg').innerHTML = planSVG(false,'measure');
+  $('shSvg').innerHTML = planSVG(false, withPanels ? 'panels' : 'measure');
+
+  /* المقاطع من اليمين ومن الشمال — بس لما في ألواح وميل */
+  if(withPanels && n>0 && tilt){
+    $('shElev').innerHTML = '<div class="sec">مقاطع الألواح</div>'
+      + '<div class="elev-wrap">'
+      + '<div>' + elevationSVG('east', false) + '<div class="elev-cap">من اليمين</div></div>'
+      + '<div>' + elevationSVG('north', false) + '<div class="elev-cap">من الشمال</div></div>'
+      + '</div>';
+  } else {
+    $('shElev').innerHTML = '';
+  }
 
   let t = '<div class="sec">قياسات السطح</div>'
     + '<table><tbody>'
@@ -988,6 +1089,7 @@ function printPlan(withPanels){
     + '<tr class="hi"><td>القدرة الإجمالية</td><td>'+kwp.toFixed(1)+' kWp</td></tr>'
     + '<tr><td>طريقة التركيب</td><td>'+(tilt?('مايلة '+tilt+'° · بين الصفوف '+shadowGap(pl,tilt).toFixed(2)+' م')
         :'نايمة · 2 سم بين لوح ولوح · ممر 40 سم')+'</td></tr>'
+    + (tilt ? '<tr><td>اتجاه الميل</td><td>'+(orientDeg==null?'تلقائي (أكبر عدد)':ORIENT_NAMES[orientDeg])+'</td></tr>' : '')
     + '</tbody></table>';
 
   t += '<div class="sec">أطوال الأضلاع</div><table><thead><tr><th>الضلع</th><th>الطول</th></tr></thead><tbody>'
