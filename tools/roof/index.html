@@ -349,6 +349,19 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
           </select>
         </div>
       </div>
+      <div style="margin-top:10px">
+        <label class="lbl">نمط الممرات بين الألواح <span class="opt">(للتنظيف والصيانة)</span></label>
+        <select id="rowGroup">
+          <option value="0">بلا ممرات — الألواح متلاصقة بالكامل (أكبر عدد)</option>
+          <option value="1">ممر بعد كل صف — أريح تنظيف، أقل عدد</option>
+          <option value="2" selected>ممر كل صفّين — توازن جيد (موصى فيه)</option>
+          <option value="3">ممر كل 3 صفوف</option>
+          <option value="4">ممر كل 4 صفوف — أكبر عدد مع ممرات</option>
+        </select>
+        <div class="two" style="margin-top:10px">
+          <div><label class="lbl">عرض الممر (سم)</label><input id="pathW" type="number" value="60" step="5"></div>
+        </div>
+      </div>
     </div>
     <div id="out"></div>
   </section>
@@ -391,8 +404,8 @@ footer a{color:var(--teal-2);text-decoration:none;font-family:'JetBrains Mono',m
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const WA = "96179434479", SITE = "https://mrelectroai-spec.github.io/mrelectroai/";
-const GAP = 0.02, PATH = 0.40;          /* 2 سم بين الألواح · 40 سم ممر */
-const PATTERN = [2,4];                   /* أول مجموعة صفّين، وبعدها كل 4 صفوف ممر */
+const GAP = 0.02;                        /* 2 سم بين الألواح */
+let PATH = 0.60, ROWGROUP = 2;           /* عرض الممر (م) · كل كم صف بيجي ممر — بتتبدّل من الواجهة */
 const $ = i => document.getElementById(i);
 let scr = 0, pts = [], poly = null, marks = [], map = null, layers = [], job = null;
 let db = load();
@@ -534,11 +547,11 @@ function shadowGap(pl, tilt){
 }
 
 /* ─── توزيع الألواح ─── */
-function layout(XY, pl, pwd, tilt, fixedAng){
+function layout(XY, pl, pwd, tilt, fixedAng, rowGroup){
   /* لو محددين اتجاه بوصلة ثابت (fixedAng بالراديان) منستعملو هوّي بس،
      غير هيك منجرّب اتجاهات الأضلاع كلها + دوران دقيق، ومنختار اللي بيدخل أكتر ألواح */
   if(fixedAng !== null && fixedAng !== undefined){
-    return fill(XY, pl, pwd, tilt, fixedAng);
+    return fill(XY, pl, pwd, tilt, fixedAng, rowGroup);
   }
   const cands = [];
   for(let i=0;i<XY.length;i++){
@@ -550,12 +563,12 @@ function layout(XY, pl, pwd, tilt, fixedAng){
   for(let d=0; d<180; d+=15) cands.push(d*Math.PI/180);
   let bestSet = null, bestN = -1;
   for(const A of cands){
-    const s = fill(XY, pl, pwd, tilt, A);
+    const s = fill(XY, pl, pwd, tilt, A, rowGroup);
     if(s.length > bestN){ bestN = s.length; bestSet = s; }
   }
   return bestSet || [];
 }
-function fill(XY, pl, pwd, tilt, ang){
+function fill(XY, pl, pwd, tilt, ang, rowGroup){
   const cos=Math.cos(-ang), sin=Math.sin(-ang);
   const rot = p => [p[0]*cos - p[1]*sin, p[0]*sin + p[1]*cos];
   const inv = p => [p[0]*Math.cos(ang) - p[1]*Math.sin(ang), p[0]*Math.sin(ang) + p[1]*Math.cos(ang)];
@@ -563,8 +576,8 @@ function fill(XY, pl, pwd, tilt, ang){
   const xs=R.map(p=>p[0]), ys=R.map(p=>p[1]);
   const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
 
-  const panels = [];
   const t = tilt||0;
+  const rg = rowGroup==null ? ROWGROUP : rowGroup;         /* كل كم صف بيجي ممر — 0 = بلا ممرات */
   const proj = t ? pl*Math.cos(t*Math.PI/180) : pl;
   const rowPitch = t ? proj + shadowGap(pl, t) : pl;
   const STEP = pwd + GAP;
@@ -573,15 +586,14 @@ function fill(XY, pl, pwd, tilt, ang){
   for(let ox=0; ox<STEP; ox+=STEP/4){
     for(let oy=0; oy<rowPitch; oy+=rowPitch/3){
       const set = [];
-      let y = y0+oy, groupIdx = 0, inGroup = 0;
-      const limit = () => (groupIdx===0 ? PATTERN[0] : PATTERN[1]);
+      let y = y0+oy, inGroup = 0;
       while(y + proj <= y1 + .001){
         for(let x=x0+ox; x + pwd <= x1 + .001; x += STEP){
           const c = [[x,y],[x+pwd,y],[x+pwd,y+proj],[x,y+proj]];
           if(c.every(q => inPoly(q[0],q[1],R))) set.push(c.map(inv));
         }
         y += rowPitch; inGroup++;
-        if(!t && inGroup >= limit()){ y += PATH; inGroup = 0; groupIdx++; }
+        if(rg>0 && inGroup >= rg){ y += PATH; inGroup = 0; }
       }
       if(set.length > best.length) best = set;
     }
@@ -746,6 +758,8 @@ $('pw').onchange = () => {
 ['cl','cw','cp'].forEach(i=>$(i).addEventListener('input',calc));
 $('tilt').addEventListener('change',()=>{ $('tilt').dataset.touched='1'; calc(); });
 $('orient').addEventListener('change', calc);
+$('rowGroup').addEventListener('change', calc);
+$('pathW').addEventListener('input', calc);
 
 function calc(){
   const A = area(pts);
@@ -755,10 +769,12 @@ function calc(){
   const orientVal = $('orient').value;
   /* زاوية البوصلة (0°=شمال، 90°=شرق...) → زاوية دوران الصفوف بنظام toXY (x=شرق, y=شمال): ang = -az */
   const fixedAng = orientVal === 'auto' ? null : (-(+orientVal) * Math.PI/180);
+  const rowGroup = parseInt($('rowGroup').value, 10);
+  PATH = (parseFloat($('pathW').value)||0) / 100;   /* سم → متر */
   const {lat0,lng0,xy} = toXY(pts);
 
-  const P = layout(xy, pl, pwd, tilt, fixedAng);
-  const flatP = tilt ? layout(xy, pl, pwd, 0, fixedAng) : P;
+  const P = layout(xy, pl, pwd, tilt, fixedAng, rowGroup);
+  const flatP = tilt ? layout(xy, pl, pwd, 0, fixedAng, rowGroup) : P;
   const n = P.length, kwp = n*w/1000;
   const nFlat = flatP.length, kwFlat = nFlat*w/1000;
   const S = sides(pts);
@@ -827,7 +843,9 @@ function calc(){
     + '<div class="row"><span class="k">بين لوح ولوح</span><span class="v">2 سم</span></div>'
     + (tilt ? '<div class="row"><span class="k">بين صف وصف<small>لتفادي ظل الشتا</small></span><span class="v">'
         + shadowGap(pl,tilt).toFixed(2)+' م</span></div>'
-      : '<div class="row"><span class="k">ممر التنظيف<small>صفّين، ممر، وبعدها كل 4 صفوف</small></span><span class="v">40 سم</span></div>')
+      : '')
+    + (rowGroup>0 ? '<div class="row"><span class="k">ممر التنظيف<small>كل '+rowGroup+' صف'+(rowGroup>1?'وف':'')+'</small></span><span class="v">'+Math.round(PATH*100)+' سم</span></div>'
+      : '<div class="row"><span class="k">ممر التنظيف</span><span class="v">بلا ممرات</span></div>')
     + '</div>';
 
   h2 += '<div class="card"><h2>📏 أطوال الأضلاع</h2><div class="sides">'
@@ -846,7 +864,7 @@ function calc(){
   h2 += '<a class="btn main" href="https://wa.me/'+WA+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">📲 ابعت القياس</a>';
 
   $('out').innerHTML = h2;
-  LAST = { A, S, n, w, kwp, err, lo, hi, P, xy, lat0, lng0, pl, pwd, tilt, nFlat, kwFlat, orientDeg: orientVal==='auto'?null:(+orientVal) };
+  LAST = { A, S, n, w, kwp, err, lo, hi, P, xy, lat0, lng0, pl, pwd, tilt, nFlat, kwFlat, orientDeg: orientVal==='auto'?null:(+orientVal), rowGroup, pathW: PATH };
   $('planBox').innerHTML = planSVG(true, 'measure');
 }
 
@@ -1044,7 +1062,7 @@ $('askX').onclick = () => $('ask').classList.remove('on');
 
 function printPlan(withPanels){
   if(!LAST) return say('ما في نتيجة بعد');
-  const { A, S, n, w, kwp, err, lo, hi, lat0, lng0, pl, pwd, tilt, orientDeg } = LAST;
+  const { A, S, n, w, kwp, err, lo, hi, lat0, lng0, pl, pwd, tilt, orientDeg, rowGroup, pathW } = LAST;
   const per = S.reduce((a,b)=>a+b,0);
   const ORIENT_NAMES = {0:'شمال',45:'شمال-شرقي',90:'شرق',135:'جنوب-شرقي',180:'جنوب',225:'جنوب-غربي',270:'غرب',315:'شمال-غربي'};
 
@@ -1088,7 +1106,8 @@ function printPlan(withPanels){
     + '<tr><td>قدرة اللوح</td><td>'+w+' واط</td></tr>'
     + '<tr class="hi"><td>القدرة الإجمالية</td><td>'+kwp.toFixed(1)+' kWp</td></tr>'
     + '<tr><td>طريقة التركيب</td><td>'+(tilt?('مايلة '+tilt+'° · بين الصفوف '+shadowGap(pl,tilt).toFixed(2)+' م')
-        :'نايمة · 2 سم بين لوح ولوح · ممر 40 سم')+'</td></tr>'
+        :'نايمة · 2 سم بين لوح ولوح')+'</td></tr>'
+    + '<tr><td>نمط الممرات</td><td>'+(rowGroup>0 ? ('كل '+rowGroup+' صف'+(rowGroup>1?'وف':'')+' · عرض الممر '+Math.round(pathW*100)+' سم') : 'بلا ممرات — الألواح متلاصقة')+'</td></tr>'
     + (tilt ? '<tr><td>اتجاه الميل</td><td>'+(orientDeg==null?'تلقائي (أكبر عدد)':ORIENT_NAMES[orientDeg])+'</td></tr>' : '')
     + '</tbody></table>';
 
