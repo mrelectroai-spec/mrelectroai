@@ -261,7 +261,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
       <div class="st"><i>4</i><span>تابعو على الخريطة وهو جاي</span></div>
     </div>
     <div class="gf">الدفع نقداً للسائق<br>
-      <a href="https://mrelectroai-spec.github.io/mrelectroai/privacy/" target="_blank" rel="noopener">سياسة الخصوصية</a> · <span id="admLink" style="cursor:pointer;text-decoration:underline">🛡️ الإدارة</span><br>
+      <a href="https://mrelectroai-spec.github.io/mrelectroai/tools/privacy/" target="_blank" rel="noopener">سياسة الخصوصية</a> · <span id="admLink" style="cursor:pointer;text-decoration:underline">🛡️ الإدارة</span><br>
       <a class="dev" href="https://mrelectroai-spec.github.io/mrelectroai/" target="_blank" rel="noopener">
         ⚡ تصميم وبرمجة <b>MrElectroAI</b></a></div>
   </div>
@@ -419,7 +419,7 @@ function drawAuth(){
       +(role==='drv'?drvExtra():'')
       +'<div class="err" id="aErr"></div>'
       +'<button class="btn main" id="aGo">إنشاء الحساب</button>'
-      +'<div class="note">بإنشائك الحساب أنت موافق على <a href="https://mrelectroai-spec.github.io/mrelectroai/privacy/" target="_blank" rel="noopener" style="color:#8A6100">سياسة الخصوصية</a>.</div>';
+      +'<div class="note">بإنشائك الحساب أنت موافق على <a href="https://mrelectroai-spec.github.io/mrelectroai/tools/privacy/" target="_blank" rel="noopener" style="color:#8A6100">سياسة الخصوصية</a>.</div>';
     $('aGo').onclick=doSignup;
     if(role==='drv'){ document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{vt=b.dataset.v;drawAuth();}); bindUp(); }
   }
@@ -543,7 +543,7 @@ $('cMenu').onclick=()=>{
     +'<div class="sub">'+(me?me.phone:'')+'</div>'
     +'<button class="btn line" id="m1">🧾 رحلاتي</button>'
     +'<button class="btn line" id="m2">🚨 إبلاغ عن مشكلة</button>'
-    +'<a class="btn line" href="https://mrelectroai-spec.github.io/mrelectroai/privacy/" target="_blank" rel="noopener">🔒 سياسة الخصوصية</a>'
+    +'<a class="btn line" href="https://mrelectroai-spec.github.io/mrelectroai/tools/privacy/" target="_blank" rel="noopener">🔒 سياسة الخصوصية</a>'
     +'<button class="btn dang" id="m3">تسجيل الخروج</button>'
     +'<button class="btn main" id="m4">← رجوع</button>';
   $('m1').onclick=myTrips; $('m2').onclick=report;
