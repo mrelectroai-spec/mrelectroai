@@ -342,6 +342,8 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
 const ADMIN_PIN="71736401ANWAR";
+const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
+const ONESIGNAL_REST_KEY="os_v2_app_d3ztrfe5lnawlejzzqhdrjymyfy7jsbcg3xehc5c7bmeawcr4npsuafet4ojv422w7tgndhvyhhgfe3mq5esro3jebukyfyxw5std3q";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
             car:{name:'سيارة',ic:'🚗',base:120,km:70,min:5,extraPax:100,minFare:200} };
 const CENTER=[34.5145,36.0075];
@@ -358,6 +360,29 @@ async function api(p,o={}){const r=await fetch(SB_URL+'/rest/v1/'+p,{...o,header
   Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'return=representation',...(o.headers||{})}});
   if(!r.ok)throw new Error(await r.text()); return r.status===204?null:r.json();}
 const sb=async fn=>{try{return await fn()}catch(e){return null}};
+
+/* ===== إشعارات Push (OneSignal عبر median) ===== */
+function syncPush(){
+  if(!(window.median&&median.onesignal&&median.onesignal.info))return;
+  median.onesignal.info().then(info=>{
+    const oid=info&&info.oneSignalUserId;
+    if(oid&&me&&role==='drv'&&me.onesignal_id!==oid){
+      me.onesignal_id=oid;
+      sb(()=>api('w_drivers?phone=eq.'+me.phone,{method:'PATCH',body:JSON.stringify({onesignal_id:oid})}));
+    }
+  }).catch(()=>{});
+}
+async function sendPushToDrivers(vtype,title,body){
+  const rows=await sb(()=>api('w_drivers?online=eq.true&status=eq.approved&vtype=eq.'+vtype+'&select=onesignal_id'));
+  const ids=(rows||[]).map(r=>r.onesignal_id).filter(Boolean);
+  if(!ids.length)return;
+  try{
+    await fetch('https://api.onesignal.com/notifications',{method:'POST',headers:{
+      'Content-Type':'application/json','Authorization':'Basic '+ONESIGNAL_REST_KEY},
+      body:JSON.stringify({app_id:ONESIGNAL_APP_ID,include_subscription_ids:ids,
+        headings:{en:title},contents:{en:body}})});
+  }catch(e){}
+}
 async function hash(s){
   const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('wasselni:'+s));
   return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -546,6 +571,7 @@ function enter(){
     initMap();const open=localStorage.getItem('w_ride');
     if(open){ride=open;watch();}else render();}
   else{$('pDrv').classList.add('on');$('drvName').textContent=me.name;
+    syncPush();setTimeout(syncPush,4000);
     drvTick();clearInterval(poll);poll=setInterval(drvTick,5000);}
 }
 $('drvOut').onclick=()=>{localStorage.removeItem('w_drv');toGate();};
@@ -805,6 +831,7 @@ async function order(){
   $('go').disabled=false;
   if(!r)return say('ما قدرنا نبعت الطلب');
   ride=id;localStorage.setItem('w_ride',id);watch();
+  sendPushToDrivers(veh,'طلب جديد '+TAR[veh].ic,A.name+' ← '+B.name+' · '+money(f.v)+' ألف');
 }
 function watch(){
   clearInterval(poll);
