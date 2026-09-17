@@ -347,7 +347,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="1.4";
+const APP_VERSION="1.5";
 const ADMIN_PIN="71736401ANWAR";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
@@ -358,6 +358,19 @@ const $=i=>document.getElementById(i);
 let me=null, role=null, map=null, A=null,B=null, mA=null,mB=null,line=null,mDrv=null,mStop=null;
 let mMe=null, veh='tuktuk', pax=1, picking=null, ride=null, poll=null, quote=null, photos={}, vt='tuktuk', wake=null;
 let stops=[];
+let FREE_TRIPS=100;
+async function loadConfig(){
+  const c=(await sb(()=>api('w_config?id=eq.1&select=free_trips')))?.[0];
+  if(c&&c.free_trips) FREE_TRIPS=c.free_trips;
+}
+async function sendPushRaw(ids,title,body){
+  if(!ids||!ids.length)return;
+  try{
+    await fetch(SB_URL+'/functions/v1/send-push',{method:'POST',headers:{
+      'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},
+      body:JSON.stringify({subscription_ids:ids,title,body})});
+  }catch(e){}
+}
 const money=n=>Math.round(n||0).toLocaleString('en-US');
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const norm=p=>(p||'').replace(/\D/g,'').replace(/^961/,'').replace(/^0/,'');
@@ -612,6 +625,7 @@ function enter(){
     initMap();const open=localStorage.getItem('w_ride');
     if(open){ride=open;watch();}else render();}
   else{$('pDrv').classList.add('on');$('drvName').textContent=me.name;
+    loadConfig();
     syncPush();setTimeout(syncPush,3000);setTimeout(syncPush,8000);setTimeout(syncPush,15000);
     drvTick();clearInterval(poll);poll=setInterval(drvTick,5000);}
 }
@@ -873,6 +887,18 @@ function watch(){
   };
   tick();poll=setInterval(tick,4000);
 }
+function resetOrderFlow(){
+  A=null;B=null;stops=[];quote=null;veh='tuktuk';pax=1;
+  if(mA){map.removeLayer(mA);mA=null;}
+  if(mB){map.removeLayer(mB);mB=null;}
+  if(mStop){map.removeLayer(mStop);mStop=null;}
+  if(mDrv){map.removeLayer(mDrv);mDrv=null;}
+  if(line){map.removeLayer(line);line=null;}
+  $('fromTxt').textContent='من وين؟';$('fromTxt').classList.remove('has');
+  $('toTxt').textContent='لوين رايح؟';$('toTxt').classList.remove('has');
+  $('sheet').dataset.v='';
+  render();
+}
 function vSearch(r){
   if($('sheet').dataset.v==='s')return;$('sheet').dataset.v='s';animSheet();
   $('sheet').innerHTML='<div class="grab"></div><div style="text-align:center"><div class="radar">'+TAR[r.vtype].ic+'</div>'
@@ -880,8 +906,9 @@ function vSearch(r){
     +'<button class="btn dang" id="cx">إلغاء الطلب</button>';
   $('cx').onclick=()=>{
     /* إلغاء فوري بالواجهة، والطلب بالخلفية بلا انتظار */
-    clearInterval(poll);localStorage.removeItem('w_ride');ride=null;$('sheet').dataset.v='';render();
+    clearInterval(poll);localStorage.removeItem('w_ride');ride=null;
     sb(()=>api('w_rides?id=eq.'+r.id,{method:'PATCH',body:JSON.stringify({status:'cancelled'})}));
+    resetOrderFlow();
   };
 }
 async function vDriver(r){
@@ -905,8 +932,7 @@ async function vDriver(r){
     +(r.status!=='onboard'?'<button class="btn dang" id="cx2">إلغاء</button>':'')
     +'<div class="note">الدفع نقداً — السعر النهائي مع السائق.</div>';
   if($('cx2'))$('cx2').onclick=async()=>{await sb(()=>api('w_rides?id=eq.'+ride,{method:'PATCH',body:JSON.stringify({status:'cancelled'})}));
-    clearInterval(poll);localStorage.removeItem('w_ride');ride=null;$('sheet').dataset.v='';
-    if(mDrv){map.removeLayer(mDrv);mDrv=null;}render();};
+    clearInterval(poll);localStorage.removeItem('w_ride');ride=null;resetOrderFlow();};
 }
 function vRate(r){
   clearInterval(poll);
@@ -972,7 +998,8 @@ async function drvTick(){
     +'<b>'+(d.online?'متاح ✅':'غير متاح')+'</b><small>'+(d.online?'خلّي التطبيق فاتح':'شغّل لتستقبل الطلبات')+'</small></div>'
     +'<label class="sw"><input type="checkbox" id="onSw"'+(d.online?' checked':'')+'><span class="sl"></span></label></div>'
     +((d.balance||0)<0?'<div class="note warn"><b>⚠️ رصيدك: '+money(d.balance)+' ألف</b> — لازم تشحن قبل ما تصير متاح.<br>'
-      +'<span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer;color:#8A6100">لمزيد من التفاصيل</span></div>':
+      +'<span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer;color:#8A6100">لمزيد من التفاصيل</span></div>'
+      +'<button class="btn y" onclick="chargeUp()" style="margin-bottom:10px">💰 اشحن رصيدك</button>':
       '<div class="note"><b>💰 رصيدك: '+money(d.balance||0)+' ألف</b> · <span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer">سجل الرحلات</span></div>')
     +'<details style="margin-bottom:10px"><summary style="cursor:pointer;font-size:12px;color:var(--muted);padding:4px 0">⚙️ أدوات تقنية</summary>'
     +'<button class="btn sm line" onclick="testPush()" style="margin-top:8px">🔔 اختبار الإشعارات (تشخيص مؤقت)</button>'
@@ -1050,7 +1077,10 @@ async function chargeCommission(rideId){
   if(!me)return;
   const doneRows=await sb(()=>api('w_rides?driver=eq.'+me.phone+'&status=eq.done&select=id'));
   const count=doneRows?doneRows.length:0;
-  if(count<=100)return;
+  if(count<=FREE_TRIPS)return;
+  if(count===FREE_TRIPS+1){
+    say('🎉 خلصت أول '+FREE_TRIPS+' رحلة مجانية معنا! من هلق، كل ما تخلص رحلة بينخصم منها 10% تكاليف خدمة (كل 100 ألف بتساوي 10 آلاف). بدك تشحن رصيدك.');
+  }
   const rideRows=await sb(()=>api('w_rides?id=eq.'+rideId+'&select=est,paid'));
   const rr=rideRows&&rideRows[0];if(!rr)return;
   const amt=Math.round((rr.paid||rr.est||0)*0.10);
@@ -1060,11 +1090,20 @@ async function chargeCommission(rideId){
   me.balance=newBal;
   say('⚠️ انخصم '+money(amt)+' ألف عمولة (رصيدك: '+money(newBal)+' ألف)');
 }
+function chargeUp(){
+  const amt=prompt('قديش بدك تشحن؟ اكتب الرقم بس (مثلاً 100)');
+  if(!amt||isNaN(amt))return;
+  const cur=prompt('بأي عملة؟ اكتب "ليرة" أو "دولار"');
+  const n=parseFloat(amt);
+  const lbp = (cur&&cur.trim().includes('دولار')) ? Math.round(n*89000) : Math.round(n);
+  const msg=encodeURIComponent('بدي اشحن رصيد وصّلني.\nالاسم: '+(me.name||'')+'\nالرقم: '+(me.phone||'')+'\nالمبلغ: '+money(lbp)+' ل.ل.');
+  window.open('https://wa.me/96179434479?text='+msg,'_blank');
+}
 async function driverRideHistory(){
   const rows=await sb(()=>api('w_rides?driver=eq.'+me.phone+'&status=eq.done&select=*&order=created_at.asc'));
   const list=rows||[];
   const items=list.map((r,i)=>{
-    const amt=r.paid||r.est||0, free=(i+1)<=100, fee=free?0:Math.round(amt*0.10);
+    const amt=r.paid||r.est||0, free=(i+1)<=FREE_TRIPS, fee=free?0:Math.round(amt*0.10);
     return {r,amt,free,fee};
   });
   $('drvBody').innerHTML='<div class="card"><h2>سجل الرحلات والخصم<button class="btn sm line" onclick="drvTick()">→ رجوع</button></h2>'
@@ -1083,6 +1122,7 @@ let admTab=0;
 $('admTabs').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;
   admTab=+b.dataset.t;[...$('admTabs').children].forEach(x=>x.classList.toggle('on',x===b));admLoad();};
 async function admLoad(){
+  await loadConfig();
   const [D,R,P,U]=await Promise.all([
     sb(()=>api('w_drivers?select=*&order=created_at.desc')),
     sb(()=>api('w_rides?select=*&order=created_at.desc&limit=300')),
@@ -1099,16 +1139,21 @@ async function admLoad(){
 
   if(admTab===0){
     const pend=D.filter(d=>d.status==='pending');
+    const findDupes=(d)=>D.filter(x=>x.phone!==d.phone&&(
+      (d.name&&x.name&&x.name.trim().toLowerCase()===d.name.trim().toLowerCase())||
+      (d.plate&&x.plate&&x.plate.trim().toLowerCase()===d.plate.trim().toLowerCase())
+    ));
     $('admBody').innerHTML=stat
       +'<div class="card"><h2>⏳ طلبات التسجيل <span class="chip y">'+pend.length+'</span></h2>'
-      +(pend.length?pend.map(d=>'<div class="row"><img src="'+d.photo+'" onclick="big(this.src)">'
+      +(pend.length?pend.map(d=>{const dup=findDupes(d);return '<div class="row"><img src="'+d.photo+'" onclick="big(this.src)">'
         +'<div class="ri"><b>'+d.name+'</b><small>'+d.phone+'</small>'
         +'<small><span class="chip">'+TAR[d.vtype||'tuktuk'].ic+' '+d.color+'</span>'
         +(d.plate?'<span class="chip">'+d.plate+'</span>':'')+'</small>'
+        +(dup.length?'<small style="color:var(--danger)">⚠️ نفس الاسم/اللوحة عند: '+dup.map(x=>x.phone+' ('+({approved:'مقبول',blocked:'موقوف',pending:'قيد المراجعة'}[x.status]||x.status)+')').join('، ')+'</small>':'')
         +'<div class="thumbs"><img src="'+d.vehicle+'" onclick="big(this.src)">'
         +'<img src="'+d.idcard+'" onclick="big(this.src)"></div></div></div>'
         +'<div class="brow" style="margin-bottom:14px"><button class="btn main" onclick="setSt(\''+d.phone+'\',\'approved\')">✅ موافقة</button>'
-        +'<button class="btn dang" onclick="setSt(\''+d.phone+'\',\'blocked\')">✖️ رفض</button></div>').join('')
+        +'<button class="btn dang" onclick="setSt(\''+d.phone+'\',\'blocked\')">✖️ رفض</button></div>';}).join('')
         :'<div class="empty">ما في طلبات جديدة.</div>')+'</div>'
       +'<div class="card"><h2>🚕 الرحلات الجارية</h2>'
       +(openR.length?openR.map(r=>{const d=D.find(x=>x.phone===r.driver);
@@ -1146,7 +1191,11 @@ async function admLoad(){
     const rt={};paid.forEach(r=>{const k=r.fromtxt+' ← '+r.totxt;rt[k]=rt[k]||{s:0,n:0,e:0};
       rt[k].s+=r.paid;rt[k].n++;rt[k].e+=r.est;});
     const ks=Object.entries(rt).sort((a,b)=>b[1].n-a[1].n).slice(0,15);
-    $('admBody').innerHTML=stat+'<div class="card"><h2>📊 الأرقام</h2>'
+    $('admBody').innerHTML=stat+'<div class="card"><h2>⚙️ إعدادات</h2>'
+      +'<label class="lbl">الفترة المجانية (عدد الرحلات)</label>'
+      +'<input id="freeTripsInp" type="number" value="'+FREE_TRIPS+'" class="mb">'
+      +'<button class="btn main sm" onclick="saveFreeTrips()">حفظ</button></div>'
+      +'<div class="card"><h2>📊 الأرقام</h2>'
       +'<div class="tr"><span>إجمالي الرحلات</span><b>'+R.length+'</b></div>'
       +'<div class="tr"><span>مكتملة</span><b>'+done.length+'</b></div>'
       +'<div class="tr"><span>ملغاة</span><b>'+R.filter(r=>r.status==='cancelled').length+'</b></div>'
@@ -1172,8 +1221,18 @@ async function admLoad(){
   }
 }
 async function setSt(ph,s){await sb(()=>api('w_drivers?phone=eq.'+ph,{method:'PATCH',body:JSON.stringify({status:s})}));
+  if(s==='approved'){
+    const d=(await sb(()=>api('w_drivers?phone=eq.'+ph+'&select=onesignal_id')))?.[0];
+    if(d&&d.onesignal_id) sendPushRaw([d.onesignal_id],'✅ تم توثيق حسابك','يلا صير متاح وابلش تستقبل الطلبات 🛺');
+  }
   say(s==='approved'?'انقبل ✅':'انوقف');admLoad();}
 async function closeRep(id){await sb(()=>api('w_reports?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'closed'})}));admLoad();}
+async function saveFreeTrips(){
+  const n=parseInt($('freeTripsInp').value);
+  if(!n||n<1)return say('رقم غير صحيح');
+  await sb(()=>api('w_config?id=eq.1',{method:'PATCH',body:JSON.stringify({free_trips:n})}));
+  FREE_TRIPS=n;say('انحفظ ✅');admLoad();
+}
 async function resetPass(t,ph){
   const code=String(Math.floor(100000+Math.random()*900000));
   await sb(()=>api(t+'?phone=eq.'+ph,{method:'PATCH',body:JSON.stringify({reset:code})}));
