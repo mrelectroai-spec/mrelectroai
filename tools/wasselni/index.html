@@ -374,11 +374,12 @@ async function testPush(){
   try{
     const info = await fn.call(median.onesignal);
     alert('📋 النتيجة:\n'+JSON.stringify(info,null,2));
-    if(info&&info.oneSignalUserId){
-      await sb(()=>api('w_drivers?phone=eq.'+me.phone,{method:'PATCH',body:JSON.stringify({onesignal_id:info.oneSignalUserId})}));
-      alert('✅ انحفظ الآيدي: '+info.oneSignalUserId);
+    const oid = info && ((info.subscription&&info.subscription.id) || info.oneSignalId);
+    if(oid){
+      await sb(()=>api('w_drivers?phone=eq.'+me.phone,{method:'PATCH',body:JSON.stringify({onesignal_id:oid})}));
+      alert('✅ انحفظ الآيدي: '+oid);
     } else {
-      alert('⚠️ الدالة رجعت بس بلا oneSignalUserId — يمكن السائق لسا ما وافق على الإذن');
+      alert('⚠️ الدالة رجعت بس بلا subscription id — يمكن السائق لسا ما وافق على الإذن');
     }
   }catch(e){alert('❌ صار خطأ:\n'+(e&&e.message?e.message:e));}
 }
@@ -387,7 +388,7 @@ function syncPush(){
   const fn = median.onesignal.onesignalInfo || median.onesignal.info;
   if(!fn)return;
   fn.call(median.onesignal).then(info=>{
-    const oid=info&&info.oneSignalUserId;
+    const oid = info && ((info.subscription&&info.subscription.id) || info.oneSignalId);
     if(oid&&me&&role==='drv'&&me.onesignal_id!==oid){
       me.onesignal_id=oid;
       sb(()=>api('w_drivers?phone=eq.'+me.phone,{method:'PATCH',body:JSON.stringify({onesignal_id:oid})}));
