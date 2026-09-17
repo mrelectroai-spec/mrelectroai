@@ -347,7 +347,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="1.7";
+const APP_VERSION="1.8";
 const ADMIN_PIN="71736401ANWAR";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
@@ -1039,7 +1039,8 @@ async function drvTick(){
   if(!d.online){$('drvBody').innerHTML=head+'<div class="card"><div class="empty">😴<br>أنت غير متاح.<br>شغّل التبديل فوق.</div></div>';
     bindSw();return;}
   if((d.trips_done||0)>=FREE_TRIPS&&(d.balance||0)<=0){
-    $('drvBody').innerHTML=head+'<div class="card"><div class="empty">🚫<br>استوفيت الفترة المجانية.<br>اشحن رصيدك لتستمر تستقبل طلبات.</div></div>';
+    $('drvBody').innerHTML=head+'<div class="card"><div class="empty">🚫<br>استوفيت الفترة المجانية.<br>اشحن رصيدك لتستمر تستقبل طلبات.</div>'
+      +'<button class="btn y" onclick="contactAdmin()">💰 اشحن رصيدك</button></div>';
     bindSw();return;}
   const open=await sb(()=>api('w_rides?status=eq.searching&vtype=eq.'+d.vtype+'&select=*&order=created_at.asc&limit=12'));
   if(!open||!open.length){$('drvBody').innerHTML=head+'<div class="card"><div class="empty">🔎<br>ما في طلبات هلق.<br>خلّي التطبيق فاتح.</div></div>';
@@ -1101,6 +1102,10 @@ async function chargeCommission(rideId){
   me.trips_done=newCount; me.balance=newBal;
   if(justExhausted) say('🎉 خلصت أول '+FREE_TRIPS+' رحلة مجانية معنا! من هلق كل رحلة بينخصم منها 10% تكاليف خدمة، ولازم يكون عندك رصيد كافي لتستمر تستقبل طلبات.');
   else if(amt>0) say('⚠️ انخصم '+money(amt)+' ألف عمولة (رصيدك: '+money(newBal)+' ألف)');
+}
+function contactAdmin(){
+  const msg=encodeURIComponent('بدي أشترك بوصّلني 🙏\nخلصت فترتي المجانية.\nالاسم: '+(me.name||'')+'\nرقمي: '+(me.phone||''));
+  window.open('https://wa.me/96179434479?text='+msg,'_blank');
 }
 function chargeUp(){
   const amt=prompt('قديش بدك تشحن؟ اكتب الرقم بس (مثلاً 100)');
@@ -1185,17 +1190,25 @@ async function admLoad(){
         +(d.status==='blocked'?'موقوف':(d.online?'متاح':'غير متاح'))+'</span>'
         +'<span class="chip">'+TAR[d.vtype||'tuktuk'].ic+' '+d.color+'</span>'
         +(d.trips?'<span class="chip y">⭐ '+(+d.rating).toFixed(1)+' · '+d.trips+'</span>':'')+'</small>'
+        +'<small><span class="chip">💰 '+money(d.balance||0)+' ألف</span></small>'
         +(d.reset?'<small style="color:var(--danger)">🔑 طلب إعادة تعيين</small>':'')+'</div>'
         +'<div style="display:flex;flex-direction:column;gap:6px">'
         +'<button class="btn sm '+(d.status==='blocked'?'main':'dang')+'" onclick="setSt(\''+d.phone+'\',\''
           +(d.status==='blocked'?'approved':'blocked')+'\')">'+(d.status==='blocked'?'تفعيل':'إيقاف')+'</button>'
-        +'<button class="btn sm line" onclick="resetPass(\'w_drivers\',\''+d.phone+'\')">🔑</button></div></div>').join('')
+        +'<button class="btn sm line" onclick="chargeDriver(\''+d.phone+'\')">💰 شحن</button>'
+        +'<button class="btn sm line" onclick="resetPass(\'w_drivers\',\''+d.phone+'\')">🔑</button>'
+        +'<button class="btn sm dang" onclick="deleteDriver(\''+d.phone+'\')">🗑 حذف</button></div></div>').join('')
         :'<div class="empty">ما في سائقين.</div>')+'</div>'
       +'<div class="card"><h2>🙋 الزباين <span class="chip">'+U.length+'</span></h2>'
       +(U.length?U.map(u=>'<div class="row"><span class="av">🙋</span>'
         +'<div class="ri"><b>'+u.name+'</b><small>'+u.phone+'</small>'
+        +(u.status==='blocked'?'<small><span class="chip r">موقوف</span></small>':'')
         +(u.reset?'<small style="color:var(--danger)">🔑 طلب إعادة تعيين</small>':'')+'</div>'
-        +'<button class="btn sm line" onclick="resetPass(\'w_users\',\''+u.phone+'\')">🔑</button></div>').join('')
+        +'<div style="display:flex;flex-direction:column;gap:6px">'
+        +'<button class="btn sm '+(u.status==='blocked'?'main':'dang')+'" onclick="setStCust(\''+u.phone+'\',\''
+          +(u.status==='blocked'?'active':'blocked')+'\')">'+(u.status==='blocked'?'تفعيل':'إيقاف')+'</button>'
+        +'<button class="btn sm line" onclick="resetPass(\'w_users\',\''+u.phone+'\')">🔑</button>'
+        +'<button class="btn sm dang" onclick="deleteUser(\''+u.phone+'\')">🗑 حذف</button></div></div>').join('')
         :'<div class="empty">ما في زباين.</div>')+'</div>';
   }
   else if(admTab===2){
