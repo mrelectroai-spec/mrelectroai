@@ -347,7 +347,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="1.1";
+const APP_VERSION="1.2";
 const ADMIN_PIN="71736401ANWAR";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const ONESIGNAL_REST_KEY="os_v2_app_d3ztrfe5lnawlejzzqhdrjymyfy7jsbcg3xehc5c7bmeawcr4npsuafet4ojv422w7tgndhvyhhgfe3mq5esro3jebukyfyxw5std3q";
@@ -369,6 +369,19 @@ async function api(p,o={}){const r=await fetch(SB_URL+'/rest/v1/'+p,{...o,header
 const sb=async fn=>{try{return await fn()}catch(e){return null}};
 
 /* ===== إشعارات Push (OneSignal عبر median) ===== */
+async function testSendPush(){
+  if(!me||!me.onesignal_id)return alert('❌ ما عندك onesignal_id محفوظ — دوس "اختبار الإشعارات" فوق أول');
+  try{
+    const r=await fetch('https://api.onesignal.com/notifications',{method:'POST',headers:{
+      'Content-Type':'application/json','Authorization':'Basic '+ONESIGNAL_REST_KEY},
+      body:JSON.stringify({app_id:ONESIGNAL_APP_ID,include_subscription_ids:[me.onesignal_id],
+        headings:{en:'🛺 طلب تجريبي'},contents:{en:'إذا وصلك هاد، يعني الإشعارات شغالة ✅'}})});
+    const j=await r.json();
+    alert('📤 استجابة OneSignal (status '+r.status+'):\n'+JSON.stringify(j,null,2));
+  }catch(e){
+    alert('❌ صار خطأ بالإرسال (يمكن CORS أو مشكلة شبكة):\n'+(e&&e.message?e.message:e));
+  }
+}
 async function testPush(){
   if(!window.median){alert('❌ median مش موجود — يعني التطبيق مش شغال جوا median wrapper (نسخة الويب مثلاً)');return;}
   if(!median.onesignal){alert('❌ median.onesignal مش موجود — يعني الـ OneSignal plugin مش مفعّل بـ median.co');return;}
@@ -964,6 +977,7 @@ async function drvTick(){
       +'<span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer;color:#8A6100">لمزيد من التفاصيل</span></div>':
       '<div class="note"><b>💰 رصيدك: '+money(d.balance||0)+' ألف</b> · <span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer">سجل الرحلات</span></div>')
     +'<button class="btn sm line" onclick="testPush()" style="margin-bottom:10px">🔔 اختبار الإشعارات (تشخيص مؤقت)</button>'
+    +'<button class="btn sm line" onclick="testSendPush()" style="margin-bottom:10px">📨 ابعت إشعار تجريبي لحالي</button>'
     +'<div class="stat"><div><b>'+today.length+'</b><small>رحلة اليوم</small></div>'
     +'<div><b>'+money(today.reduce((a,r)=>a+(r.paid||r.est||0),0))+'</b><small>ألف اليوم</small></div>'
     +'<div><b>'+(+d.rating||0).toFixed(1)+'</b><small>⭐ التقييم</small></div></div>';
