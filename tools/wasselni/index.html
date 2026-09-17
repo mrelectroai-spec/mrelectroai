@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<title>وصّلني | توكتوك وسيارات — عكار</title>
-<meta name="description" content="اطلب توكتوك أو سيارة من أقرب سائق — عكار.">
+<title>وصّلني | توكتوك وسيارات</title>
+<meta name="description" content="اطلب توكتوك أو سيارة من أقرب سائق أينما كنت بلبنان.">
 <meta name="theme-color" content="#0E7C3A">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 :root{--g:#0E7C3A;--g2:#0A5F2C;--gs:#E3F3E8;--y:#F5B301;--ys:#FDF6E3;--ink:#14261B;--muted:#6B7C72;
   --line:#E2E8E3;--soft:#F3F6F4;--paper:#FFF;--bg:#F6F7F5;--danger:#C0392B;--ds:#FDEDEA;
   --sh:0 -6px 28px rgba(20,38,27,.14);--sh2:0 4px 16px rgba(20,38,27,.12);
@@ -63,7 +64,7 @@ body.mapmode{overflow:hidden;position:fixed;inset:0}
 .inst small{display:block;font-size:11.5px;opacity:.75}
 
 .page{display:none;min-height:100vh;padding-bottom:30px}
-.page.on{display:block}
+.page.on{display:block;animation:fadeSlideIn .32s cubic-bezier(.22,1,.36,1)}
 .pbar{background:var(--g);color:#fff;position:sticky;top:0;z-index:600;padding-top:env(safe-area-inset-top)}
 .pbar-in{max-width:620px;margin:0 auto;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .pbar b{font-family:'Readex Pro',sans-serif;font-size:17px;display:block;line-height:1.2}
@@ -82,7 +83,9 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mb{margin-bottom:12px}
 .btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:15px;
   border-radius:14px;font-family:inherit;font-size:15.5px;font-weight:700;border:0;
-  background:var(--soft);color:var(--ink);cursor:pointer;margin-top:9px;text-decoration:none}
+  background:var(--soft);color:var(--ink);cursor:pointer;margin-top:9px;text-decoration:none;
+  transition:transform .15s,opacity .15s}
+.btn:active{transform:scale(.97)}
 .btn.main{background:var(--g);color:#fff}
 .btn.y{background:var(--y);color:#3A2A00}
 .btn.line{background:var(--paper);border:1.5px solid var(--line)}
@@ -129,7 +132,8 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 .pin.on{display:block}.pin.up{transform:translate(-50%,-118%)}
 .sheet{position:fixed;inset-inline:0;bottom:0;z-index:550;background:#fff;
   border-radius:26px 26px 0 0;box-shadow:var(--sh);padding:8px 16px calc(16px + env(safe-area-inset-bottom));
-  max-height:84vh;overflow-y:auto}
+  max-height:84vh;overflow-y:auto;transition:transform .32s cubic-bezier(.22,1,.36,1)}
+.sheet.anim{animation:fadeSlideIn .32s cubic-bezier(.22,1,.36,1)}
 .grab{width:42px;height:5px;border-radius:5px;background:#D7DEDA;margin:0 auto 12px}
 .sheet h2{font-family:'Readex Pro',sans-serif;font-size:19px;margin-bottom:3px;border:0;padding:0}
 .sheet .sub{font-size:13px;color:var(--muted);margin-bottom:13px}
@@ -255,8 +259,8 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
     <div class="gh">
       <div class="glogo">🛺</div>
       <h1>وصّلني</h1>
-      <p>توكتوك وسيارات — عكار</p>
-      <div class="tag">📍 ببنين · المنية · العبدة · وكل المنطقة</div>
+      <p>توكتوك وسيارات</p>
+      <div class="tag">🇱🇧 اطلب من أي منطقة بلبنان</div>
     </div>
     <button class="inst" id="inst"><span style="font-size:25px">📲</span>
       <span><b>ثبّت التطبيق على موبايلك</b><small>بيصير عندك أيقونة وبيفتح أسرع</small></span></button>
@@ -346,7 +350,7 @@ const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const ONESIGNAL_REST_KEY="os_v2_app_d3ztrfe5lnawlejzzqhdrjymyfy7jsbcg3xehc5c7bmeawcr4npsuafet4ojv422w7tgndhvyhhgfe3mq5esro3jebukyfyxw5std3q";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
             car:{name:'سيارة',ic:'🚗',base:120,km:70,min:5,extraPax:100,minFare:200} };
-const CENTER=[34.5145,36.0075];
+const CENTER=[33.8938,35.5018]; /* بيروت — مركز عام يشمل كل لبنان */
 
 const $=i=>document.getElementById(i);
 let me=null, role=null, map=null, A=null,B=null, mA=null,mB=null,line=null,mDrv=null,mStop=null;
@@ -557,7 +561,9 @@ async function tryLogin(ph,p){
   me=u; enter(); return true;
 }
 async function autoLogin(ph,p){const ok=await tryLogin(ph,p);
-  if(!ok){localStorage.removeItem('w_'+role);authTab='in';drawAuth();}}
+  hideSplash();
+  if(!ok){localStorage.removeItem('w_'+role);$('gate').style.display='none';
+    $('pAuth').classList.add('on');authTab='in';drawAuth();}}
 async function forgot(){
   const ph=norm($('aPhone').value);
   if(!ph)return $('aErr').textContent='اكتب رقمك أول';
@@ -687,6 +693,7 @@ function drawRoute(coords){
     map.fitBounds(line.getBounds(),{paddingTopLeft:[40,120],paddingBottomRight:[40,sh+40]});
   }
 }
+async function animSheet(){const s=$('sheet');s.classList.remove('anim');void s.offsetWidth;s.classList.add('anim');}
 async function quoteRide(){
   if(!A||!B)return;
   render();
@@ -697,55 +704,36 @@ async function quoteRide(){
   else { d=km(A,B); mins=Math.max(3,Math.round(d*2.6)); coords=null; }
   quote={d,mins,t:fareCalc('tuktuk',d,mins,pax),c:fareCalc('car',d,mins,pax)};
   drawRoute(coords);
+  animSheet();
   render();
 }
 function openSearch(k){picking=k;$('sp').classList.add('on');$('spq').value='';
   $('spq').placeholder=k==='stop'?'وين بدك توقف؟':(k==='a'?'من وين؟':'لوين رايح؟');$('spr').innerHTML=quickList();
   setTimeout(()=>$('spq').focus(),150);}
-const PLACES=[
-  ['مفرق ببنين',34.5145,36.0075],['ببنين',34.5203,36.0122],['جديدة ببنين',34.5265,36.0180],
-  ['جديدة القيطع',34.4930,35.9880],['المنية',34.4700,35.9560],['بحنين',34.4790,35.9700],
-  ['المحمرة',34.4980,35.9600],['دوار العبدة',34.5320,35.9930],['العبدة',34.5310,35.9915],
-  ['جوار الجاموس',34.5060,36.0230],['برقايل',34.5410,36.0400],['حلبا',34.5470,36.0790],
-  ['القبيات',34.5960,36.2350],['مشحة',34.5560,36.0930],['بيت ملات',34.5390,36.0640],
-  ['العريضة',34.6270,36.0180],['الشيخ عياش',34.5230,35.9770],['خان العبدة',34.5290,35.9880],
-  ['المرج',34.5180,36.0490],['تكريت',34.5100,36.0350],['وادي الجاموس',34.5010,36.0290],
-  ['البيرة',34.5590,36.1300],['رحبة',34.5730,36.1080],['منجز',34.6430,36.2000],
-  ['العبودية',34.6480,36.0230],['طرابلس',34.4360,35.8330]
-];
-function localHits(q){
-  return PLACES.filter(p=>p[0].includes(q)).slice(0,6).map(p=>({lat:p[1],lng:p[2],name:p[0],full:'عكار'}));
-}
 function quickList(){
   const rec=JSON.parse(localStorage.getItem('w_recent')||'[]');
   return '<div class="res" id="useMap"><span class="ri">🗺️</span><span class="rt"><b>حدّد على الخريطة</b><small>حرّك الدبوس عالمكان</small></span></div>'
     +'<div class="res" id="useGps"><span class="ri">📍</span><span class="rt"><b>موقعي الحالي</b><small>استعمل GPS</small></span></div>'
     +'<div class="res" id="useLink"><span class="ri">🔗</span><span class="rt"><b>الصق رابط من الخرائط</b><small>رابط غوغل ماب أو إحداثيات</small></span></div>'
-    +rec.map(r=>'<div class="res" data-r=\''+JSON.stringify(r)+'\'><span class="ri">🕘</span><span class="rt"><b>'+r.name+'</b><small>زيارة سابقة</small></span></div>').join('')
-    +'<div style="font-size:12px;color:var(--muted);padding:12px 10px 6px">مناطق قريبة</div>'
-    +PLACES.slice(0,10).map(p=>'<div class="res" data-r=\''+JSON.stringify({lat:p[1],lng:p[2],name:p[0],full:'عكار'})+'\'>'
-      +'<span class="ri">📌</span><span class="rt"><b>'+p[0]+'</b><small>عكار</small></span></div>').join('');
+    +rec.map(r=>'<div class="res" data-r=\''+JSON.stringify(r)+'\'><span class="ri">🕘</span><span class="rt"><b>'+r.name+'</b><small>زيارة سابقة</small></span></div>').join('');
 }
 let tmr;
 $('spq').addEventListener('input',()=>{clearTimeout(tmr);
   const q=$('spq').value.trim();
   if(q.length<2){$('spr').innerHTML=quickList();return;}
-  const loc=localHits(q);
-  const locHtml=loc.map(p=>'<div class="res" data-r=\''+JSON.stringify(p)+'\'><span class="ri">📌</span>'
-    +'<span class="rt"><b>'+p.name+'</b><small>عكار</small></span></div>').join('');
-  $('spr').innerHTML=locHtml+'<div class="res"><span class="rt"><b>عم ندوّر بالخرائط...</b></span></div>';
+  $('spr').innerHTML='<div class="res"><span class="rt"><b>عم ندوّر بالخرائط...</b></span></div>';
   tmr=setTimeout(async()=>{
     try{const c=map.getCenter();
-      const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=8&accept-language=ar&countrycodes=lb&q='
+      const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=10&accept-language=ar&countrycodes=lb&q='
         +encodeURIComponent(q)+'&viewbox='+(c.lng-.6)+','+(c.lat+.4)+','+(c.lng+.6)+','+(c.lat-.4));
       const d=await r.json();
       const web=d.map(x=>{
         const p={lat:+x.lat,lng:+x.lon,name:x.display_name.split(',')[0],full:x.display_name.split(',').slice(0,3).join('، ')};
         return '<div class="res" data-r=\''+JSON.stringify(p)+'\'><span class="ri">🌍</span><span class="rt"><b>'+p.name+'</b><small>'+p.full+'</small></span></div>';
       }).join('');
-      $('spr').innerHTML = (locHtml+web) || '<div class="res" id="useMap"><span class="ri">🗺️</span>'
+      $('spr').innerHTML = web || '<div class="res" id="useMap"><span class="ri">🗺️</span>'
         +'<span class="rt"><b>ما لقينا «'+q+'»</b><small>حدّدو على الخريطة</small></span></div>';
-    }catch(e){$('spr').innerHTML=locHtml||'<div class="res"><span class="rt"><b>ما قدرنا ندوّر</b></span></div>';}
+    }catch(e){$('spr').innerHTML='<div class="res"><span class="rt"><b>ما قدرنا ندوّر</b></span></div>';}
   },450);});
 $('spr').onclick=e=>{
   if(e.target.closest('#useMap')){$('sp').classList.remove('on');startPin();return;}
@@ -853,12 +841,15 @@ function watch(){
   tick();poll=setInterval(tick,4000);
 }
 function vSearch(r){
-  if($('sheet').dataset.v==='s')return;$('sheet').dataset.v='s';
+  if($('sheet').dataset.v==='s')return;$('sheet').dataset.v='s';animSheet();
   $('sheet').innerHTML='<div class="grab"></div><div style="text-align:center"><div class="radar">'+TAR[r.vtype].ic+'</div>'
     +'<h2>عم ندوّرلك على سائق</h2><div class="sub">'+r.fromtxt+' ← '+r.totxt+' · '+money(r.est)+' ألف</div></div>'
     +'<button class="btn dang" id="cx">إلغاء الطلب</button>';
-  $('cx').onclick=async()=>{await sb(()=>api('w_rides?id=eq.'+ride,{method:'PATCH',body:JSON.stringify({status:'cancelled'})}));
-    clearInterval(poll);localStorage.removeItem('w_ride');ride=null;$('sheet').dataset.v='';render();};
+  $('cx').onclick=()=>{
+    /* إلغاء فوري بالواجهة، والطلب بالخلفية بلا انتظار */
+    clearInterval(poll);localStorage.removeItem('w_ride');ride=null;$('sheet').dataset.v='';render();
+    sb(()=>api('w_rides?id=eq.'+r.id,{method:'PATCH',body:JSON.stringify({status:'cancelled'})}));
+  };
 }
 async function vDriver(r){
   const d=(await sb(()=>api('w_drivers?phone=eq.'+r.driver+'&select=*')))?.[0];
@@ -866,7 +857,7 @@ async function vDriver(r){
     if(mDrv)mDrv.setLatLng(p);else mDrv=L.marker(p,{icon:icon(TAR[r.vtype].ic,40)}).addTo(map);
     if(r.status==='accepted'&&mA){const sh=$('sheet').offsetHeight||300;
       map.fitBounds(L.latLngBounds([mA.getLatLng(),p]),{paddingTopLeft:[40,120],paddingBottomRight:[40,sh+40]});}}
-  if($('sheet').dataset.v===r.status)return;$('sheet').dataset.v=r.status;
+  if($('sheet').dataset.v===r.status)return;$('sheet').dataset.v=r.status;animSheet();
   const st={accepted:['السائق جاي 🛺','عم يوصل لعندك'],arrived:['السائق وصل! 🎉','هو مستنيك برّا'],
     onboard:['بالطريق 🚀','رحلة سعيدة']}[r.status]||['',''];
   $('sheet').innerHTML='<div class="grab"></div><div class="status"><b>'+st[0]+'</b><small>'+st[1]+'</small></div>'
@@ -886,7 +877,7 @@ async function vDriver(r){
 }
 function vRate(r){
   clearInterval(poll);
-  if($('sheet').dataset.v==='d')return;$('sheet').dataset.v='d';
+  if($('sheet').dataset.v==='d')return;$('sheet').dataset.v='d';animSheet();
   $('sheet').innerHTML='<div class="grab"></div><div style="text-align:center"><h2>وصلت! كيف كانت؟</h2>'
     +'<div class="stars" id="st">'+[1,2,3,4,5].map(i=>'<button data-s="'+i+'">⭐</button>').join('')+'</div></div>'
     +'<label class="lbl">كم دفعت فعلياً؟ (بالألف)</label>'
@@ -947,6 +938,9 @@ async function drvTick(){
   const head='<div class="onbar'+(d.online?' live':'')+'"><div class="oi">'
     +'<b>'+(d.online?'متاح ✅':'غير متاح')+'</b><small>'+(d.online?'خلّي التطبيق فاتح':'شغّل لتستقبل الطلبات')+'</small></div>'
     +'<label class="sw"><input type="checkbox" id="onSw"'+(d.online?' checked':'')+'><span class="sl"></span></label></div>'
+    +((d.balance||0)<0?'<div class="note warn"><b>⚠️ رصيدك: '+money(d.balance)+' ألف</b> — لازم تشحن قبل ما تصير متاح.<br>'
+      +'<span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer;color:#8A6100">لمزيد من التفاصيل</span></div>':
+      '<div class="note"><b>💰 رصيدك: '+money(d.balance||0)+' ألف</b> · <span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer">سجل الرحلات</span></div>')
     +'<div class="stat"><div><b>'+today.length+'</b><small>رحلة اليوم</small></div>'
     +'<div><b>'+money(today.reduce((a,r)=>a+(r.paid||r.est||0),0))+'</b><small>ألف اليوم</small></div>'
     +'<div><b>'+(+d.rating||0).toFixed(1)+'</b><small>⭐ التقييم</small></div></div>';
@@ -988,6 +982,7 @@ function bindSw(){
   const s=$('onSw');if(!s)return;
   s.onchange=async()=>{
     const on=s.checked;
+    if(on&&(me.balance||0)<0){s.checked=false;return say('⚠️ رصيدك سالب — اشحن رصيدك الأول');}
     await sb(()=>api('w_drivers?phone=eq.'+me.phone,{method:'PATCH',body:JSON.stringify({online:on})}));
     if(on){pushPos();try{wake=await navigator.wakeLock.request('screen')}catch(e){}}
     else if(wake){wake.release();wake=null;}
@@ -1012,7 +1007,35 @@ async function take(id){
 }
 async function step(id,s){
   await sb(()=>api('w_rides?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:s,updated_at:new Date().toISOString()})}));
-  if(s==='done')say('خلصت — مبروك 🎉');drvTick();
+  if(s==='done'){say('خلصت — مبروك 🎉');await chargeCommission(id);}
+  drvTick();
+}
+async function chargeCommission(rideId){
+  if(!me)return;
+  const doneRows=await sb(()=>api('w_rides?driver=eq.'+me.phone+'&status=eq.done&select=id'));
+  const count=doneRows?doneRows.length:0;
+  if(count<=100)return;
+  const rideRows=await sb(()=>api('w_rides?id=eq.'+rideId+'&select=est,paid'));
+  const rr=rideRows&&rideRows[0];if(!rr)return;
+  const amt=Math.round((rr.paid||rr.est||0)*0.10);
+  if(amt<=0)return;
+  const newBal=(me.balance||0)-amt;
+  await sb(()=>api('w_drivers?phone=eq.'+me.phone,{method:'PATCH',body:JSON.stringify({balance:newBal})}));
+  me.balance=newBal;
+  say('⚠️ انخصم '+money(amt)+' ألف عمولة (رصيدك: '+money(newBal)+' ألف)');
+}
+async function driverRideHistory(){
+  const rows=await sb(()=>api('w_rides?driver=eq.'+me.phone+'&status=eq.done&select=*&order=created_at.asc'));
+  const list=rows||[];
+  const items=list.map((r,i)=>{
+    const amt=r.paid||r.est||0, free=(i+1)<=100, fee=free?0:Math.round(amt*0.10);
+    return {r,amt,free,fee};
+  });
+  $('drvBody').innerHTML='<div class="card"><h2>سجل الرحلات والخصم<button class="btn sm line" onclick="drvTick()">→ رجوع</button></h2>'
+    +(items.length?items.slice().reverse().map(({r,amt,free,fee})=>'<div class="trip"><div class="ti">'
+      +'<b>'+r.fromtxt+' ← '+r.totxt+'</b><small>'+new Date(r.created_at).toLocaleDateString('ar-LB')
+      +' · '+money(amt)+' ألف · '+(free?'✅ مجانية (ضمن أول 100)':'🔴 خصم '+money(fee)+' ألف')+'</small></div></div>').join('')
+      :'<div class="empty">ما في رحلات مكتملة بعد.</div>')+'</div>';
 }
 async function cancelRide(id){
   if(!confirm('متأكد بدك تلغي؟'))return;
@@ -1127,12 +1150,22 @@ function big(src){const d=document.createElement('div');
   d.onclick=()=>d.remove();document.body.appendChild(d);}
 
 /* دخول تلقائي إذا مسجّل من قبل */
+function showSplash(){
+  const d=document.createElement('div');d.id='splash';
+  d.style.cssText='position:fixed;inset:0;background:linear-gradient(180deg,#159A4A,#0E7C3A);z-index:999;'
+    +'display:grid;place-items:center;color:#fff;font-family:inherit';
+  d.innerHTML='<div style="font-size:54px;animation:sp2 1.2s linear infinite">🛺</div>';
+  document.body.appendChild(d);
+}
+function hideSplash(){const s=document.getElementById('splash');if(s)s.remove();}
 (function boot(){
   const c=localStorage.getItem('w_cust'), d=localStorage.getItem('w_drv');
-  if(c){ role='cust'; const s=JSON.parse(c); $('gate').style.display='none';
-    $('pAuth').classList.add('on'); autoLogin(s.phone,s.pass); }
-  else if(d){ role='drv'; const s=JSON.parse(d); $('gate').style.display='none';
-    $('pAuth').classList.add('on'); autoLogin(s.phone,s.pass); }
+  if(c||d){
+    showSplash(); $('gate').style.display='none';
+    role = c?'cust':'drv';
+    const s=JSON.parse(c||d);
+    autoLogin(s.phone,s.pass);
+  }
 })();
 
 let dp=null;
