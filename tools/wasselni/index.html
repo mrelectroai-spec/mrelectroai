@@ -347,7 +347,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="1.8";
+const APP_VERSION="1.9";
 const ADMIN_PIN="71736401ANWAR";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
@@ -601,12 +601,37 @@ async function doLogin(){
 async function tryLogin(ph,p){
   const rows=await sb(()=>api(tbl()+'?phone=eq.'+ph+'&select=*'));
   if(!rows||!rows.length)return false;
-  const u=rows[0], h=await hash(p);
-  if(u.pass!==h && u.reset!==p)return false;
-  if(u.reset===p){await sb(()=>api(tbl()+'?phone=eq.'+ph,{method:'PATCH',
-    body:JSON.stringify({pass:h,reset:null})}));say('انحدّثت كلمة السر');}
-  localStorage.setItem('w_'+role,JSON.stringify({phone:ph,pass:p}));
-  me=u; enter(); return true;
+  const u=rows[0];
+  if(role==='cust'&&u.status==='blocked'){say('🚫 حسابك موقوف، تواصل مع الإدارة');return false;}
+  const h=await hash(p);
+  if(u.pass===h){
+    localStorage.setItem('w_'+role,JSON.stringify({phone:ph,pass:p}));
+    me=u; enter(); return true;
+  }
+  if(u.reset&&u.reset===p){
+    me=u; showSetNewPassword(ph); return true;
+  }
+  return false;
+}
+function showSetNewPassword(ph){
+  $('gate').style.display='none'; $('pAuth').classList.add('on');
+  $('authTitle').textContent='كلمة سر جديدة';
+  $('authSub').textContent='دخلت بكود مؤقت — حط كلمة سر دائمة';
+  $('authBox').innerHTML='<h2>كلمة سر جديدة</h2>'
+    +'<label class="lbl">كلمة السر الجديدة</label><input id="npPass" type="password" placeholder="••••••" class="mb">'
+    +'<label class="lbl">تأكيدها</label><input id="npPass2" type="password" placeholder="••••••">'
+    +'<div class="err" id="npErr"></div>'
+    +'<button class="btn main" id="npGo">حفظ وتسجيل الدخول</button>';
+  $('npGo').onclick=async()=>{
+    const p=$('npPass').value,p2=$('npPass2').value;
+    if(p.length<4)return $('npErr').textContent='كلمة السر 4 خانات على الأقل';
+    if(p!==p2)return $('npErr').textContent='كلمتا السر مش متطابقتين';
+    const h=await hash(p);
+    await sb(()=>api(tbl()+'?phone=eq.'+ph,{method:'PATCH',body:JSON.stringify({pass:h,reset:null})}));
+    localStorage.setItem('w_'+role,JSON.stringify({phone:ph,pass:p}));
+    say('انحفظت كلمة السر الجديدة ✅');
+    enter();
+  };
 }
 async function autoLogin(ph,p){const ok=await tryLogin(ph,p);
   hideSplash();
@@ -1108,12 +1133,17 @@ function contactAdmin(){
   window.open('https://wa.me/96179434479?text='+msg,'_blank');
 }
 function chargeUp(){
-  const amt=prompt('قديش بدك تشحن؟ اكتب الرقم بس (مثلاً 100)');
-  if(!amt||isNaN(amt))return;
-  const cur=prompt('بأي عملة؟ اكتب "ليرة" أو "دولار"');
+  const cur=prompt('بأي عملة بدك تشحن؟ اكتب "دولار" أو "ليرة"');
+  if(!cur)return;
+  const isUsd=cur.trim().includes('دولار');
+  const amt=prompt(isUsd?'قديش بدك تشحن؟ (بالدولار، أقل شي 10$)':'قديش بدك تشحن؟ (بالليرة، أقل شي 890,000 ل.ل.)');
   const n=parseFloat(amt);
-  const lbp = (cur&&cur.trim().includes('دولار')) ? Math.round(n*89000) : Math.round(n);
-  const msg=encodeURIComponent('بدي اشحن رصيد وصّلني.\nالاسم: '+(me.name||'')+'\nالرقم: '+(me.phone||'')+'\nالمبلغ: '+money(lbp)+' ل.ل.');
+  if(!n||n<=0)return say('رقم غير صحيح');
+  if(isUsd&&n<10)return say('الحد الأدنى للشحن 10 دولار');
+  if(!isUsd&&n<890000)return say('الحد الأدنى للشحن 890,000 ل.ل.');
+  const lbp = isUsd ? Math.round(n*89000) : Math.round(n);
+  const msg=encodeURIComponent('بدي اشحن رصيد وصّلني.\nالاسم: '+(me.name||'')+'\nالرقم: '+(me.phone||'')+'\nالمبلغ: '
+    +(isUsd?(n+'$ (≈ '+money(lbp)+' ل.ل.)'):(money(lbp)+' ل.ل.')));
   window.open('https://wa.me/96179434479?text='+msg,'_blank');
 }
 async function driverRideHistory(){
@@ -1184,6 +1214,7 @@ async function admLoad(){
   else if(admTab===1){
     const app=D.filter(d=>d.status!=='pending');
     $('admBody').innerHTML='<div class="card"><h2>🛺 السائقين <span class="chip">'+app.length+'</span></h2>'
+      +(app.length?'<button class="btn dang sm" onclick="deleteAllDrivers()" style="margin-bottom:10px">🗑️ حذف كل السائقين</button>':'')
       +(app.length?app.map(d=>'<div class="row"><img src="'+d.photo+'" onclick="big(this.src)">'
         +'<div class="ri"><b>'+d.name+'</b><small>'+d.phone+'</small>'
         +'<small><span class="chip '+(d.status==='blocked'?'r':(d.online?'':'y'))+'">'
@@ -1200,6 +1231,7 @@ async function admLoad(){
         +'<button class="btn sm dang" onclick="deleteDriver(\''+d.phone+'\')">🗑 حذف</button></div></div>').join('')
         :'<div class="empty">ما في سائقين.</div>')+'</div>'
       +'<div class="card"><h2>🙋 الزباين <span class="chip">'+U.length+'</span></h2>'
+      +(U.length?'<button class="btn dang sm" onclick="deleteAllUsers()" style="margin-bottom:10px">🗑️ حذف كل الزباين</button>':'')
       +(U.length?U.map(u=>'<div class="row"><span class="av">🙋</span>'
         +'<div class="ri"><b>'+u.name+'</b><small>'+u.phone+'</small>'
         +(u.status==='blocked'?'<small><span class="chip r">موقوف</span></small>':'')
@@ -1251,6 +1283,45 @@ async function setSt(ph,s){await sb(()=>api('w_drivers?phone=eq.'+ph,{method:'PA
     if(d&&d.onesignal_id) sendPushRaw([d.onesignal_id],'✅ تم توثيق حسابك','يلا صير متاح وابلش تستقبل الطلبات 🛺');
   }
   say(s==='approved'?'انقبل ✅':'انوقف');admLoad();}
+async function setStCust(ph,s){await sb(()=>api('w_users?phone=eq.'+ph,{method:'PATCH',body:JSON.stringify({status:s})}));
+  say(s==='blocked'?'انوقف':'انفعّل');admLoad();}
+async function chargeDriver(ph){
+  const cur=prompt('بأي عملة بدك تشحن؟ اكتب "دولار" أو "ليرة"');
+  if(!cur)return;
+  const isUsd=cur.trim().includes('دولار');
+  const amt=prompt(isUsd?'المبلغ بالدولار (أقل شي 10):':'المبلغ بالألف ليرة (أقل شي 890):');
+  const n=parseFloat(amt);
+  if(!n||n<=0)return;
+  if(isUsd&&n<10)return say('الحد الأدنى 10 دولار');
+  if(!isUsd&&n<890)return say('الحد الأدنى 890 ألف ل.ل.');
+  const addAmt = isUsd ? Math.round(n*89) : Math.round(n);
+  const d=(await sb(()=>api('w_drivers?phone=eq.'+ph+'&select=balance')))?.[0];
+  const nb=(d?.balance||0)+addAmt;
+  await sb(()=>api('w_drivers?phone=eq.'+ph,{method:'PATCH',body:JSON.stringify({balance:nb})}));
+  say('انشحن الرصيد ✅');admLoad();
+}
+async function deleteDriver(ph){
+  if(!confirm('حذف هالسائق نهائياً؟'))return;
+  await sb(()=>api('w_drivers?phone=eq.'+ph,{method:'DELETE'}));
+  say('انحذف 🗑️');admLoad();
+}
+async function deleteUser(ph){
+  if(!confirm('حذف هالزبون نهائياً؟'))return;
+  await sb(()=>api('w_users?phone=eq.'+ph,{method:'DELETE'}));
+  say('انحذف 🗑️');admLoad();
+}
+async function deleteAllDrivers(){
+  if(!confirm('حذف كل السائقين نهائياً؟ هاد إجراء ما بينرجع!'))return;
+  if(!confirm('متأكد 100%؟ رح تنحذف كل بيانات السائقين.'))return;
+  await sb(()=>api('w_drivers?phone=not.is.null',{method:'DELETE'}));
+  say('انحذف الكل 🗑️');admLoad();
+}
+async function deleteAllUsers(){
+  if(!confirm('حذف كل الزباين نهائياً؟ هاد إجراء ما بينرجع!'))return;
+  if(!confirm('متأكد 100%؟ رح تنحذف كل بيانات الزباين.'))return;
+  await sb(()=>api('w_users?phone=not.is.null',{method:'DELETE'}));
+  say('انحذف الكل 🗑️');admLoad();
+}
 async function closeRep(id){await sb(()=>api('w_reports?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'closed'})}));admLoad();}
 async function saveFreeTrips(){
   const n=parseInt($('freeTripsInp').value);
