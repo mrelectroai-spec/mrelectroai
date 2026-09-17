@@ -277,7 +277,8 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
     <div class="gf">الدفع نقداً للسائق<br>
       <a href="https://mrelectroai-spec.github.io/mrelectroai/tools/privacy/" target="_blank" rel="noopener">سياسة الخصوصية</a> · <span id="admLink" style="cursor:pointer;text-decoration:underline">🛡️ الإدارة</span><br>
       <a class="dev" href="https://mrelectroai-spec.github.io/mrelectroai/" target="_blank" rel="noopener">
-        ⚡ تصميم وبرمجة <b>MrElectroAI</b></a></div>
+        ⚡ تصميم وبرمجة <b>MrElectroAI</b></a>
+      <div style="margin-top:8px;opacity:.6;font-family:'JetBrains Mono',monospace;font-size:10.5px" id="verTag"></div></div>
   </div>
 </div>
 
@@ -321,6 +322,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
   <div class="pbar"><div class="pbar-in">
     <span><b>سائق</b><small id="drvName"></small></span>
     <button class="hb" id="drvOut">خروج</button></div></div>
+  <div style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.4;padding-top:6px" id="drvVerTag"></div>
   <div class="pw" id="drvBody"></div>
 </div>
 
@@ -345,6 +347,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
+const APP_VERSION="1.1";
 const ADMIN_PIN="71736401ANWAR";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const ONESIGNAL_REST_KEY="os_v2_app_d3ztrfe5lnawlejzzqhdrjymyfy7jsbcg3xehc5c7bmeawcr4npsuafet4ojv422w7tgndhvyhhgfe3mq5esro3jebukyfyxw5std3q";
@@ -445,6 +448,8 @@ function toGate(){
   me=null; role=null;
 }
 document.querySelectorAll('.pick').forEach(b=>b.onclick=()=>openAuth(b.dataset.r));
+if($('verTag'))$('verTag').textContent='v'+APP_VERSION;
+if($('drvVerTag'))$('drvVerTag').textContent='v'+APP_VERSION;
 $('admLink').onclick=()=>{ const p=prompt('كود الإدارة'); if(p!==ADMIN_PIN)return;
   $('gate').style.display='none'; $('pAdm').classList.add('on'); role='adm'; admLoad(); poll=setInterval(admLoad,8000); };
 
@@ -1190,7 +1195,10 @@ let dp=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('inst').classList.add('on');});
 $('inst').onclick=async()=>{if(!dp)return alert('من قائمة المتصفح اختار «إضافة إلى الشاشة الرئيسية»');
   dp.prompt();await dp.userChoice;dp=null;$('inst').classList.remove('on');};
-if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister()));
+  if(window.caches) caches.keys().then(ks=>ks.forEach(k=>caches.delete(k)));
+}
 </script>
 </body>
 </html>
