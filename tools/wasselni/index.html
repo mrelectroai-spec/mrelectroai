@@ -347,7 +347,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="1.5";
+const APP_VERSION="1.6";
 const ADMIN_PIN="71736401ANWAR";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
@@ -643,15 +643,22 @@ $('cMenu').onclick=()=>{
   $('m4').onclick=()=>{ $('sheet').dataset.v=''; render(); };
 };
 
+async function reverseGeocode(lat,lng){
+  try{
+    const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&accept-language=ar&lat='+lat+'&lon='+lng);
+    const d=await r.json();
+    return (d.name||(d.display_name||'').split(',')[0]||'موقعي الحالي');
+  }catch(e){ return 'موقعي الحالي'; }
+}
 function initMap(){
   if(map){setTimeout(()=>map.invalidateSize(),150);return;}
   if(typeof L==='undefined'){$('sheet').innerHTML='<div class="grab"></div><div class="empty">ما قدرنا نحمّل الخريطة — تفقّد الإنترنت.</div>';return;}
   map=L.map('map',{zoomControl:false,attributionControl:false}).setView(CENTER,14);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
   L.control.attribution({position:'bottomright',prefix:false}).addAttribution('© OpenStreetMap').addTo(map);
-  navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>{
+  navigator.geolocation&&navigator.geolocation.getCurrentPosition(async p=>{
     const c=[p.coords.latitude,p.coords.longitude];map.setView(c,16);
-    if(!A)setPt('a',{lat:c[0],lng:c[1],name:'موقعي الحالي'});},()=>{},{enableHighAccuracy:true,timeout:8000});
+    if(!A){const nm=await reverseGeocode(c[0],c[1]);setPt('a',{lat:c[0],lng:c[1],name:nm});}},()=>{},{enableHighAccuracy:true,timeout:8000});
   document.querySelectorAll('.sfield').forEach(f=>f.onclick=()=>openSearch(f.dataset.f));
   $('spBack').onclick=()=>$('sp').classList.remove('on');
 
@@ -665,7 +672,7 @@ function initMap(){
     if(mMe) mMe.setLatLng([g.lat,g.lng]);
     else mMe=L.circleMarker([g.lat,g.lng],{radius:8,color:'#fff',weight:3,
       fillColor:'#1B6FD4',fillOpacity:1}).addTo(map).bindTooltip('أنت هون');
-    if(!A) setPt('a',{lat:g.lat,lng:g.lng,name:'موقعي الحالي'});
+    if(!A){const nm=await reverseGeocode(g.lat,g.lng);setPt('a',{lat:g.lat,lng:g.lng,name:nm});}
     say('📍 هيدا موقعك');
   };
 }
@@ -794,7 +801,9 @@ $('spr').onclick=e=>{
     commitPoint(picking,{lat:+m[1],lng:+m[2],name:'موقع من رابط'});
     map.setView([+m[1],+m[2]],17); return;}
   if(e.target.closest('#useGps')){$('sp').classList.remove('on');
-    navigator.geolocation.getCurrentPosition(p=>{commitPoint(picking,{lat:p.coords.latitude,lng:p.coords.longitude,name:'موقعي الحالي'});
+    navigator.geolocation.getCurrentPosition(async p=>{
+      const nm=await reverseGeocode(p.coords.latitude,p.coords.longitude);
+      commitPoint(picking,{lat:p.coords.latitude,lng:p.coords.longitude,name:nm});
       map.setView([p.coords.latitude,p.coords.longitude],16);},()=>say('ما قدرنا نحدّد موقعك'),{enableHighAccuracy:true,timeout:8000});
     return;}
   const r=e.target.closest('[data-r]');if(!r)return;
