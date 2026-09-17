@@ -347,7 +347,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="1.6";
+const APP_VERSION="1.7";
 const ADMIN_PIN="71736401ANWAR";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
@@ -424,7 +424,9 @@ function syncPush(){
   }).catch(()=>{});
 }
 async function sendPushToDrivers(vtype,title,body){
-  const rows=await sb(()=>api('w_drivers?online=eq.true&status=eq.approved&vtype=eq.'+vtype+'&select=onesignal_id'));
+  await loadConfig();
+  const rows=await sb(()=>api('w_drivers?online=eq.true&status=eq.approved&vtype=eq.'+vtype+
+    '&or=(trips_done.lt.'+FREE_TRIPS+',balance.gt.0)&select=onesignal_id'));
   const ids=(rows||[]).map(r=>r.onesignal_id).filter(Boolean);
   if(!ids.length)return;
   try{
@@ -963,8 +965,7 @@ function vRate(r){
         await sb(()=>api('w_drivers?phone=eq.'+r.driver,{method:'PATCH',body:JSON.stringify({rating:+rt.toFixed(2),trips:t})}));}}
     fin();};
   $('sk').onclick=fin;
-  function fin(){localStorage.removeItem('w_ride');ride=null;$('sheet').dataset.v='';
-    if(mDrv){map.removeLayer(mDrv);mDrv=null;}say('شكراً! 🙏');render();}
+  function fin(){localStorage.removeItem('w_ride');ride=null;resetOrderFlow();say('شكراً! 🙏');}
 }
 async function myTrips(){
   const rows=await sb(()=>api('w_rides?cphone=eq.'+me.phone+'&select=*&order=created_at.desc&limit=15'));
@@ -1037,6 +1038,9 @@ async function drvTick(){
   }
   if(!d.online){$('drvBody').innerHTML=head+'<div class="card"><div class="empty">😴<br>أنت غير متاح.<br>شغّل التبديل فوق.</div></div>';
     bindSw();return;}
+  if((d.trips_done||0)>=FREE_TRIPS&&(d.balance||0)<=0){
+    $('drvBody').innerHTML=head+'<div class="card"><div class="empty">🚫<br>استوفيت الفترة المجانية.<br>اشحن رصيدك لتستمر تستقبل طلبات.</div></div>';
+    bindSw();return;}
   const open=await sb(()=>api('w_rides?status=eq.searching&vtype=eq.'+d.vtype+'&select=*&order=created_at.asc&limit=12'));
   if(!open||!open.length){$('drvBody').innerHTML=head+'<div class="card"><div class="empty">🔎<br>ما في طلبات هلق.<br>خلّي التطبيق فاتح.</div></div>';
     bindSw();return;}
@@ -1054,7 +1058,7 @@ function bindSw(){
   const s=$('onSw');if(!s)return;
   s.onchange=async()=>{
     const on=s.checked;
-    if(on&&(me.balance||0)<0){s.checked=false;return say('⚠️ رصيدك سالب — اشحن رصيدك الأول');}
+    if(on&&(me.trips_done||0)>=FREE_TRIPS&&(me.balance||0)<=0){s.checked=false;return say('⚠️ استوفيت الفترة المجانية — اشحن رصيدك الأول');}
     await sb(()=>api('w_drivers?phone=eq.'+me.phone,{method:'PATCH',body:JSON.stringify({online:on})}));
     if(on){pushPos();try{wake=await navigator.wakeLock.request('screen')}catch(e){}}
     else if(wake){wake.release();wake=null;}
@@ -1084,20 +1088,19 @@ async function step(id,s){
 }
 async function chargeCommission(rideId){
   if(!me)return;
-  const doneRows=await sb(()=>api('w_rides?driver=eq.'+me.phone+'&status=eq.done&select=id'));
-  const count=doneRows?doneRows.length:0;
-  if(count<=FREE_TRIPS)return;
-  if(count===FREE_TRIPS+1){
-    say('🎉 خلصت أول '+FREE_TRIPS+' رحلة مجانية معنا! من هلق، كل ما تخلص رحلة بينخصم منها 10% تكاليف خدمة (كل 100 ألف بتساوي 10 آلاف). بدك تشحن رصيدك.');
+  const newCount=(me.trips_done||0)+1;
+  const patch={trips_done:newCount};
+  let justExhausted=false, amt=0, newBal=me.balance||0;
+  if(newCount>FREE_TRIPS){
+    const rideRows=await sb(()=>api('w_rides?id=eq.'+rideId+'&select=est,paid'));
+    const rr=rideRows&&rideRows[0];
+    if(rr){ amt=Math.round((rr.paid||rr.est||0)*0.10); newBal=(me.balance||0)-amt; patch.balance=newBal; }
+    if(newCount===FREE_TRIPS+1) justExhausted=true;
   }
-  const rideRows=await sb(()=>api('w_rides?id=eq.'+rideId+'&select=est,paid'));
-  const rr=rideRows&&rideRows[0];if(!rr)return;
-  const amt=Math.round((rr.paid||rr.est||0)*0.10);
-  if(amt<=0)return;
-  const newBal=(me.balance||0)-amt;
-  await sb(()=>api('w_drivers?phone=eq.'+me.phone,{method:'PATCH',body:JSON.stringify({balance:newBal})}));
-  me.balance=newBal;
-  say('⚠️ انخصم '+money(amt)+' ألف عمولة (رصيدك: '+money(newBal)+' ألف)');
+  await sb(()=>api('w_drivers?phone=eq.'+me.phone,{method:'PATCH',body:JSON.stringify(patch)}));
+  me.trips_done=newCount; me.balance=newBal;
+  if(justExhausted) say('🎉 خلصت أول '+FREE_TRIPS+' رحلة مجانية معنا! من هلق كل رحلة بينخصم منها 10% تكاليف خدمة، ولازم يكون عندك رصيد كافي لتستمر تستقبل طلبات.');
+  else if(amt>0) say('⚠️ انخصم '+money(amt)+' ألف عمولة (رصيدك: '+money(newBal)+' ألف)');
 }
 function chargeUp(){
   const amt=prompt('قديش بدك تشحن؟ اكتب الرقم بس (مثلاً 100)');
