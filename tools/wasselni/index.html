@@ -347,7 +347,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="1.9";
+const APP_VERSION="2.0";
 const ADMIN_PIN="71736401ANWAR";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
@@ -368,7 +368,8 @@ async function sendPushRaw(ids,title,body){
   try{
     await fetch(SB_URL+'/functions/v1/send-push',{method:'POST',headers:{
       'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},
-      body:JSON.stringify({subscription_ids:ids,title,body})});
+      body:JSON.stringify({subscription_ids:ids,title,body,
+        large_icon:'https://mrelectroai-spec.github.io/mrelectroai/tools/wasselni/icon-512.png'})});
   }catch(e){}
 }
 const money=n=>Math.round(n||0).toLocaleString('en-US');
@@ -428,12 +429,7 @@ async function sendPushToDrivers(vtype,title,body){
   const rows=await sb(()=>api('w_drivers?online=eq.true&status=eq.approved&vtype=eq.'+vtype+
     '&or=(trips_done.lt.'+FREE_TRIPS+',balance.gt.0)&select=onesignal_id'));
   const ids=(rows||[]).map(r=>r.onesignal_id).filter(Boolean);
-  if(!ids.length)return;
-  try{
-    await fetch(SB_URL+'/functions/v1/send-push',{method:'POST',headers:{
-      'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},
-      body:JSON.stringify({subscription_ids:ids,title,body})});
-  }catch(e){}
+  await sendPushRaw(ids,title,body);
 }
 async function hash(s){
   const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('wasselni:'+s));
@@ -475,9 +471,49 @@ function toGate(){
 }
 document.querySelectorAll('.pick').forEach(b=>b.onclick=()=>openAuth(b.dataset.r));
 if($('verTag'))$('verTag').textContent='v'+APP_VERSION;
+async function bioRegister(){
+  if(!window.PublicKeyCredential)return say('جهازك ما بيدعم البصمة');
+  try{
+    const cred=await navigator.credentials.create({publicKey:{
+      challenge:crypto.getRandomValues(new Uint8Array(32)),
+      rp:{name:'وصّلني'},
+      user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'admin',displayName:'الإدارة'},
+      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
+      timeout:60000}});
+    localStorage.setItem('w_admin_cred',btoa(String.fromCharCode(...new Uint8Array(cred.rawId))));
+    say('انسجّلت بصمتك ✅');
+  }catch(e){say('ما قدرنا نسجّل البصمة');}
+}
+async function bioAuth(){
+  const stored=localStorage.getItem('w_admin_cred');
+  if(!stored)return false;
+  try{
+    const rawId=Uint8Array.from(atob(stored),c=>c.charCodeAt(0));
+    await navigator.credentials.get({publicKey:{
+      challenge:crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials:[{id:rawId,type:'public-key'}],
+      userVerification:'required',timeout:60000}});
+    return true;
+  }catch(e){return false;}
+}
+function enterAdmin(){
+  $('gate').style.display='none';$('pAdm').classList.add('on');role='adm';admLoad();poll=setInterval(admLoad,8000);
+}
+$('admLink').onclick=async()=>{
+  if(localStorage.getItem('w_admin_cred')){
+    const ok=await bioAuth();
+    if(ok){enterAdmin();return;}
+    say('ما قدرنا نتأكد من بصمتك، جرب الكود');
+  }
+  const p=prompt('كود الإدارة');if(p!==ADMIN_PIN)return;
+  enterAdmin();
+  if(!localStorage.getItem('w_admin_cred')&&window.PublicKeyCredential){
+    if(confirm('بدك تسجّل بصمتك لدخول أسرع المرة الجاية؟'))bioRegister();
+  }
+};
 if($('drvVerTag'))$('drvVerTag').textContent='v'+APP_VERSION;
-$('admLink').onclick=()=>{ const p=prompt('كود الإدارة'); if(p!==ADMIN_PIN)return;
-  $('gate').style.display='none'; $('pAdm').classList.add('on'); role='adm'; admLoad(); poll=setInterval(admLoad,8000); };
+
 
 let authTab='in';
 function openAuth(r){
@@ -493,7 +529,7 @@ $('authTabs').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;
 function drawAuth(){
   if(authTab==='in'){
     $('authBox').innerHTML='<h2>دخول</h2>'
-      +'<label class="lbl">رقم الموبايل</label><input id="aPhone" type="tel" inputmode="numeric" placeholder="70123456" class="mb">'
+      +'<label class="lbl">رقم الموبايل أو اليوزر</label><input id="aPhone" type="text" placeholder="70123456 أو اليوزر" class="mb">'
       +'<label class="lbl">كلمة السر</label><input id="aPass" type="password" placeholder="••••••">'
       +'<div class="err" id="aErr"></div>'
       +'<button class="btn main" id="aGo">دخول</button>'
@@ -563,6 +599,22 @@ function bindUp(){
 }
 const tbl=()=>role==='cust'?'w_users':'w_drivers';
 
+function showOnboarding(){
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;inset:0;background:rgba(20,38,27,.85);z-index:990;display:grid;place-items:center;padding:22px;font-family:inherit;direction:rtl';
+  const steps = role==='cust'
+    ? ['حدّد نقطة الانطلاق ووجهتك من فوق الخريطة','اختار توكتوك أو سيارة وشوف السعر','اضغط اطلب وانتظر سائق يقبل','تابع السائق عالخريطة وهو جاي','الدفع نقداً مباشرة للسائق']
+    : ['فعّل "متاح" لتستقبل الطلبات','لما يجيك طلب، دوس "خدها"','اتصل بالزبون أو اتبع الطريق عالخريطة','حدّث حالة الرحلة (وصلت، ركب الزبون، خلصت)','بعد أول رحلات مجانية، بينخصم 10% عمولة من كل رحلة — اشحن رصيدك لتستمر'];
+  d.innerHTML='<div style="background:#fff;border-radius:20px;padding:22px;max-width:380px;max-height:85vh;overflow-y:auto">'
+    +'<div style="font-size:40px;text-align:center;margin-bottom:8px">👋</div>'
+    +'<h3 style="text-align:center;margin-bottom:14px">أهلاً فيك بوصّلني!</h3>'
+    +steps.map((s,i)=>'<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">'
+      +'<span style="background:#E3F3E8;color:#0A5F2C;border-radius:50%;width:24px;height:24px;flex-shrink:0;display:grid;place-items:center;font-size:12px;font-weight:700">'+(i+1)+'</span>'
+      +'<span style="font-size:13.5px;line-height:1.7">'+s+'</span></div>').join('')
+    +'<button style="width:100%;padding:14px;border:0;border-radius:13px;background:#0E7C3A;color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px">فهمت، يلا نبلش</button></div>';
+  d.querySelector('button').onclick=()=>d.remove();
+  document.body.appendChild(d);
+}
 async function doSignup(){
   const n=$('aName').value.trim(), ph=norm($('aPhone').value), p=$('aPass').value, p2=$('aPass2').value;
   if(!n) return $('aErr').textContent='اكتب اسمك';
@@ -588,28 +640,30 @@ async function doSignup(){
   if(!r) return $('aErr').textContent = why.includes('duplicate')
     ? 'هالرقم مسجّل من قبل' : 'ما قدرنا نسجّل — جرّب صور أصغر أو تفقّد الإنترنت';
   localStorage.setItem('w_'+role,JSON.stringify({phone:ph,pass:p}));
-  me=r[0]; say('أهلاً '+n+' 👋'); enter();
+  me=r[0]; say('أهلاً '+n+' 👋'); enter(); showOnboarding();
 }
 async function doLogin(){
-  const ph=norm($('aPhone').value), p=$('aPass').value;
-  if(!ph||!p)return $('aErr').textContent='عبّي الرقم وكلمة السر';
+  const raw=$('aPhone').value.trim(), p=$('aPass').value;
+  if(!raw||!p)return $('aErr').textContent='عبّي الرقم/اليوزر وكلمة السر';
   $('aGo').disabled=true;
-  const ok=await tryLogin(ph,p);
+  const ok=await tryLogin(raw,p);
   $('aGo').disabled=false;
-  if(!ok)$('aErr').textContent='الرقم أو كلمة السر غلط';
+  if(!ok)$('aErr').textContent='المعلومات غلط';
 }
-async function tryLogin(ph,p){
-  const rows=await sb(()=>api(tbl()+'?phone=eq.'+ph+'&select=*'));
+async function tryLogin(raw,p){
+  const isPhone=/^\d+$/.test(norm(raw));
+  const q=isPhone?('phone=eq.'+norm(raw)):('username=eq.'+encodeURIComponent(raw.trim()));
+  const rows=await sb(()=>api(tbl()+'?'+q+'&select=*'));
   if(!rows||!rows.length)return false;
   const u=rows[0];
   if(role==='cust'&&u.status==='blocked'){say('🚫 حسابك موقوف، تواصل مع الإدارة');return false;}
   const h=await hash(p);
   if(u.pass===h){
-    localStorage.setItem('w_'+role,JSON.stringify({phone:ph,pass:p}));
+    localStorage.setItem('w_'+role,JSON.stringify({phone:u.phone,pass:p}));
     me=u; enter(); return true;
   }
   if(u.reset&&u.reset===p){
-    me=u; showSetNewPassword(ph); return true;
+    me=u; showSetNewPassword(u.phone); return true;
   }
   return false;
 }
@@ -659,16 +713,40 @@ function enter(){
 $('drvOut').onclick=()=>{localStorage.removeItem('w_drv');toGate();};
 $('cMenu').onclick=()=>{
   $('sheet').innerHTML='<div class="grab"></div><h2>'+(me?me.name:'حسابي')+'</h2>'
-    +'<div class="sub">'+(me?me.phone:'')+'</div>'
+    +'<div class="sub">'+(me?me.phone:'')+(me&&me.username?' · @'+me.username:'')+'</div>'
     +'<button class="btn line" id="m1">🧾 رحلاتي</button>'
+    +'<button class="btn line" id="m5">✏️ تعديل الملف الشخصي</button>'
     +'<button class="btn line" id="m2">🚨 إبلاغ عن مشكلة</button>'
     +'<a class="btn line" href="https://mrelectroai-spec.github.io/mrelectroai/tools/privacy/" target="_blank" rel="noopener">🔒 سياسة الخصوصية</a>'
     +'<button class="btn dang" id="m3">تسجيل الخروج</button>'
     +'<button class="btn main" id="m4">← رجوع</button>';
-  $('m1').onclick=myTrips; $('m2').onclick=report;
+  $('m1').onclick=myTrips; $('m2').onclick=report; $('m5').onclick=editProfile;
   $('m3').onclick=()=>{localStorage.removeItem('w_cust');toGate();};
   $('m4').onclick=()=>{ $('sheet').dataset.v=''; render(); };
 };
+function editProfile(){
+  const html='<div class="grab"></div><h2>تعديل الملف الشخصي</h2>'
+    +'<div class="sub">رقمك: '+(me.phone||'')+' (ثابت)</div>'
+    +'<label class="lbl">اسم المستخدم (يوزر) — اختياري، بتقدر تسجل دخول فيه بدل الرقم</label>'
+    +'<input id="epUser" placeholder="مثلاً: anwar123" value="'+(me.username||'')+'" class="mb">'
+    +'<div class="err" id="epErr"></div>'
+    +'<button class="btn main" id="epGo">حفظ</button>'
+    +'<button class="btn line" id="epBack">رجوع</button>';
+  if(role==='cust'){ $('sheet').innerHTML=html; }
+  else { $('drvBody').innerHTML='<div class="card">'+html+'</div>'; }
+  $('epGo').onclick=async()=>{
+    const u=$('epUser').value.trim();
+    if(u&&!/^[a-zA-Z0-9_]{3,20}$/.test(u))return $('epErr').textContent='اليوزر أحرف/أرقام إنكليزي بس، 3-20 خانة';
+    if(u){
+      const ex=await sb(()=>api(tbl()+'?username=eq.'+encodeURIComponent(u)+'&select=phone'));
+      if(ex&&ex.length&&ex[0].phone!==me.phone)return $('epErr').textContent='هاليوزر مأخوذ';
+    }
+    await sb(()=>api(tbl()+'?phone=eq.'+me.phone,{method:'PATCH',body:JSON.stringify({username:u||null})}));
+    me.username=u; say('انحفظ ✅');
+    if(role==='cust'){$('sheet').dataset.v='';render();}else{drvTick();}
+  };
+  $('epBack').onclick=()=>{ if(role==='cust'){$('sheet').dataset.v='';render();}else{drvTick();} };
+}
 
 async function reverseGeocode(lat,lng){
   try{
@@ -1035,7 +1113,7 @@ async function drvTick(){
     +((d.balance||0)<0?'<div class="note warn"><b>⚠️ رصيدك: '+money(d.balance)+' ألف</b> — لازم تشحن قبل ما تصير متاح.<br>'
       +'<span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer;color:#8A6100">لمزيد من التفاصيل</span></div>'
       +'<button class="btn y" onclick="chargeUp()" style="margin-bottom:10px">💰 اشحن رصيدك</button>':
-      '<div class="note"><b>💰 رصيدك: '+money(d.balance||0)+' ألف</b> · <span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer">سجل الرحلات</span></div>')
+      '<div class="note"><b>💰 رصيدك: '+money(d.balance||0)+' ألف</b> · <span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer">سجل الرحلات</span> · <span onclick="editProfile()" style="text-decoration:underline;cursor:pointer">تعديل الملف</span></div>')
     +'<details style="margin-bottom:10px"><summary style="cursor:pointer;font-size:12px;color:var(--muted);padding:4px 0">⚙️ أدوات تقنية</summary>'
     +'<button class="btn sm line" onclick="testPush()" style="margin-top:8px">🔔 اختبار الإشعارات (تشخيص مؤقت)</button>'
     +'<button class="btn sm line" onclick="testSendPush()">📨 ابعت إشعار تجريبي لحالي</button></details>'
@@ -1208,7 +1286,8 @@ async function admLoad(){
         +'<div class="ri"><b>'+r.fromtxt+' ← '+r.totxt+'</b>'
         +'<small>'+r.cname+' · '+r.cphone+(d?' · السائق: '+d.name:'')+'</small>'
         +'<small><span class="chip">'+({searching:'عم يدوّر',accepted:'رايح عالزبون',arrived:'وصل',onboard:'بالطريق'}[r.status])+'</span>'
-        +'<span class="chip">'+money(r.est)+' ألف</span></small></div></div>';}).join('')
+        +'<span class="chip">'+money(r.est)+' ألف</span></small></div>'
+        +'<button class="btn sm dang" onclick="deleteRide(\''+r.id+'\')">🗑</button></div>';}).join('')
         :'<div class="empty">ما في رحلات جارية.</div>')+'</div>';
   }
   else if(admTab===1){
@@ -1280,7 +1359,7 @@ async function admLoad(){
 async function setSt(ph,s){await sb(()=>api('w_drivers?phone=eq.'+ph,{method:'PATCH',body:JSON.stringify({status:s})}));
   if(s==='approved'){
     const d=(await sb(()=>api('w_drivers?phone=eq.'+ph+'&select=onesignal_id')))?.[0];
-    if(d&&d.onesignal_id) sendPushRaw([d.onesignal_id],'✅ تم توثيق حسابك','يلا صير متاح وابلش تستقبل الطلبات 🛺');
+    if(d&&d.onesignal_id) sendPushRaw([d.onesignal_id],'✅ تم توثيق حسابك','يلا صير متاح، بلش تستقبل الطلبات 🛺');
   }
   say(s==='approved'?'انقبل ✅':'انوقف');admLoad();}
 async function setStCust(ph,s){await sb(()=>api('w_users?phone=eq.'+ph,{method:'PATCH',body:JSON.stringify({status:s})}));
@@ -1309,6 +1388,11 @@ async function deleteUser(ph){
   if(!confirm('حذف هالزبون نهائياً؟'))return;
   await sb(()=>api('w_users?phone=eq.'+ph,{method:'DELETE'}));
   say('انحذف 🗑️');admLoad();
+}
+async function deleteRide(id){
+  if(!confirm('حذف هالرحلة نهائياً؟'))return;
+  await sb(()=>api('w_rides?id=eq.'+id,{method:'DELETE'}));
+  say('انحذفت 🗑️');admLoad();
 }
 async function deleteAllDrivers(){
   if(!confirm('حذف كل السائقين نهائياً؟ هاد إجراء ما بينرجع!'))return;
