@@ -351,7 +351,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="2.2";
+const APP_VERSION="1.0.2";
 const ADMIN_PIN="26927";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
@@ -872,11 +872,19 @@ async function animSheet(){const s=$('sheet');s.classList.remove('anim');void s.
 async function quoteRide(){
   if(!A||!B)return;
   render();
-  const pts=[A,...stops,B];
-  const rt=await fetchRoute(pts);
+  const myA=A, myB=B;
+  const pts=[myA,...stops,myB];
+  let rt=null;
+  try{
+    rt=await Promise.race([
+      fetchRoute(pts),
+      new Promise(res=>setTimeout(()=>res(null),8000))
+    ]);
+  }catch(e){ rt=null; }
+  if(A!==myA||B!==myB)return; /* المستخدم غيّر النقاط بالأثناء — تجاهل هالنتيجة القديمة */
   let d,mins,coords;
   if(rt){ d=rt.d; mins=rt.mins; coords=rt.coords; }
-  else { d=km(A,B); mins=Math.max(3,Math.round(d*2.6)); coords=null; }
+  else { d=km(myA,myB); mins=Math.max(3,Math.round(d*2.6)); coords=null; }
   quote={d,mins,t:fareCalc('tuktuk',d,mins,pax),c:fareCalc('car',d,mins,pax)};
   drawRoute(coords);
   animSheet();
@@ -1017,6 +1025,14 @@ function watch(){
   };
   tick();poll=setInterval(tick,4000);
 }
+async function checkCancelLimit(){
+  if(!me)return;
+  const rows=await sb(()=>api('w_rides?cphone=eq.'+me.phone+'&status=eq.cancelled&select=id'));
+  const count=rows?rows.length:0;
+  if(count>5){
+    setTimeout(()=>alert('⚠️ لاحظنا إنك بتلغي كتير — إذا عندك مشكلة مع أي سائق، تواصل معنا أو بلّغ عبر التطبيق بدل ما تلغي.'),400);
+  }
+}
 function resetOrderFlow(){
   A=null;B=null;stops=[];quote=null;veh='tuktuk';pax=1;
   if(mA){map.removeLayer(mA);mA=null;}
@@ -1037,7 +1053,8 @@ function vSearch(r){
   $('cx').onclick=()=>{
     /* إلغاء فوري بالواجهة، والطلب بالخلفية بلا انتظار */
     clearInterval(poll);localStorage.removeItem('w_ride');ride=null;
-    sb(()=>api('w_rides?id=eq.'+r.id,{method:'PATCH',body:JSON.stringify({status:'cancelled'})}));
+    sb(()=>api('w_rides?id=eq.'+r.id,{method:'PATCH',body:JSON.stringify({status:'cancelled'})}))
+      .then(()=>checkCancelLimit());
     resetOrderFlow();
   };
 }
@@ -1062,7 +1079,7 @@ async function vDriver(r){
     +(r.status!=='onboard'?'<button class="btn dang" id="cx2">إلغاء</button>':'')
     +'<div class="note">الدفع نقداً — السعر النهائي مع السائق.</div>';
   if($('cx2'))$('cx2').onclick=async()=>{await sb(()=>api('w_rides?id=eq.'+ride,{method:'PATCH',body:JSON.stringify({status:'cancelled'})}));
-    clearInterval(poll);localStorage.removeItem('w_ride');ride=null;resetOrderFlow();};
+    clearInterval(poll);localStorage.removeItem('w_ride');ride=null;resetOrderFlow();checkCancelLimit();};
 }
 function vRate(r){
   clearInterval(poll);
@@ -1242,16 +1259,17 @@ function chargeUp(){
   window.open('https://wa.me/96179434479?text='+msg,'_blank');
 }
 async function driverRideHistory(){
+  editingProfile=true;
   const rows=await sb(()=>api('w_rides?driver=eq.'+me.phone+'&status=eq.done&select=*&order=created_at.asc'));
   const list=rows||[];
   const items=list.map((r,i)=>{
     const amt=r.paid||r.est||0, free=(i+1)<=FREE_TRIPS, fee=free?0:Math.round(amt*0.10);
     return {r,amt,free,fee};
   });
-  $('drvBody').innerHTML='<div class="card"><h2>سجل الرحلات والخصم<button class="btn sm line" onclick="drvTick()">→ رجوع</button></h2>'
+  $('drvBody').innerHTML='<div class="card"><h2>سجل الرحلات والخصم<button class="btn sm line" onclick="editingProfile=false;drvTick()">→ رجوع</button></h2>'
     +(items.length?items.slice().reverse().map(({r,amt,free,fee})=>'<div class="trip"><div class="ti">'
       +'<b>'+r.fromtxt+' ← '+r.totxt+'</b><small>'+new Date(r.created_at).toLocaleDateString('ar-LB')
-      +' · '+money(amt)+' ألف · '+(free?'✅ مجانية (ضمن أول 100)':'🔴 خصم '+money(fee)+' ألف')+'</small></div></div>').join('')
+      +' · '+money(amt)+' ألف · '+(free?'✅ مجانية (ضمن أول '+FREE_TRIPS+')':'🔴 خصم '+money(fee)+' ألف')+'</small></div></div>').join('')
       :'<div class="empty">ما في رحلات مكتملة بعد.</div>')+'</div>';
 }
 async function cancelRide(id){
