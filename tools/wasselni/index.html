@@ -17,6 +17,10 @@
   --line:#E2E8E3;--soft:#F3F6F4;--paper:#FFF;--bg:#F6F7F5;--danger:#C0392B;--ds:#FDEDEA;
   --sh:0 -6px 28px rgba(20,38,27,.14);--sh2:0 4px 16px rgba(20,38,27,.12);
   --sh3:0 3px 10px rgba(20,38,27,.07),0 14px 34px rgba(20,38,27,.10)}
+body.dark{--gs:#173A26;--ys:#332B0F;--ink:#EDF2EE;--muted:#93A69C;
+  --line:#2A3A31;--soft:#1C2A22;--paper:#16211B;--bg:#0F1712;--ds:#3A1C18;
+  --sh:0 -6px 28px rgba(0,0,0,.4);--sh2:0 4px 16px rgba(0,0,0,.35);
+  --sh3:0 3px 10px rgba(0,0,0,.25),0 14px 34px rgba(0,0,0,.3)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;color:var(--ink);background:var(--bg);
   font-size:15px;line-height:1.65}
@@ -347,8 +351,8 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="2.0";
-const ADMIN_PIN="71736401ANWAR";
+const APP_VERSION="2.2";
+const ADMIN_PIN="26927";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
             car:{name:'سيارة',ic:'🚗',base:120,km:70,min:5,extraPax:100,minFare:200} };
@@ -358,6 +362,7 @@ const $=i=>document.getElementById(i);
 let me=null, role=null, map=null, A=null,B=null, mA=null,mB=null,line=null,mDrv=null,mStop=null;
 let mMe=null, veh='tuktuk', pax=1, picking=null, ride=null, poll=null, quote=null, photos={}, vt='tuktuk', wake=null;
 let stops=[];
+let editingProfile=false;
 let FREE_TRIPS=100;
 async function loadConfig(){
   const c=(await sb(()=>api('w_config?id=eq.1&select=free_trips')))?.[0];
@@ -470,6 +475,11 @@ function toGate(){
   me=null; role=null;
 }
 document.querySelectorAll('.pick').forEach(b=>b.onclick=()=>openAuth(b.dataset.r));
+if(localStorage.getItem('w_theme')==='dark')document.body.classList.add('dark');
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  localStorage.setItem('w_theme',document.body.classList.contains('dark')?'dark':'light');
+}
 if($('verTag'))$('verTag').textContent='v'+APP_VERSION;
 async function bioRegister(){
   if(!window.PublicKeyCredential)return say('جهازك ما بيدعم البصمة');
@@ -716,19 +726,21 @@ $('cMenu').onclick=()=>{
     +'<div class="sub">'+(me?me.phone:'')+(me&&me.username?' · @'+me.username:'')+'</div>'
     +'<button class="btn line" id="m1">🧾 رحلاتي</button>'
     +'<button class="btn line" id="m5">✏️ تعديل الملف الشخصي</button>'
+    +'<button class="btn line" id="m6">🌙 الوضع الليلي/النهاري</button>'
     +'<button class="btn line" id="m2">🚨 إبلاغ عن مشكلة</button>'
     +'<a class="btn line" href="https://mrelectroai-spec.github.io/mrelectroai/tools/privacy/" target="_blank" rel="noopener">🔒 سياسة الخصوصية</a>'
     +'<button class="btn dang" id="m3">تسجيل الخروج</button>'
     +'<button class="btn main" id="m4">← رجوع</button>';
-  $('m1').onclick=myTrips; $('m2').onclick=report; $('m5').onclick=editProfile;
+  $('m1').onclick=myTrips; $('m2').onclick=report; $('m5').onclick=editProfile; $('m6').onclick=toggleTheme;
   $('m3').onclick=()=>{localStorage.removeItem('w_cust');toGate();};
   $('m4').onclick=()=>{ $('sheet').dataset.v=''; render(); };
 };
 function editProfile(){
+  if(role==='drv')editingProfile=true;
   const html='<div class="grab"></div><h2>تعديل الملف الشخصي</h2>'
     +'<div class="sub">رقمك: '+(me.phone||'')+' (ثابت)</div>'
-    +'<label class="lbl">اسم المستخدم (يوزر) — اختياري، بتقدر تسجل دخول فيه بدل الرقم</label>'
-    +'<input id="epUser" placeholder="مثلاً: anwar123" value="'+(me.username||'')+'" class="mb">'
+    +'<label class="lbl">اسم المستخدم (يوزر) — عربي أو إنكليزي، بتقدر تسجل دخول فيه بدل الرقم</label>'
+    +'<input id="epUser" placeholder="مثلاً: أنور أو anwar123" value="'+(me.username||'')+'" class="mb">'
     +'<div class="err" id="epErr"></div>'
     +'<button class="btn main" id="epGo">حفظ</button>'
     +'<button class="btn line" id="epBack">رجوع</button>';
@@ -736,16 +748,20 @@ function editProfile(){
   else { $('drvBody').innerHTML='<div class="card">'+html+'</div>'; }
   $('epGo').onclick=async()=>{
     const u=$('epUser').value.trim();
-    if(u&&!/^[a-zA-Z0-9_]{3,20}$/.test(u))return $('epErr').textContent='اليوزر أحرف/أرقام إنكليزي بس، 3-20 خانة';
+    if(u&&!/^[\u0600-\u06FFa-zA-Z0-9_ ]{3,20}$/.test(u))return $('epErr').textContent='اليوزر 3-20 خانة، عربي/إنكليزي وأرقام بس';
     if(u){
       const ex=await sb(()=>api(tbl()+'?username=eq.'+encodeURIComponent(u)+'&select=phone'));
       if(ex&&ex.length&&ex[0].phone!==me.phone)return $('epErr').textContent='هاليوزر مأخوذ';
     }
     await sb(()=>api(tbl()+'?phone=eq.'+me.phone,{method:'PATCH',body:JSON.stringify({username:u||null})}));
     me.username=u; say('انحفظ ✅');
+    if(role==='drv')editingProfile=false;
     if(role==='cust'){$('sheet').dataset.v='';render();}else{drvTick();}
   };
-  $('epBack').onclick=()=>{ if(role==='cust'){$('sheet').dataset.v='';render();}else{drvTick();} };
+  $('epBack').onclick=()=>{
+    if(role==='drv')editingProfile=false;
+    if(role==='cust'){$('sheet').dataset.v='';render();}else{drvTick();}
+  };
 }
 
 async function reverseGeocode(lat,lng){
@@ -1096,6 +1112,7 @@ async function report(){
 
 async function drvTick(){
   if(!me)return;
+  if(editingProfile)return;
   const d=(await sb(()=>api('w_drivers?phone=eq.'+me.phone+'&select=*')))?.[0];
   if(!d)return;me=d;
   if(d.status!=='approved'){
@@ -1113,7 +1130,7 @@ async function drvTick(){
     +((d.balance||0)<0?'<div class="note warn"><b>⚠️ رصيدك: '+money(d.balance)+' ألف</b> — لازم تشحن قبل ما تصير متاح.<br>'
       +'<span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer;color:#8A6100">لمزيد من التفاصيل</span></div>'
       +'<button class="btn y" onclick="chargeUp()" style="margin-bottom:10px">💰 اشحن رصيدك</button>':
-      '<div class="note"><b>💰 رصيدك: '+money(d.balance||0)+' ألف</b> · <span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer">سجل الرحلات</span> · <span onclick="editProfile()" style="text-decoration:underline;cursor:pointer">تعديل الملف</span></div>')
+      '<div class="note"><b>💰 رصيدك: '+money(d.balance||0)+' ألف</b> · <span onclick="driverRideHistory()" style="text-decoration:underline;cursor:pointer">سجل الرحلات</span> · <span onclick="editProfile()" style="text-decoration:underline;cursor:pointer">تعديل الملف</span> · <span onclick="toggleTheme()" style="text-decoration:underline;cursor:pointer">🌙</span></div>')
     +'<details style="margin-bottom:10px"><summary style="cursor:pointer;font-size:12px;color:var(--muted);padding:4px 0">⚙️ أدوات تقنية</summary>'
     +'<button class="btn sm line" onclick="testPush()" style="margin-top:8px">🔔 اختبار الإشعارات (تشخيص مؤقت)</button>'
     +'<button class="btn sm line" onclick="testSendPush()">📨 ابعت إشعار تجريبي لحالي</button></details>'
