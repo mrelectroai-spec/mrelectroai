@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<title>وصّلني | توكتوك وسيارات</title>
+<title>وصّلت | توكتوك وسيارات</title>
 <meta name="description" content="اطلب توكتوك أو سيارة من أقرب سائق أينما كنت بلبنان.">
 <meta name="theme-color" content="#0E7C3A">
 <link rel="manifest" href="manifest.json">
@@ -262,7 +262,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
   <div class="gw">
     <div class="gh">
       <div class="glogo">🛺</div>
-      <h1>وصّلني</h1>
+      <h1>وصّلت</h1>
       <p>توكتوك وسيارات</p>
       <div class="tag">🇱🇧 اطلب من أي منطقة بلبنان</div>
     </div>
@@ -332,7 +332,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 
 <div class="page" id="pAdm">
   <div class="pbar"><div class="pbar-in">
-    <span><b>الإدارة</b><small>وصّلني</small></span>
+    <span><b>الإدارة</b><small>وصّلت</small></span>
     <button class="hb" onclick="toGate()">خروج</button></div></div>
   <div class="pw">
     <div class="tabs" id="admTabs">
@@ -461,7 +461,7 @@ function locHelp(){
     +'<p style="font-size:13px;color:#6B7C72;line-height:1.9;margin-bottom:16px">'
     +'التطبيق بيحتاج موقعك ليعرف السائق وين تجي.<br><br>'
     +'<b style="color:#14261B">من إعدادات موبايلك:</b><br>'
-    +'الإعدادات ← التطبيقات ← <b>وصّلني</b><br>← الأذونات ← الموقع ← <b>السماح</b></p>'
+    +'الإعدادات ← التطبيقات ← <b>وصّلت</b><br>← الأذونات ← الموقع ← <b>السماح</b></p>'
     +'<button style="width:100%;padding:14px;border:0;border-radius:13px;background:#0E7C3A;color:#fff;'
     +'font-family:inherit;font-size:15px;font-weight:700;cursor:pointer">فهمت</button></div>';
   d.onclick=()=>d.remove();
@@ -486,7 +486,7 @@ async function bioRegister(){
   try{
     const cred=await navigator.credentials.create({publicKey:{
       challenge:crypto.getRandomValues(new Uint8Array(32)),
-      rp:{name:'وصّلني'},
+      rp:{name:'وصّلت'},
       user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'admin',displayName:'الإدارة'},
       pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
       authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
@@ -617,7 +617,7 @@ function showOnboarding(){
     : ['فعّل "متاح" لتستقبل الطلبات','لما يجيك طلب، دوس "خدها"','اتصل بالزبون أو اتبع الطريق عالخريطة','حدّث حالة الرحلة (وصلت، ركب الزبون، خلصت)','بعد أول رحلات مجانية، بينخصم 10% عمولة من كل رحلة — اشحن رصيدك لتستمر'];
   d.innerHTML='<div style="background:#fff;border-radius:20px;padding:22px;max-width:380px;max-height:85vh;overflow-y:auto">'
     +'<div style="font-size:40px;text-align:center;margin-bottom:8px">👋</div>'
-    +'<h3 style="text-align:center;margin-bottom:14px">أهلاً فيك بوصّلني!</h3>'
+    +'<h3 style="text-align:center;margin-bottom:14px">أهلاً فيك بوصّلت!</h3>'
     +steps.map((s,i)=>'<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">'
       +'<span style="background:#E3F3E8;color:#0A5F2C;border-radius:50%;width:24px;height:24px;flex-shrink:0;display:grid;place-items:center;font-size:12px;font-weight:700">'+(i+1)+'</span>'
       +'<span style="font-size:13.5px;line-height:1.7">'+s+'</span></div>').join('')
@@ -1241,7 +1241,7 @@ async function chargeCommission(rideId){
   else if(amt>0) say('⚠️ انخصم '+money(amt)+' ألف عمولة (رصيدك: '+money(newBal)+' ألف)');
 }
 function contactAdmin(){
-  const msg=encodeURIComponent('بدي أشترك بوصّلني 🙏\nخلصت فترتي المجانية.\nالاسم: '+(me.name||'')+'\nرقمي: '+(me.phone||''));
+  const msg=encodeURIComponent('بدي أشترك بوصّلت 🙏\nخلصت فترتي المجانية.\nالاسم: '+(me.name||'')+'\nرقمي: '+(me.phone||''));
   window.open('https://wa.me/96179434479?text='+msg,'_blank');
 }
 function chargeUp(){
@@ -1254,7 +1254,7 @@ function chargeUp(){
   if(isUsd&&n<10)return say('الحد الأدنى للشحن 10 دولار');
   if(!isUsd&&n<890000)return say('الحد الأدنى للشحن 890,000 ل.ل.');
   const lbp = isUsd ? Math.round(n*89000) : Math.round(n);
-  const msg=encodeURIComponent('بدي اشحن رصيد وصّلني.\nالاسم: '+(me.name||'')+'\nالرقم: '+(me.phone||'')+'\nالمبلغ: '
+  const msg=encodeURIComponent('بدي اشحن رصيد وصّلت.\nالاسم: '+(me.name||'')+'\nالرقم: '+(me.phone||'')+'\nالمبلغ: '
     +(isUsd?(n+'$ (≈ '+money(lbp)+' ل.ل.)'):(money(lbp)+' ل.ل.')));
   window.open('https://wa.me/96179434479?text='+msg,'_blank');
 }
