@@ -351,7 +351,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="1.0.2";
+const APP_VERSION="1.0.4";
 const ADMIN_PIN="26927";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
@@ -553,9 +553,11 @@ function drawAuth(){
       +'<div class="two mb"><div><label class="lbl">كلمة السر</label><input id="aPass" type="password" placeholder="••••••"></div>'
       +'<div><label class="lbl">تأكيدها</label><input id="aPass2" type="password" placeholder="••••••"></div></div>'
       +(role==='drv'?drvExtra():'')
+      +'<label style="display:flex;align-items:flex-start;gap:10px;background:var(--ys);border-radius:13px;padding:13px;margin-top:10px;cursor:pointer">'
+      +'<input type="checkbox" id="agreeChk" style="width:20px;height:20px;margin-top:2px;flex-shrink:0">'
+      +'<span style="font-size:12.5px;line-height:1.75;color:#8A6100">قرأت ووافقت على <a href="https://mrelectroai-spec.github.io/mrelectroai/tools/privacy/" target="_blank" rel="noopener" style="color:#8A6100;font-weight:700">سياسة الخصوصية وشروط الاستخدام</a>، وأفهم أن التطبيق وسيط تقني فقط وغير مسؤول عن الرحلات.</span></label>'
       +'<div class="err" id="aErr"></div>'
-      +'<button class="btn main" id="aGo">إنشاء الحساب</button>'
-      +'<div class="note">بإنشائك الحساب أنت موافق على <a href="https://mrelectroai-spec.github.io/mrelectroai/tools/privacy/" target="_blank" rel="noopener" style="color:#8A6100">سياسة الخصوصية</a>.</div>';
+      +'<button class="btn main" id="aGo">إنشاء الحساب</button>';
     $('aGo').onclick=doSignup;
     if(role==='drv'){ document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{vt=b.dataset.v;drawAuth();}); bindUp(); }
   }
@@ -617,7 +619,7 @@ function showOnboarding(){
     : ['فعّل "متاح" لتستقبل الطلبات','لما يجيك طلب، دوس "خدها"','اتصل بالزبون أو اتبع الطريق عالخريطة','حدّث حالة الرحلة (وصلت، ركب الزبون، خلصت)','بعد أول رحلات مجانية، بينخصم 10% عمولة من كل رحلة — اشحن رصيدك لتستمر'];
   d.innerHTML='<div style="background:#fff;border-radius:20px;padding:22px;max-width:380px;max-height:85vh;overflow-y:auto">'
     +'<div style="font-size:40px;text-align:center;margin-bottom:8px">👋</div>'
-    +'<h3 style="text-align:center;margin-bottom:14px">أهلاً فيك بوصّلت!</h3>'
+    +'<h3 style="text-align:center;margin-bottom:14px">أهلاً فيك بتطبيق وصّلت!</h3>'
     +steps.map((s,i)=>'<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">'
       +'<span style="background:#E3F3E8;color:#0A5F2C;border-radius:50%;width:24px;height:24px;flex-shrink:0;display:grid;place-items:center;font-size:12px;font-weight:700">'+(i+1)+'</span>'
       +'<span style="font-size:13.5px;line-height:1.7">'+s+'</span></div>').join('')
@@ -631,10 +633,11 @@ async function doSignup(){
   if(ph.length<7) return $('aErr').textContent='رقم غير صحيح';
   if(p.length<4) return $('aErr').textContent='كلمة السر 4 خانات على الأقل';
   if(p!==p2) return $('aErr').textContent='كلمتا السر مش متطابقتين';
+  if(!$('agreeChk')||!$('agreeChk').checked) return $('aErr').textContent='لازم توافق على سياسة الخصوصية وشروط الاستخدام';
   $('aGo').disabled=true;
   const ex=await sb(()=>api(tbl()+'?phone=eq.'+ph+'&select=phone'));
   if(ex&&ex.length){$('aGo').disabled=false;return $('aErr').textContent='هالرقم مسجّل — استعمل «دخول»';}
-  const body={phone:ph,name:n,pass:await hash(p)};
+  const body={phone:ph,name:n,pass:await hash(p),agreed_at:new Date().toISOString()};
   if(role==='drv')Object.assign(body,{vtype:vt,color:$('aColor').value,plate:$('aPlate').value.trim(),
     photo:photos.photo,vehicle:photos.vehicle,idcard:photos.idcard,status:'pending'});
   let r=null, why='';
@@ -1241,7 +1244,7 @@ async function chargeCommission(rideId){
   else if(amt>0) say('⚠️ انخصم '+money(amt)+' ألف عمولة (رصيدك: '+money(newBal)+' ألف)');
 }
 function contactAdmin(){
-  const msg=encodeURIComponent('بدي أشترك بوصّلت 🙏\nخلصت فترتي المجانية.\nالاسم: '+(me.name||'')+'\nرقمي: '+(me.phone||''));
+  const msg=encodeURIComponent('بدي أشترك بتطبيق وصّلت 🙏\nخلصت فترتي المجانية.\nالاسم: '+(me.name||'')+'\nرقمي: '+(me.phone||''));
   window.open('https://wa.me/96179434479?text='+msg,'_blank');
 }
 function chargeUp(){
