@@ -264,7 +264,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
       <div class="glogo">🛺</div>
       <h1>وصّلت</h1>
       <p>توكتوك وسيارات</p>
-      <div class="tag">📍 عكار — من دير عمار لحلبا لقبعيت</div>
+      <div class="tag">📍 عكار<br>📍 المنية</div>
     </div>
     <button class="inst" id="inst"><span style="font-size:25px">📲</span>
       <span><b>ثبّت التطبيق على موبايلك</b><small>بيصير عندك أيقونة وبيفتح أسرع</small></span></button>
@@ -351,7 +351,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="1.0.5";
+const APP_VERSION="1.0.6";
 const ADMIN_PIN="26927";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
@@ -359,6 +359,18 @@ const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:1
 const CENTER=[34.5145,36.0075]; /* مفرق ببنين — مركز منطقة الخدمة */
 /* حدود نطاق الخدمة: دير عمار جنوباً، حلبا شرقاً، قبعيت/حرار شمالاً */
 const SERVICE_AREA={minLat:34.42,maxLat:34.62,minLng:35.90,maxLng:36.30};
+/* مناطق مقترحة تظهر أول ما يفتح البحث */
+const QUICK_PLACES=[
+  ['وادي الجاموس',34.5010,36.0290],
+  ['المنية',34.4700,35.9560],
+  ['بحنين',34.4790,35.9700],
+  ['المحمرة',34.4980,35.9600],
+  ['العبدة',34.5310,35.9915],
+  ['مفرق برقايل',34.5410,36.0400],
+  ['مفرق ببنين',34.5145,36.0075],
+  ['جديدة القيطع',34.4930,35.9880],
+  ['القرقف',34.5290,36.0210]
+];
 function inServiceArea(p){
   return p && p.lat>=SERVICE_AREA.minLat && p.lat<=SERVICE_AREA.maxLat
            && p.lng>=SERVICE_AREA.minLng && p.lng<=SERVICE_AREA.maxLng;
@@ -912,7 +924,10 @@ function quickList(){
   return '<div class="res" id="useMap"><span class="ri">🗺️</span><span class="rt"><b>حدّد على الخريطة</b><small>حرّك الدبوس عالمكان</small></span></div>'
     +'<div class="res" id="useGps"><span class="ri">📍</span><span class="rt"><b>موقعي الحالي</b><small>استعمل GPS</small></span></div>'
     +'<div class="res" id="useLink"><span class="ri">🔗</span><span class="rt"><b>الصق رابط من الخرائط</b><small>رابط غوغل ماب أو إحداثيات</small></span></div>'
-    +rec.map(r=>'<div class="res" data-r=\''+JSON.stringify(r)+'\'><span class="ri">🕘</span><span class="rt"><b>'+r.name+'</b><small>زيارة سابقة</small></span></div>').join('');
+    +rec.map(r=>'<div class="res" data-r=\''+JSON.stringify(r)+'\'><span class="ri">🕘</span><span class="rt"><b>'+r.name+'</b><small>زيارة سابقة</small></span></div>').join('')
+    +'<div style="font-size:12px;color:var(--muted);padding:12px 10px 6px">مناطق قريبة</div>'
+    +QUICK_PLACES.map(p=>'<div class="res" data-r=\''+JSON.stringify({lat:p[1],lng:p[2],name:p[0]})+'\'>'
+      +'<span class="ri">📌</span><span class="rt"><b>'+p[0]+'</b><small>ضمن نطاق الخدمة</small></span></div>').join('');
 }
 let tmr;
 $('spq').addEventListener('input',()=>{clearTimeout(tmr);
@@ -920,17 +935,21 @@ $('spq').addEventListener('input',()=>{clearTimeout(tmr);
   if(q.length<2){$('spr').innerHTML=quickList();return;}
   $('spr').innerHTML='<div class="res"><span class="rt"><b>عم ندوّر بالخرائط...</b></span></div>';
   tmr=setTimeout(async()=>{
+    /* نتائج محلية من المناطق المقترحة */
+    const localHits=QUICK_PLACES.filter(p=>p[0].includes(q)).map(p=>
+      '<div class="res" data-r=\''+JSON.stringify({lat:p[1],lng:p[2],name:p[0]})+'\'>'
+      +'<span class="ri">📌</span><span class="rt"><b>'+p[0]+'</b><small>ضمن نطاق الخدمة</small></span></div>').join('');
     try{
-      /* بحث غني بنتائج مفصّلة (محلات، صيدليات، دواوير، معالم) ضمن نطاق الخدمة */
+      /* بحث غني بنتائج مفصّلة (محلات، صيدليات، دواوير، معالم) */
       const vb=SERVICE_AREA.minLng+','+SERVICE_AREA.maxLat+','+SERVICE_AREA.maxLng+','+SERVICE_AREA.minLat;
-      const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=15&addressdetails=1'
-        +'&namedetails=1&accept-language=ar&countrycodes=lb&bounded=1&viewbox='+vb
+      const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=20&addressdetails=1'
+        +'&namedetails=1&accept-language=ar&countrycodes=lb&viewbox='+vb
         +'&q='+encodeURIComponent(q));
       const d=await r.json();
       const ICONS={pharmacy:'💊',hospital:'🏥',clinic:'🏥',doctors:'🏥',school:'🏫',college:'🏫',university:'🏫',
         restaurant:'🍽️',cafe:'☕',fast_food:'🍔',bakery:'🥖',supermarket:'🛒',shop:'🏪',convenience:'🏪',
         fuel:'⛽',bank:'🏦',atm:'🏧',mosque:'🕌',church:'⛪',place_of_worship:'🕌',
-        hotel:'🏨',pharmacy_shop:'💊',marketplace:'🛒',townhall:'🏛️',police:'🚓',
+        hotel:'🏨',marketplace:'🛒',townhall:'🏛️',police:'🚓',
         junction:'🔀',roundabout:'🔄',village:'📍',town:'📍',suburb:'📍',neighbourhood:'📍',hamlet:'📍'};
       const rows=d.filter(x=>inServiceArea({lat:+x.lat,lng:+x.lon}));
       const web=rows.map(x=>{
@@ -942,9 +961,11 @@ $('spq').addEventListener('input',()=>{clearTimeout(tmr);
         return '<div class="res" data-r=\''+JSON.stringify(p)+'\'><span class="ri">'+ic+'</span>'
           +'<span class="rt"><b>'+p.name+'</b><small>'+p.full+'</small></span></div>';
       }).join('');
-      $('spr').innerHTML = web || '<div class="res" id="useMap"><span class="ri">🗺️</span>'
+      $('spr').innerHTML = (localHits+web) || '<div class="res" id="useMap"><span class="ri">🗺️</span>'
         +'<span class="rt"><b>ما لقينا «'+q+'» بنطاق الخدمة</b><small>حدّدو على الخريطة</small></span></div>';
-    }catch(e){$('spr').innerHTML='<div class="res"><span class="rt"><b>ما قدرنا ندوّر</b></span></div>';}
+    }catch(e){
+      $('spr').innerHTML = localHits || '<div class="res"><span class="rt"><b>ما قدرنا ندوّر</b></span></div>';
+    }
   },450);});
 $('spr').onclick=e=>{
   if(e.target.closest('#useMap')){$('sp').classList.remove('on');startPin();return;}
