@@ -264,7 +264,7 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
       <div class="glogo">🛺</div>
       <h1>وصّلت</h1>
       <p>توكتوك وسيارات</p>
-      <div class="tag">🇱🇧 اطلب من أي منطقة بلبنان</div>
+      <div class="tag">📍 عكار — من دير عمار لحلبا لقبعيت</div>
     </div>
     <button class="inst" id="inst"><span style="font-size:25px">📲</span>
       <span><b>ثبّت التطبيق على موبايلك</b><small>بيصير عندك أيقونة وبيفتح أسرع</small></span></button>
@@ -351,12 +351,21 @@ label.lbl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-we
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const APP_VERSION="1.0.4";
+const APP_VERSION="1.0.5";
 const ADMIN_PIN="26927";
 const ONESIGNAL_APP_ID="1ef33894-9d5b-4165-9139-cc0e38a70cc1";
 const TAR={ tuktuk:{name:'توكتوك',ic:'🛺',base:80,km:40,min:3,extraPax:100,minFare:100},
             car:{name:'سيارة',ic:'🚗',base:120,km:70,min:5,extraPax:100,minFare:200} };
-const CENTER=[33.8938,35.5018]; /* بيروت — مركز عام يشمل كل لبنان */
+const CENTER=[34.5145,36.0075]; /* مفرق ببنين — مركز منطقة الخدمة */
+/* حدود نطاق الخدمة: دير عمار جنوباً، حلبا شرقاً، قبعيت/حرار شمالاً */
+const SERVICE_AREA={minLat:34.42,maxLat:34.62,minLng:35.90,maxLng:36.30};
+function inServiceArea(p){
+  return p && p.lat>=SERVICE_AREA.minLat && p.lat<=SERVICE_AREA.maxLat
+           && p.lng>=SERVICE_AREA.minLng && p.lng<=SERVICE_AREA.maxLng;
+}
+function outOfAreaMsg(){
+  say('📍 المنطقة خارج نطاق الخدمة حالياً');
+}
 
 const $=i=>document.getElementById(i);
 let me=null, role=null, map=null, A=null,B=null, mA=null,mB=null,line=null,mDrv=null,mStop=null;
@@ -782,7 +791,7 @@ function initMap(){
   L.control.attribution({position:'bottomright',prefix:false}).addAttribution('© OpenStreetMap').addTo(map);
   navigator.geolocation&&navigator.geolocation.getCurrentPosition(async p=>{
     const c=[p.coords.latitude,p.coords.longitude];map.setView(c,16);
-    if(!A){const nm=await reverseGeocode(c[0],c[1]);setPt('a',{lat:c[0],lng:c[1],name:nm});}},()=>{},{enableHighAccuracy:true,timeout:8000});
+    if(!A&&inServiceArea({lat:c[0],lng:c[1]})){const nm=await reverseGeocode(c[0],c[1]);setPt('a',{lat:c[0],lng:c[1],name:nm});}},()=>{},{enableHighAccuracy:true,timeout:8000});
   document.querySelectorAll('.sfield').forEach(f=>f.onclick=()=>openSearch(f.dataset.f));
   $('spBack').onclick=()=>$('sp').classList.remove('on');
 
@@ -796,6 +805,7 @@ function initMap(){
     if(mMe) mMe.setLatLng([g.lat,g.lng]);
     else mMe=L.circleMarker([g.lat,g.lng],{radius:8,color:'#fff',weight:3,
       fillColor:'#1B6FD4',fillOpacity:1}).addTo(map).bindTooltip('أنت هون');
+    if(!inServiceArea(g)){outOfAreaMsg();return;}
     if(!A){const nm=await reverseGeocode(g.lat,g.lng);setPt('a',{lat:g.lat,lng:g.lng,name:nm});}
     say('📍 هيدا موقعك');
   };
@@ -807,6 +817,7 @@ const icon=(e,s)=>L.divIcon({className:'',iconSize:[s,s],
 function addStop(p){ stops=[p]; quoteRide(); }
 function removeStop(){ stops=[]; if(mStop){map.removeLayer(mStop);mStop=null;} quoteRide(); }
 function commitPoint(k,p){
+  if(!inServiceArea(p)){ outOfAreaMsg(); return; }
   if(k==='stop'){ addStop(p); $('sp').classList.remove('on'); render(); return; }
   setPt(k,p);
 }
@@ -909,16 +920,30 @@ $('spq').addEventListener('input',()=>{clearTimeout(tmr);
   if(q.length<2){$('spr').innerHTML=quickList();return;}
   $('spr').innerHTML='<div class="res"><span class="rt"><b>عم ندوّر بالخرائط...</b></span></div>';
   tmr=setTimeout(async()=>{
-    try{const c=map.getCenter();
-      const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=10&accept-language=ar&countrycodes=lb&q='
-        +encodeURIComponent(q)+'&viewbox='+(c.lng-.6)+','+(c.lat+.4)+','+(c.lng+.6)+','+(c.lat-.4));
+    try{
+      /* بحث غني بنتائج مفصّلة (محلات، صيدليات، دواوير، معالم) ضمن نطاق الخدمة */
+      const vb=SERVICE_AREA.minLng+','+SERVICE_AREA.maxLat+','+SERVICE_AREA.maxLng+','+SERVICE_AREA.minLat;
+      const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=15&addressdetails=1'
+        +'&namedetails=1&accept-language=ar&countrycodes=lb&bounded=1&viewbox='+vb
+        +'&q='+encodeURIComponent(q));
       const d=await r.json();
-      const web=d.map(x=>{
-        const p={lat:+x.lat,lng:+x.lon,name:x.display_name.split(',')[0],full:x.display_name.split(',').slice(0,3).join('، ')};
-        return '<div class="res" data-r=\''+JSON.stringify(p)+'\'><span class="ri">🌍</span><span class="rt"><b>'+p.name+'</b><small>'+p.full+'</small></span></div>';
+      const ICONS={pharmacy:'💊',hospital:'🏥',clinic:'🏥',doctors:'🏥',school:'🏫',college:'🏫',university:'🏫',
+        restaurant:'🍽️',cafe:'☕',fast_food:'🍔',bakery:'🥖',supermarket:'🛒',shop:'🏪',convenience:'🏪',
+        fuel:'⛽',bank:'🏦',atm:'🏧',mosque:'🕌',church:'⛪',place_of_worship:'🕌',
+        hotel:'🏨',pharmacy_shop:'💊',marketplace:'🛒',townhall:'🏛️',police:'🚓',
+        junction:'🔀',roundabout:'🔄',village:'📍',town:'📍',suburb:'📍',neighbourhood:'📍',hamlet:'📍'};
+      const rows=d.filter(x=>inServiceArea({lat:+x.lat,lng:+x.lon}));
+      const web=rows.map(x=>{
+        const nm=(x.namedetails&&(x.namedetails['name:ar']||x.namedetails.name))||x.name||x.display_name.split(',')[0];
+        const a=x.address||{};
+        const area=[a.village||a.town||a.suburb||a.neighbourhood||a.city,a.county].filter(Boolean).join('، ');
+        const ic=ICONS[x.type]||ICONS[x.class]||'📍';
+        const p={lat:+x.lat,lng:+x.lon,name:nm,full:area||x.display_name.split(',').slice(1,3).join('، ')};
+        return '<div class="res" data-r=\''+JSON.stringify(p)+'\'><span class="ri">'+ic+'</span>'
+          +'<span class="rt"><b>'+p.name+'</b><small>'+p.full+'</small></span></div>';
       }).join('');
       $('spr').innerHTML = web || '<div class="res" id="useMap"><span class="ri">🗺️</span>'
-        +'<span class="rt"><b>ما لقينا «'+q+'»</b><small>حدّدو على الخريطة</small></span></div>';
+        +'<span class="rt"><b>ما لقينا «'+q+'» بنطاق الخدمة</b><small>حدّدو على الخريطة</small></span></div>';
     }catch(e){$('spr').innerHTML='<div class="res"><span class="rt"><b>ما قدرنا ندوّر</b></span></div>';}
   },450);});
 $('spr').onclick=e=>{
@@ -949,7 +974,9 @@ function startPin(){
   $('sheet').innerHTML='<div class="grab"></div><h2>حدّد المكان</h2><div class="sub">حرّك الخريطة لتصير النقطة على المكان</div>'
     +'<button class="btn main" id="pinOk">تأكيد الموقع</button><button class="btn line" id="pinX">إلغاء</button>';
   map.on('movestart',pinUp);map.on('moveend',pinDown);
-  $('pinOk').onclick=async()=>{const c=map.getCenter();let nm='موقع محدّد';
+  $('pinOk').onclick=async()=>{const c=map.getCenter();
+    if(!inServiceArea({lat:c.lat,lng:c.lng})){outOfAreaMsg();return;}
+    let nm='موقع محدّد';
     try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&accept-language=ar&lat='+c.lat+'&lon='+c.lng);
       const d=await r.json();nm=(d.name||d.display_name||'').split(',')[0]||nm;}catch(e){}
     endPin();commitPoint(picking,{lat:c.lat,lng:c.lng,name:nm});};
@@ -1479,6 +1506,35 @@ function hideSplash(){const s=document.getElementById('splash');if(s)s.remove();
     const s=JSON.parse(c||d);
     autoLogin(s.phone,s.pass);
   }
+})();
+
+/* تنبيه إضافة للشاشة الرئيسية على آيفون */
+(function iosInstallHint(){
+  const ua=navigator.userAgent||'';
+  const isIOS=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const standalone=window.navigator.standalone===true||window.matchMedia('(display-mode: standalone)').matches;
+  if(!isIOS||standalone)return;
+  if(localStorage.getItem('w_ios_hint')==='1')return;
+  setTimeout(()=>{
+    const d=document.createElement('div');
+    d.style.cssText='position:fixed;inset:0;background:rgba(20,38,27,.82);z-index:995;display:grid;'
+      +'place-items:center;padding:22px;font-family:inherit;direction:rtl';
+    d.innerHTML='<div style="background:#fff;border-radius:22px;padding:24px;max-width:350px;color:#14261B">'
+      +'<div style="font-size:42px;text-align:center;margin-bottom:10px">📲</div>'
+      +'<h3 style="text-align:center;font-size:18px;margin-bottom:6px">ضيف التطبيق عالشاشة</h3>'
+      +'<p style="font-size:13px;color:#6B7C72;text-align:center;line-height:1.8;margin-bottom:16px">'
+      +'خليه متل أي تطبيق عادي — بيفتح أسرع وبلا شريط المتصفح</p>'
+      +'<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">'
+      +'<span style="background:#E3F3E8;color:#0A5F2C;width:26px;height:26px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:12px;font-weight:700">1</span>'
+      +'<span style="font-size:13.5px;line-height:1.7">اضغط زر <b>المشاركة</b> ⬆️ تحت بالنص</span></div>'
+      +'<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:16px">'
+      +'<span style="background:#E3F3E8;color:#0A5F2C;width:26px;height:26px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:12px;font-weight:700">2</span>'
+      +'<span style="font-size:13.5px;line-height:1.7">اختار <b>«إضافة إلى الشاشة الرئيسية»</b></span></div>'
+      +'<button style="width:100%;padding:14px;border:0;border-radius:13px;background:#0E7C3A;color:#fff;'
+      +'font-family:inherit;font-size:15px;font-weight:700;cursor:pointer">فهمت</button></div>';
+    d.querySelector('button').onclick=()=>{localStorage.setItem('w_ios_hint','1');d.remove();};
+    document.body.appendChild(d);
+  },2500);
 })();
 
 let dp=null;
