@@ -1,0 +1,107 @@
+name: Build Signed Work Tracker APK
+
+on:
+  workflow_dispatch: # يتيح لك تشغيل البناء بكبسة زر من الموبايل
+  push:
+    paths:
+      - 'tools/work-tracker/**' # يبني تلقائياً كلما عدلت ملف index.html
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 3. Setup Java JDK 17 (Required for Android Gradle)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 4. Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 5. Initialize Capacitor Project & Web Folder
+        run: |
+          mkdir -p cap-app/www
+          if [ -f "tools/work-tracker/index.html" ]; then
+            cp -r tools/work-tracker/* cap-app/www/
+          else
+            echo "<h1>Work Tracker Placeholder</h1>" > cap-app/www/index.html
+          fi
+          cd cap-app
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "WorkTracker" "com.mrelectroai.worktracker" --web-dir www
+          npx cap add android
+
+      - name: 6. Inject Android Permissions (GPS, Mic, WakeLock, Foreground)
+        run: |
+          MANIFEST="cap-app/android/app/src/main/AndroidManifest.xml"
+          PERMS='
+          <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+          <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+          <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+          <uses-permission android:name="android.permission.RECORD_AUDIO" />
+          <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+          <uses-permission android:name="android.permission.WAKE_LOCK" />
+          <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+          <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+          '
+          sed -i "/<\/manifest>/i $(echo $PERMS | tr '\n' ' ')" "$MANIFEST"
+
+      - name: 7. Enable Auto-Grant for WebRTC Microphone & GPS in WebView
+        run: |
+          # تعديل MainActivity لمنح إذن المايكروفون والـ GPS فوراً داخل WebView بدون حظر
+          MAIN_ACT=$(find cap-app/android/app/src/main/java -name "MainActivity.java")
+          if [ -f "$MAIN_ACT" ]; then
+            cat << 'EOF' > "$MAIN_ACT"
+          package com.mrelectroai.worktracker;
+          import android.os.Bundle;
+          import android.webkit.PermissionRequest;
+          import android.webkit.WebChromeClient;
+          import android.view.WindowManager;
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {
+              @Override
+              public void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                  this.bridge.getWebView().setWebChromeClient(new WebChromeClient() {
+                      @Override
+                      public void onPermissionRequest(final PermissionRequest request) {
+                          request.grant(request.getResources());
+                      }
+                  });
+              }
+          }
+          EOF
+          fi
+
+      - name: 8. Build & Sign APK (Debug + Signed Release)
+        run: |
+          cd cap-app/android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+          
+          # إنشاء مفتاح توقيع رسمي وتوقيع الـ APK لمنع خطأ "التطبيق ليس مثبتاً"
+          keytool -genkey -v -keystore release-key.keystore -alias mrelectroai -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=Anwar, OU=MrElectroAI, O=MrElectroAI, L=Beirut, S=Beirut, C=LB"
+          ./gradlew assembleRelease
+          
+          BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | tail -n 1)
+          $BUILD_TOOLS_DIR/zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk app-aligned.apk
+          $BUILD_TOOLS_DIR/apksigner sign --ks release-key.keystore --ks-pass pass:123456 --key-pass pass:123456 --out WorkTracker-Signed.apk app-aligned.apk
+
+      - name: 9. Upload Ready-to-Install Signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WorkTracker-Signed-APK
+          path: cap-app/android/WorkTracker-Signed.apk
