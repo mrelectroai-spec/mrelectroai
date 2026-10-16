@@ -7,109 +7,227 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #0b0f19;
-            --card-bg: #151c2c;
+            --bg-dark: #090d16;
+            --card-bg: #131b2e;
+            --item-bg: #0d1322;
             --electric-blue: #00d2ff;
-            --neon-blue-glow: rgba(0, 210, 255, 0.35);
+            --neon-blue-glow: rgba(0, 210, 255, 0.3);
             --gold: #ffb703;
             --gold-glow: rgba(255, 183, 3, 0.35);
             --text-light: #f1f5f9;
             --text-muted: #94a3b8;
-            --border-color: #26334d;
+            --border-color: #23314f;
+            --success: #10b981;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Cairo', sans-serif;
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 15% 15%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(255, 183, 3, 0.08) 0%, transparent 40%);
+                radial-gradient(circle at 10% 10%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(255, 183, 3, 0.08) 0%, transparent 40%);
             color: var(--text-light);
-            padding: 15px;
+            padding: 12px;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
-            max-width: 550px;
+            width: 100%;
+            max-width: 480px;
             background: var(--card-bg);
-            margin: 15px auto 30px;
-            padding: 25px 20px;
-            border-radius: 18px;
+            margin: 10px auto;
+            padding: 20px 16px;
+            border-radius: 20px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 210, 255, 0.07);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 210, 255, 0.06);
         }
 
         .header {
             text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
             border-bottom: 1px solid var(--border-color);
         }
 
         .brand-title {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 800;
-            letter-spacing: 1px;
             background: linear-gradient(90deg, var(--electric-blue), #ffffff, var(--gold));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
+            display: inline-block;
         }
 
         .subtitle {
             color: var(--text-muted);
-            font-size: 14px;
+            font-size: 13px;
+            margin-top: 4px;
         }
 
-        .section-group {
-            margin-bottom: 24px;
+        /* نظام الواجهات المغلقة (Accordion) */
+        .accordion-item {
+            background: var(--item-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--gold);
-            margin-bottom: 12px;
+        .accordion-item.active {
+            border-color: var(--electric-blue);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.15);
+        }
+
+        .accordion-item.completed {
+            border-color: rgba(255, 183, 3, 0.4);
+        }
+
+        .accordion-header {
+            padding: 14px 16px;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            user-select: none;
+            transition: background 0.2s;
         }
 
-        .section-title span.hint {
+        .accordion-header:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .header-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .step-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: rgba(0, 210, 255, 0.12);
+            border: 1px solid var(--electric-blue);
+            color: var(--electric-blue);
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .accordion-item.completed .step-num {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: #000;
+        }
+
+        .question-text {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--text-light);
+            white-space: nowrap;
+        }
+
+        .selected-preview {
             font-size: 12px;
+            color: var(--gold);
+            background: rgba(255, 183, 3, 0.12);
+            padding: 2px 8px;
+            border-radius: 6px;
+            max-width: 130px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: auto;
+            margin-left: 8px;
+            display: none;
+        }
+
+        .accordion-item.completed .selected-preview {
+            display: inline-block;
+        }
+
+        .arrow-icon {
             color: var(--text-muted);
-            font-weight: normal;
+            font-size: 12px;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .accordion-item.active .arrow-icon {
+            transform: rotate(180deg);
+            color: var(--electric-blue);
+        }
+
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(9, 13, 22, 0.6);
+        }
+
+        .accordion-content {
+            padding: 12px 14px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* حقل الاسم */
+        .input-wrapper {
+            display: flex;
+            gap: 8px;
         }
 
         input[type="text"] {
             width: 100%;
-            padding: 13px 15px;
-            background: #0f1522;
+            padding: 11px 14px;
+            background: #131b2e;
             border: 1px solid var(--border-color);
             border-radius: 10px;
             color: var(--text-light);
             font-family: 'Cairo', sans-serif;
-            font-size: 15px;
-            transition: all 0.3s ease;
+            font-size: 14px;
         }
 
         input[type="text"]:focus {
             outline: none;
             border-color: var(--electric-blue);
-            box-shadow: 0 0 12px var(--neon-blue-glow);
+            box-shadow: 0 0 10px var(--neon-blue-glow);
         }
 
-        /* تصميم خيارات الكبس المباشر */
+        .next-mini-btn {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 0 16px;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* خيارات الكبس */
         .options-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 10px;
+            gap: 8px;
         }
 
         .options-grid.two-cols {
@@ -123,7 +241,6 @@
         .option-item input {
             position: absolute;
             opacity: 0;
-            cursor: pointer;
             height: 0;
             width: 0;
         }
@@ -131,43 +248,33 @@
         .option-label {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            padding: 12px 14px;
-            background: #0f1522;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: #131b2e;
             border: 1px solid var(--border-color);
             border-radius: 10px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 600;
             color: var(--text-light);
-            transition: all 0.25s ease;
-            user-select: none;
-            gap: 10px;
+            transition: all 0.2s ease;
         }
 
-        .option-label:hover {
-            border-color: var(--electric-blue);
-            background: rgba(0, 210, 255, 0.05);
-        }
-
-        /* عند اختيار عنصر */
         .option-item input:checked ~ .option-label {
-            background: rgba(0, 210, 255, 0.12);
+            background: rgba(0, 210, 255, 0.14);
             border-color: var(--electric-blue);
-            box-shadow: 0 0 12px var(--neon-blue-glow);
-            color: #ffffff;
+            box-shadow: 0 0 10px var(--neon-blue-glow);
+            color: #fff;
         }
 
-        /* دائرة المؤشر */
         .indicator {
             width: 18px;
             height: 18px;
             border-radius: 50%;
             border: 2px solid var(--text-muted);
-            display: inline-block;
             position: relative;
             flex-shrink: 0;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
         }
 
         .checkbox-indicator {
@@ -177,7 +284,6 @@
         .option-item input:checked ~ .option-label .indicator {
             border-color: var(--gold);
             background-color: var(--gold);
-            box-shadow: 0 0 8px var(--gold-glow);
         }
 
         .option-item input:checked ~ .option-label .indicator::after {
@@ -187,50 +293,53 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: #000;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 900;
+        }
+
+        .done-step-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(255, 183, 3, 0.15);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
         }
 
         .submit-btn {
             width: 100%;
-            background: linear-gradient(135deg, #00d2ff 0%, #0072ff 100%);
+            background: linear-gradient(135deg, #00d2ff 0%, #0066ff 100%);
             color: #ffffff;
             border: none;
-            padding: 15px;
+            padding: 14px;
             font-family: 'Cairo', sans-serif;
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 800;
             border-radius: 12px;
             cursor: pointer;
-            box-shadow: 0 4px 18px rgba(0, 210, 255, 0.4);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 18px rgba(0, 210, 255, 0.35);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(0, 210, 255, 0.65);
+            gap: 8px;
+            margin-top: 14px;
+            transition: transform 0.2s;
         }
 
         .submit-btn:active {
-            transform: translateY(0);
+            transform: scale(0.98);
         }
 
         .footer-note {
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-top: 15px;
-        }
-
-        @media (max-width: 480px) {
-            .options-grid.two-cols {
-                grid-template-columns: 1fr;
-            }
+            margin-top: 12px;
         }
     </style>
 </head>
@@ -238,139 +347,210 @@
 
 <div class="container">
     <div class="header">
-        <div class="brand-title">⚡ MrElectroAI</div>
-        <div class="subtitle">حدد مستواك واهتماماتك لنوجهك للطريق الصح باحترافية</div>
+        <div class="brand-title">MrElectroAI ⚡</div>
+        <div class="subtitle">اكبس على كل خانة وحدد خياراتك بثواني</div>
     </div>
 
-    <form id="electroForm">
-        
+    <form id="electroForm" onsubmit="return false;">
+
         <!-- 1. الاسم والمنطقة -->
-        <div class="section-group">
-            <div class="section-title">👤 1. الاسم الكريم والمنطقة:</div>
-            <input type="text" id="fullName" placeholder="مثال: أحمد - بيروت" required>
+        <div class="accordion-item active" id="step-1">
+            <div class="accordion-header" onclick="toggleStep(1)">
+                <div class="header-title-wrap">
+                    <span class="step-num" id="num-1">1</span>
+                    <span class="question-text">👤 الاسم والمنطقة</span>
+                    <span class="selected-preview" id="preview-1"></span>
+                </div>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="accordion-body" style="max-height: 120px;">
+                <div class="accordion-content">
+                    <div class="input-wrapper">
+                        <input type="text" id="fullName" placeholder="مثال: أحمد - بيروت" oninput="updateNamePreview()">
+                        <button type="button" class="next-mini-btn" onclick="completeNameStep()">التالي ⬅</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 2. الفئة العمرية -->
-        <div class="section-group">
-            <div class="section-title">🎂 2. الفئة العمرية:</div>
-            <div class="options-grid two-cols">
-                <label class="option-item">
-                    <input type="radio" name="age" value="أقل من 20 سنة">
-                    <span class="option-label"><span class="indicator"></span> أقل من 20 سنة</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="age" value="من 20 إلى 30 سنة" checked>
-                    <span class="option-label"><span class="indicator"></span> من 20 إلى 30 سنة</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="age" value="من 30 إلى 40 سنة">
-                    <span class="option-label"><span class="indicator"></span> من 30 إلى 40 سنة</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="age" value="أكثر من 40 سنة">
-                    <span class="option-label"><span class="indicator"></span> أكثر من 40 سنة</span>
-                </label>
+        <div class="accordion-item" id="step-2">
+            <div class="accordion-header" onclick="toggleStep(2)">
+                <div class="header-title-wrap">
+                    <span class="step-num" id="num-2">2</span>
+                    <span class="question-text">🎂 الفئة العمرية</span>
+                    <span class="selected-preview" id="preview-2"></span>
+                </div>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="accordion-body">
+                <div class="accordion-content">
+                    <div class="options-grid two-cols">
+                        <label class="option-item">
+                            <input type="radio" name="age" value="أقل من 20 سنة" onchange="selectSingle(2, this.value)">
+                            <span class="option-label"><span>أقل من 20</span><span class="indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="age" value="من 20 إلى 30 سنة" onchange="selectSingle(2, this.value)">
+                            <span class="option-label"><span>20 إلى 30</span><span class="indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="age" value="من 30 إلى 40 سنة" onchange="selectSingle(2, this.value)">
+                            <span class="option-label"><span>30 إلى 40</span><span class="indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="age" value="أكثر من 40 سنة" onchange="selectSingle(2, this.value)">
+                            <span class="option-label"><span>أكثر من 40</span><span class="indicator"></span></span>
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- 3. سنوات الخبرة -->
-        <div class="section-group">
-            <div class="section-title">⏳ 3. كم سنة خبرتك بمجال الكهرباء؟</div>
-            <div class="options-grid">
-                <label class="option-item">
-                    <input type="radio" name="experience" value="مبتدئ من الصفر (ما عندي أي فكرة)" checked>
-                    <span class="option-label"><span class="indicator"></span> مبتدئ من الصفر (ما عندي أي فكرة)</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="experience" value="هاوي (بعرف شغلات بسيطة بالبيت)">
-                    <span class="option-label"><span class="indicator"></span> هاوي (بعرف شغلات بسيطة بالبيت)</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="experience" value="أقل من سنتين (عم أتعلم بالورش)">
-                    <span class="option-label"><span class="indicator"></span> أقل من سنتين (عم أتعلم بالورش)</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="experience" value="من 2 إلى 5 سنوات (فني شغال)">
-                    <span class="option-label"><span class="indicator"></span> من 2 إلى 5 سنوات (فني شغال)</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="experience" value="أكثر من 5 سنوات (معلم / بروفيشنال)">
-                    <span class="option-label"><span class="indicator"></span> أكثر من 5 سنوات (معلم / بروفيشنال)</span>
-                </label>
+        <div class="accordion-item" id="step-3">
+            <div class="accordion-header" onclick="toggleStep(3)">
+                <div class="header-title-wrap">
+                    <span class="step-num" id="num-3">3</span>
+                    <span class="question-text">⏳ سنوات الخبرة بالكهرباء</span>
+                    <span class="selected-preview" id="preview-3"></span>
+                </div>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="accordion-body">
+                <div class="accordion-content">
+                    <div class="options-grid">
+                        <label class="option-item">
+                            <input type="radio" name="experience" value="مبتدئ من الصفر" onchange="selectSingle(3, this.value)">
+                            <span class="option-label"><span>مبتدئ من الصفر (ما عندي فكرة)</span><span class="indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="experience" value="هاوي (معلومات بسيطة)" onchange="selectSingle(3, this.value)">
+                            <span class="option-label"><span>هاوي (بعرف شغلات بسيطة)</span><span class="indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="experience" value="أقل من سنتين" onchange="selectSingle(3, this.value)">
+                            <span class="option-label"><span>أقل من سنتين (عم أتعلم بالورش)</span><span class="indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="experience" value="من 2 إلى 5 سنوات" onchange="selectSingle(3, this.value)">
+                            <span class="option-label"><span>من 2 إلى 5 سنوات (فني شغال)</span><span class="indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="experience" value="أكثر من 5 سنوات (معلم)" onchange="selectSingle(3, this.value)">
+                            <span class="option-label"><span>أكثر من 5 سنوات (معلم / بروفيشنال)</span><span class="indicator"></span></span>
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 4. المجالات الحالية -->
-        <div class="section-group">
-            <div class="section-title">🛠️ 4. شو بتعرف تشتغل حالياً؟ <span class="hint">(فيك تختار أكثر من خيار)</span></div>
-            <div class="options-grid">
-                <label class="option-item">
-                    <input type="checkbox" name="currentSkills" value="ولا شي (بعدني بالبداية)">
-                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 🆕 ولا شي (بعدني بالبداية)</span>
-                </label>
-                <label class="option-item">
-                    <input type="checkbox" name="currentSkills" value="تمديدات منزلية وصيانة عامة">
-                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 🔌 تمديدات منزلية وصيانة عامة</span>
-                </label>
-                <label class="option-item">
-                    <input type="checkbox" name="currentSkills" value="طاقة شمسية وانفرترات (Solar Systems)">
-                    <span class="option-label"><span class="indicator checkbox-indicator"></span> ☀️ طاقة شمسية وانفرترات (Solar)</span>
-                </label>
-                <label class="option-item">
-                    <input type="checkbox" name="currentSkills" value="كلاسيك كنترول ولوحات تحكم (Classic Control)">
-                    <span class="option-label"><span class="indicator checkbox-indicator"></span> ⚙️ كلاسيك كنترول ولوحات ATS</span>
-                </label>
-                <label class="option-item">
-                    <input type="checkbox" name="currentSkills" value="منازل ذكية (Smart Home / Automation)">
-                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 🏠 منازل ذكية (Home Automation)</span>
-                </label>
+        <!-- 4. المهارات الحالية -->
+        <div class="accordion-item" id="step-4">
+            <div class="accordion-header" onclick="toggleStep(4)">
+                <div class="header-title-wrap">
+                    <span class="step-num" id="num-4">4</span>
+                    <span class="question-text">🛠️ شو بتشتغل حالياً؟</span>
+                    <span class="selected-preview" id="preview-4"></span>
+                </div>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="accordion-body">
+                <div class="accordion-content">
+                    <div class="options-grid">
+                        <label class="option-item">
+                            <input type="checkbox" name="currentSkills" value="ولا شي (مبتدئ)" onchange="updateMulti(4, 'currentSkills')">
+                            <span class="option-label"><span>🆕 ولا شي (بعدني بالبداية)</span><span class="indicator checkbox-indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" name="currentSkills" value="تمديدات منزلية" onchange="updateMulti(4, 'currentSkills')">
+                            <span class="option-label"><span>🔌 تمديدات منزلية وصيانة</span><span class="indicator checkbox-indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" name="currentSkills" value="طاقة شمسية (Solar)" onchange="updateMulti(4, 'currentSkills')">
+                            <span class="option-label"><span>☀️ طاقة شمسية وانفرترات</span><span class="indicator checkbox-indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" name="currentSkills" value="كلاسيك كنترول و ATS" onchange="updateMulti(4, 'currentSkills')">
+                            <span class="option-label"><span>⚙️ كلاسيك كنترول ولوحات ATS</span><span class="indicator checkbox-indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" name="currentSkills" value="سمارت هوم (Automation)" onchange="updateMulti(4, 'currentSkills')">
+                            <span class="option-label"><span>🏠 منازل ذكية (Smart Home)</span><span class="indicator checkbox-indicator"></span></span>
+                        </label>
+                    </div>
+                    <button type="button" class="done-step-btn" onclick="toggleStep(5)">تم الاختيار - انتقل للتالي ⬇</button>
+                </div>
             </div>
         </div>
 
         <!-- 5. المجالات المطلوبة للتطوير -->
-        <div class="section-group">
-            <div class="section-title">🎯 5. بأي مجال حابب تطور حالك هلق؟ <span class="hint">(أكثر من خيار)</span></div>
-            <div class="options-grid">
-                <label class="option-item">
-                    <input type="checkbox" name="targetSkills" value="أساسيات الكهرباء من الصفر" checked>
-                    <span class="option-label"><span class="indicator checkbox-indicator"></span> ⚡ أساسيات الكهرباء من الصفر</span>
-                </label>
-                <label class="option-item">
-                    <input type="checkbox" name="targetSkills" value="احتراف الطاقة الشمسية والانفرترات">
-                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 🔋 احتراف الطاقة الشمسية والانفرترات</span>
-                </label>
-                <label class="option-item">
-                    <input type="checkbox" name="targetSkills" value="الكلاسيك كنترول وتجميع اللوحات">
-                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 🎛️ الكلاسيك كنترول وتجميع اللوحات</span>
-                </label>
-                <label class="option-item">
-                    <input type="checkbox" name="targetSkills" value="السمارت هوم والأنظمة الذكية">
-                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 📱 السمارت هوم والأنظمة الذكية</span>
-                </label>
+        <div class="accordion-item" id="step-5">
+            <div class="accordion-header" onclick="toggleStep(5)">
+                <div class="header-title-wrap">
+                    <span class="step-num" id="num-5">5</span>
+                    <span class="question-text">🎯 بشو حابب تطور حالك؟</span>
+                    <span class="selected-preview" id="preview-5"></span>
+                </div>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="accordion-body">
+                <div class="accordion-content">
+                    <div class="options-grid">
+                        <label class="option-item">
+                            <input type="checkbox" name="targetSkills" value="أساسيات الكهرباء من الصفر" onchange="updateMulti(5, 'targetSkills')">
+                            <span class="option-label"><span>⚡ أساسيات الكهرباء من الصفر</span><span class="indicator checkbox-indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" name="targetSkills" value="احتراف الطاقة الشمسية والانفرترات" onchange="updateMulti(5, 'targetSkills')">
+                            <span class="option-label"><span>🔋 احتراف الطاقة الشمسية والانفرترات</span><span class="indicator checkbox-indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" name="targetSkills" value="الكلاسيك كنترول وتجميع اللوحات" onchange="updateMulti(5, 'targetSkills')">
+                            <span class="option-label"><span>🎛️ الكلاسيك كنترول وتجميع اللوحات</span><span class="indicator checkbox-indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" name="targetSkills" value="السمارت هوم والأنظمة الذكية" onchange="updateMulti(5, 'targetSkills')">
+                            <span class="option-label"><span>📱 السمارت هوم والأنظمة الذكية</span><span class="indicator checkbox-indicator"></span></span>
+                        </label>
+                    </div>
+                    <button type="button" class="done-step-btn" onclick="toggleStep(6)">تم الاختيار - انتقل للتالي ⬇</button>
+                </div>
             </div>
         </div>
 
         <!-- 6. طريقة التعلم المفضلة -->
-        <div class="section-group">
-            <div class="section-title">📘 6. كيف بتفضل طريقة التعلم؟</div>
-            <div class="options-grid">
-                <label class="option-item">
-                    <input type="radio" name="learningMethod" value="كتب وأدلة PDF مختصرة وعملية" checked>
-                    <span class="option-label"><span class="indicator"></span> 📄 كتب وأدلة PDF مختصرة وعملية</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="learningMethod" value="فيديوهات مسجلة وشروحات">
-                    <span class="option-label"><span class="indicator"></span> 🎥 فيديوهات مسجلة وشروحات</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="learningMethod" value="تدريب عملي حضوري / كورس مباشر">
-                    <span class="option-label"><span class="indicator"></span> 🛠️ تدريب عملي حضوري / كورس مباشر</span>
-                </label>
+        <div class="accordion-item" id="step-6">
+            <div class="accordion-header" onclick="toggleStep(6)">
+                <div class="header-title-wrap">
+                    <span class="step-num" id="num-6">6</span>
+                    <span class="question-text">📘 طريقة التعلم المفضلة</span>
+                    <span class="selected-preview" id="preview-6"></span>
+                </div>
+                <span class="arrow-icon">▼</span>
+            </div>
+            <div class="accordion-body">
+                <div class="accordion-content">
+                    <div class="options-grid">
+                        <label class="option-item">
+                            <input type="radio" name="learningMethod" value="كتب وأدلة PDF مختصرة" onchange="selectSingle(6, this.value)">
+                            <span class="option-label"><span>📄 كتب وأدلة PDF مختصرة وعملية</span><span class="indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="learningMethod" value="فيديوهات مسجلة وشروحات" onchange="selectSingle(6, this.value)">
+                            <span class="option-label"><span>🎥 فيديوهات مسجلة وشروحات</span><span class="indicator"></span></span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="learningMethod" value="تدريب عملي حضوري مباشر" onchange="selectSingle(6, this.value)">
+                            <span class="option-label"><span>🛠️ تدريب عملي حضوري / كورس مباشر</span><span class="indicator"></span></span>
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
 
         <button type="button" class="submit-btn" onclick="sendToWhatsApp()">
-            <span>إرسال التفاصيل عبر واتساب</span>
+            <span>إرسال البطاقة عبر واتساب</span>
             <span>📲</span>
         </button>
 
@@ -379,11 +559,83 @@
 </div>
 
 <script>
+    function toggleStep(stepNumber) {
+        const allItems = document.querySelectorAll('.accordion-item');
+        allItems.forEach((item, index) => {
+            const currentNum = index + 1;
+            const body = item.querySelector('.accordion-body');
+            if (currentNum === stepNumber) {
+                const isOpen = item.classList.contains('active');
+                if (isOpen) {
+                    item.classList.remove('active');
+                    body.style.maxHeight = null;
+                } else {
+                    item.classList.add('active');
+                    body.style.maxHeight = body.scrollHeight + "px";
+                }
+            } else {
+                item.classList.remove('active');
+                body.style.maxHeight = null;
+            }
+        });
+    }
+
+    function markCompleted(stepNumber, previewText) {
+        const item = document.getElementById(`step-${stepNumber}`);
+        const preview = document.getElementById(`preview-${stepNumber}`);
+        const numBadge = document.getElementById(`num-${stepNumber}`);
+        if (previewText) {
+            item.classList.add('completed');
+            preview.textContent = previewText;
+            numBadge.textContent = "✓";
+        } else {
+            item.classList.remove('completed');
+            preview.textContent = "";
+            numBadge.textContent = stepNumber;
+        }
+    }
+
+    function updateNamePreview() {
+        const val = document.getElementById('fullName').value.trim();
+        markCompleted(1, val);
+    }
+
+    function completeNameStep() {
+        const val = document.getElementById('fullName').value.trim();
+        if (!val) {
+            alert('يرجى كتابة الاسم أولاً ⚡');
+            return;
+        }
+        markCompleted(1, val);
+        toggleStep(2);
+    }
+
+    function selectSingle(stepNumber, value) {
+        markCompleted(stepNumber, value);
+        setTimeout(() => {
+            if (stepNumber < 6) {
+                toggleStep(stepNumber + 1);
+            } else {
+                // إغلاق البطاقة الأخيرة بعد الاختيار لتصبح الشاشة مختصرة وجاهزة للإرسال
+                toggleStep(0);
+            }
+        }, 250);
+    }
+
+    function updateMulti(stepNumber, inputName) {
+        let selected = [];
+        document.querySelectorAll(`input[name="${inputName}"]:checked`).forEach(el => {
+            selected.push(el.value);
+        });
+        markCompleted(stepNumber, selected.length > 0 ? `${selected.length} خيارات` : "");
+    }
+
     function sendToWhatsApp() {
         const name = document.getElementById('fullName').value.trim();
         if (!name) {
-            alert('يرجى كتابة الاسم والمنطقة في الخانة الأولى ⚡');
-            document.getElementById('fullName').focus();
+            toggleStep(1);
+            setTimeout(() => document.getElementById('fullName').focus(), 300);
+            alert('يرجى كتابة الاسم والمنطقة في الخانة رقم 1 ⚡');
             return;
         }
 
@@ -399,7 +651,6 @@
         document.querySelectorAll('input[name="targetSkills"]:checked').forEach(el => targetSkills.push(el.value));
         let targetSkillsText = targetSkills.length > 0 ? targetSkills.join(' ، ') : 'غير محدد';
 
-        // رقم الواتساب الخاص بك
         const phone = "96179434479";
 
         const message = `⚡ *تقييم مستوى جديد - MrElectroAI* ⚡\n\n` +
