@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحديد المستوى والاهتمامات | MrElectroAI ⚡</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: #151c2c;
+            --electric-blue: #00d2ff;
+            --neon-blue-glow: rgba(0, 210, 255, 0.35);
+            --gold: #ffb703;
+            --gold-glow: rgba(255, 183, 3, 0.35);
+            --text-light: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #26334d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(255, 183, 3, 0.08) 0%, transparent 40%);
+            color: var(--text-light);
+            padding: 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 550px;
+            background: var(--card-bg);
+            margin: 15px auto 30px;
+            padding: 25px 20px;
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 210, 255, 0.07);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-title {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--electric-blue), #ffffff, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .section-group {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title span.hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 13px 15px;
+            background: #0f1522;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-family: 'Cairo', sans-serif;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--electric-blue);
+            box-shadow: 0 0 12px var(--neon-blue-glow);
+        }
+
+        /* تصميم خيارات الكبس المباشر */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .options-grid.two-cols {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .option-item {
+            position: relative;
+        }
+
+        .option-item input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 12px 14px;
+            background: #0f1522;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.25s ease;
+            user-select: none;
+            gap: 10px;
+        }
+
+        .option-label:hover {
+            border-color: var(--electric-blue);
+            background: rgba(0, 210, 255, 0.05);
+        }
+
+        /* عند اختيار عنصر */
+        .option-item input:checked ~ .option-label {
+            background: rgba(0, 210, 255, 0.12);
+            border-color: var(--electric-blue);
+            box-shadow: 0 0 12px var(--neon-blue-glow);
+            color: #ffffff;
+        }
+
+        /* دائرة المؤشر */
+        .indicator {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            display: inline-block;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.25s ease;
+        }
+
+        .checkbox-indicator {
+            border-radius: 5px;
+        }
+
+        .option-item input:checked ~ .option-label .indicator {
+            border-color: var(--gold);
+            background-color: var(--gold);
+            box-shadow: 0 0 8px var(--gold-glow);
+        }
+
+        .option-item input:checked ~ .option-label .indicator::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00d2ff 0%, #0072ff 100%);
+            color: #ffffff;
+            border: none;
+            padding: 15px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(0, 210, 255, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 210, 255, 0.65);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .options-grid.two-cols {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="brand-title">⚡ MrElectroAI</div>
+        <div class="subtitle">حدد مستواك واهتماماتك لنوجهك للطريق الصح باحترافية</div>
+    </div>
+
+    <form id="electroForm">
+        
+        <!-- 1. الاسم والمنطقة -->
+        <div class="section-group">
+            <div class="section-title">👤 1. الاسم الكريم والمنطقة:</div>
+            <input type="text" id="fullName" placeholder="مثال: أحمد - بيروت" required>
+        </div>
+
+        <!-- 2. الفئة العمرية -->
+        <div class="section-group">
+            <div class="section-title">🎂 2. الفئة العمرية:</div>
+            <div class="options-grid two-cols">
+                <label class="option-item">
+                    <input type="radio" name="age" value="أقل من 20 سنة">
+                    <span class="option-label"><span class="indicator"></span> أقل من 20 سنة</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="age" value="من 20 إلى 30 سنة" checked>
+                    <span class="option-label"><span class="indicator"></span> من 20 إلى 30 سنة</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="age" value="من 30 إلى 40 سنة">
+                    <span class="option-label"><span class="indicator"></span> من 30 إلى 40 سنة</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="age" value="أكثر من 40 سنة">
+                    <span class="option-label"><span class="indicator"></span> أكثر من 40 سنة</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 3. سنوات الخبرة -->
+        <div class="section-group">
+            <div class="section-title">⏳ 3. كم سنة خبرتك بمجال الكهرباء؟</div>
+            <div class="options-grid">
+                <label class="option-item">
+                    <input type="radio" name="experience" value="مبتدئ من الصفر (ما عندي أي فكرة)" checked>
+                    <span class="option-label"><span class="indicator"></span> مبتدئ من الصفر (ما عندي أي فكرة)</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="experience" value="هاوي (بعرف شغلات بسيطة بالبيت)">
+                    <span class="option-label"><span class="indicator"></span> هاوي (بعرف شغلات بسيطة بالبيت)</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="experience" value="أقل من سنتين (عم أتعلم بالورش)">
+                    <span class="option-label"><span class="indicator"></span> أقل من سنتين (عم أتعلم بالورش)</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="experience" value="من 2 إلى 5 سنوات (فني شغال)">
+                    <span class="option-label"><span class="indicator"></span> من 2 إلى 5 سنوات (فني شغال)</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="experience" value="أكثر من 5 سنوات (معلم / بروفيشنال)">
+                    <span class="option-label"><span class="indicator"></span> أكثر من 5 سنوات (معلم / بروفيشنال)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 4. المجالات الحالية -->
+        <div class="section-group">
+            <div class="section-title">🛠️ 4. شو بتعرف تشتغل حالياً؟ <span class="hint">(فيك تختار أكثر من خيار)</span></div>
+            <div class="options-grid">
+                <label class="option-item">
+                    <input type="checkbox" name="currentSkills" value="ولا شي (بعدني بالبداية)">
+                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 🆕 ولا شي (بعدني بالبداية)</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" name="currentSkills" value="تمديدات منزلية وصيانة عامة">
+                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 🔌 تمديدات منزلية وصيانة عامة</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" name="currentSkills" value="طاقة شمسية وانفرترات (Solar Systems)">
+                    <span class="option-label"><span class="indicator checkbox-indicator"></span> ☀️ طاقة شمسية وانفرترات (Solar)</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" name="currentSkills" value="كلاسيك كنترول ولوحات تحكم (Classic Control)">
+                    <span class="option-label"><span class="indicator checkbox-indicator"></span> ⚙️ كلاسيك كنترول ولوحات ATS</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" name="currentSkills" value="منازل ذكية (Smart Home / Automation)">
+                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 🏠 منازل ذكية (Home Automation)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 5. المجالات المطلوبة للتطوير -->
+        <div class="section-group">
+            <div class="section-title">🎯 5. بأي مجال حابب تطور حالك هلق؟ <span class="hint">(أكثر من خيار)</span></div>
+            <div class="options-grid">
+                <label class="option-item">
+                    <input type="checkbox" name="targetSkills" value="أساسيات الكهرباء من الصفر" checked>
+                    <span class="option-label"><span class="indicator checkbox-indicator"></span> ⚡ أساسيات الكهرباء من الصفر</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" name="targetSkills" value="احتراف الطاقة الشمسية والانفرترات">
+                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 🔋 احتراف الطاقة الشمسية والانفرترات</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" name="targetSkills" value="الكلاسيك كنترول وتجميع اللوحات">
+                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 🎛️ الكلاسيك كنترول وتجميع اللوحات</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" name="targetSkills" value="السمارت هوم والأنظمة الذكية">
+                    <span class="option-label"><span class="indicator checkbox-indicator"></span> 📱 السمارت هوم والأنظمة الذكية</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 6. طريقة التعلم المفضلة -->
+        <div class="section-group">
+            <div class="section-title">📘 6. كيف بتفضل طريقة التعلم؟</div>
+            <div class="options-grid">
+                <label class="option-item">
+                    <input type="radio" name="learningMethod" value="كتب وأدلة PDF مختصرة وعملية" checked>
+                    <span class="option-label"><span class="indicator"></span> 📄 كتب وأدلة PDF مختصرة وعملية</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="learningMethod" value="فيديوهات مسجلة وشروحات">
+                    <span class="option-label"><span class="indicator"></span> 🎥 فيديوهات مسجلة وشروحات</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="learningMethod" value="تدريب عملي حضوري / كورس مباشر">
+                    <span class="option-label"><span class="indicator"></span> 🛠️ تدريب عملي حضوري / كورس مباشر</span>
+                </label>
+            </div>
+        </div>
+
+        <button type="button" class="submit-btn" onclick="sendToWhatsApp()">
+            <span>إرسال التفاصيل عبر واتساب</span>
+            <span>📲</span>
+        </button>
+
+        <div class="footer-note">MrElectroAI © جميع الحقوق محفوظة</div>
+    </form>
+</div>
+
+<script>
+    function sendToWhatsApp() {
+        const name = document.getElementById('fullName').value.trim();
+        if (!name) {
+            alert('يرجى كتابة الاسم والمنطقة في الخانة الأولى ⚡');
+            document.getElementById('fullName').focus();
+            return;
+        }
+
+        const age = document.querySelector('input[name="age"]:checked')?.value || 'غير محدد';
+        const experience = document.querySelector('input[name="experience"]:checked')?.value || 'غير محدد';
+        const learningMethod = document.querySelector('input[name="learningMethod"]:checked')?.value || 'غير محدد';
+
+        let currentSkills = [];
+        document.querySelectorAll('input[name="currentSkills"]:checked').forEach(el => currentSkills.push(el.value));
+        let currentSkillsText = currentSkills.length > 0 ? currentSkills.join(' ، ') : 'لا يوجد / مبتدئ';
+
+        let targetSkills = [];
+        document.querySelectorAll('input[name="targetSkills"]:checked').forEach(el => targetSkills.push(el.value));
+        let targetSkillsText = targetSkills.length > 0 ? targetSkills.join(' ، ') : 'غير محدد';
+
+        // رقم الواتساب الخاص بك
+        const phone = "96179434479";
+
+        const message = `⚡ *تقييم مستوى جديد - MrElectroAI* ⚡\n\n` +
+                        `👤 *الاسم والمنطقة:* ${name}\n` +
+                        `🎂 *الفئة العمرية:* ${age}\n` +
+                        `⏳ *سنوات الخبرة:* ${experience}\n` +
+                        `🛠️ *المهارات الحالية:* ${currentSkillsText}\n` +
+                        `🎯 *يرغب بتعلم:* ${targetSkillsText}\n` +
+                        `📘 *طريقة التعلم المفضلة:* ${learningMethod}`;
+
+        const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+        window.location.href = whatsappURL;
+    }
+</script>
+
+</body>
+</html>
