@@ -161,7 +161,8 @@
     btns.forEach((b) => b.addEventListener('click', () => answer(b, opts[+b.dataset.i] === correct)));
 
     function answer(btn, ok) {
-      btns.forEach((b) => { b.disabled = true; if (opts[+b.dataset.i] === correct) b.classList.add('right'); });
+      btns.forEach((b) => { b.disabled = true; });
+      if (ok) btn.classList.add('right');   // الغلط ما بيكشف الجواب الصح: الطالب لازم يفكّر
       if (!ok) btn.classList.add('wrong');
       st.answers++;
       let passedNow = false;
@@ -181,7 +182,7 @@
       const enteringCheck = wasLearn && st.phase === 'check';
       fb.innerHTML = ok
         ? `<div class="fb ok"><b>✔ صح.</b>${esc(item.why)}</div>`
-        : `<div class="fb no"><b>✘ مش هيك. الجواب الصح: ${esc(correct)}</b>${esc(item.why)}${st.phase === 'learn' ? '<br><span class="muted">هالسؤال رح يرجعلك بعد شوي.</span>' : ''}</div>`;
+        : `<div class="fb no"><b>✘ خطأ.</b>${st.phase === 'learn' ? 'فكّر فيه منيح، هالسؤال رح يرجعلك بعد شوي.' : 'انطفت اللمبات. ركّز وبلّش العدّ من جديد.'}</div>`;
       const next = document.createElement('button');
       next.className = 'btn';
       next.textContent = passedNow ? 'ارفع الديجنتير ⚡' : enteringCheck ? `جاوبت الـ ${r.q.length} صح. عاختبار البصم` : 'كمّل';
