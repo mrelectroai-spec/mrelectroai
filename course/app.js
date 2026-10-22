@@ -1,0 +1,360 @@
+/* الكهرباء بالمختصر المفيد — كورس تفاعلي
+   قاعدة قاعدة: كل سؤال غلط بيرجع، وبعدين 5 صح ورا بعض لحتى تنفتح القاعدة يلي بعدها. */
+(function () {
+  'use strict';
+
+  const WA_NUMBER = '96179434479';           // رقم أنور (واتساب)
+  const WA_DISPLAY = '+961 79 434 479';
+  const STREAK_TARGET = 5;                    // أسئلة صح ورا بعض بآخر كل قاعدة
+  const REQUEUE_GAP = 3;                      // السؤال الغلط بيرجع بعد كم سؤال
+  const KEY = 'electro-course-v1';
+  const TOTAL = RULES.length;
+
+  const $app = document.getElementById('app');
+  const $who = document.getElementById('who');
+
+  // ---------- storage ----------
+  let S = load();
+  function load() {
+    try { const raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+    return null;
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fresh(name, phone) {
+    return { v: 1, name, phone, startedAt: Date.now(), current: 1, finishedAt: null, textSent: false, pdfSent: false, rules: {} };
+  }
+  function R(n) {
+    if (!S.rules[n]) {
+      S.rules[n] = { start: null, end: null, mistakes: 0, answers: 0, missed: {}, phase: 'learn', queue: shuffle([...Array(10).keys()]), streak: 0, last: -1, pending: null, passed: false };
+    }
+    return S.rules[n];
+  }
+
+  // ---------- helpers ----------
+  function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+  function rule(n) { return RULES[n - 1]; }
+  function fmtDate(t) {
+    if (!t) return '—';
+    const d = new Date(t);
+    return d.toLocaleDateString('ar-LB-u-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' }) + ' — ' + d.toLocaleTimeString('ar-LB-u-nu-latn', { hour: '2-digit', minute: '2-digit' });
+  }
+  function fmtDur(ms) {
+    if (!ms || ms < 0) return '—';
+    const m = Math.max(1, Math.round(ms / 60000));
+    const h = Math.floor(m / 60), r = m % 60;
+    if (h && r) return `${h} س و${r} د`;
+    if (h) return `${h} ساعة`;
+    return `${r} دقيقة`;
+  }
+  function header() { $who.textContent = S ? S.name : ''; }
+  function top() { window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' }); }
+
+  // ---------- router ----------
+  let view = 'board';
+  function render() {
+    header();
+    if (!S) return welcome();
+    if (S.finishedAt) return finalScreen();
+    if (view === 'quiz') return quiz();
+    return board();
+  }
+
+  // ---------- welcome ----------
+  function welcome() {
+    $app.innerHTML = `
+      <img class="cover" src="cover.jpg" alt="غلاف كتاب الكهرباء بالمختصر المفيد">
+      <h1>بصّم الكتاب قاعدة قاعدة</h1>
+      <p>رح نسألك 10 أسئلة على كل قاعدة من الـ ${TOTAL}. كل سؤال بتغلط فيه بيرجعلك لحتى تجاوبو صح، وبالآخر لازم تجاوب ${STREAK_TARGET} أسئلة صح ورا بعض. ما بتنفتحلك القاعدة يلي بعدها إلا بس تكون باصم يلي قبلها.</p>
+      <p class="muted">بآخر الكورس بتبعت ملخص شغلك وشهادتك لأنور عالواتساب.</p>
+      <form id="f" novalidate>
+        <label for="nm">اسمك الكامل</label>
+        <input id="nm" type="text" autocomplete="name" placeholder="مثلاً: محمد علي" required>
+        <label for="ph">رقم تلفونك (واتساب)</label>
+        <input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="مثلاً: 70 123 456" dir="ltr" required>
+        <div class="hint">الاسم بينكتب عالشهادة متل ما بتكتبو هون.</div>
+        <div class="err" id="err" role="alert"></div>
+        <button class="btn volt" type="submit">ابدأ الكورس</button>
+      </form>`;
+    document.getElementById('f').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('nm').value.trim().replace(/\s+/g, ' ');
+      const phone = document.getElementById('ph').value.trim();
+      const digits = phone.replace(/\D/g, '');
+      const err = document.getElementById('err');
+      if (name.length < 3) { err.textContent = 'اكتب اسمك الكامل (3 حروف عالأقل).'; return; }
+      if (digits.length < 7) { err.textContent = 'اكتب رقم تلفونك كامل.'; return; }
+      S = fresh(name, phone); save(); view = 'board'; render(); top();
+    });
+  }
+
+  // ---------- the board (18 breakers) ----------
+  function board() {
+    const done = Object.values(S.rules).filter((r) => r.passed).length;
+    const mods = RULES.map((r) => {
+      const st = R(r.n).passed ? 'done' : r.n === S.current ? 'now' : 'locked';
+      const label = st === 'done' ? 'مبصومة' : st === 'now' ? 'هلّق' : 'مسكّرة';
+      return `<div class="mod ${st}" ${st === 'now' ? 'role="button" tabindex="0" data-go' : ''} aria-label="القاعدة ${r.n}: ${esc(r.title)} — ${label}">
+        <span class="lever"></span><span class="num">${r.n}</span><span class="lbl">${esc(r.title)}</span></div>`;
+    }).join('');
+    const cur = rule(S.current);
+    $app.innerHTML = `
+      <h1>${done === 0 ? 'أهلا ' + esc(S.name.split(' ')[0]) : 'كمّل من وين وقفت'}</h1>
+      <p class="muted">هيدا التابلو تبعك: كل قاعدة بتبصمها بيرتفع الديجنتير تبعها.</p>
+      <section class="board">
+        <div class="board-title"><span>التابلو تبعك</span><span>${done} من ${TOTAL}</span></div>
+        <div class="rail">${mods}</div>
+      </section>
+      <button class="btn volt" id="go">ابدأ القاعدة ${cur.n}: ${esc(cur.title)}</button>
+      <button class="btn ghost" id="reset">مش إنت ${esc(S.name.split(' ')[0])}؟ بلّش من جديد</button>`;
+    const go = () => { view = 'quiz'; render(); top(); };
+    document.getElementById('go').addEventListener('click', go);
+    const now = $app.querySelector('[data-go]');
+    if (now) { now.addEventListener('click', go); now.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); }
+    document.getElementById('reset').addEventListener('click', () => {
+      if (confirm('أكيد؟ كل التقدم يلي على هالتلفون رح ينمحى.')) { try { localStorage.removeItem(KEY); } catch (e) {} S = null; render(); top(); }
+    });
+  }
+
+  // ---------- quiz ----------
+  function nextIndex(st) {
+    if (st.phase === 'learn') return st.queue[0];
+    if (st.pending === null || st.pending === undefined) {
+      let i; do { i = Math.floor(Math.random() * 10); } while (i === st.last);
+      st.pending = i; save();
+    }
+    return st.pending;
+  }
+
+  function quiz() {
+    const n = S.current, r = rule(n), st = R(n);
+    if (!st.start) { st.start = Date.now(); save(); }
+    const qi = nextIndex(st);
+    const item = r.q[qi];
+    const correct = item.a[0];
+    const opts = shuffle(item.a.slice());
+
+    const learned = 10 - st.queue.length;
+    const progress = st.phase === 'learn'
+      ? `<div class="meter" aria-hidden="true">${[...Array(10)].map((_, i) => `<i class="${i < learned ? 'on' : ''}"></i>`).join('')}</div>
+         <div class="phase">${learned} من 10 أسئلة جاوبتها صح</div>`
+      : `<div class="lamps" aria-hidden="true">${[...Array(STREAK_TARGET)].map((_, i) => `<i class="${i < st.streak ? 'on' : ''}"></i>`).join('')}</div>
+         <div class="phase">اختبار البصم: ${st.streak} من ${STREAK_TARGET} صح ورا بعض. غلطة وحدة بتطفّي اللمبات.</div>`;
+
+    $app.innerHTML = `
+      <div class="rulehead">
+        <div class="tag">القاعدة ${n} من ${TOTAL} · ${esc(r.story)}</div>
+        <h2>${esc(r.title)}</h2>
+        ${progress}
+      </div>
+      <div class="qcard">
+        <div class="qtext">${esc(item.q)}</div>
+        <div id="opts">${opts.map((o, i) => `<button class="opt" data-i="${i}">${esc(o)}</button>`).join('')}</div>
+        <div id="fb"></div>
+      </div>`;
+
+    const btns = [...$app.querySelectorAll('.opt')];
+    btns.forEach((b) => b.addEventListener('click', () => answer(b, opts[+b.dataset.i] === correct)));
+
+    function answer(btn, ok) {
+      btns.forEach((b) => { b.disabled = true; if (opts[+b.dataset.i] === correct) b.classList.add('right'); });
+      if (!ok) btn.classList.add('wrong');
+      st.answers++;
+      let passedNow = false;
+      const wasLearn = st.phase === 'learn';
+      if (st.phase === 'learn') {
+        st.queue.shift();
+        if (!ok) { st.mistakes++; st.missed[qi] = (st.missed[qi] || 0) + 1; st.queue.splice(Math.min(REQUEUE_GAP, st.queue.length), 0, qi); }
+        if (st.queue.length === 0) { st.phase = 'check'; st.streak = 0; }
+      } else {
+        st.last = qi; st.pending = null;
+        if (ok) { st.streak++; if (st.streak >= STREAK_TARGET) { st.passed = true; st.end = Date.now(); passedNow = true; } }
+        else { st.mistakes++; st.missed[qi] = (st.missed[qi] || 0) + 1; st.streak = 0; }
+      }
+      save();   // بينحفظ قبل ما يطلع الشرح: الريفريش ما بيمحي الغلطة
+
+      const fb = document.getElementById('fb');
+      const enteringCheck = wasLearn && st.phase === 'check';
+      fb.innerHTML = ok
+        ? `<div class="fb ok"><b>✔ صح.</b>${esc(item.why)}</div>`
+        : `<div class="fb no"><b>✘ مش هيك. الجواب الصح: ${esc(correct)}</b>${esc(item.why)}${st.phase === 'learn' ? '<br><span class="muted">هالسؤال رح يرجعلك بعد شوي.</span>' : ''}</div>`;
+      const next = document.createElement('button');
+      next.className = 'btn';
+      next.textContent = passedNow ? 'ارفع الديجنتير ⚡' : enteringCheck ? 'جاوبت الـ 10 صح. عاختبار البصم' : 'كمّل';
+      next.addEventListener('click', () => { passedNow ? rulePassed(n) : quiz(); top(); });
+      fb.appendChild(next);
+      next.focus({ preventScroll: true });
+      fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    }
+  }
+
+  function rulePassed(n) {
+    const r = rule(n), st = R(n);
+    const last = n === TOTAL;
+    if (!last) { S.current = n + 1; } else { S.finishedAt = Date.now(); }
+    save();
+    $app.innerHTML = `
+      <div class="switch-on">
+        <div class="big-lever" aria-hidden="true"></div>
+        <h1>بصمت القاعدة ${n}</h1>
+        <p>${esc(r.title)}. غلطت فيها ${st.mistakes === 0 ? 'ولا مرة' : st.mistakes + ' ' + (st.mistakes === 1 ? 'مرة' : 'مرات')}.</p>
+        ${last ? '<p>هيدي كانت آخر قاعدة. خلّصت الكتاب كلو!</p>' : `<p class="muted">القاعدة ${n + 1} انفتحتلك: ${esc(rule(n + 1).title)}.</p>`}
+      </div>
+      <button class="btn volt" id="nx">${last ? 'شوف شهادتك' : 'عالقاعدة ' + (n + 1)}</button>
+      ${last ? '' : '<button class="btn ghost" id="bd">شوف التابلو</button>'}`;
+    document.getElementById('nx').addEventListener('click', () => { view = 'quiz'; render(); top(); });
+    const bd = document.getElementById('bd');
+    if (bd) bd.addEventListener('click', () => { view = 'board'; render(); top(); });
+  }
+
+  // ---------- final: summary PDF + WhatsApp ----------
+  let pdfBlob = null;
+  const pdfName = () => `ملخص ${S.name} - الكهرباء بالمختصر المفيد.pdf`;
+
+  function totals() {
+    let mistakes = 0, answers = 0;
+    RULES.forEach((r) => { const st = R(r.n); mistakes += st.mistakes; answers += st.answers; });
+    return { mistakes, answers, dur: S.finishedAt - S.startedAt };
+  }
+  function waText() {
+    const t = totals();
+    return `مرحبا أستاذ أنور، أنا ${S.name}، رقمي \u2066${S.phone}\u2069.\nخلّصت كورس «الكهرباء بالمختصر المفيد» كلو: ${TOTAL} قاعدة ✅\nمجموع الغلطات: ${t.mistakes} من أصل ${t.answers} جواب.\nبلّشت: ${fmtDate(S.startedAt)}\nخلّصت: ${fmtDate(S.finishedAt)}\nرح ابعتلك ملخص PDF هلّق.`;
+  }
+
+  function finalScreen() {
+    const t = totals();
+    const step2 = S.textSent;
+    $app.innerHTML = `
+      <div class="switch-on">
+        <div class="big-lever" aria-hidden="true"></div>
+        <h1>مبروك ${esc(S.name.split(' ')[0])}! بصمت الكتاب كلو</h1>
+        <p>${TOTAL} قاعدة، ${t.mistakes} غلطة من أصل ${t.answers} جواب، بـ ${fmtDur(t.dur)}.</p>
+      </div>
+      <div class="sendbox">
+        <h2>آخر خطوة: ابعت ملخصك لأنور</h2>
+        <p class="muted">شهادتك بتنفتحلك بس تبعت الملخص.</p>
+        <button class="btn wa" id="s1">1. افتح محادثة أنور وابعت الرسالة</button>
+        <button class="btn wa" id="s2" ${step2 ? '' : 'disabled'}>2. ابعت ملف الملخص PDF</button>
+        <div class="status" id="st">${step2 ? '' : 'بلّش بالخطوة 1.'}</div>
+        <div id="after"></div>
+      </div>`;
+    if (S.pdfSent) afterSent();
+
+    document.getElementById('s1').addEventListener('click', () => {
+      window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waText())}`, '_blank');
+      S.textSent = true; save();
+      const s2 = document.getElementById('s2'); s2.disabled = false;
+      document.getElementById('st').textContent = 'بعتت الرسالة؟ هلّق اكبس الخطوة 2، واختار واتساب ← محادثة أنور (' + WA_DISPLAY + ').';
+    });
+    document.getElementById('s2').addEventListener('click', sendPdf);
+
+    // نحضّر الـ PDF من هلّق لحتى زر المشاركة يشتغل دغري عالتلفون
+    buildPdf().then(() => { if (S.textSent) document.getElementById('st').textContent = 'الملخص جاهز. اكبس الخطوة 2.'; })
+      .catch(() => { document.getElementById('st').textContent = 'ما قدرنا نحضّر الملف. تأكد إنك متصل بالإنترنت وحدّث الصفحة.'; });
+  }
+
+  async function sendPdf() {
+    const st = document.getElementById('st');
+    if (!pdfBlob) { st.textContent = 'عم نحضّر الملخص، لحظة…'; try { await buildPdf(); } catch (e) { st.textContent = 'ما قدرنا نحضّر الملف. حدّث الصفحة وجرّب مرة تانية.'; return; } }
+    const file = new File([pdfBlob], pdfName(), { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: 'ملخص الكورس', text: `ملخص ${S.name} — الكهرباء بالمختصر المفيد` });
+        S.pdfSent = true; save(); afterSent();
+      } catch (e) {
+        st.textContent = 'ما انبعت الملف. اكبس الخطوة 2 مرة تانية واختار واتساب ← محادثة أنور.';
+      }
+    } else {
+      // كمبيوتر أو متصفح ما بيدعم المشاركة: منزّل الملف ومنفتح المحادثة
+      download(pdfBlob, pdfName());
+      window.open(`https://wa.me/${WA_NUMBER}`, '_blank');
+      st.innerHTML = `نزل الملف عندك باسم «${esc(pdfName())}». بمحادثة أنور اكبس 📎 وارفقو.`;
+      S.pdfSent = true; save(); afterSent();
+    }
+  }
+
+  function afterSent() {
+    const box = document.getElementById('after');
+    if (!box) return;
+    box.innerHTML = `<p class="status">✔ تمام، وصل الملخص لأنور (إذا ما وصل، كرّر الخطوة 2).</p>
+      <button class="btn volt" id="mine">نزّل شهادتك والملخص إلك</button>`;
+    document.getElementById('mine').addEventListener('click', async () => { if (!pdfBlob) await buildPdf(); download(pdfBlob, pdfName()); });
+  }
+
+  function download(blob, name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+
+  // ---------- PDF pages ----------
+  function pagesHtml() {
+    const t = totals();
+    const rows = RULES.map((r) => {
+      const st = R(r.n);
+      return `<tr class="${st.mistakes >= 3 ? 'hot' : ''}"><td>${r.n}</td><td>${esc(r.title)}</td><td>${st.mistakes}</td><td>${st.answers}</td><td>${fmtDur(st.end - st.start)}</td></tr>`;
+    }).join('');
+    const weak = [];
+    RULES.forEach((r) => { const st = R(r.n); Object.entries(st.missed).forEach(([qi, c]) => weak.push({ n: r.n, c, q: r.q[qi] })); });
+    weak.sort((a, b) => b.c - a.c);
+    const weakHtml = weak.length
+      ? `<ol class="weak">${weak.slice(0, 14).map((w) => `<li><b>القاعدة ${w.n} — غلط ${w.c} ${w.c === 1 ? 'مرة' : 'مرات'}:</b> ${esc(w.q.q)}<br><span style="color:#2E9E5B">الجواب الصح: ${esc(w.q.a[0])}</span></li>`).join('')}</ol>`
+      : '<p>ولا غلطة بكل الكورس. شغل معلّم!</p>';
+    const foot = (p) => `<div class="foot"><span>الكهرباء بالمختصر المفيد — MrElectroAI</span><span>صفحة ${p} من 3</span></div>`;
+    return `
+      <div class="pg cert">
+        <div class="bolt">⚡</div>
+        <h1>شهادة إتمام</h1>
+        <p>هالشهادة بتأكّد إنو</p>
+        <div class="name">${esc(S.name)}</div>
+        <p>بصم كل القواعد الـ ${TOTAL} بكتاب «الكهرباء بالمختصر المفيد»، وجاوب على كل الأسئلة صح، وعدّى اختبار البصم (${STREAK_TARGET} أجوبة صح ورا بعض) بكل قاعدة.</p>
+        <p style="font-size:17px;color:#5B6B7D">تاريخ الإتمام: ${fmtDate(S.finishedAt)}</p>
+        <div class="sig">أنور الجاسم — MrElectroAI</div>
+      </div>
+      <div class="pg">
+        <h2>ملخص شغل الطالب</h2>
+        <div class="facts">
+          <div><b>الاسم:</b>${esc(S.name)}</div>
+          <div><b>التلفون:</b><bdi dir="ltr">${esc(S.phone)}</bdi></div>
+          <div><b>بلّش:</b>${fmtDate(S.startedAt)}</div>
+          <div><b>خلّص:</b>${fmtDate(S.finishedAt)}</div>
+          <div><b>المدة الكاملة:</b>${fmtDur(t.dur)}</div>
+          <div><b>الغلطات:</b>${t.mistakes} من ${t.answers} جواب</div>
+        </div>
+        <table>
+          <thead><tr><th>#</th><th>القاعدة</th><th>غلطات</th><th>أجوبة</th><th>الوقت</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <p style="font-size:13px;color:#5B6B7D;margin-top:10px">الصفوف الحمرا: قواعد غلط فيها 3 مرات أو أكتر. «الوقت» من أول سؤال لآخر سؤال بالقاعدة، ومنها الاستراحات.</p>
+        ${foot(2)}
+      </div>
+      <div class="pg">
+        <h2>نقاط الضعف: الأسئلة يلي غلط فيها أكتر شي</h2>
+        ${weakHtml}
+        ${foot(3)}
+      </div>`;
+  }
+
+  async function buildPdf() {
+    if (pdfBlob) return pdfBlob;
+    if (!window.html2canvas || !window.jspdf) throw new Error('libs');
+    const stage = document.getElementById('pdfStage');
+    stage.innerHTML = pagesHtml();
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+    const pages = [...stage.querySelectorAll('.pg')];
+    for (let i = 0; i < pages.length; i++) {
+      const canvas = await html2canvas(pages[i], { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false });
+      if (i) pdf.addPage();
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 210, 297);
+    }
+    stage.innerHTML = '';
+    pdfBlob = pdf.output('blob');
+    return pdfBlob;
+  }
+
+  render();
+})();
