@@ -148,6 +148,23 @@ footer{border-top:1px solid var(--line);padding:30px 0;text-align:center;
   font-size:12.5px;color:var(--muted);line-height:2}
 footer b{color:var(--text)}
 footer .n{font-family:'JetBrains Mono',monospace;color:var(--volt);font-weight:700}
+/* ── الكتب والكورسات ── */
+.nav .cta2{border:1px solid var(--line);color:var(--text);font-size:13.5px;font-weight:700;border-radius:11px;padding:8px 14px}
+.nav .cta2:hover{border-color:var(--volt);color:var(--volt)}
+.bookc{flex-direction:row;gap:22px;align-items:stretch}
+@media(max-width:520px){.bookc{flex-direction:column}}
+.bookc .cv{width:150px;flex-shrink:0;position:relative;align-self:flex-start}
+@media(max-width:520px){.bookc .cv{width:56%;max-width:210px;align-self:center}}
+.bookc .cv img{width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.35)}
+.bookc .body{position:relative;display:flex;flex-direction:column}
+.price{display:flex;align-items:baseline;gap:10px;margin:2px 0 6px}
+.price b{font-family:'JetBrains Mono',monospace;font-size:34px;color:var(--volt);line-height:1}
+.price s{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:18px}
+.promo{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--warn);
+  background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);
+  border-radius:999px;padding:4px 12px;margin-bottom:16px;align-self:flex-start}
+.promo[hidden]{display:none}
+.bookc .btn{align-self:flex-start;margin-top:auto}
 .rise{opacity:0;transform:translateY(20px);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)}
 .rise.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rise{opacity:1;transform:none}}
@@ -180,6 +197,7 @@ footer .n{font-family:'JetBrains Mono',monospace;color:var(--volt);font-weight:7
   <a class="logo" href="#top"><span class="m"><svg><use href="#i-bolt"/></svg></span><b>MrElectroAI</b></a>
   <div class="nav-r">
     <button class="ghost" id="theme" aria-label="تبديل الثيم">☾</button>
+    <a class="cta2" href="#books">الكتاب</a>
     <a class="cta" href="tools/">الأدوات</a>
   </div>
 </div></nav>
@@ -201,6 +219,38 @@ footer .n{font-family:'JetBrains Mono',monospace;color:var(--volt);font-weight:7
     <div><b>24/7</b><span>دعم</span></div>
   </div>
 </div></header>
+
+<section id="books"><div class="wrap">
+  <div class="head rise">
+    <div class="k">BOOKS</div>
+    <h2>الكتب والكورسات</h2>
+    <p>الكهربا من الصفر، بلغة الورشة: كتاب بتقراه، وكورس بيتأكّد إنك بصمتو.</p>
+  </div>
+  <div class="big">
+    <div class="feature bookc rise">
+      <div class="cv"><img src="course/cover.jpg" alt="غلاف كتاب الكهرباء بالمختصر المفيد" loading="lazy" width="600" height="804"></div>
+      <div class="body">
+        <h3>الكهرباء بالمختصر المفيد</h3>
+        <p>18 قاعدة للمبتدئ من الصفر، من الفولت والأمبير للتابلو والقازان وكيف تلاقي العطل.
+           كل قاعدة بتشبيه بلدي، وشرح فني، وأسرار الورشة، ورسمة. باللهجة اللبنانية، PDF عتلفونك.</p>
+        <div class="price"><b id="bkPrice">10$</b><s id="bkOld" hidden>10$</s></div>
+        <div class="promo" id="bkPromo" hidden>⏳ <span id="bkLeft"></span></div>
+        <a class="btn btn-p" id="bkBuy" href="https://wa.me/96179434479" target="_blank" rel="noopener">
+          <svg><use href="#i-wa"/></svg> اشتري الكتاب</a>
+      </div>
+    </div>
+    <div class="mini">
+      <a class="mcard rise" href="course/">
+        <span class="ic"><svg><use href="#i-bolt"/></svg></span>
+        <span><b>كورس الكتاب — للي اشتروه</b><p>180 سؤال، قاعدة قاعدة. ما بتنتقل لعيلي بعدها قبل ما تبصمها، وبالآخر شهادة باسمك.</p></span>
+      </a>
+      <div class="mcard rise">
+        <span class="ic"><svg><use href="#i-wa"/></svg></span>
+        <span><b>كيف بتشتري؟</b><p>اكبس «اشتري الكتاب»، ادفع OMT أو Whish أو نقداً، وبيوصلك الكتاب ومفتاح الكورس عالواتساب.</p></span>
+      </div>
+    </div>
+  </div>
+</div></section>
 
 <section id="tools"><div class="wrap">
   <div class="head rise">
@@ -294,6 +344,22 @@ const set=m=>{document.documentElement.dataset.theme=m;th.textContent=m==='light
   try{localStorage.setItem('mea_theme',m)}catch(e){}};
 try{const s=localStorage.getItem('mea_theme');if(s)set(s);}catch(e){}
 th.onclick=()=>set(document.documentElement.dataset.theme==='light'?'dark':'light');
+
+/* ── سعر الكتاب: 10$، وخصم 9$ لحد ليل 1 تشرين التاني 2026 (بيرجع 10$ لحالو) ── */
+(function(){
+  const PRICE=10, PROMO=9, END=new Date('2026-11-01T23:59:59+02:00');
+  const left=END-new Date(), on=left>0, now=on?PROMO:PRICE;
+  const $=id=>document.getElementById(id);
+  $('bkPrice').textContent=now+'$';
+  if(on){
+    $('bkOld').hidden=false;
+    const d=Math.floor(left/864e5);
+    $('bkLeft').textContent='خصم الإطلاق: '+(d>=3?'باقي '+d+' أيام':d===2?'باقي يومين':d===1?'باقي يوم واحد':'آخر يوم!');
+    $('bkPromo').hidden=false;
+  }
+  $('bkBuy').href='https://wa.me/96179434479?text='+encodeURIComponent(
+    'مرحبا أنور 👋\n\nبدي كتاب «الكهرباء بالمختصر المفيد»\n▸ السعر: '+now+'$'+(on?' (خصم الإطلاق)':'')+'\n\nكيف بدفع؟');
+})();
 
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),
   {threshold:.12,rootMargin:'0px 0px -40px'});

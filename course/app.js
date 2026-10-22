@@ -9,6 +9,12 @@
   const STREAK_TARGET = CFG.streak || 5;                    // أسئلة صح ورا بعض بآخر كل قاعدة
   const REQUEUE_GAP = 3;                      // السؤال الغلط بيرجع بعد كم سؤال
   const KEY = CFG.storageKey || 'electro-course-v1';
+  const NEED_KEY = CFG.requireKey !== false;  // نسخة التجربة ما بتطلب مفتاح
+
+  // نفس قاعدة مفاتيح أدوات MrElectroAI (tools/lock.js)
+  const SB_URL = 'https://utjpvjnhffapbwpbkkuc.supabase.co';
+  const SB_KEY = 'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK';
+  const BOOK_TOOL = 'book';
   const TOTAL = RULES.length;
 
   const $app = document.getElementById('app');
@@ -56,6 +62,7 @@
   function render() {
     header();
     if (!S) return welcome();
+    if (NEED_KEY && !S.key) return keyOnly();
     if (S.finishedAt) return finalScreen();
     if (view === 'quiz') return quiz();
     return board();
@@ -75,9 +82,11 @@
         <label for="ph">رقم تلفونك (واتساب)</label>
         <input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="مثلاً: 70 123 456" dir="ltr" required>
         <div class="hint">الاسم بينكتب عالشهادة متل ما بتكتبو هون.</div>
+        ${NEED_KEY ? keyField() : ''}
         <div class="err" id="err" role="alert"></div>
         <button class="btn volt" type="submit">ابدأ الكورس</button>
-      </form>`;
+      </form>
+      ${NEED_KEY ? buyHint() : ''}`;
     document.getElementById('f').addEventListener('submit', (e) => {
       e.preventDefault();
       const name = document.getElementById('nm').value.trim().replace(/\s+/g, ' ');
@@ -86,8 +95,75 @@
       const err = document.getElementById('err');
       if (name.length < 3) { err.textContent = 'اكتب اسمك الكامل (3 حروف عالأقل).'; return; }
       if (digits.length < 7) { err.textContent = 'اكتب رقم تلفونك كامل.'; return; }
-      S = fresh(name, phone); save(); view = 'board'; render(); top();
+      if (!NEED_KEY) { S = fresh(name, phone); save(); view = 'board'; render(); top(); return; }
+      activate(e.submitter || document.querySelector('#f button[type=submit]'), (code) => {
+        S = fresh(name, phone); S.key = code; save(); view = 'board'; render(); top();
+      });
     });
+  }
+
+  // ---------- مفتاح الكتاب ----------
+  function keyField() {
+    return `<label for="ky">مفتاح الكورس</label>
+        <input id="ky" type="text" autocomplete="off" spellcheck="false" placeholder="MEA-XXXX-XXXX" dir="ltr" style="text-transform:uppercase;font-family:'JetBrains Mono',monospace;letter-spacing:2px">
+        <div class="hint">المفتاح بيوصلك عالواتساب مع الكتاب.</div>`;
+  }
+  function buyHint() {
+    return `<p class="muted" style="text-align:center;margin-top:18px">ما عندك مفتاح؟ <a href="../#books" style="color:var(--volt);font-weight:600">اشتري الكتاب</a> وبيوصلك معو.</p>`;
+  }
+  // طالب بلّش قبل ما ينحط المفتاح: منطلب المفتاح بس، وتقدّمو بيضل
+  function keyOnly() {
+    $app.innerHTML = `
+      <h1>حط مفتاح الكورس</h1>
+      <p>أهلا ${esc(S.name.split(' ')[0])}. الكورس صار للي اشتروا الكتاب، وتقدّمك محفوظ متل ما هو.</p>
+      <form id="f" novalidate>
+        ${keyField()}
+        <div class="err" id="err" role="alert"></div>
+        <button class="btn volt" type="submit">كمّل الكورس</button>
+      </form>
+      ${buyHint()}`;
+    document.getElementById('f').addEventListener('submit', (e) => {
+      e.preventDefault();
+      activate(document.querySelector('#f button[type=submit]'), (code) => { S.key = code; save(); view = 'board'; render(); top(); });
+    });
+  }
+  async function activate(btn, onOk) {
+    const err = document.getElementById('err');
+    const code = (document.getElementById('ky').value || '').trim().toUpperCase().replace(/\s+/g, '');
+    if (code.length < 8) { err.textContent = 'اكتب مفتاح الكورس كامل.'; return; }
+    const label = btn.textContent; btn.disabled = true; btn.textContent = 'عم نتحقق من المفتاح…';
+    const r = await verifyKey(code);
+    btn.disabled = false; btn.textContent = label;
+    if (!r.ok) { err.textContent = r.msg; return; }
+    onOk(code);
+  }
+  async function sb(path, opts) {
+    const res = await fetch(SB_URL + '/rest/v1/' + path, Object.assign({}, opts, { headers: {
+      apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'return=representation' } }));
+    if (!res.ok) throw new Error(await res.text());
+    return res.status === 204 ? null : res.json();
+  }
+  async function fingerprint() {
+    const s = [navigator.userAgent, navigator.language, screen.width + 'x' + screen.height,
+      new Date().getTimezoneOffset(), navigator.hardwareConcurrency || 0].join('|');
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('').slice(0, 24);
+  }
+  async function verifyKey(code) {
+    let rows;
+    try { rows = await sb('licenses?code=eq.' + encodeURIComponent(code) + '&select=*'); }
+    catch (e) { return { ok: false, msg: 'ما قدرنا نتحقق من المفتاح. تأكد إنك متصل بالإنترنت وجرّب مرة تانية.' }; }
+    if (!rows || !rows.length) return { ok: false, msg: 'المفتاح غلط. تأكد منو بالرسالة يلي وصلتك.' };
+    const L = rows[0];
+    if (!L.active) return { ok: false, msg: 'هالمفتاح موقوف. تواصل مع أنور عالواتساب.' };
+    if (L.expires && new Date(L.expires) < new Date(new Date().toDateString())) return { ok: false, msg: 'هالمفتاح منتهي.' };
+    const tools = String(L.tools || '').split(',').map((t) => t.trim());
+    if (!tools.includes(BOOK_TOOL)) return { ok: false, msg: 'هالمفتاح للأدوات، مش للكتاب. مفتاح الكورس بيوصلك مع الكتاب.' };
+    const fp = await fingerprint();
+    if (L.device && L.device !== fp) return { ok: false, msg: 'هالمفتاح مفعّل على تلفون تاني. إذا بدّلت تلفون، تواصل مع أنور ليفكّو.' };
+    try { await sb('licenses?code=eq.' + encodeURIComponent(code), { method: 'PATCH',
+      body: JSON.stringify({ device: L.device || fp, uses: (L.uses || 0) + 1, last_seen: new Date().toISOString() }) }); } catch (e) {}
+    return { ok: true };
   }
 
   // ---------- the board (18 breakers) ----------

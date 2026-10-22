@@ -136,6 +136,7 @@ input:focus,select:focus{border-color:var(--volt)}
         <option value="inverters">إعدادات الإنفرترات</option>
         <option value="transformer">حاسبة المحوّلات</option>
         <option value="wirephase">توزيع الفازات</option>
+        <option value="book">📘 كتاب الكهرباء + الكورس</option>
       </select></div>
     <label class="lbl">الباقة</label>
     <div class="pkgs" id="pkgs"></div>
@@ -180,11 +181,15 @@ const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
 const PIN="71736401ANWAR";
 const WA="96179434479";
 const TOOLS={all:'كل الأدوات',roof:'قياس السطح',transformer:'المحوّلات',
-  inverters:'الإنفرترات',load:'حساب المنظومة',wirephase:'توزيع الفازات'};
+  inverters:'الإنفرترات',load:'حساب المنظومة',wirephase:'توزيع الفازات',book:'📘 كتاب الكهرباء + الكورس'};
+/* سعر الكتاب: 10$، وخصم الإطلاق 9$ لحد ليل 1 تشرين التاني 2026 */
+const BOOK_PRICE=(new Date()<new Date('2026-11-01T23:59:59+02:00'))?9:10;
+const COURSE_URL='https://mrelectroai-spec.github.io/mrelectroai/course/';
 const PRICE={
   roof:{m:10,q:25,y:80,L:200}, load:{m:10,q:25,y:80,L:200},
   inverters:{m:8,q:20,y:60,L:150}, transformer:{m:8,q:20,y:60,L:150},
-  wirephase:{m:5,q:12,y:35,L:90}, all:{m:25,q:60,y:180,L:450}
+  wirephase:{m:5,q:12,y:35,L:90}, all:{m:25,q:60,y:180,L:450},
+  book:{m:BOOK_PRICE,q:BOOK_PRICE,y:BOOK_PRICE,L:BOOK_PRICE}
 };
 const PKG={m:['شهر',30],q:['3 شهور',90],y:['سنة',365],L:['مدى الحياة',0]};
 
@@ -205,6 +210,12 @@ if(sessionStorage.getItem('mea_adm')){$('lock').style.display='none';load();}
 let pkg='y';
 function drawPkgs(){
   const t=$('nTools').value, P=PRICE[t]||PRICE.all;
+  if(t==='book'){ /* الكتاب: دفعة وحدة، والمفتاح دائم */
+    pkg='L';
+    $('pkgs').innerHTML='<button class="pk life on" data-k="L"><b>📘 الكتاب + الكورس (دائم)</b><span class="v">'+P.L+'$</span></button>';
+    $('nPaid').value=P.L; $('nDur').value=0; return;
+  }
+  if(pkg==='L'&&$('pkgs').querySelector('[data-k="L"]')&&$('pkgs').children.length===1) pkg='y';
   $('pkgs').innerHTML=['m','q','y'].map(k=>'<button class="pk'+(pkg===k?' on':'')+'" data-k="'+k+'">'
     +'<b>'+PKG[k][0]+'</b><span class="v">'+P[k]+'$</span></button>').join('')
     +'<button class="pk life'+(pkg==='L'?' on':'')+'" data-k="L"><b>💎 مدى الحياة</b>'
@@ -251,6 +262,7 @@ function waLink(phone,msg){
   return 'https://wa.me/'+full+'?text='+encodeURIComponent(msg);
 }
 function waMsg(L){
+  if(L.tools==='book') return bookMsg(L);
   const t=TOOLS[L.tools]||L.tools;
   let m='🔑 *مفتاح تفعيل أدوات MrElectroAI*\n';
   m+='━━━━━━━━━━━━━━━\n';
@@ -267,6 +279,21 @@ function waMsg(L){
   m+='4. خلص — بيضل مفتوح لعندك\n\n';
   m+='⚠️ المفتاح بينربط بجهازك الأول. إذا بدّلت موبايل تواصل معي وبفكّو.\n\n';
   m+='🔗 الأدوات:\nhttps://mrelectroai-spec.github.io/mrelectroai/\n\n';
+  m+='أي سؤال أنا جاهز 👍\nأنور الحسن الجاسم — MrElectroAI\n+961 79 434 479';
+  return m;
+}
+function bookMsg(L){
+  let m='📘 *كتاب الكهرباء بالمختصر المفيد*\n';
+  m+='━━━━━━━━━━━━━━━\n';
+  m+='أهلا '+L.name+' 👋 شكراً إنك اشتريت الكتاب.\n\n';
+  m+='📎 الكتاب PDF مرفق بهالمحادثة.\n\n';
+  m+='*مفتاح الكورس:* '+L.code+'\n';
+  m+='━━━━━━━━━━━━━━━\n';
+  m+='*كيف تبلّش الكورس؟*\n';
+  m+='1. افتح الرابط: '+COURSE_URL+'\n';
+  m+='2. اكتب اسمك ورقمك والمفتاح\n';
+  m+='3. بصّم القواعد قاعدة قاعدة، وبالآخر بتاخد شهادة باسمك\n\n';
+  m+='⚠️ المفتاح بينربط بتلفونك الأول. إذا بدّلت تلفون تواصل معي وبفكّو.\n\n';
   m+='أي سؤال أنا جاهز 👍\nأنور الحسن الجاسم — MrElectroAI\n+961 79 434 479';
   return m;
 }
