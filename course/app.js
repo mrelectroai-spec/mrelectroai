@@ -5,9 +5,10 @@
 
   const WA_NUMBER = '96179434479';           // رقم أنور (واتساب)
   const WA_DISPLAY = '+961 79 434 479';
-  const STREAK_TARGET = 5;                    // أسئلة صح ورا بعض بآخر كل قاعدة
+  const CFG = window.COURSE_CONFIG || {};
+  const STREAK_TARGET = CFG.streak || 5;                    // أسئلة صح ورا بعض بآخر كل قاعدة
   const REQUEUE_GAP = 3;                      // السؤال الغلط بيرجع بعد كم سؤال
-  const KEY = 'electro-course-v1';
+  const KEY = CFG.storageKey || 'electro-course-v1';
   const TOTAL = RULES.length;
 
   const $app = document.getElementById('app');
@@ -25,7 +26,7 @@
   }
   function R(n) {
     if (!S.rules[n]) {
-      S.rules[n] = { start: null, end: null, mistakes: 0, answers: 0, missed: {}, phase: 'learn', queue: shuffle([...Array(10).keys()]), streak: 0, last: -1, pending: null, passed: false };
+      S.rules[n] = { start: null, end: null, mistakes: 0, answers: 0, missed: {}, phase: 'learn', queue: shuffle([...Array(RULES[n - 1].q.length).keys()]), streak: 0, last: -1, pending: null, passed: false };
     }
     return S.rules[n];
   }
@@ -65,7 +66,8 @@
     $app.innerHTML = `
       <img class="cover" src="cover.jpg" alt="غلاف كتاب الكهرباء بالمختصر المفيد">
       <h1>بصّم الكتاب قاعدة قاعدة</h1>
-      <p>رح نسألك 10 أسئلة على كل قاعدة من الـ ${TOTAL}. كل سؤال بتغلط فيه بيرجعلك لحتى تجاوبو صح، وبالآخر لازم تجاوب ${STREAK_TARGET} أسئلة صح ورا بعض. ما بتنفتحلك القاعدة يلي بعدها إلا بس تكون باصم يلي قبلها.</p>
+      ${CFG.banner ? `<p class="err">${CFG.banner}</p>` : ''}
+      <p>رح نسألك ${RULES[0].q.length} أسئلة على كل قاعدة من الـ ${TOTAL}. كل سؤال بتغلط فيه بيرجعلك لحتى تجاوبو صح، وبالآخر لازم تجاوب ${STREAK_TARGET} أسئلة صح ورا بعض. ما بتنفتحلك القاعدة يلي بعدها إلا بس تكون باصم يلي قبلها.</p>
       <p class="muted">بآخر الكورس بتبعت ملخص شغلك وشهادتك لأنور عالواتساب.</p>
       <form id="f" novalidate>
         <label for="nm">اسمك الكامل</label>
@@ -120,7 +122,8 @@
   function nextIndex(st) {
     if (st.phase === 'learn') return st.queue[0];
     if (st.pending === null || st.pending === undefined) {
-      let i; do { i = Math.floor(Math.random() * 10); } while (i === st.last);
+      const len = rule(S.current).q.length;
+      let i; do { i = Math.floor(Math.random() * len); } while (len > 1 && i === st.last);
       st.pending = i; save();
     }
     return st.pending;
@@ -134,10 +137,11 @@
     const correct = item.a[0];
     const opts = shuffle(item.a.slice());
 
-    const learned = 10 - st.queue.length;
+    const QN = r.q.length;
+    const learned = QN - st.queue.length;
     const progress = st.phase === 'learn'
-      ? `<div class="meter" aria-hidden="true">${[...Array(10)].map((_, i) => `<i class="${i < learned ? 'on' : ''}"></i>`).join('')}</div>
-         <div class="phase">${learned} من 10 أسئلة جاوبتها صح</div>`
+      ? `<div class="meter" aria-hidden="true">${[...Array(QN)].map((_, i) => `<i class="${i < learned ? 'on' : ''}"></i>`).join('')}</div>
+         <div class="phase">${learned} من ${QN} أسئلة جاوبتها صح</div>`
       : `<div class="lamps" aria-hidden="true">${[...Array(STREAK_TARGET)].map((_, i) => `<i class="${i < st.streak ? 'on' : ''}"></i>`).join('')}</div>
          <div class="phase">اختبار البصم: ${st.streak} من ${STREAK_TARGET} صح ورا بعض. غلطة وحدة بتطفّي اللمبات.</div>`;
 
@@ -180,7 +184,7 @@
         : `<div class="fb no"><b>✘ مش هيك. الجواب الصح: ${esc(correct)}</b>${esc(item.why)}${st.phase === 'learn' ? '<br><span class="muted">هالسؤال رح يرجعلك بعد شوي.</span>' : ''}</div>`;
       const next = document.createElement('button');
       next.className = 'btn';
-      next.textContent = passedNow ? 'ارفع الديجنتير ⚡' : enteringCheck ? 'جاوبت الـ 10 صح. عاختبار البصم' : 'كمّل';
+      next.textContent = passedNow ? 'ارفع الديجنتير ⚡' : enteringCheck ? `جاوبت الـ ${r.q.length} صح. عاختبار البصم` : 'كمّل';
       next.addEventListener('click', () => { passedNow ? rulePassed(n) : quiz(); top(); });
       fb.appendChild(next);
       next.focus({ preventScroll: true });

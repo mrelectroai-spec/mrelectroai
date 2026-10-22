@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تجربة — الكورس</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="كورس تفاعلي على كتاب الكهرباء بالمختصر المفيد: قاعدة قاعدة، وما بتنتقل لعيلي بعدها قبل ما تبصمها.">
+<meta name="theme-color" content="#15304D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../course/style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">⚡ الكهرباء بالمختصر المفيد</div>
+  <div class="who" id="who"></div>
+</header>
+
+<main id="app" aria-live="polite"></main>
+
+<!-- مكان بناء صفحات الـ PDF (مخفي عن الشاشة) -->
+<div id="pdfStage" aria-hidden="true"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="../course/questions.js"></script>
+<script>
+  // نسخة تجربة: سؤال واحد بكل قاعدة، وجواب صح واحد بيكفّي
+  RULES.forEach(function (r) { r.q = r.q.slice(0, 1); });
+  window.COURSE_CONFIG = { streak: 1, storageKey: 'electro-course-test', banner: 'نسخة تجربة لأنور: سؤال واحد بكل قاعدة.' };
+</script>
+<script src="../course/app.js"></script>
+</body>
+</html>
