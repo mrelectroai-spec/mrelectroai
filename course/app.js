@@ -305,18 +305,18 @@
     RULES.forEach((r) => { const st = R(r.n); Object.entries(st.missed).forEach(([qi, c]) => weak.push({ n: r.n, c, q: r.q[qi] })); });
     weak.sort((a, b) => b.c - a.c);
     const weakHtml = weak.length
-      ? `<ol class="weak">${weak.slice(0, 14).map((w) => `<li><b>القاعدة ${w.n} — غلط ${w.c} ${w.c === 1 ? 'مرة' : 'مرات'}:</b> ${esc(w.q.q)}<br><span style="color:#2E9E5B">الجواب الصح: ${esc(w.q.a[0])}</span></li>`).join('')}</ol>`
+      ? `<ol class="weak">${weak.slice(0, 14).map((w) => `<li><b>القاعدة ${w.n} — غلط ${w.c} ${w.c === 1 ? 'مرة' : 'مرات'}:</b> ${esc(w.q.q)}<br><span style="color:#0E8F6E">الجواب الصح: ${esc(w.q.a[0])}</span></li>`).join('')}</ol>`
       : '<p>ولا غلطة بكل الكورس. شغل معلّم!</p>';
     const foot = (p) => `<div class="foot"><span>الكهرباء بالمختصر المفيد — MrElectroAI</span><span>صفحة ${p} من 3</span></div>`;
     return `
       <div class="pg cert">
-        <div class="bolt">⚡</div>
+        <div class="bolt"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg></div>
         <h1>شهادة إتمام</h1>
         <p>هالشهادة بتأكّد إنو</p>
         <div class="name">${esc(S.name)}</div>
         <p>بصم كل القواعد الـ ${TOTAL} بكتاب «الكهرباء بالمختصر المفيد»، وجاوب على كل الأسئلة صح، وعدّى اختبار البصم (${STREAK_TARGET} أجوبة صح ورا بعض) بكل قاعدة.</p>
         <p style="font-size:17px;color:#5B6B7D">تاريخ الإتمام: ${fmtDate(S.finishedAt)}</p>
-        <div class="sig">أنور الجاسم — MrElectroAI</div>
+        <div class="sig">أنور الحسن الجاسم — <b>MrElectroAI</b></div>
       </div>
       <div class="pg">
         <h2>ملخص شغل الطالب</h2>
