@@ -98,7 +98,8 @@ input:focus,select:focus{border-color:var(--volt)}
     <div class="ic">🔑</div>
     <h2>مفاتيح التفعيل</h2>
     <p>MrElectroAI — لوحة الإدارة</p>
-    <input id="pin" type="password" placeholder="كود الإدارة" autocomplete="off">
+    <input id="email" type="email" placeholder="الإيميل" autocomplete="username" dir="ltr" style="margin-bottom:10px">
+    <input id="pin" type="password" placeholder="كلمة السر" autocomplete="current-password">
     <div class="perr" id="perr"></div>
     <button class="btn main" id="enter">دخول</button>
   </div>
@@ -178,7 +179,7 @@ input:focus,select:focus{border-color:var(--volt)}
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const PIN="71736401ANWAR";
+const ADMIN_EMAIL="mrelectroai@gmail.com";
 const WA="96179434479";
 const TOOLS={all:'كل الأدوات',roof:'قياس السطح',transformer:'المحوّلات',
   inverters:'الإنفرترات',load:'حساب المنظومة',wirephase:'توزيع الفازات',book:'📘 كتاب الكهرباء + الكورس'};
@@ -196,16 +197,40 @@ const PKG={m:['شهر',30],q:['3 شهور',90],y:['سنة',365],L:['مدى ال�
 const $=i=>document.getElementById(i);
 let DB=[];
 function say(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500);}
-async function api(p,o={}){const r=await fetch(SB_URL+'/rest/v1/'+p,{...o,headers:{apikey:SB_KEY,
-  Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'return=representation',...(o.headers||{})}});
+/* الدخول صار بحساب Supabase (إيميل + كلمة سر)، وما في كود مكتوب بالصفحة */
+let TOKEN=null;
+try{TOKEN=JSON.parse(sessionStorage.getItem('mea_tok')||'null')}catch(e){}
+async function auth(body,grant){
+  const r=await fetch(SB_URL+'/auth/v1/token?grant_type='+grant,{method:'POST',
+    headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error('auth');
+  const j=await r.json();
+  TOKEN={a:j.access_token,r:j.refresh_token,exp:Date.now()+((j.expires_in||3600)-60)*1000};
+  sessionStorage.setItem('mea_tok',JSON.stringify(TOKEN));
+}
+async function token(){
+  if(!TOKEN)throw new Error('auth');
+  if(Date.now()>TOKEN.exp){try{await auth({refresh_token:TOKEN.r},'refresh_token')}catch(e){logout();throw e}}
+  return TOKEN.a;
+}
+function logout(){sessionStorage.removeItem('mea_tok');sessionStorage.removeItem('mea_adm');location.reload();}
+async function api(p,o={}){const t=await token();const r=await fetch(SB_URL+'/rest/v1/'+p,{...o,headers:{apikey:SB_KEY,
+  Authorization:'Bearer '+t,'Content-Type':'application/json',Prefer:'return=representation',...(o.headers||{})}});
+  if(r.status===401){logout();throw new Error('auth');}
   if(!r.ok)throw new Error(await r.text());return r.status===204?null:r.json();}
 const sb=async fn=>{try{return await fn()}catch(e){say('ما قدرنا نتصل');return null}};
 
-$('enter').onclick=()=>{if($('pin').value.trim()!==PIN){$('perr').textContent='كود غلط';$('pin').value='';return;}
-  sessionStorage.setItem('mea_adm','1');$('lock').style.display='none';load();};
+$('email').value=ADMIN_EMAIL;
+$('enter').onclick=async()=>{
+  const em=$('email').value.trim(), pw=$('pin').value;
+  if(!em||!pw){$('perr').textContent='اكتب الإيميل وكلمة السر';return;}
+  $('enter').disabled=true;$('perr').textContent='';
+  try{await auth({email:em,password:pw},'password');$('lock').style.display='none';load();}
+  catch(e){$('perr').textContent='الإيميل أو كلمة السر غلط';$('pin').value='';}
+  $('enter').disabled=false;};
 $('pin').addEventListener('keydown',e=>{if(e.key==='Enter')$('enter').click()});
-$('out').onclick=()=>{sessionStorage.removeItem('mea_adm');location.reload()};
-if(sessionStorage.getItem('mea_adm')){$('lock').style.display='none';load();}
+$('out').onclick=logout;
+if(TOKEN){$('lock').style.display='none';load();}
 
 let pkg='y';
 function drawPkgs(){

@@ -196,27 +196,16 @@
     const btn = document.getElementById('meaTGo');
     btn.disabled = true; btn.textContent = 'لحظة...';
     const fp = await fingerprint();
-    /* إذا جرّب قبل على نفس الجهاز */
-    try{
-      const old = await api('trials?device=eq.'+fp+'&select=*');
-      if(old && old.length){
-        const t = old[0];
-        if(new Date(t.ends) > new Date()){
-          localStorage.setItem(KEY+'_trial', JSON.stringify({ends:t.ends,name:t.name}));
-          btn.disabled=false; err('✅ تجربتك شغّالة — أهلاً '+t.name, true);
-          return setTimeout(()=>location.reload(), 900);
-        }
-        btn.disabled=false;
-        return err('استعملت التجربة المجانية من قبل. تواصل معي لمفتاح كامل 👇');
-      }
-    }catch(e){}
-    const ends = new Date(Date.now()+3*864e5).toISOString();
-    try{
-      await api('trials', { method:'POST', body: JSON.stringify([{ id:'t'+Date.now().toString(36),
-        name:n, phone:p, tool:TOOL, device:fp, ends }]) });
-    }catch(e){ btn.disabled=false; return err('ما قدرنا نبلّش — تفقّد الإنترنت'); }
-    localStorage.setItem(KEY+'_trial', JSON.stringify({ends,name:n}));
-    err('✅ تفضّل — التجربة بلّشت', true);
+    /* القاعدة بتقرّر: تجربة وحدة لكل جهاز */
+    let r;
+    try{ r = await api('rpc/start_trial', { method:'POST',
+      body: JSON.stringify({ p_name:n, p_phone:p, p_tool:TOOL, p_device:fp }) }); }
+    catch(e){ btn.disabled=false; btn.textContent='ابدأ التجربة'; return err('ما قدرنا نبلّش — تفقّد الإنترنت'); }
+    btn.disabled=false; btn.textContent='ابدأ التجربة';
+    if(r && r.used) return err('استعملت التجربة المجانية من قبل. تواصل معي لمفتاح كامل 👇');
+    if(!r || !r.ok) return err('اكتب اسمك ورقم موبايل صحيح');
+    localStorage.setItem(KEY+'_trial', JSON.stringify({ends:r.ends,name:r.name}));
+    err(r.existing ? '✅ تجربتك شغّالة — أهلاً '+r.name : '✅ تفضّل — التجربة بلّشت', true);
     setTimeout(()=>location.reload(), 900);
   }
 
@@ -235,24 +224,15 @@
     else err(r.msg);
   }
 
+  /* التحقق صار جوّا القاعدة: الزائر ما بيشوف جدول المفاتيح */
   async function verify(code){
-    let rows;
-    try{ rows = await api('licenses?code=eq.'+encodeURIComponent(code)+'&select=*'); }
-    catch(e){ return { ok:false, msg:'ما قدرنا نتحقق — تفقّد الإنترنت' }; }
-    if(!rows || !rows.length) return { ok:false, msg:'المفتاح غير صحيح' };
-    const L = rows[0];
-    if(!L.active) return { ok:false, msg:'هالمفتاح موقوف — تواصل معنا' };
-    if(L.expires && new Date(L.expires) < new Date(new Date().toDateString()))
-      return { ok:false, msg:'انتهت صلاحية المفتاح بتاريخ '+L.expires };
-    if(L.tools && L.tools!=='all' && !L.tools.split(',').map(s=>s.trim()).includes(TOOL))
-      return { ok:false, msg:'هالمفتاح ما بيشمل هالأداة' };
     const fp = await fingerprint();
-    if(L.device && L.device !== fp)
-      return { ok:false, msg:'هالمفتاح مفعّل على جهاز تاني' };
-    try{ await api('licenses?code=eq.'+encodeURIComponent(code), { method:'PATCH',
-      body: JSON.stringify({ device: L.device || fp, uses:(L.uses||0)+1,
-        last_seen: new Date().toISOString() }) }); }catch(e){}
-    return { ok:true, name: L.name };
+    let r;
+    try{ r = await api('rpc/verify_license', { method:'POST',
+      body: JSON.stringify({ p_code:code, p_device:fp, p_tool:TOOL }) }); }
+    catch(e){ return { ok:false, msg:'ما قدرنا نتحقق — تفقّد الإنترنت' }; }
+    if(r && r.ok) return { ok:true, name:r.name };
+    return { ok:false, msg:(r && r.msg) || 'المفتاح غير صحيح' };
   }
 
   /* ── التشغيل ── */
