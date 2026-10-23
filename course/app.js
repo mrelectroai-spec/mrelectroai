@@ -323,7 +323,7 @@
     if (S.pdfSent) afterSent();
 
     document.getElementById('s1').addEventListener('click', () => {
-      window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waText())}`, '_blank');
+      window.open(`https://api.whatsapp.com/send?phone=${WA_NUMBER}&text=${encodeURIComponent(waText())}`, '_blank');
       S.textSent = true; save();
       const s2 = document.getElementById('s2'); s2.disabled = false;
       document.getElementById('st').textContent = 'بعتت الرسالة؟ هلّق اكبس الخطوة 2، واختار واتساب ← محادثة أنور (' + WA_DISPLAY + ').';

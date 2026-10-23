@@ -247,6 +247,10 @@ footer .n{font-family:'JetBrains Mono',monospace;color:var(--volt);font-weight:7
         <span class="ic"><svg><use href="#i-bolt"/></svg></span>
         <span><b>كورس الكتاب — للي اشتروه</b><p>180 سؤال، قاعدة قاعدة. ما بتنتقل لعيلي بعدها قبل ما تبصمها، وبالآخر شهادة باسمك.</p></span>
       </a>
+      <a class="mcard rise" href="quiz.html">
+        <span class="ic"><svg><use href="#i-sys"/></svg></span>
+        <span><b>مش عارف من وين تبلّش؟</b><p>جاوب 6 أسئلة بدقيقة، وبقلّك شو بيناسب مستواك.</p></span>
+      </a>
       <div class="mcard rise">
         <span class="ic"><svg><use href="#i-wa"/></svg></span>
         <span><b>كيف بتشتري؟</b><p>اكبس «اشتري الكتاب»، ادفع OMT أو Whish أو نقداً، وبيوصلك الكتاب ومفتاح الكورس عالواتساب.</p></span>
@@ -378,7 +382,7 @@ th.onclick=()=>set(document.documentElement.dataset.theme==='light'?'dark':'ligh
     $('bkLeft').textContent='خصم الإطلاق: '+(d>=3?'باقي '+d+' أيام':d===2?'باقي يومين':d===1?'باقي يوم واحد':'آخر يوم!');
     $('bkPromo').hidden=false;
   }
-  $('bkBuy').href='https://wa.me/96179434479?text='+encodeURIComponent(
+  $('bkBuy').href='https://api.whatsapp.com/send?phone=96179434479&text='+encodeURIComponent(
     'مرحبا أنور 👋\n\nبدي كتاب «الكهرباء بالمختصر المفيد»\n▸ السعر: '+now+'$'+(on?' (خصم الإطلاق)':'')+'\n\nكيف بدفع؟');
 })();
 

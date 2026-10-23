@@ -121,7 +121,7 @@
     document.getElementById('meaGo').onclick = check;
     setTimeout(()=>inp.focus(), 300);
   }
-  const ask=(pkg,per,price)=>'https://wa.me/'+WA+'?text='+encodeURIComponent(
+  const ask=(pkg,per,price)=>'https://api.whatsapp.com/send?phone='+WA+'&text='+encodeURIComponent(
     'مرحبا أنور 👋\n\nبدي أشترك:\n▸ '+pkg+'\n▸ '+per+'\n▸ '+price+'$\n\nكيف بدفع؟');
 
   function priceView(){

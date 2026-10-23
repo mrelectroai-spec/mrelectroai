@@ -259,7 +259,7 @@ $('gen').onclick=async()=>{
 function waLink(phone,msg){
   const p=(phone||'').replace(/\D/g,'').replace(/^0/,'');
   const full=p?('961'+p):'';
-  return 'https://wa.me/'+full+'?text='+encodeURIComponent(msg);
+  return 'https://api.whatsapp.com/send?'+(full?'phone='+full+'&':'')+'text='+encodeURIComponent(msg);
 }
 function waMsg(L){
   if(L.tools==='book') return bookMsg(L);

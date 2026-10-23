@@ -4,20 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحديد المستوى والاهتمامات | MrElectroAI ⚡</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#081311">
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #090d16;
-            --card-bg: #131b2e;
-            --item-bg: #0d1322;
-            --electric-blue: #00d2ff;
-            --neon-blue-glow: rgba(0, 210, 255, 0.3);
-            --gold: #ffb703;
-            --gold-glow: rgba(255, 183, 3, 0.35);
-            --text-light: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border-color: #23314f;
-            --danger: #ef4444;
+            /* نفس ألوان موقع MrElectroAI */
+            --bg-dark: #070F0D;
+            --card-bg: #0E1A17;
+            --item-bg: #14241F;
+            --electric-blue: #22C79B;
+            --neon-blue-glow: rgba(34, 199, 155, 0.25);
+            --gold: #22C79B;
+            --gold-glow: rgba(34, 199, 155, 0.3);
+            --text-light: #E8F2EE;
+            --text-muted: #7B928C;
+            --border-color: #1E332D;
+            --danger: #F06A6A;
         }
 
         * {
@@ -28,11 +30,10 @@
         }
 
         body {
-            font-family: 'Cairo', sans-serif;
+            font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 10% 10%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(255, 183, 3, 0.08) 0%, transparent 40%);
+                radial-gradient(circle at 85% 5%, rgba(34, 199, 155, 0.14) 0%, transparent 45%);
             color: var(--text-light);
             padding: 12px;
             min-height: 100vh;
@@ -49,7 +50,7 @@
             padding: 20px 16px;
             border-radius: 20px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 210, 255, 0.06);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(34, 199, 155, 0.06);
         }
 
         .header {
@@ -62,7 +63,9 @@
         .brand-title {
             font-size: 26px;
             font-weight: 800;
-            background: linear-gradient(90deg, var(--electric-blue), #ffffff, var(--gold));
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -0.02em;
+            background: linear-gradient(110deg, #22C79B, #63E3C2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: inline-block;
@@ -107,11 +110,11 @@
 
         .accordion-item.active {
             border-color: var(--electric-blue);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.15);
+            box-shadow: 0 0 15px rgba(34, 199, 155, 0.15);
         }
 
         .accordion-item.completed {
-            border-color: rgba(255, 183, 3, 0.45);
+            border-color: rgba(34, 199, 155, 0.45);
         }
 
         .accordion-item.error-border {
@@ -140,7 +143,7 @@
             width: 26px;
             height: 26px;
             border-radius: 8px;
-            background: rgba(0, 210, 255, 0.12);
+            background: rgba(34, 199, 155, 0.12);
             border: 1px solid var(--electric-blue);
             color: var(--electric-blue);
             font-size: 13px;
@@ -168,7 +171,7 @@
         .selected-preview {
             font-size: 12px;
             color: var(--gold);
-            background: rgba(255, 183, 3, 0.12);
+            background: rgba(34, 199, 155, 0.12);
             padding: 2px 8px;
             border-radius: 6px;
             max-width: 140px;
@@ -200,7 +203,7 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(9, 13, 22, 0.6);
+            background: rgba(7, 15, 13, 0.6);
         }
 
         .accordion-content {
@@ -211,11 +214,11 @@
         input[type="text"] {
             width: 100%;
             padding: 12px 14px;
-            background: #131b2e;
+            background: var(--item-bg);
             border: 1px solid var(--border-color);
             border-radius: 10px;
             color: var(--text-light);
-            font-family: 'Cairo', sans-serif;
+            font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
             font-size: 14.5px;
         }
 
@@ -252,7 +255,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 11px 13px;
-            background: #131b2e;
+            background: var(--item-bg);
             border: 1px solid var(--border-color);
             border-radius: 10px;
             cursor: pointer;
@@ -263,7 +266,7 @@
         }
 
         .option-item input:checked ~ .option-label {
-            background: rgba(0, 210, 255, 0.14);
+            background: rgba(34, 199, 155, 0.14);
             border-color: var(--electric-blue);
             box-shadow: 0 0 10px var(--neon-blue-glow);
             color: #fff;
@@ -297,16 +300,16 @@
 
         .submit-btn {
             width: 100%;
-            background: linear-gradient(135deg, #00d2ff 0%, #0066ff 100%);
-            color: #ffffff;
+            background: #22C79B;
+            color: #031310;
             border: none;
             padding: 14px;
-            font-family: 'Cairo', sans-serif;
+            font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
             font-size: 16px;
             font-weight: 800;
             border-radius: 12px;
             cursor: pointer;
-            box-shadow: 0 4px 18px rgba(0, 210, 255, 0.35);
+            box-shadow: 0 6px 22px rgba(34, 199, 155, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -319,6 +322,27 @@
             transform: scale(0.98);
         }
 
+        .home-link { display: inline-block; text-decoration: none; }
+        .next-btn {
+            margin-top: 10px; width: 100%; padding: 10px; border-radius: 10px; cursor: pointer;
+            background: transparent; border: 1px solid var(--electric-blue); color: var(--electric-blue);
+            font-family: inherit; font-size: 14px; font-weight: 700;
+        }
+        /* نتيجة بعد الإرسال */
+        .result { text-align: center; }
+        .result h2 { font-family: 'Readex Pro', sans-serif; font-size: 22px; margin: 6px 0 8px; }
+        .result p { color: var(--text-muted); font-size: 14px; line-height: 1.8; margin-bottom: 14px; }
+        .rec { background: var(--item-bg); border: 1px solid var(--electric-blue); border-radius: 16px; padding: 16px; margin: 14px 0; text-align: right; }
+        .rec .top { display: flex; gap: 14px; align-items: flex-start; }
+        .rec img { width: 92px; border-radius: 10px; border: 1px solid var(--border-color); flex-shrink: 0; }
+        .rec h3 { font-family: 'Readex Pro', sans-serif; font-size: 17px; margin-bottom: 4px; }
+        .rec .why { color: var(--text-muted); font-size: 13px; line-height: 1.75; }
+        .rec .price { margin: 10px 0 2px; font-family: 'JetBrains Mono', monospace; }
+        .rec .price b { font-size: 26px; color: #22C79B; }
+        .rec .price s { color: var(--text-muted); margin-inline-start: 10px; }
+        .rec .promo { font-size: 12px; color: #E8A33D; }
+        .buy-btn { display: block; text-decoration: none; text-align: center; background: #22C79B; color: #031310; font-weight: 800; padding: 13px; border-radius: 12px; margin-top: 12px; }
+        .ghost-btn { display: block; text-decoration: none; text-align: center; color: var(--text-muted); font-size: 13px; padding: 10px; margin-top: 6px; text-decoration: underline; text-underline-offset: 4px; }
         .footer-note {
             text-align: center;
             font-size: 11px;
@@ -331,11 +355,11 @@
 
 <div class="container">
     <div class="header">
-        <div class="brand-title">MrElectroAI ⚡</div>
-        <div class="subtitle">اكبس على الخيار لننتقل تلقائياً للسؤال التالي</div>
+        <a class="home-link" href="./" aria-label="MrElectroAI — الصفحة الرئيسية"><div class="brand-title">MrElectroAI ⚡</div></a>
+        <div class="subtitle">نقّي جوابك، ومنقلك لحالنا عالسؤال يلي بعدو</div>
     </div>
 
-    <div id="errorToast" class="error-toast">⚠️ يرجى تعبئة كافة الخانات المطلوبة قبل الإرسال!</div>
+    <div id="errorToast" class="error-toast">⚠️ عبّي كل الخانات قبل ما تبعت.</div>
 
     <form id="electroForm" onsubmit="return false;">
 
@@ -349,9 +373,10 @@
                 </div>
                 <span class="arrow-icon">▼</span>
             </div>
-            <div class="accordion-body" style="max-height: 110px;">
+            <div class="accordion-body" style="max-height: 170px;">
                 <div class="accordion-content">
-                    <input type="text" id="fullName" placeholder="اكتب اسمك ومنطقتك (مثال: أحمد - بيروت)" oninput="handleNameInput()" onkeypress="handleNameKey(event)">
+                    <input type="text" id="fullName" placeholder="اكتب اسمك ومنطقتك (مثال: أحمد - بيروت)" oninput="handleNameInput()" onkeydown="handleNameKey(event)">
+                    <button type="button" class="next-btn" onclick="nameNext()">التالي</button>
                 </div>
             </div>
         </div>
@@ -374,16 +399,16 @@
                             <span class="option-label"><span>أقل من 20</span><span class="indicator"></span></span>
                         </label>
                         <label class="option-item">
-                            <input type="radio" name="age" value="من 20 إلى 30 سنة" onclick="autoAdvance(2, this.value)">
-                            <span class="option-label"><span>20 إلى 30</span><span class="indicator"></span></span>
+                            <input type="radio" name="age" value="من 20 لـ 29 سنة" onclick="autoAdvance(2, this.value)">
+                            <span class="option-label"><span>20 لـ 29</span><span class="indicator"></span></span>
                         </label>
                         <label class="option-item">
-                            <input type="radio" name="age" value="من 30 إلى 40 سنة" onclick="autoAdvance(2, this.value)">
-                            <span class="option-label"><span>30 إلى 40</span><span class="indicator"></span></span>
+                            <input type="radio" name="age" value="من 30 لـ 39 سنة" onclick="autoAdvance(2, this.value)">
+                            <span class="option-label"><span>30 لـ 39</span><span class="indicator"></span></span>
                         </label>
                         <label class="option-item">
-                            <input type="radio" name="age" value="أكثر من 40 سنة" onclick="autoAdvance(2, this.value)">
-                            <span class="option-label"><span>أكثر من 40</span><span class="indicator"></span></span>
+                            <input type="radio" name="age" value="40 سنة وطالع" onclick="autoAdvance(2, this.value)">
+                            <span class="option-label"><span>40 وطالع</span><span class="indicator"></span></span>
                         </label>
                     </div>
                 </div>
@@ -513,7 +538,7 @@
             <div class="accordion-header" onclick="toggleStep(6)">
                 <div class="header-title-wrap">
                     <span class="step-num" id="num-6">6</span>
-                    <span class="question-text">📘 طريقة التعلم المفضلة</span>
+                    <span class="question-text">📘 كيف بتحب تتعلّم؟</span>
                     <span class="selected-preview" id="preview-6"></span>
                 </div>
                 <span class="arrow-icon">▼</span>
@@ -548,20 +573,31 @@
 </div>
 
 <script>
-    let nameTimer = null;
+    const PHONE = "96179434479";
+    // الخبرة: 0 مبتدئ من الصفر، 1 هاوي، 2 أقل من سنتين، 3 من 2 لـ 5، 4 أكتر من 5
+    const LEVEL = {
+        'مبتدئ من الصفر (ما عندي فكرة)': 0,
+        'هاوي (بعرف شغلات بسيطة)': 1,
+        'أقل من سنتين (عم أتعلم بالورش)': 2,
+        'من 2 إلى 5 سنوات (فني شغال)': 3,
+        'أكثر من 5 سنوات (معلم / بروفيشنال)': 4
+    };
+    const NOTHING = 'ولا شي (بعدني بالبداية)';
+    const BASICS = 'أساسيات الكهرباء من الصفر';
+    const ALL_BEGIN = 'شامل (كل المجالات من الصفر للاحتراف)';
+    const ALL_PRO = 'شامل (تعمّق بكل المجالات)';
+
+    // سعر الكتاب: 10$، وخصم 9$ لحد ليل 1 تشرين التاني 2026
+    const PROMO_END = new Date('2026-11-01T23:59:59+02:00');
+    const promoOn = () => new Date() < PROMO_END;
+    const bookPrice = () => promoOn() ? 9 : 10;
 
     function toggleStep(stepNumber) {
-        // إذا كان ينتقل من خطوة الاسم وكان كاتب اسمه، نسجلها مكتملة
         const nameVal = document.getElementById('fullName').value.trim();
-        if (nameVal.length >= 2) {
-            markCompleted(1, nameVal);
-        }
-
-        const allItems = document.querySelectorAll('.accordion-item');
-        allItems.forEach((item, index) => {
-            const currentNum = index + 1;
+        if (nameVal.length >= 2) markCompleted(1, nameVal);
+        document.querySelectorAll('.accordion-item').forEach((item, index) => {
             const body = item.querySelector('.accordion-body');
-            if (currentNum === stepNumber) {
+            if (index + 1 === stepNumber) {
                 item.classList.add('active');
                 item.classList.remove('error-border');
                 body.style.maxHeight = body.scrollHeight + "px";
@@ -589,49 +625,85 @@
         }
     }
 
+    // الاسم: ما منقلو لحالو وهوّي عم يكتب، بس بزر «التالي» أو Enter
     function handleNameInput() {
+        markCompleted(1, document.getElementById('fullName').value.trim());
+    }
+    function nameNext() {
         const val = document.getElementById('fullName').value.trim();
+        if (val.length < 2) { showError(1, "⚠️ اكتب اسمك ومنطقتك (الخانة 1)"); return; }
         markCompleted(1, val);
-        clearTimeout(nameTimer);
-        // ينتقل تلقائياً للسؤال الثاني بعد ثانية واحدة من التوقف عن كتابة الاسم
-        if (val.length >= 4) {
-            nameTimer = setTimeout(() => {
-                toggleStep(2);
-            }, 1100);
+        toggleStep(2);
+    }
+    function handleNameKey(e) {
+        if (e.key === 'Enter') { e.preventDefault(); nameNext(); }
+    }
+
+    function optionLabel(name, value) {
+        const input = document.querySelector(`input[name="${name}"][value="${value}"]`);
+        return input ? input.closest('label') : null;
+    }
+    function setVisible(name, value, show) {
+        const label = optionLabel(name, value);
+        if (!label) return;
+        label.style.display = show ? '' : 'none';
+        const input = label.querySelector('input');
+        if (!show && input.checked) {
+            input.checked = false;
+            markCompleted(name === 'currentSkills' ? 4 : 5, '');
         }
     }
 
-    function handleNameKey(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            const val = document.getElementById('fullName').value.trim();
-            if (val.length >= 2) {
-                clearTimeout(nameTimer);
-                markCompleted(1, val);
-                toggleStep(2);
-            }
+    // الأجوبة لازم تركب مع الخبرة: المحترف ما بيتعلّم «من الصفر»، والمبتدئ ما بيشتغل بمجال
+    function applyExperience(level) {
+        // السؤال 4
+        document.querySelectorAll('input[name="currentSkills"]').forEach((input) => {
+            const isNothing = input.value === NOTHING;
+            const show = level === 0 ? isNothing : (level <= 1 ? true : !isNothing);
+            setVisible('currentSkills', input.value, show);
+        });
+        // السؤال 5
+        setVisible('targetSkills', BASICS, level <= 2);
+        const allInput = document.querySelector('input[name="targetSkills"][value="' + ALL_BEGIN + '"], input[name="targetSkills"][value="' + ALL_PRO + '"]');
+        const want = level >= 3 ? ALL_PRO : ALL_BEGIN;
+        if (allInput.value !== want) {
+            if (allInput.checked) { allInput.checked = false; markCompleted(5, ''); }
+            allInput.value = want;
+            allInput.closest('label').querySelector('.option-label > span').textContent = '🔥 ' + want;
+        }
+        // المبتدئ من الصفر: السؤال 4 جوابو واحد، منعبّيه لحالو
+        if (level === 0) {
+            const nothing = document.querySelector('input[name="currentSkills"][value="' + NOTHING + '"]');
+            nothing.checked = true;
+            markCompleted(4, NOTHING);
         }
     }
 
     function autoAdvance(stepNumber, value) {
         markCompleted(stepNumber, value);
-        setTimeout(() => {
-            if (stepNumber < 6) {
-                toggleStep(stepNumber + 1);
-            } else {
-                // إغلاق البطاقة الأخيرة بعد الاختيار لتصبح الشاشة جاهزة للإرسال
-                toggleStep(0);
-            }
-        }, 220);
+        let next = stepNumber + 1;
+        if (stepNumber === 3) {
+            const level = LEVEL[value];
+            applyExperience(level);
+            if (level === 0) next = 5;
+        }
+        setTimeout(() => toggleStep(stepNumber < 6 ? next : 0), 220);
     }
 
     function showError(stepNumber, msg) {
         const toast = document.getElementById('errorToast');
         toast.textContent = msg;
         toast.style.display = 'block';
-        const item = document.getElementById(`step-${stepNumber}`);
-        item.classList.add('error-border');
+        document.getElementById(`step-${stepNumber}`).classList.add('error-border');
         toggleStep(stepNumber);
+    }
+
+    // الكتاب للمبتدئين: من الصفر، هاوي، أو أقل من سنتين
+    function recommendBook(level) { return level <= 2; }
+
+    function waLink(text) {
+        // api.whatsapp.com بيحافظ عالإيموجي أحسن من wa.me على بعض تلفونات أندرويد
+        return `https://api.whatsapp.com/send?phone=${PHONE}&text=${encodeURIComponent(text)}`;
     }
 
     function sendToWhatsApp() {
@@ -642,34 +714,16 @@
         const targetSkills = document.querySelector('input[name="targetSkills"]:checked')?.value;
         const learningMethod = document.querySelector('input[name="learningMethod"]:checked')?.value;
 
-        // فحص إجباري لكل خانة من 1 إلى 6
-        if (!name || name.length < 2) {
-            showError(1, "⚠️ يرجى كتابة الاسم والمنطقة في الخانة رقم 1");
-            setTimeout(() => document.getElementById('fullName').focus(), 300);
-            return;
-        }
-        if (!age) {
-            showError(2, "⚠️ يرجى اختيار الفئة العمرية (الخانة رقم 2)");
-            return;
-        }
-        if (!experience) {
-            showError(3, "⚠️ يرجى تحديد سنوات الخبرة (الخانة رقم 3)");
-            return;
-        }
-        if (!currentSkills) {
-            showError(4, "⚠️ يرجى تحديد شو بتشتغل حالياً (الخانة رقم 4)");
-            return;
-        }
-        if (!targetSkills) {
-            showError(5, "⚠️ يرجى تحديد بشو حابب تطور حالك (الخانة رقم 5)");
-            return;
-        }
-        if (!learningMethod) {
-            showError(6, "⚠️ يرجى اختيار طريقة التعلم المفضلة (الخانة رقم 6)");
-            return;
-        }
+        if (!name || name.length < 2) { showError(1, "⚠️ اكتب اسمك ومنطقتك (الخانة 1)"); setTimeout(() => document.getElementById('fullName').focus(), 300); return; }
+        if (!age) { showError(2, "⚠️ نقّي عمرك (الخانة 2)"); return; }
+        if (!experience) { showError(3, "⚠️ نقّي خبرتك (الخانة 3)"); return; }
+        if (!currentSkills) { showError(4, "⚠️ نقّي شو بتشتغل هلّق (الخانة 4)"); return; }
+        if (!targetSkills) { showError(5, "⚠️ نقّي بشو بدك تطوّر حالك (الخانة 5)"); return; }
+        if (!learningMethod) { showError(6, "⚠️ نقّي كيف بتحب تتعلّم (الخانة 6)"); return; }
 
-        const phone = "96179434479";
+        const level = LEVEL[experience];
+        const book = recommendBook(level);
+        const rec = book ? 'كتاب «الكهرباء بالمختصر المفيد» (مبتدئ)' : 'مستوى متقدّم: بدّو متابعة شخصية';
 
         const message = `⚡ *تقييم مستوى جديد - MrElectroAI* ⚡\n\n` +
                         `👤 *الاسم والمنطقة:* ${name}\n` +
@@ -677,10 +731,56 @@
                         `⏳ *سنوات الخبرة:* ${experience}\n` +
                         `🛠️ *المهارات الحالية:* ${currentSkills}\n` +
                         `🎯 *يرغب بتعلم:* ${targetSkills}\n` +
-                        `📘 *طريقة التعلم المفضلة:* ${learningMethod}`;
+                        `📘 *طريقة التعلم المفضلة:* ${learningMethod}\n\n` +
+                        `📊 *التوصية:* ${rec}`;
+        const url = waLink(message);
+        showResult(name, level, targetSkills, url);
+        const win = window.open(url, '_blank');
+        if (!win) window.location.href = url;
+    }
 
-        const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-        window.location.href = whatsappURL;
+    function esc(t) { return String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+    function showResult(name, level, target, url) {
+        const first = esc(name.split(/[\s\-–—]+/)[0]);
+        const box = document.getElementById('electroForm');
+        let card;
+        if (recommendBook(level)) {
+            const p = bookPrice();
+            const left = Math.floor((PROMO_END - new Date()) / 864e5);
+            const promo = promoOn() ? `<div class="promo">⏳ خصم الإطلاق: ${left >= 3 ? 'باقي ' + left + ' أيام' : left === 2 ? 'باقي يومين' : left === 1 ? 'باقي يوم واحد' : 'آخر يوم!'}</div>` : '';
+            const buy = `مرحبا أنور 👋\n\nعملت تحديد المستوى، وبدي كتاب «الكهرباء بالمختصر المفيد»\n▸ السعر: ${p}$${promoOn() ? ' (خصم الإطلاق)' : ''}\n\nكيف بدفع؟`;
+            card = `
+            <div class="rec">
+              <div class="top">
+                <img src="course/cover.jpg" alt="غلاف كتاب الكهرباء بالمختصر المفيد">
+                <div>
+                  <h3>الكهرباء بالمختصر المفيد</h3>
+                  <div class="why">بما إنك بأول الطريق، هيدا الكتاب بيبنيلك الأساس الصح: 18 قاعدة من الصفر بلغة الورشة، ومعو كورس اختبارات وشهادة باسمك.</div>
+                </div>
+              </div>
+              <div class="price"><b>${p}$</b>${promoOn() ? '<s>10$</s>' : ''}</div>
+              ${promo}
+              <a class="buy-btn" href="${waLink(buy)}" target="_blank" rel="noopener">اشتري الكتاب</a>
+              <a class="ghost-btn" href="./#books">شوف تفاصيل الكتاب</a>
+            </div>`;
+        } else {
+            card = `
+            <div class="rec">
+              <h3>مستواك متقدّم 💪</h3>
+              <div class="why">ما رح نضيّع وقتك بكتاب مبتدئين. وصلتني بطاقتك، ورح احكيك عالواتساب بشو بيناسبك بـ«${esc(target)}».</div>
+              <a class="ghost-btn" href="./#books">عندك متدرّب أو صانع؟ الكتاب بيبلّشو صح</a>
+            </div>`;
+        }
+        box.innerHTML = `
+          <div class="result">
+            <h2>شكراً ${first} ✅</h2>
+            <p>انفتح الواتساب وفيه بطاقتك. اكبس «إرسال» لتوصلني.</p>
+            ${card}
+            <a class="ghost-btn" href="${url}" target="_blank" rel="noopener">ما انفتح الواتساب؟ اكبس هون</a>
+          </div>`;
+        document.getElementById('errorToast').style.display = 'none';
+        window.scrollTo(0, 0);
     }
 </script>
 
