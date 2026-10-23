@@ -1,0 +1,1449 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="مختبر القطع من MrElectroAI: 17 قطعة كلاسيك كنترول بالـ3D مع شرح وتجربة ومخطط.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>مختبر القطع</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;700&display=swap">
+<style>
+/* Layout: workshop bench — part picker strip, 3D part with pins, then the same part as a schematic; one dark MrElectroAI look */
+:root {
+  --bg: #070F0D;
+  --panel: #0c1a16;
+  --panel-2: #10231d;
+  --line: #1c3a31;
+  --fg: #e6f2ee;
+  --mute: #8fa9a1;
+  --accent: #22C79B;
+  --accent-ink: #052019;
+  --lamp: #f5d04a;
+  --fault: #ff6b5b;
+  --display: "Readex Pro", "IBM Plex Sans Arabic", "Noto Sans Arabic", Tahoma, sans-serif;
+  --body: "IBM Plex Sans Arabic", "Noto Sans Arabic", Tahoma, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body);
+  font-size: 15px; line-height: 1.7; direction: rtl;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 32px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.brand { font-family: var(--display); font-weight: 700; color: var(--accent); direction: ltr; font-size: 13px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 5vw, 32px); line-height: 1.25; margin: 0; }
+.lede { color: var(--mute); margin: 2px 0 0; max-width: 64ch; }
+
+.picker { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+.picker .cat { flex: none; align-self: center; color: var(--mute); font-size: 12px; font-weight: 700; letter-spacing: .04em; padding: 0 4px 0 2px; }
+.chip {
+  flex: none; display: flex; gap: 8px; align-items: center; border: 1px solid var(--line); background: var(--panel);
+  color: var(--fg); border-radius: 999px; padding: 6px 14px 6px 10px; font: 600 14px var(--body); cursor: pointer; white-space: nowrap;
+}
+.chip .n { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font: 700 11px/19px var(--display); text-align: center; }
+.chip[aria-current="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.chip[aria-current="true"] .n { border-color: var(--accent-ink); color: var(--accent-ink); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+.stage-box { position: relative; background: radial-gradient(120% 90% at 50% 40%, var(--panel-2), var(--bg) 75%); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+#stage { width: 100%; aspect-ratio: 1 / 1; max-height: 580px; display: block; touch-action: pan-y; cursor: grab; }
+#stage:active { cursor: grabbing; }
+.hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; color: var(--mute); font-size: 12.5px; pointer-events: none; }
+.dot {
+  position: absolute; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink); font: 700 13px/24px var(--display); text-align: center;
+  border: 2px solid var(--bg); box-shadow: 0 0 0 4px rgba(34,199,155,.22); cursor: pointer; padding: 0; z-index: 3;
+  transition: opacity .2s, transform .2s;
+}
+.dot[aria-pressed="true"] { transform: scale(1.18); box-shadow: 0 0 0 6px rgba(34,199,155,.35); }
+.dot.away { opacity: 0; pointer-events: none; }
+button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.zoom { position: absolute; top: 10px; left: 10px; z-index: 4; display: flex; flex-direction: column; gap: 6px; }
+.zoom button { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: rgba(12,26,22,.85); color: var(--fg); font: 700 20px/1 var(--display); cursor: pointer; }
+.zoom button:hover { border-color: var(--accent); color: var(--accent); }
+.banner { position: absolute; top: 10px; left: 58px; right: 10px; z-index: 4; background: rgba(12,26,22,.92); border: 1px solid var(--accent); border-radius: 10px; padding: 6px 12px; color: var(--accent); font-weight: 600; font-size: 13.5px; line-height: 1.5; text-align: center; pointer-events: none; }
+.pop {
+  position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 5;
+  background: rgba(12, 26, 22, .96); border: 1px solid var(--accent); border-radius: 14px;
+  padding: 14px 16px; box-shadow: 0 12px 40px rgba(0,0,0,.5); animation: popIn .22s ease-out; max-height: 64%; overflow: auto;
+}
+.pop h2 { font-family: var(--display); font-size: 17px; margin: 0 0 6px; padding-left: 30px; display: flex; gap: 10px; align-items: center; }
+.pop h2 .n { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 12px; line-height: 24px; text-align: center; }
+.pop p { margin: 0 0 10px; font-size: 14.5px; }
+.pop .x { position: absolute; top: 8px; left: 8px; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel-2); color: var(--fg); font-size: 18px; line-height: 26px; cursor: pointer; }
+@keyframes popIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.test { font: 700 13px var(--display); letter-spacing: .08em; direction: ltr; background: transparent; color: var(--accent); border: 1.5px solid var(--accent); border-radius: 10px; padding: 8px 18px; cursor: pointer; }
+.test:hover { background: var(--accent); color: var(--accent-ink); }
+.tag { display: inline-block; direction: ltr; unicode-bidi: isolate; font-family: var(--display); font-weight: 500; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; font-size: .92em; }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; min-width: 0; }
+.card h3 { font-family: var(--display); font-size: 18px; margin: 0 0 4px; }
+.intro { margin: 0 0 12px; color: var(--fg); }
+.power { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.btn { font: 600 15px var(--body); border-radius: 10px; padding: 10px 16px; cursor: pointer; background: transparent; color: var(--fg); border: 1.5px solid var(--accent); }
+.btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.state { color: var(--mute); font-size: 14px; margin: 10px 0 0; }
+.state b { color: var(--accent); }
+
+.schem-card h3 { font-size: 16px; margin-bottom: 8px; }
+.schem { width: 100%; height: auto; display: block; }
+.schem .w { stroke: var(--mute); stroke-width: 2.4; stroke-linecap: round; fill: none; }
+.schem .w.p { stroke-width: 3.2; }
+.schem .live .w, .schem .w.live { stroke: var(--accent); }
+.schem .live .w { stroke-dasharray: 8 6; animation: flow .6s linear infinite; }
+.schem .fault .w, .schem .w.fault { stroke: var(--fault); }
+@keyframes flow { to { stroke-dashoffset: -14; } }
+.schem .el { fill: var(--panel-2); stroke: var(--mute); stroke-width: 2.4; }
+.schem .el.on { fill: var(--accent); stroke: var(--accent); }
+.schem .el.lampon { fill: var(--lamp); stroke: var(--lamp); }
+.schem .el.redon { fill: var(--fault); stroke: var(--fault); }
+.schem .el.ring { fill: none; }
+.schem .mech { fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 5 5; opacity: .7; }
+.schem .lbl { fill: var(--mute); font: 600 13px var(--body); }
+.schem .lbl.b { fill: var(--fg); font-weight: 700; }
+.schem .lbl.s { font-size: 11.5px; }
+.schem .lbl.mb { fill: var(--fg); font: 700 17px var(--display); }
+.schem .lbl.a { fill: var(--accent); }
+.schem .lbl.r { fill: var(--fault); }
+.schem .hide { opacity: 0; }
+.scap { margin: 6px 0 0; color: var(--mute); font-size: 14px; }
+.scap b { color: var(--accent); }
+
+.parts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.parts button { width: 100%; text-align: right; display: flex; gap: 10px; align-items: center; background: transparent; border: 1px solid var(--line); border-radius: 10px; color: var(--fg); font: 500 14.5px var(--body); padding: 8px 12px; cursor: pointer; }
+.parts button .n { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font: 700 12px/19px var(--display); text-align: center; }
+.parts button[aria-pressed="true"] { background: var(--panel-2); border-color: var(--accent); }
+.note { color: var(--mute); font-size: 13px; border-top: 1px solid var(--line); padding-top: 12px; margin: 0; }
+.fallback { padding: 40px 20px; text-align: center; color: var(--mute); }
+@media (prefers-reduced-motion: reduce) { .dot, .pop { transition: none; animation: none; } .schem .live .w { animation: none; stroke-dasharray: none; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>مختبر القطع</h1>
+      <p class="lede">17 قطعة كلاسيك كنترول. لفّ كل قطعة، شوف جوّاتها، كبس عأي رقم لتقرا شرحو وتعمل TEST، والمخطط تحت بيتحرّك معها.</p>
+    </div>
+    <span class="brand">MrElectroAI</span>
+  </header>
+
+  <nav class="picker" id="picker" aria-label="اختار القطعة"></nav>
+
+  <div class="grid">
+    <div class="col">
+      <div class="stage-box" id="box">
+        <canvas id="stage" aria-label="القطعة بالـ3D، اسحب لتلفّها"></canvas>
+        <div id="dots"></div>
+        <div class="banner" id="banner" aria-live="polite" hidden></div>
+        <div class="zoom"><button type="button" id="zin" aria-label="كبّر">+</button><button type="button" id="zout" aria-label="صغّر">−</button></div>
+        <div class="hint" id="hint">↔ اسحب لتلفّها · إصبعين للزوم · كبس عأي رقم</div>
+        <div class="pop" id="pop" role="dialog" aria-modal="false" aria-labelledby="popT" hidden>
+          <button class="x" id="popX" type="button" aria-label="سكّر">×</button>
+          <h2><span class="n" id="popN"></span><span id="popT"></span></h2>
+          <p id="popB"></p>
+          <button class="test" id="testBtn" type="button">TEST ▶</button>
+        </div>
+      </div>
+      <div class="card schem-card">
+        <h3 id="schemT">المخطط</h3>
+        <div id="schem"></div>
+        <p class="scap" id="scap"></p>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h3 id="partName"></h3>
+        <p class="intro" id="partIntro"></p>
+        <div class="power">
+          <button class="btn" id="act" aria-pressed="false"></button>
+          <button class="btn" id="glass" aria-pressed="true">جسم شفاف</button>
+        </div>
+        <p class="state" id="state"></p>
+      </div>
+      <ul class="parts" id="spots"></ul>
+      <p class="note">الأرقام والرموز حسب المعيار IEC، وهيك بتلاقيها عأغلب الماركات. القيم المكتوبة عالقطع (أمبير، فولت، أوقات) أمثلة.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+"use strict";
+const $ = id => document.getElementById(id);
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const fmt = s => s.replace(/([A-Z0-9][A-Za-z0-9\-·\/~\s.]*[A-Za-z0-9~]|[A-Z]\d?)/g, '<span class="tag">$1</span>');
+const lerp = (a, b, k) => a + (b - a) * k;
+const clamp01 = v => Math.max(0, Math.min(1, v));
+
+/* ================= schematic helpers ================= */
+const S = {
+  t(x, y, txt, cls = "lbl", anchor = "middle", ltr = false) {
+    return `<text x="${x}" y="${y}" class="${cls}" text-anchor="${anchor}" direction="${ltr ? "ltr" : "rtl"}">${txt}</text>`;
+  },
+  l(x1, y1, x2, y2, cls = "w") { return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${cls}"/>`; },
+  p(d, cls = "w") { return `<path d="${d}" class="${cls}"/>`; },
+  g(id, inner) { return `<g id="${id}">${inner}</g>`; },
+  // contact: fixed wire ends at y, moving pivot at y+20 (caller draws wires)
+  blade(id, x, y, nc = false, cls = "w") {
+    return (nc ? `<line x1="${x}" y1="${y}" x2="${x + 12}" y2="${y}" class="w"/>` : "") +
+      `<line id="${id}" x1="${x}" y1="${y + 20}" x2="${x}" y2="${y}" class="${cls} blade" data-x="${x}" data-y="${y}" data-nc="${nc ? 1 : 0}"/>`;
+  },
+  coil(id, x, y) { return `<rect id="${id}" x="${x - 22}" y="${y}" width="44" height="28" rx="3" class="el"/>`; },
+  lamp(id, x, y) { return `<circle id="${id}" cx="${x}" cy="${y}" r="13" class="el"/><path d="M${x - 9},${y - 9} L${x + 9},${y + 9} M${x + 9},${y - 9} L${x - 9},${y + 9}" class="w"/>`; },
+  motor(id, x, y) { return `<circle id="${id}" cx="${x}" cy="${y}" r="28" class="el"/>` + S.t(x, y - 1, "M", "lbl mb", "middle", true) + S.t(x, y + 16, "3~", "lbl s", "middle", true); },
+  box(id, x, y, w, h, txt) { return `<rect id="${id}" x="${x}" y="${y}" width="${w}" height="${h}" rx="4" class="el"/>` + (txt ? S.t(x + w / 2, y + h / 2 + 5, txt, "lbl s", "middle", true) : ""); },
+  thermal(x, y) { return `<path d="M${x},${y} v6 h-7 v10 h7 v6" class="w"/>`; },
+  magnet(x, y) { return `<rect x="${x - 7}" y="${y}" width="14" height="20" class="w"/><path d="M${x - 7},${y + 20} l14,-20" class="w"/>`; },
+  svg(inner, w = 490, h = 280) { return `<svg viewBox="0 0 ${w} ${h}" class="schem" role="img">${inner}</svg>`; }
+};
+
+/* ================= parts ================= */
+const PARTS = [];
+const P = def => PARTS.push(def);
+
+/* ---------- 1. MCB ---------- */
+P({
+  id: "mcb", cat: "الحماية", name: "القاطع العادي MCB", dist: 5.2,
+  intro: "بيحمي الشريط من الحمل الزايد ومن الشورت. جوّاتو بايمتال للحمل الزايد، وملف مغناطيسي للشورت.",
+  act: ["سكّر القاطع", "افتح القاطع"], st: ["القاطع مفتوح: ما في كهربا عالخط.", "<b>القاطع مسكّر:</b> الكهربا واصلة عالخط."],
+  build(A, R) {
+    const b = A.din(R, 1);
+    const lever = new THREE.Group(); lever.position.set(0, 0.02, 0.6); R.add(lever);
+    A.tag(A.box(0.15, 0.32, 0.12, A.mat(0x2b3940, { roughness: .5 }), 0, 0.16, 0, lever), "lever");
+    const win = A.box(0.12, 0.06, 0.01, A.mat(0x2e9e5b), 0, 0.33, 0.605);
+    A.text(["C16"], 0.3, 0.12, 0, -0.26, 0.605, { color: "#1b2422", scale: .8 });
+    A.text(["6000", "230/400V"], 0.28, 0.12, 0, -0.38, 0.605, { color: "#3b4644", scale: .4, weight: 600 });
+    // internals
+    const cu = A.copper(), ir = A.iron(), sv = A.silver();
+    A.tag(A.box(0.05, 0.36, 0.02, cu, -0.06, 0.6, 0.0), "path");
+    const coil = A.tag(A.cyl(0.08, 0.08, 0.2, cu, -0.06, 0.32, -0.05, "y"), "coil");
+    const plunger = A.tag(A.cyl(0.035, 0.035, 0.26, ir, -0.06, 0.32, -0.05, "y"), "coil");
+    A.box(0.06, 0.03, 0.03, sv, -0.06, 0.12, 0.02);
+    const arm = new THREE.Group(); arm.position.set(0.05, -0.02, 0.02); R.add(arm);
+    A.tag(A.box(0.03, 0.18, 0.02, cu, 0, 0.09, 0, arm), "path");
+    A.box(0.05, 0.03, 0.03, sv, 0, 0.17, 0, arm);
+    for (let i = 0; i < 6; i++) A.tag(A.box(0.12, 0.012, 0.2, ir, -0.08, -0.05 - i * 0.035, -0.1), "arc");
+    const bim = new THREE.Group(); bim.position.set(0.09, -0.35, -0.02); R.add(bim);
+    A.tag(A.box(0.035, 0.34, 0.02, A.brass(), 0, 0.17, 0, bim), "bim");
+    A.tag(A.box(0.05, 0.3, 0.02, cu, 0.05, -0.55, 0.0), "path");
+    return {
+      anim(k, F) {
+        lever.rotation.x = lerp(Math.PI - 0.45, 0.4, k);
+        win.material.color.set(k > 0.5 ? 0xd63b2f : 0x2e9e5b);
+        arm.rotation.z = lerp(0.5, 0, k);
+        plunger.position.y = 0.32 - (F.kind === "short" ? 0.07 * F.f : 0);
+        bim.rotation.z = F.kind === "over" ? -0.35 * F.f : 0;
+      }
+    };
+  },
+  spots: [
+    { t: "الذراع", b: "لفوق يعني مسكّر (ON)، لتحت مفتوح (OFF). إذا فصل لحالو، ما ترجّعو قبل ما تعرف ليش فصل. الشبّاك فوقو بيبيّن الحالة.", p: [0, 0.28, 0.72], yaw: 0, pitch: 0.15, test: { mode: "toggle", key: "lever", msg: "الذراع طلع لفوق: القاطع سكّر والكهربا مرقت." } },
+    { t: "الدخلة فوق", b: "الشريط الجايي من البسبار بيفوت من فوق، وبيمرق جوّا عالملف والبايمتال لعند الطلعة.", p: [0, 0.64, 0.36], yaw: 0, pitch: 0.25, test: { mode: "on", key: "path", msg: "الكهربا فاتت من فوق ومرقت بالنحاس لتحت." } },
+    { t: "الطلعة تحت", b: "من هون بيطلع الشريط عالحمل: بريز، لمبات، أو تابلو تاني.", p: [0, -0.64, 0.36], yaw: 0, pitch: -0.25, test: { mode: "on", key: "path", msg: "الكهربا طالعة من تحت عالحمل." } },
+    { t: "الكتابة C16", b: "16 هوّي الأمبير. والحرف هوّي المنحنى: B بيفصل الشورت بين 3 و5 أضعاف، C بين 5 و10 (للبيوت والإنارة)، D بين 10 و20 (للموتورات والمحوّلات). 6000 يعني بيقدر يقطع شورت لحد 6 كيلو أمبير.", p: [0, -0.26, 0.62], yaw: 0, pitch: 0, test: { mode: "on", key: "lever", msg: "اختار الأمبير حسب الشريط، والحرف حسب نوع الحمل." } },
+    { t: "جوّا: الملف المغناطيسي", b: "للشورت. التيار الكبير بيعمل مغناطيس قوي بالملف، بيضرب القضيب الحديد وبيفصل القاطع بأجزاء من الثانية.", p: [-0.06, 0.32, 0.03], inner: true, yaw: 0.6, pitch: 0.1, test: { mode: "trip", kind: "short", key: "coil", msg: "شورت! الملف سحب القضيب والقاطع فصل فوراً." } },
+    { t: "جوّا: البايمتال", b: "للحمل الزايد. شريحتين معدن بيتمدّدوا غير بعض مع السخونة، فبتتعوّج الشريحة ببطء وبتفصل القاطع. كل ما زاد الحمل، بيفصل أسرع.", p: [0.09, -0.18, 0.02], inner: true, yaw: -0.6, pitch: 0.1, test: { mode: "trip", kind: "over", key: "bim", slow: true, msg: "حمل زايد: البايمتال سخن وتعوّج، وبعدين فصل القاطع." } },
+    { t: "جوّا: حجرة إطفاء الشرارة", b: "صفايح حديد بتقطّع الشرارة يلّي بتطلع لما يفتح الكونتاكت تحت الحمل، وبتبرّدها.", p: [-0.08, -0.12, -0.02], inner: true, yaw: 0.8, pitch: 0, test: { mode: "trip", kind: "short", key: "arc", msg: "الشرارة دخلت بالصفايح وانطفت." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(120, 26, "L 220V", "lbl b", "middle", true) +
+      S.g("s-sup", S.l(120, 34, 120, 70)) + S.blade("bl0", 120, 70) +
+      S.g("s-load", S.l(120, 90, 120, 104) + S.l(120, 140, 120, 190) + S.l(120, 216, 120, 250)) +
+      `<rect x="98" y="104" width="44" height="36" rx="4" class="el ring"/>` + S.thermal(112, 108) + S.magnet(130, 110) +
+      S.t(160, 126, "MCB", "lbl b", "start", true) + S.t(160, 144, "حراري + مغناطيسي", "lbl s", "end") +
+      S.lamp("s-lamp", 120, 203) + S.t(142, 208, "الحمل", "lbl", "end") +
+      S.t(120, 268, "N", "lbl b", "middle", true) +
+      S.t(330, 110, "حمل زايد ← البايمتال", "lbl s") + S.t(330, 132, "شورت ← الملف المغناطيسي", "lbl s") +
+      S.g("s-x", S.t(330, 170, "القاطع فصل!", "lbl r hide"))
+    ),
+    blades: [["bl0", "k"]],
+    update(s) { return { live: { "s-sup": true, "s-load": s.k > .85 }, on: { "s-lamp": s.k > .85 ? "lampon" : "" }, show: { "s-x": s.f > .5 } }; },
+    cap(s) { return s.f > .5 ? "<b>فصل:</b> الحماية فتحت الكونتاكت والحمل انطفى." : s.k > .85 ? "<b>مسكّر:</b> الكهربا مارقة بالحراري والمغناطيسي لعند الحمل." : "مفتوح: الحمل طافي."; }
+  }
+});
+
+/* ---------- 2. Motor protection breaker ---------- */
+P({
+  id: "mpcb", cat: "الحماية", name: "قاطع الموتور", dist: 5.4,
+  intro: "قاطع تلات فاز خاص بالموتورات: فيه حماية حرارية بتنضبط على أمبير الموتور، وحماية مغناطيسية للشورت، وبيشغّل ويطفي بإيدو.",
+  act: ["شغّل القاطع", "طفّي القاطع"], st: ["مطفي: الموتور ما بتوصلو كهربا.", "<b>شغّال:</b> الفازات التلاتة واصلين عالموتور."],
+  build(A, R) {
+    const sh = A.shell(0xe2e5e4), sh2 = A.shell(0x6f7978);
+    A.rbox(0.9, 1.7, 0.7, 0.06, sh, 0, 0, -0.25);
+    A.rbox(0.9, 0.42, 0.26, 0.04, sh, 0, 0.64, 0.2); A.rbox(0.9, 0.42, 0.26, 0.04, sh, 0, -0.64, 0.2);
+    A.rbox(0.9, 0.86, 0.5, 0.05, sh2, 0, 0, 0.35);
+    A.rail(R, 1.6);
+    [-0.28, 0, 0.28].forEach((x, i) => {
+      A.tag(A.screw(x, 0.62, 0.33), "in"); A.tag(A.screw(x, -0.62, 0.33), "out");
+      A.text([["1L1", "3L2", "5L3"][i]], 0.2, 0.06, x, 0.48, 0.335, {}); A.text([["2T1", "4T2", "6T3"][i]], 0.2, 0.06, x, -0.48, 0.335, {});
+    });
+    const knob = new THREE.Group(); knob.position.set(0, 0.12, 0.6); R.add(knob);
+    A.tag(A.cyl(0.2, 0.22, 0.06, A.mat(0x1d2326), 0, 0, 0.03, "z", knob), "knob");
+    A.tag(A.box(0.36, 0.08, 0.08, A.mat(0x1d2326), 0, 0, 0.09, knob), "knob");
+    A.box(0.02, 0.06, 0.01, A.mat(0xffffff), 0.15, 0, 0.135, knob);
+    A.text(["O", "I"], 0.06, 0.3, -0.27, 0.12, 0.602, { scale: .5 });
+    const dial = A.tag(A.cyl(0.07, 0.07, 0.03, A.mat(0xd9dcdb), 0.25, -0.26, 0.61, "z"), "dial");
+    A.box(0.012, 0.06, 0.01, A.mat(0x111111), 0.25, -0.24, 0.63);
+    A.text(["6 - 10 A"], 0.3, 0.07, -0.08, -0.26, 0.602, { scale: .7 });
+    const cu = A.copper(), br = A.brass();
+    const bims = [];
+    [-0.28, 0, 0.28].forEach(x => {
+      A.tag(A.box(0.05, 0.3, 0.02, cu, x, 0.42, 0.0), "in", "path");
+      A.tag(A.cyl(0.06, 0.06, 0.14, cu, x, 0.2, 0.0, "y"), "mag");
+      const g = new THREE.Group(); g.position.set(x, -0.3, 0); R.add(g);
+      A.tag(A.box(0.04, 0.3, 0.02, br, 0, 0.15, 0, g), "bim"); bims.push(g);
+      A.tag(A.box(0.05, 0.3, 0.02, cu, x, -0.46, 0.0), "out", "path");
+    });
+    return {
+      anim(k, F) {
+        const trip = F.f > 0.5 ? -Math.PI / 4 : null;
+        knob.rotation.z = trip !== null ? trip : lerp(0, -Math.PI / 2, k);
+        bims.forEach(g => g.rotation.z = F.kind === "over" ? -0.35 * F.f : 0);
+      }
+    };
+  },
+  spots: [
+    { t: "مسكة التشغيل", b: "بتلفّها عـ I لتشغّل وعـ O لتطفي. إذا فصل لحالو بتوقف بالنص (Trip)، ولازم ترجّعها عـ O قبل ما تشغّل من جديد.", p: [0, 0.12, 0.74], yaw: 0, pitch: 0.1, test: { mode: "toggle", key: "knob", msg: "المسكة عـ I: القاطع شغّال." } },
+    { t: "ضبط الأمبير", b: "بتضبطو على الأمبير المكتوب على لوحة الموتور (FLA)، مش أكتر. إذا ضبطتو عالي، الموتور بيحترق قبل ما يفصل.", p: [0.25, -0.26, 0.64], yaw: -0.2, pitch: -0.05, test: { mode: "on", key: "dial", msg: "اضبط الدايل على أمبير الموتور المكتوب عاللوحة." } },
+    { t: "الدخلة 1L1 · 3L2 · 5L3", b: "من فوق بتفوت التلات فازات من البسبار.", p: [0, 0.64, 0.36], yaw: 0, pitch: 0.25, test: { mode: "on", key: "in", msg: "التلات فازات فايتين من فوق." } },
+    { t: "الطلعة 2T1 · 4T2 · 6T3", b: "من تحت بتطلع الفازات عالكونتاكتور أو عالموتور مباشرة.", p: [0, -0.64, 0.36], yaw: 0, pitch: -0.25, test: { mode: "on", key: "out", msg: "الفازات طالعة من تحت عالكونتاكتور." } },
+    { t: "جوّا: الحماية المغناطيسية", b: "ملف لكل فاز. وقت الشورت بيفصل فوراً. هالحماية ثابتة وما بتنضبط.", p: [0, 0.2, 0.06], inner: true, yaw: 0.5, pitch: 0.1, test: { mode: "trip", kind: "short", key: "mag", msg: "شورت: الملفات فصلت فوراً والمسكة وقفت عـ Trip." } },
+    { t: "جوّا: الحماية الحرارية", b: "بايمتال لكل فاز. إذا الموتور سحب أكتر من الأمبير المضبوط مدة، بيتعوّج وبيفصل. وإذا غاب فاز، كتير موديلات بتفصل أسرع.", p: [0.28, -0.15, 0.03], inner: true, yaw: -0.5, pitch: 0.1, test: { mode: "trip", kind: "over", key: "bim", slow: true, msg: "حمل زايد عالموتور: البايمتال تعوّج والقاطع فصل." } }
+  ],
+  schem: {
+    svg: S.svg(
+      [150, 210, 270].map((x, i) => S.t(x, 26, ["L1", "L2", "L3"][i], "lbl b", "middle", true)).join("") +
+      S.g("s-sup", [150, 210, 270].map(x => S.l(x, 34, x, 64, "w p")).join("")) +
+      S.blade("bl0", 150, 64, false, "w p") + S.blade("bl1", 210, 64, false, "w p") + S.blade("bl2", 270, 64, false, "w p") +
+      `<path d="M136,74 H290" class="mech"/>` +
+      S.g("s-load", [150, 210, 270].map(x => S.l(x, 84, x, 98, "w p") + S.l(x, 152, x, 176, "w p")).join("") + `<path d="M150,176 L190,204 M210,176 V194 M270,176 L230,204" class="w p"/>`) +
+      [150, 210, 270].map(x => S.magnet(x, 100) + S.thermal(x, 126)).join("") +
+      `<rect x="128" y="96" width="164" height="56" rx="6" class="el ring"/>` +
+      S.t(300, 130, "قاطع الموتور", "lbl b", "end") +
+      S.motor("s-m", 210, 228) +
+      S.g("s-x", S.t(380, 228, "فصل: Trip", "lbl r hide", "middle"))
+    ),
+    blades: [["bl0", "k"], ["bl1", "k"], ["bl2", "k"]],
+    update(s) { return { live: { "s-sup": true, "s-load": s.k > .85 }, on: { "s-m": s.k > .85 ? "on" : "" }, show: { "s-x": s.f > .5 } }; },
+    cap(s) { return s.f > .5 ? "<b>فصل:</b> الحماية فتحت الفازات التلاتة سوا." : s.k > .85 ? "<b>شغّال:</b> الفازات مارقة بالمغناطيسي والحراري لعند الموتور." : "مطفي: الموتور واقف."; }
+  }
+});
+
+/* ---------- 3. Overload ---------- */
+P({
+  id: "overload", cat: "الحماية", name: "الأوفرلود", dist: 5.0, fault: true,
+  intro: "بيتركّب تحت الكونتاكتور وبيحمي الموتور من الحمل الزايد ومن غياب فاز. ما بيقطع الفازات بنفسو: بيفتح 95-96 بدارة التحكم، فالكونتاكتور بيفلت.",
+  act: ["اعمل حمل زايد", "اعمل Reset"], st: ["عادي: 95-96 مسكّر والكونتاكتور بيقدر يشتغل.", "<b>فصل:</b> 95-96 فتح و97-98 سكّر. لازم Reset."],
+  build(A, R) {
+    const sh = A.shell(0xe2e5e4), sh2 = A.shell(0x5f6a69);
+    A.rbox(0.92, 0.8, 0.8, 0.06, sh, 0, 0, 0);
+    A.rbox(0.6, 0.5, 0.14, 0.04, sh2, -0.1, 0.03, 0.44);
+    const cu = A.copper(), br = A.brass();
+    [-0.3, 0, 0.3].forEach((x, i) => {
+      A.tag(A.cyl(0.035, 0.035, 0.42, cu, x, 0.58, 0.18, "y"), "pins");
+      A.tag(A.screw(x, -0.3, 0.41), "out");
+      A.text([["2T1", "4T2", "6T3"][i]], 0.2, 0.06, x, -0.17, 0.41, {});
+    });
+    A.tag(A.screw(0.33, 0.22, 0.41), "nc"); A.tag(A.screw(0.33, 0.05, 0.41), "no");
+    A.text(["95-96"], 0.2, 0.06, 0.33, 0.33, 0.41, {}); A.text(["97-98"], 0.2, 0.06, 0.33, -0.06, 0.41, {});
+    const dial = A.tag(A.cyl(0.09, 0.09, 0.03, A.mat(0xd9dcdb), -0.25, 0.1, 0.53, "z"), "dial");
+    A.box(0.014, 0.08, 0.01, A.mat(0x111111), -0.25, 0.13, 0.55);
+    A.text(["9 - 13 A"], 0.25, 0.06, -0.25, -0.05, 0.512, { color: "#e6f2ee" });
+    const reset = A.tag(A.cyl(0.06, 0.06, 0.06, A.mat(0x2f6fd6), 0.03, 0.15, 0.53, "z"), "reset");
+    const stop = A.tag(A.cyl(0.05, 0.05, 0.05, A.mat(0xd63b2f), 0.03, -0.06, 0.53, "z"), "stop");
+    const flag = A.box(0.08, 0.05, 0.01, A.mat(0x2e9e5b), -0.1, 0.24, 0.515);
+    const bims = [];
+    [-0.3, 0, 0.3].forEach(x => {
+      const g = new THREE.Group(); g.position.set(x, -0.15, 0.05); R.add(g);
+      A.tag(A.box(0.05, 0.42, 0.03, br, 0, 0.21, 0, g), "bim"); bims.push(g);
+      A.tag(A.cyl(0.04, 0.04, 0.3, A.mat(0x8a3a1a, { roughness: .6 }), x, 0.06, 0.08, "y"), "bim");
+    });
+    const bar = A.tag(A.box(0.8, 0.04, 0.04, A.mat(0x2f7a64), 0, 0.28, 0.12), "bar");
+    return {
+      anim(k) {
+        bims.forEach(g => g.rotation.z = -0.3 * k);
+        bar.position.x = 0.06 * k;
+        flag.material.color.set(k > .5 ? 0xf0a500 : 0x2e9e5b);
+        reset.position.z = 0.53 + (k < .5 && k > .05 ? -0.02 : 0);
+      }
+    };
+  },
+  spots: [
+    { t: "ضبط الأمبير", b: "بتضبطو على أمبير الموتور المكتوب عاللوحة (FLA). مثلاً موتور 11 أمبير، بتحطّو على 11.", p: [-0.25, 0.1, 0.56], yaw: 0.2, pitch: 0, test: { mode: "on", key: "dial", msg: "ضبطنا الدايل على أمبير الموتور." } },
+    { t: "95-96 مسكّر (NC)", b: "منحطّو عالتسلسل مع كويل الكونتاكتور. وقت الحمل الزايد بيفتح، الكويل بيفلت والموتور بيوقف.", p: [0.33, 0.22, 0.44], yaw: -0.2, pitch: 0, test: { mode: "toggle", key: "nc", msg: "حمل زايد: 95-96 فتح، فالكويل فلت." } },
+    { t: "97-98 مفتوح (NO)", b: "بيسكّر لما يفصل الأوفرلود. منستعملو للمبة عطل أو جرس.", p: [0.33, 0.05, 0.44], yaw: -0.2, pitch: 0, test: { mode: "toggle", key: "no", msg: "97-98 سكّر: لمبة العطل ضوّت." } },
+    { t: "زر الـReset الأزرق", b: "بعد ما يفصل وتعرف السبب، بتستنّى يبرد شوي وبتكبسو ليرجع. في موديلات بتنضبط H (يدوي) أو A (أوتوماتيك). للموتورات خلّيه يدوي.", p: [0.03, 0.15, 0.57], yaw: 0, pitch: 0, test: { mode: "reset", key: "reset", msg: "Reset: الأوفرلود رجع، و95-96 رجع سكّر." } },
+    { t: "زر Stop / Test الأحمر", b: "بيفتح 95-96 بإيدك لتجرّب إنو الكونتاكتور بيوقف. منيح تجرّبو قبل ما تسلّم الشغل.", p: [0.03, -0.06, 0.56], yaw: 0, pitch: -0.05, test: { mode: "toggle", key: "stop", msg: "كبسنا Test: الأوفرلود فصل متل الحقيقي." } },
+    { t: "الإبر لفوق", b: "التلات إبر النحاس بيفوتوا مباشرة تحت الكونتاكتور، على 2T1-4T2-6T3 تبعو.", p: [0, 0.72, 0.2], yaw: 0, pitch: 0.4, test: { mode: "on", key: "pins", msg: "الإبر هنّي الوصلة مع الكونتاكتور." } },
+    { t: "جوّا: البايمتال", b: "التيار بيسخّن شريحة لكل فاز. إذا زاد الحمل، الشرايح بتتعوّج وبتدفش القضيب، فبيفتح 95-96. هيدا Class 10 يعني بيفصل خلال 10 ثواني تقريباً على 7 أضعاف الأمبير.", p: [0, 0.05, 0.12], inner: true, yaw: 0.5, pitch: 0.1, test: { mode: "toggle", key: "bim", msg: "الشرايح تعوّجت ودفشت القضيب: فصل." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(90, 26, "L", "lbl b", "middle", true) +
+      S.g("s-c1", S.l(90, 34, 90, 70)) + S.blade("bl0", 90, 70, true) +
+      S.t(108, 82, "95-96", "lbl s", "start", true) +
+      S.g("s-c2", S.l(90, 90, 90, 130) + S.l(90, 158, 90, 250)) + S.coil("s-coil", 90, 130) + S.t(118, 148, "KM1", "lbl s", "start", true) +
+      S.t(90, 268, "N", "lbl b", "middle", true) +
+      S.t(220, 26, "L", "lbl b", "middle", true) +
+      S.g("s-a1", S.l(220, 34, 220, 70)) + S.blade("bl1", 220, 70) + S.t(238, 82, "97-98", "lbl s", "start", true) +
+      S.g("s-a2", S.l(220, 90, 220, 131) + S.l(220, 157, 220, 250)) + S.lamp("s-lamp", 220, 144) + S.t(242, 150, "عطل", "lbl", "end") +
+      S.t(220, 268, "N", "lbl b", "middle", true) +
+      [340, 390, 440].map((x, i) => S.t(x, 26, ["L1", "L2", "L3"][i], "lbl b", "middle", true) + S.l(x, 34, x, 100, "w p") + S.thermal(x, 100) + S.l(x, 122, x, 180, "w p")).join("") +
+      `<rect x="322" y="94" width="136" height="34" rx="5" class="el ring"/>` + S.t(390, 150, "الحراري", "lbl s") +
+      `<path d="M322,111 H120 V80" class="mech"/>` + S.t(390, 200, "لعند الموتور", "lbl s")
+    ),
+    blades: [["bl0", "k"], ["bl1", "k"]],
+    update(s) { return { live: { "s-c1": true, "s-c2": s.k < .15, "s-a1": true, "s-a2": s.k > .85 }, on: { "s-coil": s.k < .15 ? "on" : "", "s-lamp": s.k > .85 ? "redon" : "" } }; },
+    cap(s) { return s.k > .85 ? "<b>فصل:</b> 95-96 فتح فالكويل فلت والموتور وقف، و97-98 ضوّى لمبة العطل." : "عادي: 95-96 مسكّر، الكويل شادد والموتور شغّال."; }
+  }
+});
+
+/* ---------- 4. RCD ---------- */
+P({
+  id: "rcd", cat: "الحماية", name: "الدفرانسير RCD", dist: 5.2,
+  intro: "بيقارن التيار الطالع عالفاز مع الراجع عالنوترال. إذا في فرق (تيار عم يهرب عالأرض أو عجسم حدا)، بيفصل. ما بيحمي من الشورت ولا من الحمل الزايد.",
+  act: ["سكّر الدفرانسير", "افتح الدفرانسير"], st: ["مفتوح: ما في كهربا.", "<b>مسكّر:</b> التيار الطالع قدّ الراجع، كل شي تمام."],
+  build(A, R) {
+    const b = A.din(R, 2);
+    const lever = new THREE.Group(); lever.position.set(-0.12, 0.05, 0.6); R.add(lever);
+    A.tag(A.box(0.26, 0.3, 0.12, A.mat(0x2b3940), 0, 0.15, 0, lever), "lever");
+    const tbtn = A.tag(A.cyl(0.07, 0.07, 0.05, A.mat(0xf0c419), 0.2, 0.18, 0.62, "z"), "tbtn");
+    A.text(["T"], 0.08, 0.08, 0.2, 0.18, 0.648, { scale: .9 });
+    A.text(["40A  30mA"], 0.5, 0.08, 0, -0.27, 0.605, { scale: .7 });
+    A.text(["Type A"], 0.3, 0.06, 0, -0.37, 0.605, { scale: .7, color: "#3b4644" });
+    A.text(["N"], 0.08, 0.06, -0.18, 0.48, 0.33, {}); A.text(["L"], 0.08, 0.06, 0.18, 0.48, 0.33, {});
+    A.tag(A.screw(-0.18, 0.62, 0.33), "in"); A.tag(A.screw(0.18, 0.62, 0.33), "in");
+    A.tag(A.screw(-0.18, -0.62, 0.33), "out"); A.tag(A.screw(0.18, -0.62, 0.33), "out");
+    const tor = A.tag(new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.05, 16, 48), A.iron()), "tor");
+    tor.position.set(0, -0.12, 0.05); R.add(tor);
+    A.tag(A.box(0.03, 0.9, 0.03, A.mat(0x8a5a2b, { emissive: 0x2a1404 }), 0.05, 0.1, 0.05), "wires");
+    A.tag(A.box(0.03, 0.9, 0.03, A.mat(0x2b6cb0, { emissive: 0x06182e }), -0.05, 0.1, 0.05), "wires");
+    A.tag(A.cyl(0.05, 0.05, 0.12, A.copper(), 0.22, -0.05, 0.0, "y"), "trip");
+    return { anim(k) { lever.rotation.x = lerp(Math.PI - 0.45, 0.4, k); } };
+  },
+  spots: [
+    { t: "الذراع", b: "لفوق مسكّر، لتحت مفتوح. إذا فصل، شيل الأحمال واحد واحد لتلاقي يلّي عم يهرّب.", p: [-0.12, 0.3, 0.72], yaw: 0, pitch: 0.15, test: { mode: "toggle", key: "lever", msg: "الذراع لفوق: الدفرانسير سكّر." } },
+    { t: "زر الـTest", b: "بيعمل تسريب صغير جوّا ليتأكّد إنو بيفصل. اكبسو كل فترة والكهربا شغّالة: لازم يفصل فوراً. إذا ما فصل، غيّرو.", p: [0.2, 0.18, 0.66], yaw: -0.2, pitch: 0, test: { mode: "trip", kind: "leak", key: "tbtn", msg: "كبسنا T: عمل تسريب صغير والدفرانسير فصل." } },
+    { t: "30mA", b: "يعني بيفصل إذا هرب أقل من 30 ملّي أمبير. هيدا لحماية الناس. للحماية من الحريق عالخطوط الكبيرة في 300mA. وType A أحسن من AC للأجهزة الإلكترونية.", p: [0, -0.27, 0.62], yaw: 0, pitch: 0, test: { mode: "on", key: "lever", msg: "30mA بيحمي الناس من الكهربا." } },
+    { t: "L و N فوق وتحت", b: "الفاز والنوترال لازم يمرقوا التنين بالدفرانسير، وبنفس الترتيب. إذا النوترال مرق من برّا، بيفصل عالفاضي.", p: [0, 0.64, 0.36], yaw: 0, pitch: 0.25, test: { mode: "on", key: "in", msg: "L و N فايتين سوا من فوق." } },
+    { t: "جوّا: الحلقة الحديد", b: "الفاز والنوترال بيمرقوا بنصّها. إذا التيارين قدّ بعض، مغناطيسهن بيلغي بعض. إذا في فرق، بيطلع تيار بالملف الصغير وبيفصل.", p: [0, -0.12, 0.1], inner: true, yaw: 0.4, pitch: 0.1, test: { mode: "trip", kind: "leak", key: "tor", msg: "صار فرق بين L و N: الحلقة حسّت والدفرانسير فصل." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(120, 26, "L", "lbl b", "middle", true) + S.t(200, 26, "N", "lbl b", "middle", true) +
+      S.g("s-sup", S.l(120, 34, 120, 62) + S.l(200, 34, 200, 62)) +
+      S.blade("bl0", 120, 62) + S.blade("bl1", 200, 62) + `<path d="M106,72 H214" class="mech"/>` +
+      S.g("s-load", S.l(120, 82, 120, 180) + S.l(200, 82, 200, 180) + S.l(120, 220, 120, 236) + S.l(200, 220, 200, 236) + S.l(120, 236, 145, 236) + S.l(200, 236, 175, 236)) +
+      `<ellipse cx="160" cy="125" rx="62" ry="16" class="el ring"/>` + S.t(250, 130, "الحلقة", "lbl s", "end") +
+      `<rect x="110" y="180" width="100" height="40" rx="5" class="el ring"/>` + S.t(160, 205, "الجهاز", "lbl s") +
+      S.g("s-leak", `<path d="M210,200 H300 V250" class="w fault"/>` + `<path d="M290,250 h20 M294,256 h12 M298,262 h4" class="w fault"/>` + S.t(360, 214, "تسريب عالأرض", "lbl r", "middle"))
+    ),
+    blades: [["bl0", "k"], ["bl1", "k"]],
+    update(s) { return { live: { "s-sup": true, "s-load": s.k > .85 }, show: { "s-leak": s.f > .2 } }; },
+    cap(s) { return s.f > .5 ? "<b>تسريب:</b> الطالع صار أكبر من الراجع، فالدفرانسير فصل الخطّين." : s.k > .85 ? "<b>مسكّر:</b> نفس التيار رايح وراجع." : "مفتوح."; }
+  }
+});
+
+/* ---------- 5. Phase monitoring relay ---------- */
+P({
+  id: "phase", cat: "الحماية", name: "ريليه الفازات", dist: 5.2, fault: true, startOn: false,
+  intro: "بيراقب الفازات التلاتة: إذا غاب فاز، انعكس الترتيب، أو الفولت نزل أو طلع، بيفتح 11-14 فبتفلت كل الكونتاكتورات.",
+  act: ["شيل فاز", "رجّع الفاز"], st: ["كل شي تمام: اللمبة الخضرا ضاوية و11-14 مسكّر.", "<b>عطل:</b> فاز L3 غاب، 11-14 فتح والكنترول وقف."],
+  build(A, R) {
+    const b = A.din(R, 2);
+    A.text(["L1  L2  L3"], 0.6, 0.07, 0, 0.48, 0.33, {});
+    A.text(["11  12  14"], 0.6, 0.07, 0, -0.48, 0.33, {});
+    [-0.22, 0, 0.22].forEach(x => { A.tag(A.screw(x, 0.62, 0.33), "in"); A.tag(A.screw(x, -0.62, 0.33), "out"); });
+    const g = A.tag(A.cyl(0.035, 0.035, 0.02, A.mat(0x1f7a4d, { emissive: 0x000000 }), -0.2, 0.3, 0.61, "z"), "led");
+    const rr = A.tag(A.cyl(0.035, 0.035, 0.02, A.mat(0x6b1d18, { emissive: 0x000000 }), 0.2, 0.3, 0.61, "z"), "led");
+    A.text(["OK", "FAULT"], 0.6, 0.06, 0, 0.21, 0.605, { scale: .8, color: "#3b4644", split: true });
+    A.tag(A.cyl(0.07, 0.07, 0.04, A.mat(0xd9dcdb), -0.15, 0.0, 0.62, "z"), "knob");
+    A.tag(A.cyl(0.07, 0.07, 0.04, A.mat(0xd9dcdb), 0.15, 0.0, 0.62, "z"), "knob");
+    A.text(["t (s)", "U (%)"], 0.6, 0.06, 0, -0.12, 0.605, { scale: .8, color: "#3b4644", split: true });
+    A.tag(A.box(0.5, 0.4, 0.02, A.mat(0x1c6b45), 0, 0.05, -0.15), "pcb");
+    const rel = A.tag(A.box(0.22, 0.16, 0.16, A.mat(0x2a2f33), 0.1, -0.25, -0.05), "rel");
+    return {
+      anim(k, F, t) {
+        g.material.emissive.set(k < .5 ? 0x22c79b : 0x000000);
+        rr.material.emissive.set(k > .5 && Math.sin(t / 160) > 0 ? 0xff3b2b : 0x000000);
+      }
+    };
+  },
+  spots: [
+    { t: "الدخلة L1 · L2 · L3", b: "بيتوصل عالتلات فازات (عبر قاطع صغير). في موديلات بدّها نوترال كمان.", p: [0, 0.64, 0.36], yaw: 0, pitch: 0.25, test: { mode: "toggle", key: "in", msg: "شلنا L3: الريليه حسّ فوراً." } },
+    { t: "اللمبات", b: "الخضرا: الفازات تمام والريليه شادد. الحمرا عم تضوّي وتطفي: في عطل، وببعض الموديلات عدد الرمشات بيقلّك شو العطل.", p: [0, 0.3, 0.64], yaw: 0, pitch: 0.05, test: { mode: "toggle", key: "led", msg: "الخضرا طفت والحمرا عم ترمش: عطل بالفازات." } },
+    { t: "الضبط: وقت وفولت", b: "t هوّي التأخير قبل ما يفصل (لحتى ما يفصل عرجفة صغيرة)، وU هوّي قديش بيقبل الفولت ينزل أو يطلع.", p: [0, 0.0, 0.66], yaw: 0, pitch: 0, test: { mode: "toggle", key: "knob", msg: "بعد التأخير المضبوط، فصل الريليه." } },
+    { t: "الطلعة 11 · 12 · 14", b: "11 المشترك، 12 مسكّر بالعطل، 14 مسكّر لما كل شي تمام. منستعمل 11-14 عالتسلسل بأول دارة التحكم.", p: [0, -0.64, 0.36], yaw: 0, pitch: -0.25, test: { mode: "toggle", key: "out", msg: "11-14 فتح: كل الكويلات فلتت." } },
+    { t: "جوّا: الريليه", b: "بورد إلكتروني بيقيس الفازات وبيشغّل ريليه صغير. الريليه بيضل شادد طول ما كل شي تمام.", p: [0.1, -0.25, 0.05], inner: true, yaw: -0.4, pitch: 0.1, test: { mode: "toggle", key: "rel", msg: "الريليه الصغير فلت." } }
+  ],
+  schem: {
+    svg: S.svg(
+      [70, 110, 150].map((x, i) => S.t(x, 26, ["L1", "L2", "L3"][i], "lbl b", "middle", true)).join("") +
+      S.g("s-ph", S.l(70, 34, 70, 120, "w p") + S.l(110, 34, 110, 120, "w p")) + S.g("s-l3", S.l(150, 34, 150, 120, "w p")) +
+      S.g("s-x", S.t(150, 80, "✕", "lbl r hide")) +
+      S.box("s-rel", 50, 120, 120, 40, "") + S.t(110, 145, "ريليه الفازات", "lbl s") +
+      `<path d="M170,140 H260" class="mech"/>` +
+      S.t(300, 26, "L", "lbl b", "middle", true) + S.g("s-c1", S.l(300, 34, 300, 120)) + S.blade("bl0", 300, 120) + S.t(318, 132, "11-14", "lbl s", "start", true) +
+      S.g("s-c2", S.l(300, 140, 300, 180) + S.l(300, 208, 300, 250)) + S.coil("s-coil", 300, 180) + S.t(330, 198, "الكويلات", "lbl s", "end") +
+      S.t(300, 268, "N", "lbl b", "middle", true)
+    ),
+    blades: [["bl0", "nk"]],
+    update(s) { return { live: { "s-ph": true, "s-l3": s.k < .5, "s-c1": true, "s-c2": s.k < .15 }, on: { "s-rel": s.k < .5 ? "on" : "redon", "s-coil": s.k < .15 ? "on" : "" }, show: { "s-x": s.k > .5 } }; },
+    cap(s) { return s.k > .5 ? "<b>عطل:</b> L3 غاب، الريليه فلت، 11-14 فتح وكل الكويلات فلتت." : "<b>تمام:</b> التلات فازات موجودين، 11-14 مسكّر والكنترول شغّال."; }
+  }
+});
+
+/* ---------- 6. Contactor ---------- */
+P({
+  id: "contactor", cat: "التحكم", name: "الكونتاكتور", dist: 4.6,
+  intro: "مفتاح كبير بيتحكّم فيه مغناطيس. لما الكويل ياخد كهربا، الكونتاكتات الكبيرة بتسكّر والموتور بيدور.",
+  act: ["شغّل الكونتاكتور", "وقّف الكونتاكتور"], st: ["الكويل فاضي: الكونتاكتات مفتوحة.", "<b>شادد:</b> المغناطيس سحب الجسور، 1-2، 3-4، 5-6 و13-14 مسكّرين."],
+  build(A, R) {
+    const sh = A.shell(0xe3e6e4), sh2 = A.shell(0x7d8786);
+    A.rbox(1.0, 1.36, 0.95, 0.07, sh, 0, 0, 0);
+    A.rbox(0.84, 0.64, 0.12, 0.05, sh2, 0, 0, 0.5);
+    [0.55, -0.55].forEach(y => A.rbox(1.0, 0.26, 0.18, 0.04, sh, 0, y, 0.49));
+    const xs = [-0.4, -0.2, 0, 0.2, 0.4], top = ["A1", "1L1", "3L2", "5L3", "13NO"], bot = ["A2", "2T1", "4T2", "6T3", "14NO"];
+    xs.forEach((x, i) => {
+      const k1 = i === 0 ? "coil" : i === 4 ? "aux" : "in", k2 = i === 0 ? "coil" : i === 4 ? "aux" : "out";
+      A.tag(A.screw(x, 0.58, 0.58), k1); A.tag(A.screw(x, -0.58, 0.58), k2);
+      A.text([top[i]], 0.18, 0.05, x, 0.455, 0.584, {}); A.text([bot[i]], 0.18, 0.05, x, -0.455, 0.584, {});
+    });
+    A.text(["Uc: 220V AC  50/60Hz", "AC-3: 25A  ·  Ue 400V"], 0.6, 0.15, 0, 0.12, 0.562, { bg: "#eef1ef", scale: .5, weight: 500 });
+    A.box(0.22, 0.1, 0.01, A.mat(0x111615), 0, -0.17, 0.562);
+    const slider = A.box(0.08, 0.07, 0.012, A.mat(0xf1f3f2), -0.05, -0.17, 0.57);
+    A.rail(R, 1.7, -0.5);
+    const cu = A.copper(), ir = A.iron(), sv = A.silver();
+    A.tag(A.box(0.56, 0.46, 0.08, ir, 0, -0.05, -0.36), "core");
+    [-0.22, 0, 0.22].forEach(x => A.tag(A.box(x === 0 ? 0.14 : 0.1, 0.46, 0.18, ir, x, -0.05, -0.23), "core"));
+    const coilM = A.tag(A.cyl(0.15, 0.15, 0.16, cu, 0, -0.05, -0.22, "z", null, true), "coil", "core");
+    A.tag(A.box(0.018, 0.52, 0.018, cu, -0.4, 0.3, 0.2), "coil"); A.tag(A.box(0.018, 0.52, 0.018, cu, -0.4, -0.38, 0.2), "coil");
+    [-0.2, 0, 0.2, 0.4].forEach(x => {
+      A.tag(A.box(0.07, 0.26, 0.02, cu, x, 0.44, 0.33), x > 0.3 ? "aux" : "in"); A.tag(A.box(0.07, 0.26, 0.02, cu, x, -0.44, 0.33), x > 0.3 ? "aux" : "out");
+      A.box(0.05, 0.04, 0.012, sv, x, 0.32, 0.346); A.box(0.05, 0.04, 0.012, sv, x, -0.32, 0.346);
+    });
+    const mover = new THREE.Group(); R.add(mover);
+    A.tag(A.box(0.56, 0.46, 0.06, ir, 0, -0.05, -0.08, mover), "core");
+    A.box(0.8, 0.1, 0.44, A.mat(0x2f7a64), 0.05, 0, 0.15, mover);
+    [-0.2, 0, 0.2, 0.4].forEach(x => {
+      A.tag(A.box(0.075, 0.7, 0.024, cu, x, 0, 0.385, mover), x > 0.3 ? "aux" : "bridges", "in", "out");
+      A.box(0.05, 0.04, 0.012, sv, x, 0.32, 0.37, mover); A.box(0.05, 0.04, 0.012, sv, x, -0.32, 0.37, mover);
+    });
+    return { anim(k) { mover.position.z = -0.03 * k; slider.position.x = lerp(-0.05, 0.05, k); slider.material.color.set(k > .5 ? 0x22c79b : 0xf1f3f2); } };
+  },
+  spots: [
+    { t: "الدخلة 1L1 · 3L2 · 5L3", b: "هون بتفوت الفازات التلاتة جايي من القاطع. الأرقام المفردة دايماً فوق.", p: [0, 0.58, 0.63], yaw: 0, pitch: 0.18, test: { mode: "on", key: "in", msg: "الكويل شدّ: الفازات فايتة من فوق ومارقة بالجسور." } },
+    { t: "الطلعة 2T1 · 4T2 · 6T3", b: "هون بتطلع الفازات عالأوفرلود والموتور. 1 مع 2، 3 مع 4، 5 مع 6.", p: [0, -0.58, 0.63], yaw: 0, pitch: -0.18, test: { mode: "on", key: "out", msg: "الفازات طالعة من تحت عالأوفرلود والموتور." } },
+    { t: "الكويل A1 و A2", b: "منعطيهن الفولت المكتوب عالكونتاكتور (مثلاً 220V AC)، فبيصير مغناطيس وبيشدّ. فولت غلط يعني كويل محروق أو كونتاكتور ما بيشدّ.", p: [-0.4, 0.58, 0.63], yaw: 0.35, pitch: 0.18, test: { mode: "on", key: "coil", msg: "220V على A1-A2: الكويل صار مغناطيس وشدّ." } },
+    { t: "المساعد 13NO · 14NO", b: "كونتاكت صغير مفتوح بيسكّر مع الكونتاكتور، للتثبيت أو للمبة. آخرو 3-4 يعني مفتوح (NO)، و1-2 يعني مسكّر (NC).", p: [0.4, 0.58, 0.63], yaw: -0.35, pitch: 0.18, test: { mode: "on", key: "aux", msg: "13-14 سكّر مع الكونتاكتور." } },
+    { t: "جوّا: الكويل والنواة", b: "شريط نحاس ملفوف حول نواة حديد. لما ياخد كهربا بيصير مغناطيس وبيسحب الأرماتور لعندو.", p: [0, -0.05, -0.02], inner: true, yaw: 0.5, pitch: 0.1, test: { mode: "on", key: "core", glass: true, msg: "المغناطيس سحب الأرماتور لعندو." } },
+    { t: "جوّا: الجسور النحاس", b: "مربوطة بالأرماتور. لما يسحب، كل جسر بيسكّر بين برغي فوق وبرغي تحت. لما تقطع الكهربا، سوستة بترجّعهن.", p: [0.2, 0, 0.39], inner: true, yaw: -0.5, pitch: 0.1, test: { mode: "on", key: "bridges", glass: true, msg: "الجسور لزقت بالكونتاكتات الثابتة." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(95, 26, "L 220V", "lbl b", "middle", true) + S.g("s-c", S.l(95, 34, 95, 80) + S.l(95, 100, 95, 140) + S.l(95, 168, 95, 250)) +
+      S.blade("bl0", 95, 80) + S.t(76, 96, "زر التشغيل", "lbl", "start") + S.coil("s-coil", 95, 140) +
+      S.t(123, 146, "A1", "lbl s", "start", true) + S.t(123, 174, "A2", "lbl s", "start", true) + S.t(95, 268, "N", "lbl b", "middle", true) +
+      `<path d="M117,154 H160 V90 H418" class="mech"/>` +
+      S.g("s-p", [200, 250, 300].map(x => S.l(x, 34, x, 80, "w p") + S.l(x, 100, x, 170, "w p")).join("") + `<path d="M200,170 L228,198 M250,170 V184 M300,170 L272,198" class="w p"/>`) +
+      [200, 250, 300].map((x, i) => S.t(x, 26, ["L1", "L2", "L3"][i], "lbl b", "middle", true) + S.blade("bl" + (i + 1), x, 80, false, "w p")).join("") +
+      S.motor("s-m", 250, 216) +
+      S.t(410, 26, "L", "lbl b", "middle", true) + S.g("s-a", S.l(410, 34, 410, 80) + S.l(410, 100, 410, 146) + S.l(410, 174, 410, 250)) +
+      S.blade("bl4", 410, 80) + S.t(420, 78, "13", "lbl s", "start", true) + S.t(420, 112, "14", "lbl s", "start", true) +
+      S.lamp("s-lamp", 410, 160) + S.t(432, 165, "لمبة", "lbl", "end") + S.t(410, 268, "N", "lbl b", "middle", true)
+    ),
+    blades: [["bl0", "k"], ["bl1", "k"], ["bl2", "k"], ["bl3", "k"], ["bl4", "k"]],
+    update(s) { const on = s.k > .85; return { live: { "s-c": on, "s-p": on, "s-a": on }, on: { "s-coil": on ? "on" : "", "s-m": on ? "on" : "", "s-lamp": on ? "lampon" : "" } }; },
+    cap(s) { return s.k > .85 ? "<b>شغّال:</b> 220V على A1-A2، الكويل شدّ، 1-2، 3-4، 5-6 سكّرت والموتور دار، و13-14 ضوّى اللمبة." : "الكويل فاضي: كل الكونتاكتات مفتوحة والموتور واقف."; }
+  }
+});
+
+/* ---------- 7. Plug-in relay ---------- */
+P({
+  id: "relay", cat: "التحكم", name: "الريليه المساعد", dist: 4.4,
+  intro: "كونتاكتور صغير للإشارات: تياراتو صغيرة، بس بيعطيك كونتاكتات زيادة. بيركب على قاعدة، وبتغيّرو بلا ما تفكّ الشرايط.",
+  act: ["كهرب الريليه", "فلّت الريليه"], st: ["فالت: المشترك 11 لازق بـ12.", "<b>شادد:</b> المشترك 11 انتقل لـ14."],
+  build(A, R) {
+    const base = A.shell(0x2c3236);
+    A.rbox(0.9, 1.2, 0.3, 0.05, base, 0, 0, -0.3);
+    const cover = A.shell(0xb9d4e8, true);
+    A.rbox(0.62, 0.72, 0.6, 0.05, cover, 0, 0.0, 0.15);
+    ["A1", "A2", "11", "12", "14"].forEach((n, i) => {
+      const x = [-0.3, 0.3, -0.3, 0, 0.3][i], y = i < 2 ? 0.48 : -0.48;
+      A.tag(A.screw(x, y, -0.13), i < 2 ? "coil" : "cont"); A.text([n], 0.12, 0.06, x, y + (i < 2 ? -0.1 : 0.1), -0.135, { color: "#e6f2ee" });
+    });
+    const cu = A.copper(), ir = A.iron(), sv = A.silver();
+    A.tag(A.cyl(0.12, 0.12, 0.3, cu, -0.12, -0.05, 0.1, "y", null, true), "coil");
+    A.tag(A.cyl(0.04, 0.04, 0.34, ir, -0.12, -0.05, 0.1, "y"), "coil");
+    const arm = new THREE.Group(); arm.position.set(0.02, 0.15, 0.1); R.add(arm);
+    A.tag(A.box(0.04, 0.24, 0.12, ir, 0, -0.12, 0, arm), "arm");
+    A.tag(A.box(0.02, 0.36, 0.03, cu, 0.08, -0.12, 0, arm), "cont");
+    A.box(0.04, 0.04, 0.04, sv, 0.1, -0.28, 0, arm);
+    A.tag(A.box(0.02, 0.3, 0.03, cu, 0.17, -0.25, 0.1), "nc"); A.box(0.03, 0.04, 0.04, sv, 0.155, -0.13, 0.1);
+    A.tag(A.box(0.02, 0.3, 0.03, cu, 0.03, -0.25, 0.1), "no"); A.box(0.03, 0.04, 0.04, sv, 0.045, -0.13, 0.1);
+    const led = A.cyl(0.03, 0.03, 0.02, A.mat(0x5a1a14), 0.2, 0.28, 0.455, "z");
+    A.text(["220V AC"], 0.3, 0.06, 0, 0.27, 0.452, {});
+    return {
+      anim(k) {
+        arm.rotation.z = lerp(0, 0.18, k);
+        led.material.color.set(k > .5 ? 0xff4a3a : 0x5a1a14); led.material.emissive.set(k > .5 ? 0x8a1a10 : 0x000000);
+      }
+    };
+  },
+  spots: [
+    { t: "الكويل A1 · A2", b: "متل الكونتاكتور: الفولت المكتوب (220V AC أو 24V DC) لازم يطابق. ريليه DC عـAC ما بيشتغل صح.", p: [0, 0.48, -0.1], yaw: 0, pitch: 0.4, test: { mode: "on", key: "coil", msg: "220V على A1-A2: الريليه شدّ." } },
+    { t: "المشترك 11 · 12 · 14", b: "11 المشترك. فالت: 11 مع 12. شادد: 11 مع 14. هيك بتاخد بنفس الريليه كونتاكت مسكّر وكونتاكت مفتوح.", p: [0, -0.48, -0.1], yaw: 0, pitch: -0.3, test: { mode: "on", key: "cont", msg: "المشترك تحرّك من 12 لـ14." } },
+    { t: "الغطا الشفاف واللمبة", b: "بتشوف من خلالو إذا شادد، واللمبة الحمرا بتضوّي لما ياخد كهربا.", p: [0.2, 0.28, 0.48], yaw: -0.2, pitch: 0.1, test: { mode: "on", key: "arm", msg: "اللمبة ضوّت والحديدة تحرّكت." } },
+    { t: "القاعدة", b: "الشرايط بتنشدّ عالقاعدة. إذا الريليه خرب، بتشدّو لبرّا وبتركّب غيرو بثواني.", p: [0, -0.3, -0.13], yaw: 0, pitch: -0.1, test: { mode: "on", key: "coil", msg: "الريليه راكب عالقاعدة وشغّال." } },
+    { t: "جوّا: الملف والحديدة", b: "الملف بيصير مغناطيس وبيسحب الحديدة، والحديدة بتشيل الشفرة النحاس من 12 وبتلزقها بـ14.", p: [-0.12, -0.05, 0.25], inner: true, yaw: 0.4, pitch: 0.1, test: { mode: "on", key: "arm", glass: true, msg: "الحديدة انسحبت والشفرة انتقلت." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(100, 26, "L", "lbl b", "middle", true) + S.g("s-c", S.l(100, 34, 100, 80) + S.l(100, 100, 100, 140) + S.l(100, 168, 100, 250)) +
+      S.blade("bl0", 100, 80) + S.t(82, 96, "أمر", "lbl", "start") + S.coil("s-coil", 100, 140) + S.t(128, 158, "A1-A2", "lbl s", "start", true) + S.t(100, 268, "N", "lbl b", "middle", true) +
+      `<path d="M122,154 H190 V72 H290" class="mech"/>` +
+      S.t(300, 26, "L", "lbl b", "middle", true) + S.g("s-com", S.l(300, 34, 300, 100)) + S.t(318, 98, "11", "lbl s", "start", true) +
+      `<line id="bl1" x1="300" y1="100" x2="250" y2="70" class="w blade2"/>` +
+      S.g("s-12", S.l(250, 70, 250, 140) + S.l(250, 166, 250, 250)) + S.g("s-14", S.l(350, 70, 350, 140) + S.l(350, 166, 350, 250)) +
+      S.t(250, 60, "12", "lbl s", "middle", true) + S.t(350, 60, "14", "lbl s", "middle", true) +
+      S.lamp("s-l12", 250, 153) + S.lamp("s-l14", 350, 153) + S.t(250, 190, "فالت", "lbl s") + S.t(350, 190, "شادد", "lbl s") +
+      S.t(300, 268, "N", "lbl b", "middle", true)
+    ),
+    blades: [["bl0", "k"]],
+    update(s) {
+      const b = $("bl1"); if (b) b.setAttribute("x2", lerp(250, 350, s.k).toFixed(1));
+      const on = s.k > .85, off = s.k < .15;
+      if (b) b.classList.toggle("live", true);
+      return { live: { "s-c": on, "s-com": true, "s-12": off, "s-14": on }, on: { "s-coil": on ? "on" : "", "s-l12": off ? "redon" : "", "s-l14": on ? "on" : "" } };
+    },
+    cap(s) { return s.k > .85 ? "<b>شادد:</b> المشترك 11 انتقل لـ14، اللمبة الخضرا ضوّت والحمرا طفت." : "فالت: المشترك 11 لازق بـ12، اللمبة الحمرا ضاوية."; }
+  }
+});
+
+/* ---------- 8. Timer ---------- */
+P({
+  id: "timer", cat: "التحكم", name: "التايمر", dist: 5.2, timed: 2500,
+  intro: "ريليه بوقت. الأشهر On-delay: بتعطيه كهربا، بينطر الوقت المضبوط، وبعدين بيسكّر 15-18. منستعملو مثلاً لستار-دلتا أو لتأخير ترمبة.",
+  act: ["عطي التايمر كهربا", "قطاع الكهربا"], st: ["طافي: 15-16 مسكّر.", "<b>عم يعدّ:</b> بعد الوقت بيسكّر 15-18."],
+  build(A, R) {
+    const b = A.din(R, 1, { noScrew: true });
+    A.text(["A1  A2"], 0.32, 0.06, 0, 0.48, 0.33, {}); A.text(["15 16 18"], 0.32, 0.06, 0, -0.48, 0.33, {});
+    [-0.09, 0.09].forEach(x => { A.tag(A.screw(x, 0.62, 0.33), "in"); });
+    [-0.11, 0, 0.11].forEach(x => { A.tag(A.screw(x, -0.62, 0.33, null, 0.75), "out"); });
+    const knob = new THREE.Group(); knob.position.set(0, 0.0, 0.62); R.add(knob);
+    A.tag(A.cyl(0.11, 0.11, 0.05, A.mat(0xd9dcdb), 0, 0, 0, "z", knob), "knob");
+    A.box(0.016, 0.1, 0.01, A.mat(0x111111), 0, 0.05, 0.03, knob);
+    A.text(["0.1s - 10h"], 0.32, 0.05, 0, -0.17, 0.605, { scale: .8 });
+    const u = A.tag(A.cyl(0.025, 0.025, 0.02, A.mat(0x1f7a4d), -0.08, 0.3, 0.61, "z"), "led");
+    const r = A.tag(A.cyl(0.025, 0.025, 0.02, A.mat(0x6b5a14), 0.08, 0.3, 0.61, "z"), "led");
+    A.text(["U   R"], 0.3, 0.05, 0, 0.22, 0.605, { color: "#3b4644" });
+    A.tag(A.box(0.26, 0.4, 0.02, A.mat(0x1c6b45), 0, 0.05, -0.15), "pcb");
+    return {
+      anim(k, F, t, s) {
+        const pw = k > .5, done = pw && s.elapsed > s.def.timed;
+        u.material.emissive.set(pw ? (done ? 0x22c79b : (Math.sin(t / 120) > 0 ? 0x22c79b : 0x000000)) : 0x000000);
+        r.material.emissive.set(done ? 0xf0b000 : 0x000000);
+        knob.rotation.z = pw && !done ? -2 * Math.PI * (s.elapsed / s.def.timed) : 0;
+      }
+    };
+  },
+  spots: [
+    { t: "A1 · A2", b: "كهربا التايمر. أغلب الموديلات بتقبل كذا فولت (مثلاً 24-240V AC/DC)، بس تأكّد من الكتابة.", p: [0, 0.64, 0.36], yaw: 0, pitch: 0.25, test: { mode: "on", key: "in", msg: "التايمر أخد كهربا وبلّش يعدّ." } },
+    { t: "دايل الوقت", b: "بتختار المجال (ثواني، دقايق، ساعات) وبعدين الرقم. التايمر هون مضبوط عـ2.5 ثانية لتشوف التجربة.", p: [0, 0, 0.66], yaw: 0, pitch: 0, test: { mode: "on", key: "knob", msg: "الدايل عم يعدّ لحد ما يخلص الوقت." } },
+    { t: "اللمبات U و R", b: "U خضرا: في كهربا (بترمش وهوّي عم يعدّ). R صفرا: الريليه شدّ و15-18 سكّر.", p: [0, 0.3, 0.64], yaw: 0, pitch: 0.05, test: { mode: "on", key: "led", msg: "U عم ترمش، وبعد الوقت R بتضوّي." } },
+    { t: "15 · 16 · 18", b: "15 المشترك، 16 مسكّر قبل الوقت، 18 بيسكّر بعد الوقت. الرقم 5-6-8 يعني كونتاكت بوقت.", p: [0, -0.64, 0.36], yaw: 0, pitch: -0.25, test: { mode: "on", key: "out", msg: "بعد الوقت، 15 انتقل من 16 لـ18." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(100, 26, "L", "lbl b", "middle", true) + S.g("s-c", S.l(100, 34, 100, 80) + S.l(100, 100, 100, 140) + S.l(100, 168, 100, 250)) +
+      S.blade("bl0", 100, 80) + S.t(82, 96, "أمر", "lbl", "start") + S.box("s-coil", 78, 140, 44, 28, "") + S.t(100, 159, "KT", "lbl s", "middle", true) +
+      S.t(100, 268, "N", "lbl b", "middle", true) +
+      `<rect id="s-bar" x="140" y="214" width="0" height="8" rx="4" class="el on"/>` + `<rect x="140" y="214" width="140" height="8" rx="4" class="el ring"/>` + S.t(210, 242, "الوقت", "lbl s") +
+      S.t(330, 26, "L", "lbl b", "middle", true) + S.g("s-a", S.l(330, 34, 330, 80)) + S.blade("bl1", 330, 80) +
+      `<path d="M318,88 h-10 M318,92 h-10" class="w"/>` + S.t(348, 82, "15", "lbl s", "start", true) + S.t(348, 114, "18", "lbl s", "start", true) +
+      S.g("s-b", S.l(330, 100, 330, 146) + S.l(330, 174, 330, 250)) + S.lamp("s-lamp", 330, 160) + S.t(352, 165, "الحمل", "lbl", "end") + S.t(330, 268, "N", "lbl b", "middle", true)
+    ),
+    blades: [["bl0", "k"], ["bl1", "done"]],
+    update(s) {
+      const bar = $("s-bar"); if (bar) bar.setAttribute("width", (140 * clamp01(s.k > .5 ? s.elapsed / s.def.timed : 0)).toFixed(1));
+      const done = s.k > .5 && s.elapsed > s.def.timed;
+      return { live: { "s-c": s.k > .85, "s-a": true, "s-b": done }, on: { "s-coil": s.k > .85 ? "on" : "", "s-lamp": done ? "lampon" : "" } };
+    },
+    cap(s) { const done = s.k > .5 && s.elapsed > s.def.timed; return done ? "<b>خلص الوقت:</b> 15-18 سكّر والحمل اشتغل." : s.k > .5 ? "<b>عم يعدّ:</b> التايمر أخد كهربا، ناطر الوقت." : "طافي: 15-18 مفتوح."; }
+  }
+});
+
+/* ---------- 9. Staircase timer ---------- */
+P({
+  id: "stair", cat: "التحكم", name: "تايمر الدرج", dist: 5.2, timed: 4500, momentary: 600,
+  intro: "بتكبس أي كبسة عالدرج، بتولّع كل لمبات الدرج، وبعد الوقت المضبوط بتنطفي لحالها. الكبسات كلّها بالتوازي.",
+  act: ["اكبس كبسة الدرج", "اكبس كبسة الدرج"], st: ["اللمبات طافية.", "<b>ضاوية:</b> بتنطفي لحالها بعد الوقت."],
+  build(A, R) {
+    const b = A.din(R, 1, { noScrew: true });
+    A.text(["L  N  S"], 0.32, 0.06, 0, 0.48, 0.33, {}); A.text(["L'"], 0.2, 0.06, 0, -0.48, 0.33, {});
+    [-0.11, 0, 0.11].forEach(x => A.tag(A.screw(x, 0.62, 0.33, null, 0.75), "in"));
+    A.tag(A.screw(0, -0.62, 0.33), "out");
+    A.tag(A.cyl(0.1, 0.1, 0.05, A.mat(0xd9dcdb), 0, 0.02, 0.62, "z"), "knob");
+    A.text(["0.5 - 20 min"], 0.32, 0.05, 0, -0.14, 0.605, { scale: .8 });
+    const sel = A.tag(A.box(0.12, 0.05, 0.05, A.mat(0x1d2326), 0, -0.3, 0.62), "sel");
+    A.text(["AUTO · ON"], 0.32, 0.05, 0, -0.38, 0.605, { scale: .8, color: "#3b4644" });
+    const led = A.cyl(0.025, 0.025, 0.02, A.mat(0x6b5a14), 0, 0.3, 0.61, "z");
+    return { anim(k, F, t, s) { const lit = s.lit; led.material.emissive.set(lit ? 0xf0b000 : 0x000000); } };
+  },
+  spots: [
+    { t: "الدخلة L · N · S", b: "L وN كهربا التايمر، وS هوّي الشريط الجايي من الكبسات. كل الكبسات بتوصل بالتوازي بين L وS.", p: [0, 0.64, 0.36], yaw: 0, pitch: 0.25, test: { mode: "press", key: "in", msg: "حدا كبس عالدرج: S أخد كهربا والتايمر بلّش." } },
+    { t: "دايل الدقايق", b: "بتضبط قديش بتضل اللمبات ضاوية. هون مضبوط عـ4.5 ثانية للتجربة. بالبناية عادةً دقيقة أو تنين.", p: [0, 0.02, 0.66], yaw: 0, pitch: 0, test: { mode: "press", key: "knob", msg: "اللمبات ضوّت، وبعد الوقت بتطفي لحالها." } },
+    { t: "سيليكتور AUTO / ON", b: "AUTO: شغل عادي بالتايمر. ON: اللمبات بتضل ضاوية (للتنضيف أو الصيانة).", p: [0, -0.3, 0.66], yaw: 0, pitch: -0.05, test: { mode: "press", key: "sel", msg: "على AUTO: بيطفي لحالو بعد الوقت." } },
+    { t: "الطلعة L'", b: "من هون بيطلع الفاز عاللمبات كلّها، والنوترال تبعهن عالخط مباشرة.", p: [0, -0.64, 0.36], yaw: 0, pitch: -0.25, test: { mode: "press", key: "out", msg: "L' طلع عاللمبات." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(90, 26, "L", "lbl b", "middle", true) + S.g("s-sup", S.l(90, 34, 90, 60) + S.l(50, 60, 170, 60) + [50, 110, 170].map(x => S.l(x, 60, x, 80)).join("")) +
+      [50, 110, 170].map((x, i) => S.blade("bl" + i, x, 80)).join("") + S.t(110, 128, "كبسات الدرج (بالتوازي)", "lbl s") +
+      S.g("s-s", [50, 110, 170].map(x => S.l(x, 100, x, 112)).join("") + S.l(50, 112, 170, 112) + S.l(110, 112, 110, 150)) +
+      S.box("s-t", 70, 150, 80, 40, "") + S.t(110, 175, "تايمر", "lbl s") +
+      `<rect id="s-bar" x="70" y="200" width="0" height="8" rx="4" class="el on"/>` + `<rect x="70" y="200" width="80" height="8" rx="4" class="el ring"/>` +
+      `<path d="M150,170 H240" class="mech"/>` +
+      S.t(280, 26, "L", "lbl b", "middle", true) + S.g("s-a", S.l(280, 34, 280, 80)) + S.blade("bl3", 280, 80) +
+      S.g("s-b", S.l(280, 100, 280, 120) + S.l(280, 120, 420, 120) + [300, 360, 420].map(x => S.l(x, 120, x, 147) + S.l(x, 173, x, 210)).join("") + S.l(300, 210, 420, 210) + S.l(360, 210, 360, 250)) +
+      [300, 360, 420].map((x, i) => S.lamp("s-lp" + i, x, 160)).join("") + S.t(360, 236, "لمبات الدرج", "lbl s") + S.t(360, 268, "N", "lbl b", "middle", true)
+    ),
+    blades: [["bl0", "k"], ["bl1", "z"], ["bl2", "z"], ["bl3", "lit"]],
+    update(s) {
+      const bar = $("s-bar"); if (bar) bar.setAttribute("width", (s.lit ? 80 * (1 - clamp01(s.elapsed / s.def.timed)) : 0).toFixed(1));
+      return { live: { "s-sup": true, "s-s": s.k > .85, "s-a": true, "s-b": s.lit }, on: { "s-t": s.lit ? "on" : "", "s-lp0": s.lit ? "lampon" : "", "s-lp1": s.lit ? "lampon" : "", "s-lp2": s.lit ? "lampon" : "" } };
+    },
+    cap(s) { return s.lit ? "<b>ضاوية:</b> التايمر عم يعدّ، وبس يخلص الوقت بتطفي اللمبات لحالها." : "طافية: ناطرة حدا يكبس."; }
+  }
+});
+
+/* ---------- panel (22mm) helper parts ---------- */
+function panel(A, R, w, h) {
+  const pl = A.shell(0x9aa3a5);
+  A.box(w, h, 0.04, pl, 0, 0, 0.0);
+  return pl;
+}
+function block(A, R, x, y, kind, keys) {
+  const c = kind === "NO" ? 0x2e9e5b : 0xd63b2f;
+  const sh = A.shell(0xe2e5e4);
+  A.box(0.34, 0.42, 0.4, sh, x, y, -0.3);
+  A.box(0.34, 0.06, 0.4, A.mat(c), x, y + 0.24, -0.3);
+  const nums = kind === "NO" ? ["13", "14"] : ["11", "12"];
+  A.tag(A.screw(x - 0.09, y - 0.08, -0.095, null, 0.7), ...keys); A.tag(A.screw(x + 0.09, y - 0.08, -0.095, null, 0.7), ...keys);
+  A.text([nums[0] + "   " + nums[1]], 0.3, 0.06, x, y + 0.08, -0.098, {});
+  const cu = A.copper(), sv = A.silver();
+  const br = new THREE.Group(); br.position.set(x, y, -0.3); R.add(br);
+  A.tag(A.box(0.26, 0.03, 0.03, cu, 0, -0.06, 0, br), ...keys);
+  A.box(0.04, 0.03, 0.03, sv, -0.1, -0.08, 0, br); A.box(0.04, 0.03, 0.03, sv, 0.1, -0.08, 0, br);
+  A.tag(A.box(0.06, 0.06, 0.03, cu, -0.12, kind === "NO" ? -0.13 : -0.13, 0.04), ...keys);
+  A.tag(A.box(0.06, 0.06, 0.03, cu, 0.12, -0.13, 0.04), ...keys);
+  return br;
+}
+
+/* ---------- 10. Start / Stop pushbuttons ---------- */
+P({
+  id: "buttons", cat: "الأوامر", name: "كبسات Start و Stop", dist: 4.4, momentary: 1200,
+  intro: "كبسة بترجع لحالها لما تشيل إيدك. Start عليها كونتاكت مفتوح NO، وStop عليها كونتاكت مسكّر NC.",
+  act: ["اكبس Start", "اكبس Start"], st: ["ما حدا كابس.", "<b>عم تكبس Start:</b> 13-14 مسكّر طول ما إيدك عليها."],
+  build(A, R) {
+    panel(A, R, 1.3, 0.8);
+    const mk = (x, col, key) => {
+      A.cyl(0.17, 0.17, 0.06, A.mat(0xb9c0c2, { metalness: .6, roughness: .3 }), x, 0, 0.05, "z");
+      const g = new THREE.Group(); g.position.set(x, 0, 0.08); R.add(g);
+      A.tag(A.cyl(0.13, 0.13, 0.08, A.mat(col), 0, 0, 0.04, "z", g), key);
+      A.cyl(0.06, 0.06, 0.32, A.mat(0x2a2f33), x, 0, -0.14, "z");
+      return g;
+    };
+    const gS = mk(-0.32, 0x1f9e55, "start"), gT = mk(0.32, 0xd63b2f, "stop");
+    A.text(["START"], 0.3, 0.07, -0.32, 0.3, 0.022, { color: "#111" }); A.text(["STOP"], 0.3, 0.07, 0.32, 0.3, 0.022, { color: "#111" });
+    const b1 = block(A, R, -0.32, 0, "NO", ["no"]), b2 = block(A, R, 0.32, 0, "NC", ["nc"]);
+    return {
+      anim(k, F) {
+        gS.position.z = 0.08 - 0.05 * k; b1.position.z = -0.3 - 0.04 * k;
+        const st = F.stop || 0; gT.position.z = 0.08 - 0.05 * st; b2.position.z = -0.3 - 0.04 * st;
+      }
+    };
+  },
+  spots: [
+    { t: "كبسة Start الخضرا", b: "بتسكّر 13-14 طول ما إنت ضاغط بس. لحتى يضل الموتور شغّال بعد ما تشيل إيدك، بدّك دارة تثبيت بكونتاكت مساعد من الكونتاكتور.", p: [-0.32, 0, 0.2], yaw: 0.2, pitch: 0, test: { mode: "press", key: "start", msg: "ضغطنا Start: 13-14 سكّر، ولما تركنا رجع فتح." } },
+    { t: "كبسة Stop الحمرا", b: "عليها 11-12 مسكّر بالعادة. لما تكبسها بتفتح وبتقطع الكهربا عن الكويل. لهيك الـStop دايماً NC: إذا انقطع شريطها، الماكينة بتوقف ما بتضل شغّالة.", p: [0.32, 0, 0.2], yaw: -0.2, pitch: 0, test: { mode: "stop", key: "stop", msg: "ضغطنا Stop: 11-12 فتح والكويل فلت." } },
+    { t: "بلوك NO أخضر 13-14", b: "البلوك الأخضر مفتوح بالعادة. فيك تركّب أكتر من بلوك ورا نفس الكبسة.", inner: true, p: [-0.32, -0.08, -0.08], yaw: 2.6, pitch: 0, test: { mode: "press", key: "no", msg: "الجسر النحاس نزل وسكّر 13-14." } },
+    { t: "بلوك NC أحمر 11-12", b: "البلوك الأحمر مسكّر بالعادة، وبيفتح لما تكبس.", inner: true, p: [0.32, -0.08, -0.08], yaw: -2.6, pitch: 0, test: { mode: "stop", key: "nc", msg: "الجسر انشال وفتح 11-12." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(120, 26, "L", "lbl b", "middle", true) + S.g("s-1", S.l(120, 34, 120, 70)) + S.blade("bl0", 120, 70, true) + S.t(140, 84, "Stop 11-12", "lbl s", "start", true) +
+      S.g("s-2", S.l(120, 90, 120, 130)) + S.blade("bl1", 120, 130) + S.t(140, 144, "Start 13-14", "lbl s", "start", true) +
+      S.g("s-3", S.l(120, 150, 120, 180) + S.l(120, 208, 120, 250)) + S.coil("s-coil", 120, 180) + S.t(148, 198, "الكويل", "lbl s", "end") +
+      S.t(120, 268, "N", "lbl b", "middle", true) +
+      S.t(340, 120, "بلا تثبيت: الكويل بيضل شادد", "lbl s") + S.t(340, 140, "بس طول ما إنت ضاغط Start", "lbl s")
+    ),
+    blades: [["bl0", "stop"], ["bl1", "k"]],
+    update(s) { const st = (s.F.stop || 0) > .5, on = s.k > .85 && !st; return { live: { "s-1": true, "s-2": !st, "s-3": on }, on: { "s-coil": on ? "on" : "" } }; },
+    cap(s) { const st = (s.F.stop || 0) > .5; return st ? "<b>Stop مكبوسة:</b> 11-12 فتح، ما في شي بيوصل للكويل." : s.k > .85 ? "<b>Start مكبوسة:</b> الكهربا مرقت بالـStop والـStart، والكويل شادد." : "ما حدا كابس: Start مفتوحة والكويل فاضي."; }
+  }
+});
+
+/* ---------- 11. Emergency stop ---------- */
+P({
+  id: "estop", cat: "الأوامر", name: "كبسة الطوارئ", dist: 4.4,
+  intro: "فطر أحمر على خلفية صفرا. بتكبسها بتعلق مكانها وبتقطع، وما بترجع إلا إذا لفّيتها أو شدّيتها. كونتاكتها NC.",
+  act: ["اكبس الطوارئ", "لفّها لترجع"], st: ["عادي: 11-12 مسكّر والماكينة بتقدر تشتغل.", "<b>مكبوسة:</b> علقت مكانها و11-12 مفتوح."],
+  build(A, R) {
+    panel(A, R, 1.0, 1.0);
+    A.cyl(0.34, 0.34, 0.012, A.mat(0xf2c400), 0, 0, 0.026, "z");
+    A.text(["EMERGENCY STOP"], 0.6, 0.06, 0, 0.27, 0.034, { color: "#111", scale: .8 });
+    A.cyl(0.16, 0.16, 0.08, A.mat(0xb9c0c2, { metalness: .6, roughness: .3 }), 0, 0, 0.07, "z");
+    const g = new THREE.Group(); g.position.set(0, 0, 0.12); R.add(g);
+    A.tag(A.cyl(0.06, 0.06, 0.12, A.mat(0xb3261e), 0, 0, 0.05, "z", g), "head");
+    const mush = new THREE.Mesh(new THREE.SphereGeometry(0.22, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), A.mat(0xd63b2f, { roughness: .35 }));
+    mush.rotation.x = Math.PI / 2; mush.scale.set(1, 0.55, 1); mush.position.z = 0.11; g.add(mush); A.tag(mush, "head");
+    A.cyl(0.06, 0.06, 0.32, A.mat(0x2a2f33), 0, 0, -0.14, "z");
+    const b = block(A, R, 0, 0, "NC", ["nc"]);
+    return { anim(k) { g.position.z = 0.12 - 0.06 * k; g.rotation.z = k > .5 ? 0 : 0; b.position.z = -0.3 - 0.04 * k; } };
+  },
+  spots: [
+    { t: "الفطر الأحمر", b: "بتكبسو بكفّك كلّها بأي لحظة خطر. بيعلق مكانو، فحتى لو شلت إيدك ما بترجع الماكينة تشتغل.", p: [0, 0, 0.3], yaw: 0, pitch: 0, test: { mode: "toggle", key: "head", msg: "كبسنا الطوارئ: علقت و11-12 فتح." } },
+    { t: "الإرجاع باللفّ", b: "لترجّعها بتلفّها مع الأسهم أو بتشدّها لبرّا. ورجعتها ما بتشغّل الماكينة: لازم بعدها تكبس Start.", p: [0.18, 0.1, 0.22], yaw: -0.3, pitch: 0, test: { mode: "toggle", key: "head", msg: "علقت. لترجع بدّك تلفّها، وبعدين Start." } },
+    { t: "بلوك NC 11-12", b: "كونتاكت مسكّر بفتحة إجبارية: الكبسة بتشلع الكونتاكت ميكانيكياً حتى لو لازق. منحطّها بأول دارة التحكم قبل كل شي.", inner: true, p: [0, -0.08, -0.08], yaw: Math.PI, pitch: 0, test: { mode: "toggle", key: "nc", msg: "الجسر انشال: 11-12 فتح." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(120, 26, "L", "lbl b", "middle", true) + S.g("s-1", S.l(120, 34, 120, 70)) + S.blade("bl0", 120, 70, true) + S.t(140, 84, "طوارئ 11-12", "lbl s", "start", true) +
+      S.g("s-2", S.l(120, 90, 120, 120) + S.l(120, 160, 120, 180) + S.l(120, 208, 120, 250)) +
+      `<rect x="90" y="120" width="60" height="40" rx="5" class="el ring" stroke-dasharray="4 3"/>` + S.t(120, 145, "Stop · Start", "lbl s", "middle", true) +
+      S.coil("s-coil", 120, 180) + S.t(148, 198, "الكويل", "lbl s", "end") + S.t(120, 268, "N", "lbl b", "middle", true) +
+      S.t(340, 130, "الطوارئ أول شي بالدارة:", "lbl s") + S.t(340, 150, "بتقطع كل يلّي بعدها", "lbl s")
+    ),
+    blades: [["bl0", "k"]],
+    update(s) { const p = s.k > .5; return { live: { "s-1": true, "s-2": !p }, on: { "s-coil": !p ? "on" : "" } }; },
+    cap(s) { return s.k > .5 ? "<b>مكبوسة:</b> 11-12 فتح، الكويل فلت والماكينة وقفت." : "عادي: الكهربا مارقة بالطوارئ لباقي الدارة."; }
+  }
+});
+
+/* ---------- 12. Selector ---------- */
+P({
+  id: "selector", cat: "الأوامر", name: "السيليكتور", dist: 4.4, cycle: 3,
+  intro: "مفتاح بتلات وضعيات: يدوي، 0، أوتوماتيك. بكل وضعية بيسكّر كونتاكت غير. منستعملو مثلاً لترمبة المي.",
+  act: ["لفّ السيليكتور", "لفّ السيليكتور"], st: ["عـ0: ولا كونتاكت مسكّر."],
+  build(A, R) {
+    panel(A, R, 1.1, 0.9);
+    A.text(["يدوي", "0", "أوتو"], 0.7, 0.08, 0, 0.3, 0.022, { color: "#111", split: true, scale: .9 });
+    A.cyl(0.17, 0.17, 0.06, A.mat(0xb9c0c2, { metalness: .6, roughness: .3 }), 0, 0, 0.05, "z");
+    const g = new THREE.Group(); g.position.set(0, 0, 0.1); R.add(g);
+    A.tag(A.cyl(0.14, 0.14, 0.06, A.mat(0x1d2326), 0, 0, 0, "z", g), "knob");
+    A.tag(A.box(0.07, 0.26, 0.08, A.mat(0x1d2326), 0, 0, 0.06, g), "knob");
+    A.box(0.02, 0.06, 0.01, A.mat(0xffffff), 0, 0.1, 0.105, g);
+    A.cyl(0.06, 0.06, 0.32, A.mat(0x2a2f33), 0, 0, -0.14, "z");
+    const b1 = block(A, R, -0.22, 0, "NO", ["man"]), b2 = block(A, R, 0.22, 0, "NO", ["auto"]);
+    return {
+      anim(k, F, t, s) {
+        const pos = s.pos; g.rotation.z = pos === 1 ? Math.PI / 4 : pos === 2 ? -Math.PI / 4 : 0;
+        b1.position.z = -0.3 - (pos === 1 ? 0.04 : 0); b2.position.z = -0.3 - (pos === 2 ? 0.04 : 0);
+      }
+    };
+  },
+  spots: [
+    { t: "المسكة", b: "يدوي (عالشمال): الترمبة بتشتغل دغري، مفيد للتجربة. 0: طافي. أوتو (عاليمين): الفلوت أو البرشر سويتش بيقرّر.", p: [0, 0.12, 0.22], yaw: 0, pitch: 0, test: { mode: "cycle", key: "knob", msg: "لفّينا المسكة: كل وضعية بتسكّر كونتاكت." } },
+    { t: "بلوك اليدوي 13-14", b: "بيسكّر بس عـيدوي، وبيوصّل الكويل دغري بلا الحساس. خلّي الحماية (الأوفرلود والفلوت التحتاني) بالتسلسل حتى باليدوي.", inner: true, p: [-0.22, -0.08, -0.08], yaw: 2.6, pitch: 0, test: { mode: "set", pos: 1, key: "man", msg: "عـيدوي: بلوك اليدوي سكّر والترمبة اشتغلت." } },
+    { t: "بلوك الأوتو 23-24", b: "بيسكّر بس عـأوتو، والكهربا بتمرق بالفلوت قبل الكويل.", inner: true, p: [0.22, -0.08, -0.08], yaw: -2.6, pitch: 0, test: { mode: "set", pos: 2, key: "auto", msg: "عـأوتو: الفلوت صار هوّي يلّي بيقرّر." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(200, 26, "L", "lbl b", "middle", true) + S.g("s-0", S.l(200, 34, 200, 56) + S.l(120, 56, 280, 56) + S.l(120, 56, 120, 70) + S.l(280, 56, 280, 70)) +
+      S.blade("bl0", 120, 70) + S.blade("bl1", 280, 70) + S.t(140, 84, "يدوي", "lbl s", "end") + S.t(300, 84, "أوتو", "lbl s", "end") +
+      S.g("s-m", S.l(120, 90, 120, 160) + S.l(120, 160, 200, 160)) +
+      S.g("s-a", S.l(280, 90, 280, 104)) + S.blade("bl2", 280, 104) + S.t(300, 118, "الفلوت", "lbl s", "end") +
+      S.g("s-a2", S.l(280, 124, 280, 160) + S.l(280, 160, 200, 160)) +
+      S.g("s-c", S.l(200, 160, 200, 180) + S.l(200, 208, 200, 250)) + S.coil("s-coil", 200, 180) + S.t(228, 198, "الترمبة", "lbl s", "end") +
+      S.t(200, 268, "N", "lbl b", "middle", true)
+    ),
+    blades: [["bl0", "man"], ["bl1", "auto"], ["bl2", "z1"]],
+    update(s) { const m = s.pos === 1, a = s.pos === 2; return { live: { "s-0": true, "s-m": m, "s-a": a, "s-a2": a, "s-c": m || a }, on: { "s-coil": (m || a) ? "on" : "" } }; },
+    cap(s) { return s.pos === 1 ? "<b>يدوي:</b> الكهربا مرقت دغري عالكويل والترمبة شغّالة." : s.pos === 2 ? "<b>أوتو:</b> الكهربا مارقة بالفلوت، والفلوت هوّي يلّي بيقرّر." : "عـ0: ولا كونتاكت مسكّر، الترمبة واقفة."; }
+  }
+});
+
+/* ---------- 13. Pilot lamps ---------- */
+P({
+  id: "lamps", cat: "الأوامر", name: "لمبات الإشارة", dist: 4.6,
+  intro: "بتقلّك شو عم يصير بلا ما تفتح التابلو. الألوان حسب المعيار: أخضر شغّال وعادي، أحمر عطل أو خطر، أصفر تنبيه.",
+  act: ["ولّع اللمبات", "طفّي اللمبات"], st: ["كلّها طافية.", "<b>ضاوية:</b> كل لمبة عم تقلّك حالة."],
+  build(A, R) {
+    panel(A, R, 1.4, 0.7);
+    const lens = [];
+    [[-0.42, 0x1f9e55, "green"], [0, 0xd63b2f, "red"], [0.42, 0xf0b000, "yellow"]].forEach(([x, c, key]) => {
+      A.cyl(0.16, 0.16, 0.05, A.mat(0xb9c0c2, { metalness: .6, roughness: .3 }), x, 0, 0.045, "z");
+      const m = A.tag(A.cyl(0.12, 0.12, 0.06, A.mat(c, { roughness: .2, transparent: true, opacity: .9 }), x, 0, 0.09, "z"), key);
+      lens.push([m, c]);
+      A.cyl(0.06, 0.06, 0.3, A.mat(0x2a2f33), x, 0, -0.14, "z");
+      A.box(0.26, 0.3, 0.3, A.shell(0xe2e5e4), x, 0, -0.32);
+      A.tag(A.screw(x - 0.07, -0.05, -0.165, null, 0.65), "term"); A.tag(A.screw(x + 0.07, -0.05, -0.165, null, 0.65), "term");
+      A.text(["X1  X2"], 0.22, 0.05, x, 0.07, -0.168, {});
+    });
+    return { anim(k) { lens.forEach(([m, c]) => m.material.emissive.set(k > .5 ? c : 0x000000)); } };
+  },
+  spots: [
+    { t: "الخضرا: شغّال", b: "منوصلها مثلاً عـ13-14 تبع الكونتاكتور: بتضوّي لما الموتور يشتغل.", p: [-0.42, 0, 0.16], yaw: 0, pitch: 0, test: { mode: "on", key: "green", msg: "الخضرا ضوّت: الموتور شغّال." } },
+    { t: "الحمرا: عطل", b: "منوصلها عـ97-98 تبع الأوفرلود: بتضوّي إذا فصل.", p: [0, 0, 0.16], yaw: 0, pitch: 0, test: { mode: "on", key: "red", msg: "الحمرا ضوّت: في عطل." } },
+    { t: "الصفرا: تنبيه", b: "لحالة لازم تنتبهلها، متل المي عالية بجورة النشّ.", p: [0.42, 0, 0.16], yaw: 0, pitch: 0, test: { mode: "on", key: "yellow", msg: "الصفرا ضوّت: تنبيه." } },
+    { t: "X1 · X2 من ورا", b: "طرفين اللمبة. اختار فولتها متل الكنترول: 220V أو 24V. لمبة 24V عـ220V بتحترق فوراً.", inner: true, p: [0, -0.05, -0.15], yaw: Math.PI, pitch: 0, test: { mode: "on", key: "term", msg: "الكهربا واصلة على X1-X2." } }
+  ],
+  schem: {
+    svg: S.svg(
+      [[110, "13-14 KM1", "s-g", "شغّال"], [245, "97-98 F1", "s-r", "عطل"], [380, "تنبيه", "s-y", "تنبيه"]].map(([x, c, id, n], i) =>
+        S.t(x, 26, "L", "lbl b", "middle", true) + S.g("s-a" + i, S.l(x, 34, x, 80)) + S.blade("bl" + i, x, 80) + S.t(x + 18, 96, c, "lbl s", "start", i < 2) +
+        S.g("s-b" + i, S.l(x, 100, x, 147) + S.l(x, 173, x, 250)) + S.lamp(id, x, 160) + S.t(x + 22, 165, n, "lbl s", "end") + S.t(x, 268, "N", "lbl b", "middle", true)).join("")
+    ),
+    blades: [["bl0", "k"], ["bl1", "k"], ["bl2", "k"]],
+    update(s) { const on = s.k > .85; return { live: { "s-a0": true, "s-a1": true, "s-a2": true, "s-b0": on, "s-b1": on, "s-b2": on }, on: { "s-g": on ? "on" : "", "s-r": on ? "redon" : "", "s-y": on ? "lampon" : "" } }; },
+    cap(s) { return s.k > .85 ? "<b>ضاوية:</b> كل كونتاكت سكّر وضوّى لمبتو." : "طافية: الكونتاكتات مفتوحة."; }
+  }
+});
+
+/* ---------- 14. Float switch ---------- */
+P({
+  id: "float", cat: "الحساسات", name: "الفلوت", dist: 5.4,
+  intro: "طابة بشريط بتطوف عالمي. لما المي تطلع بتنقلب لفوق، ولما تنزل بتتدلّى، وجوّاتها كونتاكت بيتغيّر مع الوضعية.",
+  act: ["عبّي الخزان", "فضّي الخزان"], st: ["المي تحت: الفلوت متدلّي، والترمبة شغّالة لتعبّي.", "<b>المي فوق:</b> الفلوت انقلب، والترمبة وقفت."],
+  build(A, R) {
+    const tank = A.shell(0xbfd6e6, true);
+    A.box(1.3, 1.5, 0.9, tank, 0, 0, 0);
+    const water = A.box(1.26, 1, 0.86, A.mat(0x2b7bb9, { transparent: true, opacity: .45, roughness: .2 }), 0, -0.73, 0);
+    const pivot = new THREE.Group(); pivot.position.set(-0.55, 0.15, 0); R.add(pivot);
+    A.tag(A.cyl(0.018, 0.018, 0.4, A.mat(0x1d2326), -0.2, 0, 0, "x", pivot), "cable");
+    A.cyl(0.018, 0.018, 0.6, A.mat(0x1d2326), -0.55, 0.45, 0, "y");
+    A.tag(A.cyl(0.05, 0.05, 0.08, A.iron(), -0.55, 0.15, 0, "y"), "weight");
+    const arm = new THREE.Group(); pivot.add(arm);
+    A.tag(A.cyl(0.018, 0.018, 0.35, A.mat(0x1d2326), 0.175, 0, 0, "x", arm), "cable");
+    const fl = new THREE.Mesh(new THREE.SphereGeometry(0.14, 32, 20), A.shell(0x2d8a6b)); fl.scale.set(1.6, 1, 1); fl.position.set(0.5, 0, 0); arm.add(fl); A.tag(fl, "ball");
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.04, 16, 12), A.silver()); arm.add(ball); A.tag(ball, "sw");
+    A.tag(A.box(0.12, 0.06, 0.06, A.mat(0x2a2f33), 0.42, 0, 0, arm), "sw");
+    A.text(["خزان"], 0.4, 0.1, 0.4, 0.66, 0.452, { color: "#e6f2ee", scale: .9 });
+    return {
+      anim(k) {
+        water.scale.y = lerp(0.45, 1.35, k); water.position.y = -0.75 + 0.5 * water.scale.y;
+        arm.rotation.z = lerp(-1.1, 0.5, k);
+        ball.position.x = lerp(0.34, 0.5, k);
+      }
+    };
+  },
+  spots: [
+    { t: "الطابة", b: "بتطوف عالمي. المي نازلة: متدلّية لتحت. المي طالعة: بتنقلب لفوق. قديش بتتحرّك قبل ما تقلب، بيعتمد على طول الشريط الحرّ.", p: [0.0, 0.0, 0.25], yaw: 0, pitch: 0, test: { mode: "toggle", key: "ball", msg: "المي طلعت: الطابة انقلبت لفوق." } },
+    { t: "التقل عالشريط", b: "بيثبّت نقطة الدوران. كل ما طوّلت الشريط تحت التقل، بيكبر الفرق بين التشغيل والوقوف.", p: [-0.55, 0.15, 0.08], yaw: 0.3, pitch: 0, test: { mode: "toggle", key: "weight", msg: "الشريط بيلفّ حول نقطة التقل." } },
+    { t: "جوّا: الطابة والمفتاح", b: "طابة حديد صغيرة بتتدحرج لما ينقلب الفلوت، وبتكبس مفتاح صغير. بيعطيك 3 شرايط: مشترك، مسكّر، ومفتوح.", p: [0.0, 0.0, 0.1], inner: true, yaw: 0, pitch: 0.2, test: { mode: "toggle", key: "sw", glass: true, msg: "الطابة الصغيرة تدحرجت وغيّرت الكونتاكت." } },
+    { t: "تعبئة ولّا تفضية؟", b: "للتعبئة (خزان السطح): منستعمل الكونتاكت يلّي بيسكّر لما المي تنزل. للتفضية (جورة النشّ): الكونتاكت يلّي بيسكّر لما المي تطلع. نفس الفلوت، شريط غير.", p: [0.3, 0.6, 0.46], yaw: 0, pitch: 0.1, test: { mode: "toggle", key: "ball", msg: "المي فوق: كونتاكت التعبئة فتح والترمبة وقفت." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(130, 26, "L", "lbl b", "middle", true) + S.g("s-0", S.l(130, 34, 130, 70)) + S.blade("bl0", 130, 70, true) + S.t(150, 84, "الفلوت (تعبئة)", "lbl s", "end") +
+      S.g("s-1", S.l(130, 90, 130, 150) + S.l(130, 178, 130, 250)) + S.coil("s-coil", 130, 150) + S.t(158, 168, "الترمبة", "lbl s", "end") + S.t(130, 268, "N", "lbl b", "middle", true) +
+      `<rect x="290" y="60" width="140" height="180" rx="6" class="el ring"/>` +
+      `<rect id="s-water" x="292" y="180" width="136" height="58" class="el" style="fill:#2b7bb9;stroke:none;opacity:.55"/>` + S.t(360, 52, "الخزان", "lbl s")
+    ),
+    blades: [["bl0", "k"]],
+    update(s) {
+      const w = $("s-water"); if (w) { const h = lerp(40, 160, s.k); w.setAttribute("y", (238 - h).toFixed(1)); w.setAttribute("height", h.toFixed(1)); }
+      const run = s.k < .15; return { live: { "s-0": true, "s-1": run }, on: { "s-coil": run ? "on" : "" } };
+    },
+    cap(s) { return s.k > .85 ? "<b>المي فوق:</b> الفلوت انقلب، الكونتاكت فتح والترمبة وقفت." : s.k < .15 ? "<b>المي تحت:</b> الفلوت متدلّي، الكونتاكت مسكّر والترمبة عم تعبّي." : "المي عم تطلع..."; }
+  }
+});
+
+/* ---------- 15. Pressure switch ---------- */
+P({
+  id: "pressure", cat: "الحساسات", name: "البرشر سويتش", dist: 5.0,
+  intro: "بيحسّ بضغط المي بالقسطل. لما الضغط ينزل (حدا فتح حنفية) بيسكّر وبيشغّل الترمبة، ولما يوصل للضغط المضبوط بيفتح وبيوقّفها.",
+  act: ["افتح حنفية", "سكّر الحنفية"], st: ["الضغط 4 بار: الكونتاكت مفتوح والترمبة واقفة.", "<b>الضغط نزل لـ2 بار:</b> الكونتاكت سكّر والترمبة اشتغلت."],
+  build(A, R) {
+    const pipe = A.cyl(0.08, 0.08, 1.6, A.mat(0x8f979a, { metalness: .6, roughness: .35 }), 0, -0.6, 0, "x");
+    A.cyl(0.06, 0.06, 0.25, A.mat(0x8f979a, { metalness: .6 }), 0, -0.45, 0, "y");
+    const body = A.shell(0x5e6a6d); A.rbox(0.6, 0.6, 0.5, 0.05, body, 0, 0, 0);
+    const cover = A.shell(0x9aa8ad); A.rbox(0.62, 0.62, 0.08, 0.05, cover, 0, 0, 0.28);
+    A.tag(A.cyl(0.18, 0.18, 0.04, A.mat(0x1d2326), 0, -0.25, 0, "y"), "diaph");
+    const sp = (x, h, r, key) => { for (let i = 0; i < 7; i++) { const m = A.add(new THREE.Mesh(new THREE.TorusGeometry(r, 0.012, 6, 24), A.mat(0xc7cdd0, { metalness: .7, roughness: .3 })), x, -0.15 + i * h / 7, 0); m.rotation.x = Math.PI / 2; A.tag(m, key); } };
+    sp(-0.12, 0.3, 0.06, "big"); sp(0.14, 0.22, 0.035, "small");
+    A.tag(A.cyl(0.02, 0.02, 0.45, A.mat(0xc7cdd0, { metalness: .7 }), -0.12, 0.02, 0, "y"), "big");
+    A.tag(A.cyl(0.015, 0.015, 0.35, A.mat(0xc7cdd0, { metalness: .7 }), 0.14, 0.0, 0, "y"), "small");
+    A.tag(A.box(0.08, 0.04, 0.08, A.brass(), -0.12, 0.24, 0), "big"); A.tag(A.box(0.06, 0.03, 0.06, A.brass(), 0.14, 0.18, 0), "small");
+    const cg = new THREE.Group(); cg.position.set(0.0, 0.1, 0.1); R.add(cg);
+    A.tag(A.box(0.3, 0.03, 0.04, A.copper(), 0, 0, 0, cg), "cont");
+    A.tag(A.box(0.05, 0.05, 0.05, A.copper(), 0.18, 0.06, 0.1), "cont");
+    const gauge = A.cyl(0.2, 0.2, 0.05, A.mat(0xeef1ef), 0.55, -0.6, 0.1, "z");
+    A.cyl(0.21, 0.21, 0.04, A.mat(0x8f979a, { metalness: .6 }), 0.55, -0.6, 0.075, "z");
+    const needle = new THREE.Group(); needle.position.set(0.55, -0.6, 0.13); R.add(needle);
+    A.tag(A.box(0.012, 0.16, 0.01, A.mat(0xd63b2f), 0, 0.07, 0, needle), "gauge");
+    A.text(["0   bar   6"], 0.3, 0.05, 0.55, -0.72, 0.128, { scale: .8 });
+    return { anim(k) { needle.rotation.z = lerp(0.8, -0.2, 1 - k) * 1 - 0.0; needle.rotation.z = lerp(-0.6, 0.5, k); cg.rotation.z = lerp(0, 0.25, k); } };
+  },
+  spots: [
+    { t: "الدخلة عالقسطل", b: "بيتركّب عالقسطل بعد الترمبة، وجنبو ساعة ضغط وتانك ضغط. من تحت في غشاء بيحسّ بالضغط.", p: [0, -0.4, 0.1], yaw: 0, pitch: -0.2, test: { mode: "on", key: "diaph", msg: "الضغط نزل: الغشاء رجع لتحت." } },
+    { t: "السوستة الكبيرة", b: "بتضبط ضغط التشغيل والوقوف سوا. بتشدّها بيطلع الضغطين.", p: [-0.12, 0.24, 0.1], inner: true, yaw: 0.3, pitch: 0.2, test: { mode: "on", key: "big", glass: true, msg: "السوستة الكبيرة بتحدّد الضغط." } },
+    { t: "السوستة الصغيرة", b: "بتضبط الفرق بين التشغيل والوقوف (مثلاً 2 بار). بتشدّها بيطلع ضغط الوقوف بس.", p: [0.14, 0.18, 0.1], inner: true, yaw: -0.3, pitch: 0.2, test: { mode: "on", key: "small", glass: true, msg: "السوستة الصغيرة بتحدّد الفرق." } },
+    { t: "الكونتاكت", b: "مسكّر بالضغط الواطي ومفتوح بالضغط العالي. إذا تيار الترمبة كبير، منخلّيه يشغّل كونتاكتور، مش الترمبة مباشرة.", p: [0, 0.1, 0.15], inner: true, yaw: 0, pitch: 0.2, test: { mode: "on", key: "cont", glass: true, msg: "الكونتاكت سكّر: الترمبة اشتغلت." } },
+    { t: "ساعة الضغط", b: "مثال: التشغيل عـ2 بار والوقوف عـ4 بار. ضبطهن حسب الترمبة وعلوّ البناية.", p: [0.55, -0.6, 0.18], yaw: -0.3, pitch: 0, test: { mode: "on", key: "gauge", msg: "الضغط نزل لـ2 بار: الترمبة اشتغلت." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(130, 26, "L", "lbl b", "middle", true) + S.g("s-0", S.l(130, 34, 130, 70)) + S.blade("bl0", 130, 70) + S.t(150, 84, "البرشر سويتش", "lbl s", "end") +
+      S.g("s-1", S.l(130, 90, 130, 150) + S.l(130, 178, 130, 250)) + S.coil("s-coil", 130, 150) + S.t(158, 168, "الترمبة", "lbl s", "end") + S.t(130, 268, "N", "lbl b", "middle", true) +
+      `<rect x="300" y="200" width="120" height="10" rx="5" class="el ring"/>` + `<rect id="s-pbar" x="300" y="200" width="120" height="10" rx="5" class="el on"/>` +
+      S.t(300, 232, "0", "lbl s", "middle", true) + S.t(420, 232, "6 bar", "lbl s", "middle", true) + S.t(360, 186, "الضغط", "lbl s") +
+      S.t(340, 120, "تشغيل عـ2 بار", "lbl s") + S.t(340, 142, "وقوف عـ4 بار", "lbl s")
+    ),
+    blades: [["bl0", "k"]],
+    update(s) { const b = $("s-pbar"); if (b) b.setAttribute("width", (120 * lerp(4, 2, s.k) / 6).toFixed(1)); const on = s.k > .85; return { live: { "s-0": true, "s-1": on }, on: { "s-coil": on ? "on" : "" } }; },
+    cap(s) { return s.k > .85 ? "<b>2 بار:</b> الكونتاكت سكّر والترمبة عم ترفع الضغط." : "<b>4 بار:</b> الكونتاكت مفتوح والترمبة واقفة."; }
+  }
+});
+
+/* ---------- 16. Limit switch ---------- */
+P({
+  id: "limit", cat: "الحساسات", name: "الليميت سويتش", dist: 5.0,
+  intro: "مفتاح بيتكبس ميكانيكياً لما شي يوصل لآخر مشوارو، متل باب الكراج. بيوقّف الموتور بالمحل المظبوط.",
+  act: ["سكّر الباب", "افتح الباب"], st: ["الباب بعيد: NC مسكّر والموتور عم يسكّر.", "<b>الباب وصل:</b> الذراع انكبس، NC فتح والموتور وقف."],
+  build(A, R) {
+    const b = A.shell(0x8f979a); A.rbox(0.46, 0.8, 0.42, 0.05, b, 0, -0.2, 0);
+    A.rbox(0.3, 0.2, 0.3, 0.04, A.shell(0x6f7978), 0, 0.3, 0);
+    const lever = new THREE.Group(); lever.position.set(0, 0.32, 0.17); R.add(lever);
+    A.tag(A.box(0.05, 0.42, 0.04, A.mat(0x2a2f33), 0, 0.21, 0, lever), "lever");
+    A.tag(A.cyl(0.08, 0.08, 0.06, A.mat(0x1d2326), 0, 0.44, 0, "z", lever), "lever");
+    A.tag(A.screw(-0.1, -0.35, 0.215, null, 0.75), "term"); A.tag(A.screw(0.1, -0.35, 0.215, null, 0.75), "term");
+    A.tag(A.screw(-0.1, -0.5, 0.215, null, 0.75), "term"); A.tag(A.screw(0.1, -0.5, 0.215, null, 0.75), "term");
+    A.text(["11 · 12  NC", "13 · 14  NO"], 0.36, 0.2, 0, -0.08, 0.215, { scale: .45 });
+    const cam = A.tag(A.box(0.5, 0.18, 0.3, A.mat(0xb06a2a, { roughness: .6 }), 0.8, 0.86, 0.17), "cam");
+    const plunger = A.cyl(0.03, 0.03, 0.2, A.mat(0xc7cdd0, { metalness: .7 }), 0, 0.12, 0.1, "y");
+    const br = new THREE.Group(); br.position.set(0, -0.15, 0.05); R.add(br); A.tag(A.box(0.3, 0.03, 0.04, A.copper(), 0, 0, 0, br), "cont");
+    return {
+      anim(k) {
+        cam.position.x = lerp(1.0, 0.25, k); lever.rotation.z = lerp(0, 0.45, clamp01((k - 0.55) / 0.45));
+        const p = clamp01((k - 0.55) / 0.45); plunger.position.y = 0.12 - 0.05 * p; br.position.y = -0.15 - 0.05 * p;
+      }
+    };
+  },
+  spots: [
+    { t: "ذراع الرولّر", b: "لما الباب يوصل، بيكبس الرولّر وبيلفّ الذراع. فيك تلفّ الذراع وتضبط طولها لتوقف بالمحل المظبوط.", p: [0, 0.76, 0.22], yaw: 0, pitch: 0.1, test: { mode: "toggle", key: "lever", msg: "الباب وصل وكبس الرولّر." } },
+    { t: "الكونتاكتات NC و NO", b: "منستعمل NC عالتسلسل مع كويل التسكير: لما ينكبس بيفتح والموتور بيوقف. والـNC أأمن: إذا انقطع شريطو بيوقف الموتور.", p: [0, -0.42, 0.24], yaw: 0, pitch: -0.1, test: { mode: "toggle", key: "term", msg: "11-12 فتح: الموتور وقف." } },
+    { t: "الباب (الكام)", b: "أي شي متحرّك: باب، عربة، رافعة. بيوصل للذراع وبيكبسها.", p: [0.6, 0.86, 0.33], yaw: -0.2, pitch: 0, test: { mode: "toggle", key: "cam", msg: "الباب عم يسكّر لحد ما يوصل للذراع." } },
+    { t: "جوّا: الجسر", b: "الذراع بيدفش قضيب، والقضيب بيحرّك الجسر النحاس: بيفتح 11-12 وبيسكّر 13-14.", p: [0, -0.15, 0.1], inner: true, yaw: 0.3, pitch: 0.1, test: { mode: "toggle", key: "cont", glass: true, msg: "الجسر نزل: NC فتح وNO سكّر." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(130, 26, "L", "lbl b", "middle", true) + S.g("s-0", S.l(130, 34, 130, 70)) + S.blade("bl0", 130, 70, true) + S.t(150, 84, "ليميت 11-12", "lbl s", "end") +
+      S.g("s-1", S.l(130, 90, 130, 150) + S.l(130, 178, 130, 250)) + S.coil("s-coil", 130, 150) + S.t(158, 168, "موتور التسكير", "lbl s", "end") + S.t(130, 268, "N", "lbl b", "middle", true) +
+      `<rect x="280" y="120" width="180" height="12" rx="3" class="el ring"/>` + `<rect id="s-door" x="440" y="100" width="40" height="52" rx="4" class="el" style="fill:#b06a2a;stroke:none"/>` +
+      `<line x1="290" y1="90" x2="290" y2="150" class="w"/>` + S.t(290, 80, "الليميت", "lbl s") + S.t(370, 176, "الباب عم يسكّر ←", "lbl s")
+    ),
+    blades: [["bl0", "kl"]],
+    update(s) { const d = $("s-door"); if (d) d.setAttribute("x", lerp(420, 295, s.k).toFixed(1)); const run = s.k < .9; return { live: { "s-0": true, "s-1": run }, on: { "s-coil": run ? "on" : "" } }; },
+    cap(s) { return s.k > .9 ? "<b>وصل:</b> الذراع انكبس، 11-12 فتح والموتور وقف." : "<b>عم يسكّر:</b> 11-12 مسكّر والموتور شغّال."; }
+  }
+});
+
+/* ---------- 17. Photocell ---------- */
+P({
+  id: "photo", cat: "الحساسات", name: "الفوتوسيل", dist: 4.6,
+  intro: "بيحسّ بالضو: بالليل بيسكّر وبيولّع اللمبات، والصبح بيطفيها. منستعملو للإنارة برّا ولمبات الطيران.",
+  act: ["صار ليل", "صار نهار"], st: ["نهار: الكونتاكت مفتوح واللمبات طافية.", "<b>ليل:</b> الكونتاكت سكّر واللمبات ضوّت."],
+  build(A, R) {
+    const body = A.shell(0xe2e5e4); A.rbox(0.5, 0.7, 0.4, 0.06, body, 0, -0.1, 0);
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(0.2, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), A.shell(0xcfe8f5, true));
+    dome.position.set(0, 0.25, 0); R.add(dome); A.tag(dome, "dome");
+    const ldr = A.tag(A.cyl(0.08, 0.08, 0.02, A.mat(0xb5601e, { emissive: 0x000000 }), 0, 0.3, 0, "y"), "ldr");
+    A.tag(A.cyl(0.05, 0.05, 0.04, A.mat(0x1d2326), 0, -0.2, 0.21, "z"), "adj");
+    A.text(["LUX"], 0.16, 0.05, 0, -0.08, 0.205, {});
+    [[-0.12, 0x6b3b1a, "L"], [0, 0x2b6cb0, "N"], [0.12, 0xb3261e, "Load"]].forEach(([x, c, n]) => {
+      A.tag(A.cyl(0.02, 0.02, 0.5, A.mat(c), x, -0.68, 0, "y"), "wires");
+    });
+    A.text(["L   N   Load"], 0.36, 0.05, 0, -0.38, 0.205, {});
+    const sun = new THREE.Mesh(new THREE.SphereGeometry(0.14, 24, 16), new THREE.MeshBasicMaterial({ color: 0xffd54a })); sun.position.set(0.8, 0.8, -0.4); R.add(sun);
+    return {
+      anim(k) {
+        sun.material.color.set(k > .5 ? 0xdfe8ff : 0xffd54a); sun.scale.setScalar(k > .5 ? 0.6 : 1);
+        ldr.material.emissive.set(k > .5 ? 0x000000 : 0x3a1a05);
+        A.ambient(lerp(1, 0.45, k));
+      }
+    };
+  },
+  spots: [
+    { t: "القبّة الشفافة", b: "جوّاتها خلية بتحسّ بالضو. وجّهها لجهة الشمال (عنا بلبنان) وبعيد عن اللمبات يلّي بتولّعها، وإلا بتولّع وبتطفي عالدوام.", p: [0, 0.36, 0.12], yaw: 0, pitch: 0.3, test: { mode: "toggle", key: "dome", msg: "الضو خفّ: الخلية حسّت." } },
+    { t: "ضبط الحساسية LUX", b: "بتقرّر قديش لازم يعتم الجو قبل ما يولّع. في موديلات فيها تأخير لحتى ما تولّع إذا مرقت غيمة.", p: [0, -0.2, 0.25], yaw: 0, pitch: 0, test: { mode: "toggle", key: "adj", msg: "وصل الضو للحد المضبوط: ولّع." } },
+    { t: "الشرايط L · N · Load", b: "L فاز داخل، N نوترال، وLoad (غالباً أحمر) طالع عاللمبات. إذا الحمل كبير، خلّيه يشغّل كونتاكتور.", p: [0, -0.68, 0.1], yaw: 0, pitch: -0.2, test: { mode: "toggle", key: "wires", msg: "Load أخد فاز: اللمبات ضوّت." } },
+    { t: "جوّا: الخلية", b: "مقاومة بتتغيّر مع الضو (LDR): بالنهار واطية، بالليل عالية. الدارة جوّا بتقرا هالفرق وبتشغّل ريليه.", p: [0, 0.3, 0.05], inner: true, yaw: 0, pitch: 0.4, test: { mode: "toggle", key: "ldr", glass: true, msg: "الخلية عتمت: الريليه سكّر." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(130, 26, "L", "lbl b", "middle", true) + S.g("s-0", S.l(130, 34, 130, 70)) + S.blade("bl0", 130, 70) + S.t(150, 84, "الفوتوسيل", "lbl s", "end") +
+      S.g("s-1", S.l(130, 90, 130, 112) + S.l(70, 112, 190, 112) + [70, 130, 190].map(x => S.l(x, 112, x, 147) + S.l(x, 173, x, 220)).join("") + S.l(70, 220, 190, 220) + S.l(130, 220, 130, 250)) +
+      [70, 130, 190].map((x, i) => S.lamp("s-lp" + i, x, 160)).join("") + S.t(130, 240, "لمبات برّا", "lbl s") + S.t(130, 268, "N", "lbl b", "middle", true) +
+      `<circle id="s-sun" cx="360" cy="110" r="34" class="el" style="fill:#ffd54a;stroke:none"/>` + S.g("s-moon", S.t(360, 172, "ليل", "lbl b hide"))
+    ),
+    blades: [["bl0", "k"]],
+    update(s) {
+      const sun = $("s-sun"); if (sun) { sun.style.fill = s.k > .5 ? "#cfd8f0" : "#ffd54a"; sun.setAttribute("r", s.k > .5 ? 22 : 34); }
+      const on = s.k > .85; return { live: { "s-0": true, "s-1": on }, on: { "s-lp0": on ? "lampon" : "", "s-lp1": on ? "lampon" : "", "s-lp2": on ? "lampon" : "" }, show: { "s-moon": s.k > .5 } };
+    },
+    cap(s) { return s.k > .85 ? "<b>ليل:</b> الفوتوسيل سكّر واللمبات ضوّت." : "<b>نهار:</b> الفوتوسيل مفتوح واللمبات طافية."; }
+  }
+});
+
+/* ================= engine ================= */
+const canvas = $("stage"), box = $("box"), dotsEl = $("dots"), pop = $("pop");
+if (!window.THREE) { box.innerHTML = '<div class="fallback">ما قدرنا نحمّل الرسم الثلاثي الأبعاد. جرّب تفتح الصفحة من جديد.</div>'; }
+let renderer = null;
+try { if (window.THREE) renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true }); } catch (e) { box.innerHTML = '<div class="fallback">جهازك ما بيدعم الرسم الثلاثي الأبعاد. الشرح والمخطط بعدن هون.</div>'; }
+
+let scene, camera, hemi, model = null;
+const shellMats = [];
+let HL = {};
+if (renderer) {
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15;
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
+  hemi = new THREE.HemisphereLight(0xffffff, 0x1b2b27, 0.85); scene.add(hemi);
+  [[0xffffff, .85, 2.5, 3, 4], [0x22c79b, .3, -3, 1, -3], [0xffffff, .45, -3, -1, 3], [0xffffff, .5, 0, 5, 1]].forEach(([c, i, x, y, z]) => { const d = new THREE.DirectionalLight(c, i); d.position.set(x, y, z); scene.add(d); });
+}
+
+/* build api */
+let curRoot = null;
+const A = {
+  mat(c, o) { return new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.55, metalness: 0.05 }, o || {})); },
+  shell(c, clear) { const m = A.mat(c, { roughness: 0.5 }); m.userData.clear = !!clear; shellMats.push(m); return m; },
+  copper() { return A.mat(0xe8893c, { metalness: 0.3, roughness: 0.28, emissive: 0x3a1704 }); },
+  brass() { return A.mat(0xd9b24a, { metalness: 0.4, roughness: 0.3, emissive: 0x2a2004 }); },
+  iron() { return A.mat(0x5d6568, { metalness: 0.55, roughness: 0.45 }); },
+  silver() { return A.mat(0xe6e9ea, { metalness: 0.8, roughness: 0.2 }); },
+  add(mesh, x, y, z, parent) { mesh.position.set(x, y, z); (parent || curRoot).add(mesh); return mesh; },
+  box(w, h, d, mat, x, y, z, parent) { return A.add(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat), x, y, z, parent); },
+  cyl(r1, r2, h, mat, x, y, z, axis, parent, open) {
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r2, h, 32, 1, !!open), mat);
+    if (open) mat.side = THREE.DoubleSide;
+    if (axis === "z") m.rotation.x = Math.PI / 2; else if (axis === "x") m.rotation.z = Math.PI / 2;
+    return A.add(m, x, y, z, parent);
+  },
+  rbox(w, h, d, r, mat, x, y, z, parent) {
+    const bs = Math.min(r * 0.7, d * 0.25), iw = w - 2 * bs, ih = h - 2 * bs, rr = Math.max(0.001, r - bs);
+    const sh = new THREE.Shape(), X = -iw / 2, Y = -ih / 2;
+    sh.moveTo(X + rr, Y); sh.lineTo(X + iw - rr, Y); sh.quadraticCurveTo(X + iw, Y, X + iw, Y + rr);
+    sh.lineTo(X + iw, Y + ih - rr); sh.quadraticCurveTo(X + iw, Y + ih, X + iw - rr, Y + ih);
+    sh.lineTo(X + rr, Y + ih); sh.quadraticCurveTo(X, Y + ih, X, Y + ih - rr); sh.lineTo(X, Y + rr); sh.quadraticCurveTo(X, Y, X + rr, Y);
+    const g = new THREE.ExtrudeGeometry(sh, { depth: d - 2 * bs, bevelEnabled: true, bevelThickness: bs, bevelSize: bs, bevelSegments: 3, curveSegments: 6 });
+    g.translate(0, 0, -(d - 2 * bs) / 2);
+    return A.add(new THREE.Mesh(g, mat), x, y, z, parent);
+  },
+  screw(x, y, z, parent, s) {
+    s = s || 1;
+    A.box(0.15 * s, 0.13 * s, 0.02, A.mat(0x1e2322, { roughness: .9 }), x, y, z - 0.005, parent);
+    A.box(0.1 * s, 0.1 * s, 0.012, A.mat(0xb7bcbd, { metalness: .7, roughness: .35 }), x, y, z + 0.008, parent);
+    const h = A.cyl(0.042 * s, 0.046 * s, 0.03, A.mat(0xc9cfd1, { metalness: .75, roughness: .25 }), x, y, z + 0.025, "z", parent);
+    A.box(0.062 * s, 0.011, 0.01, A.mat(0x2c3132), x, y, z + 0.042, parent); A.box(0.011, 0.062 * s, 0.01, A.mat(0x2c3132), x, y, z + 0.042, parent);
+    return h;
+  },
+  text(lines, w, h, x, y, z, o, parent) {
+    o = o || {};
+    const c = document.createElement("canvas"), K = 1024; c.width = K; c.height = Math.max(16, Math.round(K * h / w));
+    const g = c.getContext("2d");
+    if (o.bg) { g.fillStyle = o.bg; g.fillRect(0, 0, c.width, c.height); }
+    g.fillStyle = o.color || "#1b2422"; g.textBaseline = "middle";
+    if (o.split) {
+      const n = lines.length; g.textAlign = "center";
+      g.font = `${o.weight || 700} ${Math.round(c.height * (o.scale || .7))}px "Readex Pro", "IBM Plex Sans Arabic", sans-serif`;
+      lines.forEach((ln, i) => g.fillText(ln, c.width * (i + 0.5) / n, c.height / 2));
+    } else {
+      g.textAlign = "center"; const lh = c.height / lines.length;
+      lines.forEach((ln, i) => { g.font = `${o.weight || 700} ${Math.round(lh * (o.scale || .7))}px "Readex Pro", "IBM Plex Sans Arabic", sans-serif`; g.fillText(ln, c.width / 2, lh * (i + .5)); });
+    }
+    const tex = new THREE.CanvasTexture(c); tex.anisotropy = 8; tex.encoding = THREE.sRGBEncoding;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true, toneMapped: false }));
+    return A.add(m, x, y, z, parent);
+  },
+  tag(mesh, ...keys) {
+    if (!mesh.userData.tagged) { mesh.material = mesh.material.clone(); mesh.userData.tagged = true; mesh.userData.e0 = mesh.material.emissive ? mesh.material.emissive.clone() : null; }
+    keys.forEach(k => (HL[k] = HL[k] || []).push(mesh));
+    return mesh;
+  },
+  rail(R, w, z) {
+    z = z === undefined ? -0.62 : z;
+    const m = A.mat(0x1c2325, { metalness: .3, roughness: .7 });
+    A.box(w, 0.7, 0.02, m, 0, 0, z, R); A.box(w, 0.04, 0.06, m, 0, 0.33, z - 0.03, R); A.box(w, 0.04, 0.06, m, 0, -0.33, z - 0.03, R);
+  },
+  din(R, mods, opt) {
+    const W = 0.36 * mods;
+    const sh = A.shell(0xe9ecea), sh2 = A.shell(0xf2f4f3);
+    A.rbox(W, 1.7, 0.7, 0.05, sh, 0, 0, -0.25, R);
+    A.rbox(W, 0.42, 0.26, 0.04, sh, 0, 0.64, 0.2, R); A.rbox(W, 0.42, 0.26, 0.04, sh, 0, -0.64, 0.2, R);
+    A.rbox(W, 0.86, 0.5, 0.05, sh2, 0, 0, 0.35, R);
+    A.rail(R, Math.max(1.3, W + 0.7));
+    if (mods === 1 && !(opt && opt.noScrew)) { A.tag(A.screw(0, 0.62, 0.33, R), "in", "path"); A.tag(A.screw(0, -0.62, 0.33, R), "out", "path"); }
+    return { W };
+  },
+  ambient(f) { if (hemi) hemi.intensity = 0.85 * f; }
+};
+
+/* state */
+let cur = null, built = null, glass = true;
+const st = { k: 0, on: false, f: 0, fault: false, F: {}, kind: null, elapsed: 0, t0: 0, lit: false, pos: 0, def: null };
+let yaw = -0.5, pitch = 0.12, yawT = yaw, pitchT = pitch, idleUntil = 0, dist = 4.6, distT = 4.6, drag = null;
+let dots = [], items = [], active = -1, hlKey = null, timers = [];
+
+function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+function after(ms, fn) { timers.push(setTimeout(fn, ms)); }
+function clearHL() { Object.values(HL).forEach(a => a.forEach(m => { if (m.userData.e0) m.material.emissive.copy(m.userData.e0); })); }
+
+function setGlass(g) {
+  glass = g; $("glass").setAttribute("aria-pressed", g ? "true" : "false");
+  shellMats.forEach(m => { const t = g || m.userData.clear; m.transparent = t; m.opacity = g ? (m.userData.clear ? .18 : .14) : (m.userData.clear ? .35 : 1); m.depthWrite = !t; m.needsUpdate = true; });
+}
+
+function setOn(v) {
+  st.on = v;
+  if (v) { st.t0 = performance.now(); }
+  renderAct();
+}
+function renderAct() {
+  const d = cur; if (!d) return;
+  const btn = $("act");
+  if (d.cycle) { btn.textContent = d.act[0]; btn.setAttribute("aria-pressed", st.pos ? "true" : "false"); }
+  else if (d.momentary) { btn.textContent = d.act[0]; btn.setAttribute("aria-pressed", st.on ? "true" : "false"); }
+  else { btn.textContent = st.on ? d.act[1] : d.act[0]; btn.setAttribute("aria-pressed", st.on ? "true" : "false"); }
+}
+
+function load(id) {
+  const d = PARTS.find(p => p.id === id) || PARTS[0];
+  cur = d; st.def = d; clearTimers(); hlKey = null; closePop(); $("banner").hidden = true;
+  Object.assign(st, { k: 0, on: false, f: 0, fault: false, F: {}, kind: null, elapsed: 0, lit: false, pos: 0 });
+  document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-current", c.dataset.id === d.id ? "true" : "false"));
+  $("partName").textContent = d.name; $("partIntro").innerHTML = fmt(d.intro);
+  $("schemT").textContent = "المخطط: " + d.name;
+  $("schem").innerHTML = d.schem.svg;
+  // spots
+  dotsEl.innerHTML = ""; $("spots").innerHTML = ""; dots = []; items = [];
+  d.spots.forEach((p, i) => {
+    const li = document.createElement("li"), b = document.createElement("button");
+    b.type = "button"; b.setAttribute("aria-pressed", "false"); b.innerHTML = `<span class="n">${i + 1}</span><span>${fmt(p.t)}</span>`;
+    b.addEventListener("click", () => select(i, true)); li.appendChild(b); $("spots").appendChild(li); items.push(b);
+    const dt = document.createElement("button"); dt.type = "button"; dt.className = "dot"; dt.textContent = i + 1; dt.setAttribute("aria-label", p.t);
+    dt.addEventListener("click", e => { e.stopPropagation(); select(i, true); }); dotsEl.appendChild(dt); dots.push(dt);
+  });
+  // 3D
+  if (renderer) {
+    if (model) { scene.remove(model); model.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); } }); }
+    shellMats.length = 0; HL = {};
+    model = new THREE.Group(); curRoot = model; scene.add(model);
+    built = d.build(A, model) || { anim() {} };
+    A.ambient(1);
+    setGlass(glass);
+    distT = dist = d.dist || 4.6; yawT = yaw = -0.5; pitchT = pitch = 0.12; idleUntil = 0;
+  }
+  renderAct(); updateTexts(true);
+}
+
+function updateTexts(force) {
+  const d = cur; if (!d) return;
+  const s = schemState();
+  const txt = d.cycle ? (st.pos === 1 ? "<b>يدوي:</b> بلوك اليدوي مسكّر." : st.pos === 2 ? "<b>أوتو:</b> بلوك الأوتو مسكّر." : d.st[0]) : (st.k > .5 ? d.st[1] : d.st[0]);
+  $("state").innerHTML = txt;
+  $("scap").innerHTML = d.schem.cap(s);
+}
+
+function schemState() {
+  return { k: st.k, f: st.f, F: st.F, elapsed: st.elapsed, def: cur, lit: st.lit, pos: st.pos };
+}
+let lastSig = "";
+function updateSchem() {
+  const d = cur; const s = schemState();
+  const drv = { k: st.k, nk: st.k, f: st.f, z: 0, z1: 0, done: (st.k > .5 && st.elapsed > (d.timed || 0)) ? 1 : 0, lit: st.lit ? 1 : 0, stop: st.F.stop || 0, man: st.pos === 1 ? 1 : 0, auto: st.pos === 2 ? 1 : 0, kl: clamp01((st.k - .55) / .45) };
+  d.schem.blades.forEach(([id, key]) => {
+    const el = $(id); if (!el) return;
+    const x = +el.dataset.x, y = +el.dataset.y, nc = el.dataset.nc === "1";
+    let v = drv[key] !== undefined ? drv[key] : 0;
+    if (key === "nk") v = 1 - st.k;
+    const closed = nc ? 1 - v : v;
+    if (nc) { el.setAttribute("x2", lerp(x - 11, x + 13, closed).toFixed(1)); el.setAttribute("y2", lerp(y + 4, y - 1, closed).toFixed(1)); }
+    else { el.setAttribute("x2", lerp(x - 13, x, closed).toFixed(1)); el.setAttribute("y2", lerp(y + 4, y, closed).toFixed(1)); }
+    el.classList.toggle("live", closed > .9);
+  });
+  const r = d.schem.update(s) || {};
+  const sig = JSON.stringify(r);
+  if (sig !== lastSig) {
+    lastSig = sig;
+    Object.entries(r.live || {}).forEach(([id, v]) => { const e = $(id); if (e) e.classList.toggle("live", !!v); });
+    Object.entries(r.on || {}).forEach(([id, v]) => { const e = $(id); if (e) { e.classList.remove("on", "lampon", "redon"); if (v) e.classList.add(v); } });
+    Object.entries(r.show || {}).forEach(([id, v]) => { const e = $(id); if (e) e.querySelectorAll("text,path").forEach(n => n.classList.toggle("hide", !v)); });
+    updateTexts();
+  }
+}
+
+/* actions */
+$("act").addEventListener("click", () => {
+  const d = cur; clearTimers(); hlKey = null; clearHL();
+  if (d.cycle) { st.pos = (st.pos + 1) % 3; renderAct(); return; }
+  if (d.momentary) { press(d.momentary); return; }
+  setOn(!st.on);
+});
+$("glass").addEventListener("click", () => setGlass(!glass));
+function press(ms) {
+  setOn(true); st.lit = cur.timed ? true : st.lit; if (cur.timed) st.t0 = performance.now();
+  after(ms, () => setOn(false));
+}
+
+function runTest(i) {
+  const d = cur, sp = d.spots[i], tc = sp.test || { mode: "on" };
+  select(i, true); closePop(true);
+  clearTimers(); clearHL(); st.F = {};
+  if (tc.glass && !glass) setGlass(true);
+  hlKey = tc.key || null;
+  const bn = $("banner"); bn.innerHTML = "TEST: " + fmt(tc.msg || ""); bn.hidden = false;
+  let dur = 3200;
+  if (d.cycle) {
+    if (tc.mode === "set") { st.pos = tc.pos; } else { st.pos = 1; after(1300, () => { st.pos = 2; renderAct(); }); after(2600, () => { st.pos = 0; renderAct(); }); }
+    renderAct(); dur = tc.mode === "set" ? 3200 : 3400;
+    after(dur, () => { if (tc.mode === "set") { st.pos = 0; renderAct(); } done(); });
+    return;
+  }
+  if (d.id === "buttons" && tc.mode === "stop") { st.F.stop = 1; setOn(false); after(1400, () => { st.F.stop = 0; }); after(dur, done); return; }
+  if (tc.mode === "press") { press(d.momentary || 1200); dur = d.timed ? d.timed + 1200 : 3200; after(dur, done); return; }
+  if (tc.mode === "trip") {
+    setOn(true); st.kind = tc.kind;
+    const tt = tc.slow ? 2000 : 900;
+    after(tt, () => { st.fault = true; st.F.kind = tc.kind; setOn(false); });
+    dur = tt + 2600;
+    after(dur, () => { st.fault = false; done(); });
+    return;
+  }
+  if (tc.mode === "reset") { setOn(true); after(1300, () => setOn(false)); after(dur, done); return; }
+  if (tc.mode === "toggle" || tc.mode === "on") {
+    const was = st.on; setOn(d.fault ? true : true);
+    after(dur - 400, () => setOn(false)); after(dur, done); return;
+  }
+  after(dur, done);
+}
+function done() { hlKey = null; clearHL(); $("banner").hidden = true; }
+
+/* popup */
+function select(i, turn) {
+  active = i; const p = cur.spots[i];
+  $("popN").textContent = i + 1; $("popT").innerHTML = fmt(p.t); $("popB").innerHTML = fmt(p.b);
+  $("testBtn").onclick = () => runTest(i);
+  items.forEach((b, k) => b.setAttribute("aria-pressed", k === i ? "true" : "false"));
+  dots.forEach((d, k) => d.setAttribute("aria-pressed", k === i ? "true" : "false"));
+  pop.hidden = false; $("hint").hidden = true;
+  if (p.inner && !glass) setGlass(true);
+  if (turn) {
+    let y = p.yaw || 0; while (y - yawT > Math.PI) y -= 2 * Math.PI; while (y - yawT < -Math.PI) y += 2 * Math.PI;
+    yawT = y; pitchT = p.pitch || 0; idleUntil = performance.now() + 8000;
+    if (window.innerWidth <= 860) { const r = box.getBoundingClientRect(); if (r.top < 0 || r.bottom > window.innerHeight) box.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }); }
+  }
+}
+function closePop(keepSel) {
+  pop.hidden = true;
+  if (!keepSel) { active = -1; items.forEach(b => b.setAttribute("aria-pressed", "false")); dots.forEach(d => d.setAttribute("aria-pressed", "false")); }
+}
+$("popX").addEventListener("click", () => closePop());
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !pop.hidden) closePop(); });
+
+/* picker */
+let lastCat = "";
+PARTS.forEach((p, i) => {
+  if (p.cat !== lastCat) { lastCat = p.cat; const s = document.createElement("span"); s.className = "cat"; s.textContent = p.cat; $("picker").appendChild(s); }
+  const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.dataset.id = p.id;
+  b.innerHTML = `<span class="n">${i + 1}</span>${p.name}`;
+  b.addEventListener("click", () => { if (location.hash !== "#" + p.id) location.hash = p.id; else load(p.id); });
+  $("picker").appendChild(b);
+});
+window.addEventListener("hashchange", () => { load(location.hash.slice(1)); scrollChip(); });
+function scrollChip() { const c = document.querySelector('.chip[aria-current="true"]'); if (c) c.scrollIntoView({ block: "nearest", inline: "center", behavior: reduce ? "auto" : "smooth" }); }
+
+/* input */
+const DMIN = 2.2, DMAX = 9;
+const zoomBy = f => { distT = Math.max(DMIN, Math.min(DMAX, distT * f)); idleUntil = performance.now() + 4000; };
+$("zin").addEventListener("click", () => zoomBy(0.8)); $("zout").addEventListener("click", () => zoomBy(1.25));
+canvas.addEventListener("wheel", e => { e.preventDefault(); zoomBy(Math.exp(e.deltaY * 0.0015)); }, { passive: false });
+const pts = new Map(); let pinch0 = 0;
+const pdist = () => { const [a, b] = [...pts.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
+canvas.addEventListener("pointerdown", e => {
+  pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pts.size === 1) drag = { x: e.clientX, y: e.clientY, id: e.pointerId };
+  if (pts.size === 2) { drag = null; pinch0 = pdist(); }
+  idleUntil = performance.now() + 4000;
+});
+window.addEventListener("pointermove", e => {
+  if (!pts.has(e.pointerId)) return;
+  pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pts.size === 2) { const d = pdist(); if (pinch0 > 0) zoomBy(pinch0 / d); pinch0 = d; return; }
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
+  yawT += dx * 0.011; pitchT = Math.max(-0.9, Math.min(0.9, pitchT + dy * 0.008));
+  idleUntil = performance.now() + 4000; $("hint").hidden = true;
+});
+const end = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch0 = 0; if (drag && drag.id === e.pointerId) drag = null; };
+window.addEventListener("pointerup", end); window.addEventListener("pointercancel", end);
+
+function resize() { if (!renderer) return; const w = canvas.clientWidth, h = canvas.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+if (renderer) { new ResizeObserver(resize).observe(canvas); resize(); }
+
+const v = window.THREE ? new THREE.Vector3() : null, nrm = window.THREE ? new THREE.Vector3() : null, toCam = window.THREE ? new THREE.Vector3() : null;
+function placeDots() {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  cur.spots.forEach((p, i) => {
+    const el = dots[i]; if (!el) return;
+    if (p.inner) { el.classList.add("away"); return; }
+    const n = p.n || [0, 0, 1];
+    v.set(p.p[0], p.p[1], p.p[2]).applyMatrix4(model.matrixWorld);
+    nrm.set(n[0], n[1], n[2]).applyQuaternion(model.quaternion);
+    toCam.copy(camera.position).sub(v).normalize();
+    const facing = nrm.dot(toCam) > 0.2;
+    v.project(camera);
+    el.style.left = ((v.x + 1) / 2 * w) + "px"; el.style.top = ((1 - v.y) / 2 * h) + "px";
+    el.classList.toggle("away", !facing);
+  });
+}
+
+function frame(t) {
+  if (cur) {
+    st.k += ((st.on ? 1 : 0) - st.k) * 0.18;
+    st.f += ((st.fault ? 1 : 0) - st.f) * 0.18;
+    st.elapsed = st.on || (cur.timed && st.lit) ? performance.now() - st.t0 : 0;
+    if (cur.timed && cur.momentary) { st.lit = st.lit && st.elapsed < cur.timed; if (!st.lit && !st.on) st.elapsed = 0; }
+    st.F.f = st.f; st.F.kind = st.F.kind || st.kind;
+    if (renderer && model) {
+      if (!drag && t > idleUntil && !reduce) yawT += 0.0045;
+      yaw += (yawT - yaw) * 0.12; pitch += (pitchT - pitch) * 0.12; dist += (distT - dist) * 0.15;
+      camera.position.set(0, 0.15 * dist / 4.6, dist); camera.lookAt(0, 0, 0);
+      model.rotation.set(pitch, yaw, 0);
+      try { built.anim(st.k, st.F, t, st); } catch (e) { }
+      if (hlKey && HL[hlKey]) { const q = 0.5 + 0.5 * Math.sin(t / 140); HL[hlKey].forEach(m => m.material.emissive && m.material.emissive.setRGB(0.05 + 0.08 * q, 0.35 + 0.45 * q, 0.28 + 0.32 * q)); }
+      model.updateMatrixWorld();
+      renderer.render(scene, camera);
+      placeDots();
+    }
+    updateSchem();
+    if (cur.timed) updateTexts();
+  }
+  requestAnimationFrame(frame);
+}
+
+(document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => {
+  load(location.hash.slice(1) || PARTS[0].id); scrollChip();
+  requestAnimationFrame(frame);
+});
+})();
+</script>
+
+</body>
+</html>
