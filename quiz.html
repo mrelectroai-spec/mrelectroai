@@ -337,7 +337,7 @@
         .rec img { width: 92px; border-radius: 10px; border: 1px solid var(--border-color); flex-shrink: 0; }
         .rec h3 { font-family: 'Readex Pro', sans-serif; font-size: 17px; margin-bottom: 4px; }
         .rec .why { color: var(--text-muted); font-size: 13px; line-height: 1.75; }
-        .rec .price { margin: 10px 0 2px; font-family: 'JetBrains Mono', monospace; }
+        .rec .price { margin: 10px 0 2px; font-family: 'JetBrains Mono', monospace; display: flex; align-items: baseline; gap: 10px; }
         .rec .price b { font-size: 26px; color: #22C79B; }
         .rec .price s { color: var(--text-muted); margin-inline-start: 10px; }
         .rec .promo { font-size: 12px; color: #E8A33D; }
@@ -564,7 +564,7 @@
         </div>
 
         <button type="button" class="submit-btn" onclick="sendToWhatsApp()">
-            <span>إرسال البطاقة عبر واتساب</span>
+            <span>شوف نتيجتك</span>
             <span>📲</span>
         </button>
 
@@ -706,6 +706,15 @@
         return `https://api.whatsapp.com/send?phone=${PHONE}&text=${encodeURIComponent(text)}`;
     }
 
+    // التصنيف: لحتى ينفرز الاستبيان بالواتساب بالبحث عن الهاشتاغ
+    function methodTag(method) {
+        if (method.includes('حضوري')) return 'حضوري';
+        if (method.includes('فيديو')) return 'فيديوهات';
+        return 'PDF';
+    }
+
+    let CARD = null;   // البطاقة بعد ما يعبّي
+
     function sendToWhatsApp() {
         const name = document.getElementById('fullName').value.trim();
         const age = document.querySelector('input[name="age"]:checked')?.value;
@@ -722,63 +731,81 @@
         if (!learningMethod) { showError(6, "⚠️ نقّي كيف بتحب تتعلّم (الخانة 6)"); return; }
 
         const level = LEVEL[experience];
-        const book = recommendBook(level);
-        const rec = book ? 'كتاب «الكهرباء بالمختصر المفيد» (مبتدئ)' : 'مستوى متقدّم: بدّو متابعة شخصية';
-
-        const message = `⚡ *تقييم مستوى جديد - MrElectroAI* ⚡\n\n` +
-                        `👤 *الاسم والمنطقة:* ${name}\n` +
-                        `🎂 *الفئة العمرية:* ${age}\n` +
-                        `⏳ *سنوات الخبرة:* ${experience}\n` +
-                        `🛠️ *المهارات الحالية:* ${currentSkills}\n` +
-                        `🎯 *يرغب بتعلم:* ${targetSkills}\n` +
-                        `📘 *طريقة التعلم المفضلة:* ${learningMethod}\n\n` +
-                        `📊 *التوصية:* ${rec}`;
-        const url = waLink(message);
-        showResult(name, level, targetSkills, url);
-        const win = window.open(url, '_blank');
-        if (!win) window.location.href = url;
+        CARD = { name, age, experience, currentSkills, targetSkills, learningMethod, level, book: recommendBook(level) };
+        showResult();   // ما منفتح الواتساب هون: أول شي بيشوف شو بيناسبو
     }
 
-    function esc(t) { return String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+    function buildMessage(buying) {
+        const c = CARD;
+        const p = bookPrice();
+        const rec = c.book ? 'كتاب «الكهرباء بالمختصر المفيد» (مبتدئ)' : 'مستوى متقدّم: بدّو متابعة شخصية';
+        const tag = methodTag(c.learningMethod);
+        const tags = ['#' + tag, c.book ? '#مبتدئ' : '#متقدم'];
+        if (buying) tags.push('#طلب_شراء');
+        let m = buying
+            ? `🛒 *طلب شراء كتاب + تقييم مستوى* ⚡\n\n` +
+              `بدي كتاب «الكهرباء بالمختصر المفيد»\n` +
+              `▸ السعر: ${p}$${promoOn() ? ' (خصم الإطلاق)' : ''}\n` +
+              `كيف بدفع؟\n\n` +
+              `━━━━━━━━━━━━━━━\n`
+            : `⚡ *تقييم مستوى جديد - MrElectroAI* ⚡\n\n`;
+        m += `👤 *الاسم والمنطقة:* ${c.name}\n` +
+             `🎂 *الفئة العمرية:* ${c.age}\n` +
+             `⏳ *سنوات الخبرة:* ${c.experience}\n` +
+             `🛠️ *المهارات الحالية:* ${c.currentSkills}\n` +
+             `🎯 *يرغب بتعلم:* ${c.targetSkills}\n` +
+             `📘 *طريقة التعلم المفضلة:* ${c.learningMethod}\n\n` +
+             `📊 *التوصية:* ${rec}\n` +
+             `🏷️ *التصنيف:* ${tag}\n` +
+             tags.join(' ');
+        return m;
+    }
 
-    function showResult(name, level, target, url) {
-        const first = esc(name.split(/[\s\-–—]+/)[0]);
-        const box = document.getElementById('electroForm');
-        let card;
-        if (recommendBook(level)) {
+    function esc(t) { return String(t).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch])); }
+
+    function showResult() {
+        const c = CARD;
+        const first = esc(c.name.split(/[\s\-–—]+/)[0]);
+        const form = document.getElementById('electroForm');
+        let box = document.getElementById('resultBox');
+        if (!box) { box = document.createElement('div'); box.id = 'resultBox'; form.after(box); }
+        let html;
+        if (c.book) {
             const p = bookPrice();
             const left = Math.floor((PROMO_END - new Date()) / 864e5);
             const promo = promoOn() ? `<div class="promo">⏳ خصم الإطلاق: ${left >= 3 ? 'باقي ' + left + ' أيام' : left === 2 ? 'باقي يومين' : left === 1 ? 'باقي يوم واحد' : 'آخر يوم!'}</div>` : '';
-            const buy = `مرحبا أنور 👋\n\nعملت تحديد المستوى، وبدي كتاب «الكهرباء بالمختصر المفيد»\n▸ السعر: ${p}$${promoOn() ? ' (خصم الإطلاق)' : ''}\n\nكيف بدفع؟`;
-            card = `
+            html = `
+            <h2>${first}، هيدا بيناسبك 👇</h2>
+            <p>بما إنك بأول الطريق، بلّش بالأساس الصح.</p>
             <div class="rec">
               <div class="top">
                 <img src="course/cover.jpg" alt="غلاف كتاب الكهرباء بالمختصر المفيد">
                 <div>
                   <h3>الكهرباء بالمختصر المفيد</h3>
-                  <div class="why">بما إنك بأول الطريق، هيدا الكتاب بيبنيلك الأساس الصح: 18 قاعدة من الصفر بلغة الورشة، ومعو كورس اختبارات وشهادة باسمك.</div>
+                  <div class="why">18 قاعدة من الصفر بلغة الورشة: الشرايط، التابلو، الديجنتير والدفرانسير، القازان، وكيف تلاقي العطل. ومعو كورس اختبارات وشهادة باسمك 🎓</div>
                 </div>
               </div>
               <div class="price"><b>${p}$</b>${promoOn() ? '<s>10$</s>' : ''}</div>
               ${promo}
-              <a class="buy-btn" href="${waLink(buy)}" target="_blank" rel="noopener">اشتري الكتاب</a>
-              <a class="ghost-btn" href="./#books">شوف تفاصيل الكتاب</a>
-            </div>`;
+              <a class="buy-btn" id="sendBuy" href="${waLink(buildMessage(true))}" target="_blank" rel="noopener">اشتري الكتاب وابعت بطاقتي</a>
+            </div>
+            <a class="next-btn" id="sendOnly" href="${waLink(buildMessage(false))}" target="_blank" rel="noopener" style="display:block;text-decoration:none;text-align:center">مش هلّق، ابعت بطاقتي بس</a>`;
         } else {
-            card = `
-            <div class="rec">
-              <h3>مستواك متقدّم 💪</h3>
-              <div class="why">ما رح نضيّع وقتك بكتاب مبتدئين. وصلتني بطاقتك، ورح احكيك عالواتساب بشو بيناسبك بـ«${esc(target)}».</div>
-              <a class="ghost-btn" href="./#books">عندك متدرّب أو صانع؟ الكتاب بيبلّشو صح</a>
-            </div>`;
+            html = `
+            <h2>شكراً ${first} 💪</h2>
+            <p>مستواك متقدّم، فما رح نضيّع وقتك بكتاب مبتدئين. ابعتلي بطاقتك، ورح احكيك عالواتساب بشو بيناسبك بـ«${esc(c.targetSkills)}».</p>
+            <a class="buy-btn" id="sendOnly" href="${waLink(buildMessage(false))}" target="_blank" rel="noopener">ابعت بطاقتي عالواتساب</a>
+            <a class="ghost-btn" href="./#books">عندك متدرّب أو صانع؟ الكتاب بيبلّشو صح</a>`;
         }
-        box.innerHTML = `
-          <div class="result">
-            <h2>شكراً ${first} ✅</h2>
-            <p>انفتح الواتساب وفيه بطاقتك. اكبس «إرسال» لتوصلني.</p>
-            ${card}
-            <a class="ghost-btn" href="${url}" target="_blank" rel="noopener">ما انفتح الواتساب؟ اكبس هون</a>
-          </div>`;
+        box.innerHTML = `<div class="result">${html}
+            <p class="status" id="sentNote" style="display:none;margin-top:14px">✅ انفتح الواتساب. اكبس «إرسال» لتوصلني.</p>
+            <a class="ghost-btn" href="#" id="editBack">رجوع لتعديل أجوبتي</a></div>`;
+        box.querySelectorAll('#sendBuy, #sendOnly').forEach((a) => a.addEventListener('click', () => {
+            document.getElementById('sentNote').style.display = 'block';
+        }));
+        document.getElementById('editBack').addEventListener('click', (e) => { e.preventDefault(); box.style.display = 'none'; form.style.display = ''; document.querySelector('.subtitle').style.display = ''; window.scrollTo(0, 0); });
+        form.style.display = 'none'; box.style.display = '';
+        document.querySelector('.subtitle').style.display = 'none';
         document.getElementById('errorToast').style.display = 'none';
         window.scrollTo(0, 0);
     }
