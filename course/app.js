@@ -9,7 +9,12 @@
   const STREAK_TARGET = CFG.streak || 5;                    // أسئلة صح ورا بعض بآخر كل قاعدة
   const REQUEUE_GAP = 3;                      // السؤال الغلط بيرجع بعد كم سؤال
   const KEY = CFG.storageKey || 'electro-course-v1';
-  const NEED_KEY = CFG.requireKey !== false;  // نسخة التجربة ما بتطلب مفتاح
+  const NEED_KEY = CFG.requireKey === true;   // الكورس صار تحدّي مجاني؛ المفتاح بيرجع إذا انحط requireKey: true
+
+  // تحدّي الكتاب: يلي بيخلّص بـ 5 غلطات أو أقل بياخد الكتاب بخصم 30%
+  const CHALLENGE_MAX = 5;
+  const CHALLENGE_PRICE = 7;
+  const BOOK_FULL = 10;
 
   // نفس قاعدة مفاتيح أدوات MrElectroAI (tools/lock.js)
   const SB_URL = 'https://utjpvjnhffapbwpbkkuc.supabase.co';
@@ -75,7 +80,8 @@
       <h1>بصّم الكتاب قاعدة قاعدة</h1>
       ${CFG.banner ? `<p class="err">${CFG.banner}</p>` : ''}
       <p>رح نسألك ${RULES[0].q.length} أسئلة على كل قاعدة من الـ ${TOTAL}. كل سؤال بتغلط فيه بيرجعلك لحتى تجاوبو صح، وبالآخر لازم تجاوب ${STREAK_TARGET} أسئلة صح ورا بعض. ما بتنفتحلك القاعدة يلي بعدها إلا بس تكون باصم يلي قبلها.</p>
-      <p class="muted">بآخر الكورس بتبعت ملخص شغلك وشهادتك لأنور عالواتساب.</p>
+      <div class="challenge"><b>🎁 التحدّي:</b> خلّص الـ ${RULES.length * RULES[0].q.length} سؤال بـ ${CHALLENGE_MAX} غلطات أو أقل، وخود كتاب «الكهرباء بالمختصر المفيد» بخصم 30%: <b>${CHALLENGE_PRICE}$</b> بدل ${BOOK_FULL}$.</div>
+      <p class="muted">بآخر الكورس بتبعت ملخص شغلك لأنور عالواتساب، وبتاخد شهادة باسمك.</p>
       <form id="f" novalidate>
         <label for="nm">اسمك الكامل</label>
         <input id="nm" type="text" autocomplete="name" placeholder="مثلاً: محمد علي" required>
@@ -224,6 +230,7 @@
     $app.innerHTML = `
       <div class="rulehead">
         <div class="tag">القاعدة ${n} من ${TOTAL} · ${esc(r.story)}</div>
+        ${mistakeChip()}
         <h2>${esc(r.title)}</h2>
         ${progress}
       </div>
@@ -293,6 +300,16 @@
   let pdfBlob = null;
   const pdfName = () => `ملخص ${S.name} - الكهرباء بالمختصر المفيد.pdf`;
 
+  function totalMistakes() {
+    let m = 0; Object.values(S.rules).forEach((st) => { m += st.mistakes || 0; }); return m;
+  }
+  function challengeOk() { return totalMistakes() <= CHALLENGE_MAX; }
+  function mistakeChip() {
+    const m = totalMistakes();
+    if (m <= CHALLENGE_MAX) return `<div class="chip ${m >= CHALLENGE_MAX - 1 ? 'warn' : ''}">🎁 غلطاتك: ${m} من ${CHALLENGE_MAX}${m === CHALLENGE_MAX ? ' (ولا غلطة كمان!)' : ''}</div>`;
+    return `<div class="chip lost">غلطاتك: ${m}. راح خصم التحدّي، بس كمّل لتاخد الشهادة 💪</div>`;
+  }
+
   function totals() {
     let mistakes = 0, answers = 0;
     RULES.forEach((r) => { const st = R(r.n); mistakes += st.mistakes; answers += st.answers; });
@@ -300,7 +317,7 @@
   }
   function waText() {
     const t = totals();
-    return `مرحبا أستاذ أنور، أنا ${S.name}، رقمي \u2066${S.phone}\u2069.\nخلّصت كورس «الكهرباء بالمختصر المفيد» كلو: ${TOTAL} قاعدة ✅\nمجموع الغلطات: ${t.mistakes} من أصل ${t.answers} جواب.\nبلّشت: ${fmtDate(S.startedAt)}\nخلّصت: ${fmtDate(S.finishedAt)}\nرح ابعتلك ملخص PDF هلّق.`;
+    return `مرحبا أستاذ أنور، أنا ${S.name}، رقمي \u2066${S.phone}\u2069.\nخلّصت كورس «الكهرباء بالمختصر المفيد» كلو: ${TOTAL} قاعدة ✅\nمجموع الغلطات: ${t.mistakes} من أصل ${t.answers} جواب.\nبلّشت: ${fmtDate(S.startedAt)}\nخلّصت: ${fmtDate(S.finishedAt)}\n🎁 تحدّي الـ ${CHALLENGE_MAX} غلطات: ${challengeOk() ? 'نجحت ✅ (الكتاب بـ ' + CHALLENGE_PRICE + '$)' : 'ما نجحت'}\nرح ابعتلك ملخص PDF هلّق.\n\n${challengeOk() ? '#تحدي_ناجح' : '#تحدي'}`;
   }
 
   function finalScreen() {
@@ -319,7 +336,8 @@
         <button class="btn wa" id="s2" ${step2 ? '' : 'disabled'}>2. ابعت ملف الملخص PDF</button>
         <div class="status" id="st">${step2 ? '' : 'بلّش بالخطوة 1.'}</div>
         <div id="after"></div>
-      </div>`;
+      </div>
+      ${challengeBox(t)}`;
     if (S.pdfSent) afterSent();
 
     document.getElementById('s1').addEventListener('click', () => {
@@ -333,6 +351,23 @@
     // نحضّر الـ PDF من هلّق لحتى زر المشاركة يشتغل دغري عالتلفون
     buildPdf().then(() => { if (S.textSent) document.getElementById('st').textContent = 'الملخص جاهز. اكبس الخطوة 2.'; })
       .catch(() => { document.getElementById('st').textContent = 'ما قدرنا نحضّر الملف. تأكد إنك متصل بالإنترنت وحدّث الصفحة.'; });
+  }
+
+  function challengeBox(t) {
+    if (challengeOk()) {
+      const msg = `مرحبا أنور 👋\nأنا ${S.name}، رقمي \u2066${S.phone}\u2069.\nخلّصت الكورس بـ ${t.mistakes} ${t.mistakes === 1 ? 'غلطة' : 'غلطات'} بس، وربحت خصم التحدّي 🎁\nبدي كتاب «الكهرباء بالمختصر المفيد» بـ ${CHALLENGE_PRICE}$.\nكيف بدفع؟\n\n#تحدي_ناجح #طلب_شراء`;
+      return `<div class="sendbox win">
+        <h2>🎁 ربحت خصم التحدّي!</h2>
+        <p>خلّصت بـ ${t.mistakes} ${t.mistakes === 1 ? 'غلطة' : 'غلطات'} بس. الكتاب إلك بـ <b>${CHALLENGE_PRICE}$</b> بدل <s>${BOOK_FULL}$</s> (خصم 30%).</p>
+        <a class="btn volt" href="https://api.whatsapp.com/send?phone=${WA_NUMBER}&text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">اطلب الكتاب بـ ${CHALLENGE_PRICE}$</a>
+        <p class="muted" style="margin-top:10px">عندك الكتاب من قبل؟ ما عليك شي، شهادتك محفوظة.</p>
+      </div>`;
+    }
+    return `<div class="sendbox">
+        <h2>قرّبت!</h2>
+        <p class="muted">غلطت ${t.mistakes} مرات، وخصم التحدّي للي بيغلط ${CHALLENGE_MAX} أو أقل. بس الكتاب لسا عليه خصم الإطلاق، وبيفيدك تثبّت يلي غلطت فيه.</p>
+        <a class="btn volt" href="../#books">شوف الكتاب</a>
+      </div>`;
   }
 
   async function sendPdf() {
@@ -403,6 +438,7 @@
           <div><b>خلّص:</b>${fmtDate(S.finishedAt)}</div>
           <div><b>المدة الكاملة:</b>${fmtDur(t.dur)}</div>
           <div><b>الغلطات:</b>${t.mistakes} من ${t.answers} جواب</div>
+          <div><b>تحدّي الخصم:</b>${challengeOk() ? 'نجح ✅ (' + CHALLENGE_MAX + ' غلطات أو أقل)' : 'ما نجح'}</div>
         </div>
         <table>
           <thead><tr><th>#</th><th>القاعدة</th><th>غلطات</th><th>أجوبة</th><th>الوقت</th></tr></thead>

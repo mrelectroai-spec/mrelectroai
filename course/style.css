@@ -159,3 +159,13 @@ input:focus { border-color: var(--volt); outline: none; box-shadow: 0 0 0 3px va
 .pg tr.hot td { background: #FDEEEE; }
 .pg .weak li { margin-bottom: 6px; }
 .pg .foot { position: absolute; bottom: 26px; inset-inline: 60px; font-size: 12.5px; color: var(--p-muted); display: flex; justify-content: space-between; }
+
+/* ── تحدّي الخصم ── */
+.challenge { background: var(--glow); border: 1px solid var(--volt); border-radius: 14px; padding: 12px 14px; margin-bottom: 14px; font-size: 15px; }
+.challenge b { color: var(--volt); }
+.chip { display: inline-block; margin-top: 6px; font-size: 12.5px; font-weight: 600; color: var(--volt); background: var(--glow); border: 1px solid color-mix(in srgb, var(--volt) 40%, transparent); border-radius: 999px; padding: 3px 12px; }
+.chip.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); border-color: color-mix(in srgb, var(--warn) 40%, transparent); }
+.chip.lost { color: var(--muted); background: var(--panel-2); border-color: var(--line); }
+.sendbox.win { border-color: var(--warn); margin-top: 16px; }
+.sendbox.win b { color: var(--volt); font-family: 'JetBrains Mono', monospace; font-size: 18px; }
+.sendbox + .sendbox { margin-top: 16px; }
