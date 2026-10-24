@@ -182,3 +182,8 @@ input:focus { border-color: var(--volt); outline: none; box-shadow: 0 0 0 3px va
 .figsvg svg { width: 100%; height: auto; display: block; }
 .figcap { text-align: center; font-size: 13px; color: #5b6e68; margin-top: 6px; }
 .figx { position: absolute; top: 8px; left: 8px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid #cfe0da; background: #fff; color: #070F0D; font-size: 20px; line-height: 30px; cursor: pointer; z-index: 1; }
+
+.advice { margin-top: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--warn); background: color-mix(in srgb, var(--warn) 10%, transparent); font-size: 14px; line-height: 1.7; }
+.advice ul { margin: 6px 0 10px; padding-inline-start: 20px; }
+.premeter { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; margin: 10px 0 6px; }
+.premeter i { display: block; height: 100%; background: var(--volt); border-radius: 999px; }

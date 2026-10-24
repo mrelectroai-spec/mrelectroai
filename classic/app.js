@@ -12,6 +12,31 @@
   const BOOK = CFG.book || 'الكلاسيك كنترول بالمختصر المفيد';
   const LAB = CFG.lab || '../lab/#';
   const CHALLENGE = CFG.challenge === true;   // التحدّي (خصم عالكتاب) مطفي لهالكورس
+
+  // ---------- الشرط: لازم يخلّص كورس الكتاب الأول ----------
+  const PRE_KEY = CFG.preKey || 'electro-course-v1';   // نفس مفتاح الكورس الأول (نفس الموقع)
+  const PRE_URL = CFG.preUrl || '../course/';
+  const PRE_TOTAL = 18;
+  const ADVICE_AT = 4;   // من كم غلطة بقاعدة منقلّو يرجع للكورس الأول
+  const BASICS = { 1: 'الفولت، الأمبير، والأوم', 2: 'الشرايط التلاتة (فاز، نتر، تير)', 4: 'سماكة الشرايط', 5: 'الديجنتير العادي والدفرانسير',
+    8: 'حسبة الوات والأمبير', 9: 'التايمر والفوتوسيل', 10: 'الكونتاكتور', 13: 'طابة الأتوماتيك', 14: 'حماية الفولت (البرتيزار)',
+    16: 'ترتيب التابلو', 17: 'كيف تلاقي العطل', 18: 'الأخطاء الـ 6 القاتلة' };
+  // كل قاعدة بالكلاسيك، شو بتحتاج من الكتاب الأول
+  const NEEDS = { 1: [10, 1], 2: [16, 2], 3: [5, 2], 4: [14], 5: [16, 17], 6: [14, 8], 7: [10], 8: [5, 4, 8], 9: [10], 10: [10],
+    11: [9], 12: [9, 13], 13: [2, 17], 14: [9], 15: [13], 16: [13], 17: [9], 18: [8, 1], 19: [10], 20: [16],
+    21: [18], 22: [18], 23: [5, 16], 24: [2], 25: [17, 18] };
+  function preData() { try { const raw = localStorage.getItem(PRE_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
+  function preStatus() {
+    const o = preData();
+    const passed = o && o.rules ? Object.values(o.rules).filter((r) => r && r.passed).length : 0;
+    return { done: !!(o && o.finishedAt), passed, started: !!o, name: o && o.name, phone: o && o.phone };
+  }
+  function adviceHtml(n) {
+    const list = (NEEDS[n] || []).map((k) => `<li>القاعدة ${k}: ${esc(BASICS[k] || '')}</li>`).join('');
+    return `<div class="advice"><b>💡 نصيحة من أنور:</b> عم تغلط كتير بهالقاعدة. غالباً الأساس من الكتاب الأول مش ثابت بعد.
+      ارجع راجع هول بالكورس الأول، وبعدين كمّل هون:<ul>${list}</ul>
+      <a class="tool" href="${PRE_URL}" target="_blank" rel="noopener">افتح الكورس الأول</a></div>`;
+  }
   const NEED_KEY = CFG.requireKey === true;   // الكورس صار تحدّي مجاني؛ المفتاح بيرجع إذا انحط requireKey: true
 
   // تحدّي الكتاب: يلي بيخلّص بـ 5 غلطات أو أقل بياخد الكتاب بخصم 30%
@@ -69,11 +94,31 @@
   let view = 'board';
   function render() {
     header();
+    if (!S && !preStatus().done) return gate();
     if (!S) return welcome();
+    if (!S.pre && !preStatus().done) return gate();
     if (NEED_KEY && !S.key) return keyOnly();
     if (S.finishedAt) return finalScreen();
     if (view === 'quiz') return quiz();
     return board();
+  }
+
+  // ---------- الشرط ----------
+  function gate() {
+    const p = preStatus();
+    const pct = Math.round(100 * p.passed / PRE_TOTAL);
+    $app.innerHTML = `
+      <img class="cover" src="cover.jpg" alt="غلاف كتاب ${BOOK}">
+      <h1>بلّش بالكورس الأول</h1>
+      <p>كورس الكلاسيك كنترول مبني عالكتاب الأول «الكهرباء بالمختصر المفيد»: الفولت والأمبير، الشرايط، القواطع، الكونتاكتور والتابلو.
+      إذا هودي مش ثابتين، الكلاسيك رح يطلع صعب وما رح يفهم معك. لهيك بينفتح بس تخلّص الكورس الأول.</p>
+      <div class="challenge">${p.started
+        ? `<b>${p.name ? esc(p.name.split(' ')[0]) + '، ' : ''}وصلت للقاعدة ${Math.min(p.passed + 1, PRE_TOTAL)} من ${PRE_TOTAL} بالكورس الأول.</b>
+           <div class="premeter" aria-hidden="true"><i style="width:${pct}%"></i></div>
+           <span class="muted">باقي ${PRE_TOTAL - p.passed} ${PRE_TOTAL - p.passed === 1 ? 'قاعدة' : 'قواعد'}، وبعدها بينفتحلك الكلاسيك لحالو.</span>`
+        : `<b>لسّا ما بلّشت الكورس الأول على هالتلفون.</b> ${PRE_TOTAL} قاعدة، ومجاني.`}</div>
+      <a class="btn volt" href="${PRE_URL}">${p.started ? 'كمّل الكورس الأول' : 'ابدأ الكورس الأول'}</a>
+      <p class="muted" style="margin-top:16px">خلّصت الكورس الأول على تلفون تاني؟ لازم تكمّل الاتنين عنفس التلفون، أو ابعت لأنور عالواتساب <bdi dir="ltr">${WA_DISPLAY}</bdi>.</p>`;
   }
 
   // ---------- welcome ----------
@@ -87,9 +132,9 @@
       <p class="muted">بآخر الكورس بتبعت ملخص شغلك لأنور عالواتساب، وبتاخد شهادة باسمك.</p>
       <form id="f" novalidate>
         <label for="nm">اسمك الكامل</label>
-        <input id="nm" type="text" autocomplete="name" placeholder="مثلاً: محمد علي" required>
+        <input id="nm" type="text" autocomplete="name" placeholder="مثلاً: محمد علي" required value="${esc(preStatus().name || '')}">
         <label for="ph">رقم تلفونك (واتساب)</label>
-        <input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="مثلاً: 70 123 456" dir="ltr" required>
+        <input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="مثلاً: 70 123 456" dir="ltr" required value="${esc(preStatus().phone || '')}">
         <div class="hint">الاسم بينكتب عالشهادة متل ما بتكتبو هون.</div>
         ${NEED_KEY ? keyField() : ''}
         <div class="err" id="err" role="alert"></div>
@@ -104,7 +149,7 @@
       const err = document.getElementById('err');
       if (name.length < 3) { err.textContent = 'اكتب اسمك الكامل (3 حروف عالأقل).'; return; }
       if (digits.length < 7) { err.textContent = 'اكتب رقم تلفونك كامل.'; return; }
-      if (!NEED_KEY) { S = fresh(name, phone); save(); view = 'board'; render(); top(); return; }
+      if (!NEED_KEY) { S = fresh(name, phone); S.pre = true; save(); view = 'board'; render(); top(); return; }
       activate(e.submitter || document.querySelector('#f button[type=submit]'), (code) => {
         S = fresh(name, phone); S.key = code; save(); view = 'board'; render(); top();
       });
@@ -276,6 +321,7 @@
       fb.innerHTML = ok
         ? `<div class="fb ok"><b>✔ صح.</b>${esc(item.why)}</div>`
         : `<div class="fb no"><b>✘ خطأ.</b>${st.phase === 'learn' ? 'فكّر فيه منيح، هالسؤال رح يرجعلك بعد شوي.' : 'انطفت اللمبات. ركّز وبلّش العدّ من جديد.'}</div>`;
+      if (!ok && st.mistakes >= ADVICE_AT && !st.advised) { st.advised = true; save(); fb.insertAdjacentHTML('beforeend', adviceHtml(n)); }
       const next = document.createElement('button');
       next.className = 'btn';
       next.textContent = passedNow ? 'ارفع الديجنتير ⚡' : enteringCheck ? `جاوبت الـ ${r.q.length} صح. عاختبار البصم` : 'كمّل';
@@ -314,6 +360,7 @@
         <p>${esc(r.title)}. غلطت فيها ${st.mistakes === 0 ? 'ولا مرة' : st.mistakes + ' ' + (st.mistakes === 1 ? 'مرة' : 'مرات')}.</p>
         ${last ? '<p>هيدي كانت آخر قاعدة. خلّصت الكتاب كلو!</p>' : `<p class="muted">القاعدة ${n + 1} انفتحتلك: ${esc(rule(n + 1).title)}.</p>`}
       </div>
+      ${st.mistakes >= ADVICE_AT ? adviceHtml(n) : ''}
       <button class="btn volt" id="nx">${last ? 'شوف شهادتك' : 'عالقاعدة ' + (n + 1)}</button>
       ${last ? '' : '<button class="btn ghost" id="bd">شوف التابلو</button>'}`;
     document.getElementById('nx').addEventListener('click', () => { view = 'quiz'; render(); top(); });
@@ -454,6 +501,8 @@
     const weakHtml = weak.length
       ? `<ol class="weak">${weak.slice(0, 14).map((w) => `<li><b>القاعدة ${w.n}${w.q.t ? ' · ' + esc(w.q.t) : ''} — غلط ${w.c} ${w.c === 1 ? 'مرة' : 'مرات'}:</b> ${esc(w.q.q)}<br><span style="color:#0E8F6E">الجواب الصح: ${esc(w.q.a[0])}</span></li>`).join('')}</ol>`
       : '<p>ولا غلطة بكل الكورس. شغل معلّم!</p>';
+    const rev = new Set(); RULES.forEach((r) => { if (R(r.n).mistakes >= ADVICE_AT) (NEEDS[r.n] || []).forEach((k) => rev.add(k)); });
+    const revHtml = rev.size ? `<h2 style="margin-top:18px">بيفيدو يراجع من الكتاب الأول</h2><p>${[...rev].sort((a, b) => a - b).map((k) => `القاعدة ${k}: ${esc(BASICS[k] || '')}`).join(' · ')}</p>` : '';
     const foot = (p) => `<div class="foot"><span>${BOOK} — MrElectroAI</span><span>صفحة ${p} من 3</span></div>`;
     return `
       <div class="pg cert">
@@ -486,6 +535,7 @@
       <div class="pg">
         <h2>نقاط الضعف: الأسئلة يلي غلط فيها أكتر شي</h2>
         ${weakHtml}
+        ${revHtml}
         ${foot(3)}
       </div>`;
   }
