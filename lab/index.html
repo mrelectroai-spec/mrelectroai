@@ -1,7 +1,9 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
 <meta charset="utf-8">
+<meta name="theme-color" content="#070F0D">
+<script>try{var m=localStorage.getItem("mea_theme");if(m)document.documentElement.dataset.theme=m;}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="مختبر القطع من MrElectroAI: 17 قطعة كلاسيك كنترول بالـ3D مع شرح وتجربة ومخطط.">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
@@ -21,9 +23,19 @@
   --accent-ink: #052019;
   --lamp: #f5d04a;
   --fault: #ff6b5b;
+  --overlay: rgba(12, 26, 22, .94);
+  --stage-1: #10231d;
+  --stage-2: #070F0D;
   --display: "Readex Pro", "IBM Plex Sans Arabic", "Noto Sans Arabic", Tahoma, sans-serif;
   --body: "IBM Plex Sans Arabic", "Noto Sans Arabic", Tahoma, sans-serif;
   color-scheme: dark;
+}
+[data-theme="light"] {
+  --bg: #F7F9F8; --panel: #FFFFFF; --panel-2: #F0F5F3; --line: #DCE6E2;
+  --fg: #0B1613; --mute: #5A6D67; --accent: #0E8F6E; --accent-ink: #FFFFFF;
+  --lamp: #E0A800; --fault: #D63B2F; --overlay: rgba(255, 255, 255, .96);
+  --stage-1: #E9F0ED; --stage-2: #CFDBD6;
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
 body {
@@ -53,7 +65,7 @@ h1 { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 5vw, 
 @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 .col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 
-.stage-box { position: relative; background: radial-gradient(120% 90% at 50% 40%, var(--panel-2), var(--bg) 75%); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.stage-box { position: relative; background: radial-gradient(120% 90% at 50% 40%, var(--stage-1), var(--stage-2) 75%); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
 #stage { width: 100%; aspect-ratio: 1 / 1; max-height: 580px; display: block; touch-action: pan-y; cursor: grab; }
 #stage:active { cursor: grabbing; }
 .hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; color: var(--mute); font-size: 12.5px; pointer-events: none; }
@@ -67,12 +79,12 @@ h1 { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 5vw, 
 .dot.away { opacity: 0; pointer-events: none; }
 button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 .zoom { position: absolute; top: 10px; left: 10px; z-index: 4; display: flex; flex-direction: column; gap: 6px; }
-.zoom button { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: rgba(12,26,22,.85); color: var(--fg); font: 700 20px/1 var(--display); cursor: pointer; }
+.zoom button { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--overlay); color: var(--fg); font: 700 20px/1 var(--display); cursor: pointer; }
 .zoom button:hover { border-color: var(--accent); color: var(--accent); }
-.banner { position: absolute; top: 10px; left: 58px; right: 10px; z-index: 4; background: rgba(12,26,22,.92); border: 1px solid var(--accent); border-radius: 10px; padding: 6px 12px; color: var(--accent); font-weight: 600; font-size: 13.5px; line-height: 1.5; text-align: center; pointer-events: none; }
+.banner { position: absolute; top: 10px; left: 58px; right: 10px; z-index: 4; background: var(--overlay); border: 1px solid var(--accent); border-radius: 10px; padding: 6px 12px; color: var(--accent); font-weight: 600; font-size: 13.5px; line-height: 1.5; text-align: center; pointer-events: none; }
 .pop {
   position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 5;
-  background: rgba(12, 26, 22, .96); border: 1px solid var(--accent); border-radius: 14px;
+  background: var(--overlay); border: 1px solid var(--accent); border-radius: 14px;
   padding: 14px 16px; box-shadow: 0 12px 40px rgba(0,0,0,.5); animation: popIn .22s ease-out; max-height: 64%; overflow: auto;
 }
 .pop h2 { font-family: var(--display); font-size: 17px; margin: 0 0 6px; padding-left: 30px; display: flex; gap: 10px; align-items: center; }
@@ -122,6 +134,9 @@ button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 .parts button .n { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font: 700 12px/19px var(--display); text-align: center; }
 .parts button[aria-pressed="true"] { background: var(--panel-2); border-color: var(--accent); }
 .note { color: var(--mute); font-size: 13px; border-top: 1px solid var(--line); padding-top: 12px; margin: 0; }
+.hdr-r { display: flex; gap: 10px; align-items: center; }
+.theme { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: none; color: var(--mute); font-size: 17px; line-height: 1; cursor: pointer; }
+.theme:hover { color: var(--accent); border-color: var(--accent); }
 .fallback { padding: 40px 20px; text-align: center; color: var(--mute); }
 @media (prefers-reduced-motion: reduce) { .dot, .pop { transition: none; animation: none; } .schem .live .w { animation: none; stroke-dasharray: none; } }
 </style>
@@ -134,7 +149,7 @@ button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
       <h1>مختبر القطع</h1>
       <p class="lede">17 قطعة كلاسيك كنترول. لفّ كل قطعة، شوف جوّاتها، كبس عأي رقم لتقرا شرحو وتعمل TEST، والمخطط تحت بيتحرّك معها.</p>
     </div>
-    <span class="brand">MrElectroAI</span>
+    <div class="hdr-r"><button class="theme" id="theme" type="button" aria-label="تبديل الثيم">☾</button><span class="brand">MrElectroAI</span></div>
   </header>
 
   <nav class="picker" id="picker" aria-label="اختار القطعة"></nav>
@@ -182,6 +197,16 @@ button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 (function () {
 "use strict";
 const $ = id => document.getElementById(id);
+(function () {
+  const th = $("theme"), meta = document.querySelector('meta[name="theme-color"]');
+  const set = (m, save) => {
+    document.documentElement.dataset.theme = m; th.textContent = m === "light" ? "☀" : "☾";
+    if (meta) meta.setAttribute("content", m === "light" ? "#F7F9F8" : "#070F0D");
+    if (save) { try { localStorage.setItem("mea_theme", m); } catch (e) {} }
+  };
+  set(document.documentElement.dataset.theme === "light" ? "light" : "dark", false);
+  th.addEventListener("click", () => set(document.documentElement.dataset.theme === "light" ? "dark" : "light", true));
+})();
 const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const fmt = s => s.replace(/([A-Z0-9][A-Za-z0-9\-·\/~\s.]*[A-Za-z0-9~]|[A-Z]\d?)/g, '<span class="tag">$1</span>');
 const lerp = (a, b, k) => a + (b - a) * k;
