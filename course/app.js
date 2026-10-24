@@ -394,7 +394,12 @@
     const box = document.getElementById('after');
     if (!box) return;
     box.innerHTML = `<p class="status">✔ تمام، وصل الملخص لأنور (إذا ما وصل، كرّر الخطوة 2).</p>
-      <button class="btn volt" id="mine">نزّل شهادتك والملخص إلك</button>`;
+      <button class="btn volt" id="mine">نزّل شهادتك والملخص إلك</button>
+      <div class="sendbox win" style="margin-top:14px">
+        <h2>⚡ انفتحلك الكورس التاني</h2>
+        <p>خلّصت الأساس. هلّق فيك تكمّل عكورس «الكلاسيك كنترول بالمختصر المفيد»: 25 قاعدة على بناية وحدة، من الكونتاكتور لمضخة الحريق.</p>
+        <a class="btn volt" href="../classic/">كمّل عكورس الكلاسيك كنترول</a>
+      </div>`;
     document.getElementById('mine').addEventListener('click', async () => { if (!pdfBlob) await buildPdf(); download(pdfBlob, pdfName()); });
   }
 
