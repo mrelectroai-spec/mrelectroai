@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#070F0D">
+<title>نتائج الطلاب · MrElectroAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--void:#070F0D;--panel:#0E1A17;--panel-2:#14241F;--line:#1E332D;--volt:#22C79B;--volt-ink:#031310;--text:#E8F2EE;--muted:#7B928C;--warn:#E8A33D;--fault:#F06A6A;--r:18px}
+[data-theme="light"]{--void:#F7F9F8;--panel:#FFF;--panel-2:#F0F5F3;--line:#E1EAE6;--volt:#0E8F6E;--volt-ink:#FFF;--text:#0B1613;--muted:#5A6D67;--warn:#B87514;--fault:#C93C3C}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--void);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;font-size:16px;line-height:1.6;min-height:100vh}
+h1,h2,h3{font-family:'Readex Pro',sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:18px 16px 60px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.top h1{font-size:22px}.top h1 b{color:var(--volt)}
+.ib{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:8px 12px;font:inherit;font-size:14px;cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--volt);color:var(--volt-ink);border:0;border-radius:14px;padding:12px 18px;font:600 16px 'Readex Pro',sans-serif;cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn:disabled{opacity:.6}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.login{max-width:420px;margin:12vh auto 0}
+.login h1{font-size:24px;margin-bottom:6px}
+label{display:block;font-size:14px;color:var(--muted);margin:14px 0 6px}
+input{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:12px;font:inherit}
+input:focus{outline:2px solid var(--volt);outline-offset:1px}
+.err{color:var(--fault);font-size:14px;margin-top:10px;min-height:20px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.stat b{display:block;font:700 26px 'Readex Pro',sans-serif;color:var(--volt)}
+.stat span{font-size:13px;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.chip{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 14px;font:inherit;font-size:14px;cursor:pointer}
+.chip.on{background:var(--volt);color:var(--volt-ink);border-color:var(--volt);font-weight:600}
+.search{flex:1;min-width:200px}
+.list{display:grid;gap:10px}
+.row{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:6px 14px;cursor:pointer;text-align:start;color:inherit;font:inherit;width:100%}
+.row:hover{border-color:var(--volt)}
+.row .nm{font-weight:600;font-size:17px}
+.row .ph{direction:ltr;unicode-bidi:isolate;color:var(--muted);font-size:14px}
+.row .meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13.5px;color:var(--muted)}
+.prog{grid-column:1/-1;height:8px;background:var(--panel-2);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--volt);border-radius:99px}
+.tag{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12.5px;font-weight:600;border:1px solid var(--line)}
+.tag.e{color:#E8A33D;border-color:rgba(232,163,61,.4)}.tag.c{color:var(--volt);border-color:rgba(34,199,155,.4)}
+.tag.done{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
+.tag.new{background:var(--warn);color:#1b1103;border-color:var(--warn)}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+.dlg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-start;justify-content:center;padding:20px 12px;overflow:auto;z-index:9}
+.dlg.on{display:flex}
+.dlg .card{width:100%;max-width:760px}
+.dh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+.dh h2{font-size:22px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;background:var(--panel-2);border-radius:12px;padding:12px 14px;margin:10px 0;font-size:14.5px}
+.facts b{color:var(--muted);font-weight:500;margin-inline-end:6px}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:start;color:var(--muted);font-weight:500;padding:6px;border-bottom:1px solid var(--line)}
+td{padding:6px;border-bottom:1px solid var(--line)}
+tr.hot td{color:var(--fault)}
+tr.np td{color:var(--muted);opacity:.7}
+.weak{padding-inline-start:20px;font-size:14px}.weak li{margin-bottom:6px}
+.weak .ok{color:var(--volt)}
+.hist{font-size:13.5px;color:var(--muted);padding-inline-start:18px}
+h3{font-size:16px;margin:16px 0 8px}
+@media (max-width:640px){.stats{grid-template-columns:1fr 1fr}.facts{grid-template-columns:1fr}}
+/* PDF pages — دايماً فاتحة */
+#pdfStage{position:fixed;left:-10000px;top:0;width:794px}
+.pg{--p-ink:#0B1613;--p-muted:#5A6D67;--p-volt:#0E8F6E;--p-line:#E1EAE6;--p-soft:#F0F5F3;--p-dark:#070F0D;width:794px;height:1123px;background:#fff;color:var(--p-ink);padding:56px 60px;position:relative;overflow:hidden;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:16px;line-height:1.7}
+.pg h1,.pg h2{font-family:'Readex Pro',sans-serif;color:var(--p-ink)}
+.pg.cert{border:18px solid var(--p-dark);outline:3px solid var(--p-volt);outline-offset:-30px;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.pg.cert .bolt{width:64px;height:64px;border-radius:18px;background:var(--p-volt);display:grid;place-items:center;margin-bottom:10px}
+.pg.cert h1{font-size:40px;margin:6px 0 22px}
+.pg.cert .name{font-family:'Readex Pro',sans-serif;font-size:46px;font-weight:700;color:var(--p-volt);margin:10px 0 18px;border-bottom:3px solid var(--p-volt);padding:0 30px 6px}
+.pg.cert p{font-size:20px;max-width:560px}
+.pg.cert .sig{margin-top:40px;font-size:17px;color:var(--p-muted)}.pg.cert .sig b{color:var(--p-volt)}
+.pg h2{font-size:26px;margin-bottom:16px}
+.pg .facts{background:var(--p-soft);font-size:16px;margin-bottom:18px;padding:14px 18px;gap:6px 24px}
+.pg .facts b{color:var(--p-muted)}
+.pg table{font-size:14.5px}
+.pg th{background:var(--p-dark);color:#fff;padding:6px 8px;font-weight:600;border:0}
+.pg td{padding:4px 8px;border-bottom:1px solid var(--p-line);color:var(--p-ink)}
+.pg tr.hot td{background:#FDEEEE;color:var(--p-ink)}
+.pg tr.np td{color:#9aa8a3;opacity:1}
+.pg .weak{font-size:15px}.pg .weak .ok{color:#0E8F6E}
+.pg .foot{position:absolute;bottom:26px;inset-inline:60px;font-size:12.5px;color:var(--p-muted);display:flex;justify-content:space-between}
+.pg.dense td{padding:2px 8px;font-size:13px;line-height:1.45}.pg.dense h2{margin-bottom:10px}.pg.dense .facts{margin-bottom:12px;padding:10px 16px}
+.pg .badge{display:inline-block;background:#FFF4E0;color:#8a5a00;border-radius:8px;padding:2px 10px;font-size:14px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="dlg" id="dlg"><div class="card" id="dc"></div></div>
+<div id="pdfStage" aria-hidden="true"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(() => {
+  const SB_URL = 'https://utjpvjnhffapbwpbkkuc.supabase.co';
+  const SB_KEY = 'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK';
+  const TK = 'mea_admin_session', SEEN = 'mea_admin_seen';
+  const COURSES = { electro: 'الكهرباء بالمختصر المفيد', classic: 'الكلاسيك كنترول بالمختصر المفيد' };
+  const $app = document.getElementById('app'), $dlg = document.getElementById('dlg'), $dc = document.getElementById('dc');
+  try { const th = localStorage.getItem('mea_theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
+
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const ls = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+  function fmtDate(t) {
+    if (!t) return '—';
+    const d = new Date(t);
+    return d.toLocaleDateString('ar-LB-u-nu-latn', { year: 'numeric', month: 'short', day: 'numeric' }) + ' — ' + d.toLocaleTimeString('ar-LB-u-nu-latn', { hour: '2-digit', minute: '2-digit' });
+  }
+  function ago(t) {
+    const m = Math.round((Date.now() - new Date(t)) / 60000);
+    if (m < 1) return 'هلّق';
+    if (m < 60) return `من ${m} دقيقة`;
+    const h = Math.round(m / 60); if (h < 24) return `من ${h} ساعة`;
+    const d = Math.round(h / 24); return `من ${d} ${d === 1 ? 'يوم' : 'أيام'}`;
+  }
+  function fmtDur(ms) {
+    if (!ms || ms < 0) return '—';
+    const m = Math.max(1, Math.round(ms / 60000)), h = Math.floor(m / 60), r = m % 60;
+    if (h && r) return `${h} س و${r} د`; if (h) return `${h} ساعة`; return `${r} دقيقة`;
+  }
+  function waNum(p) {
+    let d = String(p || '').replace(/\D/g, '');
+    if (d.startsWith('00')) d = d.slice(2);
+    if (d.length <= 8) d = '961' + d.replace(/^0/, '');
+    return d;
+  }
+
+  // ---------- auth (Supabase Auth: إيميل وكلمة سر) ----------
+  let T = ls.get(TK);
+  async function auth(body, grant) {
+    const r = await fetch(`${SB_URL}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error_description || j.msg || 'login');
+    T = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000, email: j.user && j.user.email };
+    ls.set(TK, T); return T;
+  }
+  async function token() {
+    if (!T) throw new Error('nologin');
+    if (Date.now() > T.exp - 60000) await auth({ refresh_token: T.rt }, 'refresh_token');
+    return T.at;
+  }
+  async function api(path) {
+    const at = await token();
+    const r = await fetch(`${SB_URL}/rest/v1/${path}`, { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + at } });
+    if (r.status === 401) { T = null; ls.set(TK, null); throw new Error('nologin'); }
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  }
+  function logout() { T = null; ls.set(TK, null); loginView(); }
+
+  function loginView(msg) {
+    $app.innerHTML = `<div class="card login">
+      <h1>نتائج الطلاب</h1>
+      <p style="color:var(--muted);font-size:14.5px">لأنور بس. فوت بالإيميل وكلمة السر يلي عملتهن بـSupabase.</p>
+      <form id="lf">
+        <label for="em">الإيميل</label><input id="em" type="email" autocomplete="username" dir="ltr" required>
+        <label for="pw">كلمة السر</label><input id="pw" type="password" autocomplete="current-password" dir="ltr" required>
+        <div class="err" id="er">${esc(msg || '')}</div>
+        <button class="btn" style="width:100%" type="submit">فوت</button>
+      </form></div>`;
+    document.getElementById('lf').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const b = e.target.querySelector('button'), er = document.getElementById('er');
+      b.disabled = true; b.textContent = 'عم نفوت…'; er.textContent = '';
+      try { await auth({ email: document.getElementById('em').value.trim(), password: document.getElementById('pw').value }, 'password'); load(); }
+      catch (x) { er.textContent = 'الإيميل أو كلمة السر غلط.'; b.disabled = false; b.textContent = 'فوت'; }
+    });
+  }
+
+  // ---------- data ----------
+  let ROWS = [], STU = [], F = { course: 'all', state: 'all', q: '' }, seenAt = ls.get(SEEN) || 0, prevSeen = seenAt;
+  async function load(auto) {
+    if (!auto) $app.innerHTML = '<div class="empty">عم نجيب النتائج…</div>';
+    try { ROWS = await api('course_results?select=*&order=created_at.desc&limit=20000'); }
+    catch (x) {
+      if (x.message === 'nologin') return loginView('خلصت الجلسة، فوت من جديد.');
+      $app.innerHTML = `<div class="card"><h2>ما قدرنا نجيب النتائج</h2><p style="color:var(--muted);margin:8px 0 14px">إذا هيدي أول مرة، تأكّد إنك شغّلت كود الـSQL بـSupabase، وإنو الإيميل يلي فوّت فيه هوي نفسو يلي بالكود.</p><pre dir="ltr" style="white-space:pre-wrap;font-size:12px;color:var(--muted)">${esc(x.message).slice(0, 400)}</pre><div class="acts"><button class="btn" id="rt">جرّب مرة تانية</button><button class="btn ghost" id="lo">اطلع</button></div></div>`;
+      document.getElementById('rt').onclick = load; document.getElementById('lo').onclick = logout; return;
+    }
+    const m = new Map();
+    ROWS.forEach((r) => { const k = r.client_id + '|' + r.course; if (!m.has(k)) m.set(k, { last: r, events: [] }); m.get(k).events.push(r); });
+    STU = [...m.values()];
+    if (!auto) { prevSeen = seenAt; seenAt = Date.now(); ls.set(SEEN, seenAt); }
+    board();
+  }
+
+  function filtered() {
+    const q = F.q.trim().toLowerCase(), qd = q.replace(/\D/g, '');
+    return STU.filter(({ last: r }) => (F.course === 'all' || r.course === F.course)
+      && (F.state === 'all' || (F.state === 'done' ? !!r.finished_at : !r.finished_at))
+      && (!q || String(r.name).toLowerCase().includes(q) || (qd.length >= 3 && String(r.phone).replace(/\D/g, '').includes(qd))));
+  }
+
+  function board() {
+    const fin = (c) => STU.filter((s) => s.last.course === c && s.last.finished_at).length;
+    const today = STU.filter((s) => Date.now() - new Date(s.last.created_at) < 864e5).length;
+    $app.innerHTML = `
+      <div class="top"><h1>نتائج <b>الطلاب</b></h1>
+        <div style="display:flex;gap:6px"><button class="ib" id="rf">↻ حدّث</button><button class="ib" id="csv">Excel</button><button class="ib" id="th">ليلي/نهاري</button><button class="ib" id="lo">اطلع</button></div></div>
+      <div class="stats">
+        <div class="stat"><b>${STU.length}</b><span>طالب بلّش</span></div>
+        <div class="stat"><b>${fin('electro')}</b><span>خلّصوا الكهرباء</span></div>
+        <div class="stat"><b>${fin('classic')}</b><span>خلّصوا الكلاسيك</span></div>
+        <div class="stat"><b>${today}</b><span>اشتغلوا آخر 24 ساعة</span></div>
+      </div>
+      <div class="bar" id="fc">
+        ${[['all', 'الكل'], ['electro', 'الكهرباء'], ['classic', 'الكلاسيك']].map(([k, l]) => `<button class="chip ${F.course === k ? 'on' : ''}" data-c="${k}">${l}</button>`).join('')}
+        <span style="width:6px"></span>
+        ${[['all', 'الكل'], ['done', 'خلّصوا'], ['going', 'عم يكمّلوا']].map(([k, l]) => `<button class="chip ${F.state === k ? 'on' : ''}" data-s="${k}">${l}</button>`).join('')}
+      </div>
+      <div class="bar"><input class="search" id="q" type="search" placeholder="فتّش بالاسم أو الرقم" value="${esc(F.q)}"></div>
+      <div class="list" id="ls"></div>`;
+    document.getElementById('rf').onclick = () => load();
+    document.getElementById('lo').onclick = logout;
+    document.getElementById('csv').onclick = csv;
+    document.getElementById('th').onclick = () => { const n = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = n; try { localStorage.setItem('mea_theme', n); } catch (e) {} };
+    document.getElementById('fc').onclick = (e) => { const b = e.target.closest('.chip'); if (!b) return; if (b.dataset.c) F.course = b.dataset.c; if (b.dataset.s) F.state = b.dataset.s; board(); };
+    const q = document.getElementById('q');
+    q.oninput = () => { F.q = q.value; list(); };
+    list();
+  }
+
+  function list() {
+    const L = filtered(), el = document.getElementById('ls');
+    if (!L.length) { el.innerHTML = `<div class="empty">${STU.length ? 'ما في حدا بهالفلتر.' : 'بعد ما حدا بلّش الكورس. أول ما حدا يسجّل، بيطلع هون.'}</div>`; return; }
+    el.innerHTML = L.map(({ last: r }, i) => {
+      const pc = Math.round(100 * (r.rules_done || 0) / (r.total || 1));
+      const isNew = new Date(r.created_at).getTime() > prevSeen && prevSeen > 0;
+      return `<button class="row" data-i="${STU.indexOf(L[i])}">
+        <div><div class="nm">${esc(r.name)} ${isNew ? '<span class="tag new">جديد</span>' : ''}</div><div class="ph">${esc(r.phone)}</div></div>
+        <div style="text-align:end"><span class="tag ${r.course === 'electro' ? 'e' : 'c'}">${r.course === 'electro' ? 'الكهرباء' : 'الكلاسيك'}</span> ${r.finished_at ? '<span class="tag done">خلّص ✓</span>' : ''}</div>
+        <div class="prog"><i style="width:${pc}%"></i></div>
+        <div class="meta"><span>${r.rules_done}/${r.total} قاعدة</span><span>${r.mistakes} غلطة من ${r.answers} جواب</span><span>آخر شي: ${ago(r.created_at)}</span></div>
+      </button>`;
+    }).join('');
+    el.onclick = (e) => { const b = e.target.closest('.row'); if (b) detail(STU[+b.dataset.i]); };
+  }
+
+  // ---------- detail ----------
+  let CUR = null;
+  function detail(s) {
+    CUR = s; const r = s.last, d = r.data || {}, rules = d.rules || [], weak = d.weak || [];
+    const hot = (x) => x.m >= 3;
+    $dc.innerHTML = `
+      <div class="dh"><div><h2>${esc(r.name)}</h2><div style="color:var(--muted);font-size:14px">${esc(COURSES[r.course] || r.course)}</div></div><button class="ib" id="x">✕</button></div>
+      <div class="facts">
+        <div><b>التلفون:</b><bdi dir="ltr">${esc(r.phone)}</bdi></div>
+        <div><b>الحالة:</b>${r.finished_at ? 'خلّص الكورس ✓' : `عم يكمّل (${r.rules_done}/${r.total})`}</div>
+        <div><b>بلّش:</b>${fmtDate(r.started_at)}</div>
+        <div><b>خلّص:</b>${fmtDate(r.finished_at)}</div>
+        <div><b>المدة:</b>${r.finished_at ? fmtDur(new Date(r.finished_at) - new Date(r.started_at)) : '—'}</div>
+        <div><b>الغلطات:</b>${r.mistakes} من ${r.answers} جواب</div>
+        ${d.challenge != null ? `<div><b>تحدّي الخصم:</b>${d.challenge ? 'نجح ✅' : 'ما نجح'}</div>` : ''}
+        <div><b>آخر تحديث:</b>${fmtDate(r.created_at)}</div>
+      </div>
+      <div class="acts">
+        <button class="btn" id="pdf">نزّل PDF</button>
+        <a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/${waNum(r.phone)}">واتساب</a>
+      </div>
+      <h3>القواعد</h3>
+      <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>القاعدة</th><th>غلطات</th><th>أجوبة</th><th>الوقت</th></tr></thead><tbody>
+        ${rules.map((x) => `<tr class="${!x.p ? 'np' : hot(x) ? 'hot' : ''}"><td>${x.n}</td><td>${esc(x.t)}</td><td>${x.m}</td><td>${x.a}</td><td>${x.p ? fmtDur(x.e - x.s) : (x.a ? 'عم يكمّل' : '—')}</td></tr>`).join('')}
+      </tbody></table></div>
+      <h3>نقاط الضعف</h3>
+      ${weak.length ? `<ol class="weak">${weak.map((w) => `<li><b>القاعدة ${w.n} (غلط ${w.c}):</b> ${esc(w.q)}<br><span class="ok">الصح: ${esc(w.a)}</span></li>`).join('')}</ol>` : '<p style="color:var(--muted)">ولا غلطة لهلّق.</p>'}
+      <h3>السجل</h3>
+      <ul class="hist">${s.events.slice(0, 40).map((e) => `<li>${fmtDate(e.created_at)}: ${e.event === 'start' ? 'سجّل وبلّش' : e.event === 'finish' ? 'خلّص الكورس' : 'خلّص القاعدة ' + e.rules_done}</li>`).join('')}</ul>`;
+    $dlg.classList.add('on');
+    document.getElementById('x').onclick = close;
+    document.getElementById('pdf').onclick = async (e) => {
+      const b = e.target; b.disabled = true; b.textContent = 'عم نجهّز الملف…';
+      try { const blob = await buildPdf(r); download(blob, `ملخص ${r.name} - ${COURSES[r.course] || r.course}.pdf`); }
+      catch (x) { alert('ما زبط الـPDF، جرّب مرة تانية.'); }
+      b.disabled = false; b.textContent = 'نزّل PDF';
+    };
+  }
+  function close() { $dlg.classList.remove('on'); CUR = null; }
+  $dlg.addEventListener('click', (e) => { if (e.target === $dlg) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+  // ---------- PDF (نفس شكل ملخص الكورس) ----------
+  function pagesHtml(r) {
+    const d = r.data || {}, rules = d.rules || [], weak = d.weak || [], book = COURSES[r.course] || r.course, fin = !!r.finished_at;
+    const pages = fin ? 3 : 2; let pn = 0;
+    const foot = () => `<div class="foot"><span>${esc(book)} — MrElectroAI</span><span>صفحة ${++pn} من ${pages}</span></div>`;
+    const cert = fin ? `<div class="pg cert">
+        <div class="bolt"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg></div>
+        <h1>شهادة إتمام</h1><p>هالشهادة بتأكّد إنو</p><div class="name">${esc(r.name)}</div>
+        <p>بصم كل القواعد الـ ${r.total} بكتاب «${esc(book)}»، وجاوب على كل الأسئلة صح، وعدّى اختبار البصم بكل قاعدة.</p>
+        <p style="font-size:17px;color:#5B6B7D">تاريخ الإتمام: ${fmtDate(r.finished_at)}</p>
+        <div class="sig">أنور الحسن الجاسم — <b>MrElectroAI</b></div>${(pn++, '')}</div>` : '';
+    return cert + `
+      <div class="pg ${rules.length > 18 ? 'dense' : ''}">
+        <h2>ملخص شغل الطالب</h2>
+        ${fin ? '' : `<div class="badge">بعدو عم يكمّل: ${r.rules_done} من ${r.total} قاعدة</div>`}
+        <div class="facts">
+          <div><b>الاسم:</b>${esc(r.name)}</div><div><b>التلفون:</b><bdi dir="ltr">${esc(r.phone)}</bdi></div>
+          <div><b>بلّش:</b>${fmtDate(r.started_at)}</div><div><b>خلّص:</b>${fmtDate(r.finished_at)}</div>
+          <div><b>المدة الكاملة:</b>${fin ? fmtDur(new Date(r.finished_at) - new Date(r.started_at)) : '—'}</div>
+          <div><b>الغلطات:</b>${r.mistakes} من ${r.answers} جواب</div>
+          ${d.challenge != null ? `<div><b>تحدّي الخصم:</b>${d.challenge ? 'نجح ✅' : 'ما نجح'}</div>` : ''}
+        </div>
+        <table><thead><tr><th>#</th><th>القاعدة</th><th>غلطات</th><th>أجوبة</th><th>الوقت</th></tr></thead><tbody>
+          ${rules.map((x) => `<tr class="${!x.p ? 'np' : x.m >= 3 ? 'hot' : ''}"><td>${x.n}</td><td>${esc(x.t)}</td><td>${x.m}</td><td>${x.a}</td><td>${x.p ? fmtDur(x.e - x.s) : '—'}</td></tr>`).join('')}
+        </tbody></table>
+        <p style="font-size:13px;color:#5B6B7D;margin-top:10px">الصفوف الحمرا: قواعد غلط فيها 3 مرات أو أكتر. والرمادية: بعد ما خلّصها.</p>
+        ${foot()}
+      </div>
+      <div class="pg">
+        <h2>نقاط الضعف: الأسئلة يلي غلط فيها أكتر شي</h2>
+        ${weak.length ? `<ol class="weak">${weak.slice(0, 14).map((w) => `<li><b>القاعدة ${w.n} — غلط ${w.c} ${w.c === 1 ? 'مرة' : 'مرات'}:</b> ${esc(w.q)}<br><span class="ok">الجواب الصح: ${esc(w.a)}</span></li>`).join('')}</ol>` : '<p>ولا غلطة. شغل معلّم!</p>'}
+        ${foot()}
+      </div>`;
+  }
+  async function buildPdf(r) {
+    if (!window.html2canvas || !window.jspdf) throw new Error('libs');
+    const stage = document.getElementById('pdfStage');
+    stage.innerHTML = pagesHtml(r);
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+    const pages = [...stage.querySelectorAll('.pg')];
+    for (let i = 0; i < pages.length; i++) {
+      const c = await html2canvas(pages[i], { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false });
+      if (i) pdf.addPage();
+      pdf.addImage(c.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 210, 297);
+    }
+    stage.innerHTML = '';
+    return pdf.output('blob');
+  }
+  function download(blob, name) {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+  function csv() {
+    const L = filtered().map((s) => s.last);
+    const head = ['الاسم', 'التلفون', 'الكورس', 'القواعد', 'من أصل', 'الغلطات', 'الأجوبة', 'بلّش', 'خلّص', 'آخر تحديث'];
+    const q = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const lines = [head.map(q).join(',')].concat(L.map((r) => [r.name, '⁦' + r.phone, COURSES[r.course] || r.course, r.rules_done, r.total, r.mistakes, r.answers, fmtDate(r.started_at), fmtDate(r.finished_at), fmtDate(r.created_at)].map(q).join(',')));
+    download(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' }), 'نتائج الطلاب.csv');
+  }
+
+  T ? load() : loginView();
+  setInterval(() => { if (T && !CUR && document.visibilityState === 'visible' && document.activeElement.id !== 'q') load(true); }, 120000);
+})();
+</script>
+</body>
+</html>

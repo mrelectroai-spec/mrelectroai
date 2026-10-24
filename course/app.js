@@ -32,6 +32,40 @@
     return null;
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  const COURSE_ID = 'electro';
+  const CHALLENGE_ON = true;
+
+  // ---------- بيوصل لأنور لحالو: كل قاعدة بتخلص بتنحفظ بقاعدة البيانات (إضافة بس، ما حدا بيقدر يقرا غير أنور) ----------
+  function cid() {
+    if (!S.cid) { S.cid = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 12)); save(); }
+    return S.cid;
+  }
+  function snapshot() {
+    const rules = RULES.map((r) => { const st = S.rules[r.n] || {}; return { n: r.n, t: r.title, m: st.mistakes || 0, a: st.answers || 0, s: st.start || null, e: st.end || null, p: !!st.passed }; });
+    const weak = [];
+    RULES.forEach((r) => { const st = S.rules[r.n]; if (!st) return; Object.entries(st.missed || {}).forEach(([qi, c]) => { const q = r.q[qi]; if (q) weak.push({ n: r.n, c, q: q.q, a: q.a[0] }); }); });
+    weak.sort((x, y) => y.c - x.c);
+    const done = rules.filter((r) => r.p).length;
+    return { done, m: rules.reduce((s, r) => s + r.m, 0), a: rules.reduce((s, r) => s + r.a, 0), rules, weak: weak.slice(0, 20) };
+  }
+  let reporting = false;
+  async function report() {
+    if (!S || !S.name || reporting) return;
+    const x = snapshot();
+    const sig = x.done + '|' + (S.finishedAt || 0);
+    if (S.repSig === sig) return;
+    reporting = true;
+    try {
+      const res = await fetch(SB_URL + '/rest/v1/course_results', { method: 'POST',
+        headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ client_id: cid(), course: COURSE_ID, event: S.finishedAt ? 'finish' : (x.done ? 'rule' : 'start'),
+          name: String(S.name).slice(0, 80), phone: String(S.phone).slice(0, 25), rules_done: x.done, total: TOTAL, mistakes: x.m, answers: x.a,
+          started_at: S.startedAt ? new Date(S.startedAt).toISOString() : null, finished_at: S.finishedAt ? new Date(S.finishedAt).toISOString() : null,
+          data: { rules: x.rules, weak: x.weak, challenge: CHALLENGE_ON ? challengeOk() : null, max: CHALLENGE_ON ? CHALLENGE_MAX : null } }) });
+      if (res.ok) { S.repSig = sig; save(); }
+    } catch (e) {} finally { reporting = false; }
+  }
+  window.addEventListener('online', () => report());
   function fresh(name, phone) {
     return { v: 1, name, phone, startedAt: Date.now(), current: 1, finishedAt: null, textSent: false, pdfSent: false, rules: {} };
   }
@@ -90,6 +124,7 @@
         <div class="hint">الاسم بينكتب عالشهادة متل ما بتكتبو هون.</div>
         ${NEED_KEY ? keyField() : ''}
         <div class="err" id="err" role="alert"></div>
+        <p class="muted" style="font-size:14px;margin:6px 0 10px">اسمك ورقمك ونتيجتك بيوصلو لأنور لحالو، ليتابع معك. ما حدا غيرو بيشوفهن.</p>
         <button class="btn volt" type="submit">ابدأ الكورس</button>
       </form>
       ${NEED_KEY ? buyHint() : ''}`;
@@ -101,9 +136,9 @@
       const err = document.getElementById('err');
       if (name.length < 3) { err.textContent = 'اكتب اسمك الكامل (3 حروف عالأقل).'; return; }
       if (digits.length < 7) { err.textContent = 'اكتب رقم تلفونك كامل.'; return; }
-      if (!NEED_KEY) { S = fresh(name, phone); save(); view = 'board'; render(); top(); return; }
+      if (!NEED_KEY) { S = fresh(name, phone); save(); report(); view = 'board'; render(); top(); return; }
       activate(e.submitter || document.querySelector('#f button[type=submit]'), (code) => {
-        S = fresh(name, phone); S.key = code; save(); view = 'board'; render(); top();
+        S = fresh(name, phone); S.key = code; save(); report(); view = 'board'; render(); top();
       });
     });
   }
@@ -282,6 +317,7 @@
     const last = n === TOTAL;
     if (!last) { S.current = n + 1; } else { S.finishedAt = Date.now(); }
     save();
+    report();
     $app.innerHTML = `
       <div class="switch-on">
         <div class="big-lever" aria-hidden="true"></div>
@@ -479,4 +515,5 @@
   }
 
   render();
+  if (S) report();
 })();
