@@ -104,6 +104,29 @@ h3{font-size:16px;margin:16px 0 8px}
 .pg .foot{position:absolute;bottom:26px;inset-inline:60px;font-size:12.5px;color:var(--p-muted);display:flex;justify-content:space-between}
 .pg.dense td{padding:2px 8px;font-size:13px;line-height:1.45}.pg.dense h2{margin-bottom:10px}.pg.dense .facts{margin-bottom:12px;padding:10px 16px}
 .pg .badge{display:inline-block;background:#FFF4E0;color:#8a5a00;border-radius:8px;padding:2px 10px;font-size:14px;margin-bottom:12px}
+
+.stat.warn b{color:var(--warn)}
+.tag.stall{background:var(--warn);color:#1b1103;border-color:var(--warn)}
+.tag.go{color:var(--volt);border-color:rgba(34,199,155,.4)}
+.person{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.person.stalled,.person.new{border-color:rgba(232,163,61,.55)}
+.ph1{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.person .nm{font-weight:600;font-size:17px}
+.person .phn{direction:ltr;unicode-bidi:isolate;color:var(--muted);font-size:14px;text-align:end}
+.person .when{font-size:13px;color:var(--muted);white-space:nowrap}
+.cl{margin-top:10px;font-size:15px}
+.cl .prog{height:6px;margin-top:6px}
+.person .meta{margin-top:8px;font-size:13px;color:var(--muted)}
+.person .meta b{color:var(--text);font-weight:500}
+.btn.sm{padding:8px 16px;font-size:14.5px;border-radius:12px}
+.hint{font-size:13.5px;color:var(--muted);margin:4px 0 12px}
+.cbox{background:var(--panel-2);border-radius:14px;padding:14px;margin:10px 0}
+.cbox .facts{background:var(--panel)}
+.hb{display:grid;grid-template-columns:130px 1fr auto;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.hb i{display:block;height:10px;border-radius:99px;background:var(--volt);min-width:4px}
+.hb b{font-weight:600;font-size:13.5px;white-space:nowrap}
+details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
 </style>
 </head>
 <body>
@@ -116,8 +139,13 @@ h3{font-size:16px;margin:16px 0 8px}
 (() => {
   const SB_URL = 'https://utjpvjnhffapbwpbkkuc.supabase.co';
   const SB_KEY = 'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK';
-  const TK = 'mea_admin_session', SEEN = 'mea_admin_seen';
+  const SITE = 'https://mrelectroai-spec.github.io/mrelectroai/';
+  const TK = 'mea_admin_session';
   const COURSES = { electro: 'الكهرباء بالمختصر المفيد', classic: 'الكلاسيك كنترول بالمختصر المفيد' };
+  const SHORT = { electro: 'الكهرباء', classic: 'الكلاسيك' };
+  const CURL = { electro: SITE + 'course/', classic: SITE + 'classic/' };
+  const PAGES = { home: 'الصفحة الرئيسية', sample: 'صفحة العيّنة', lab: 'مختبر القطع', course: 'كورس الكهرباء', classic: 'كورس الكلاسيك', quiz: 'اختبار المستوى', tools: 'الأدوات', other: 'صفحة تانية' };
+  const STALL_DAYS = 2;
   const $app = document.getElementById('app'), $dlg = document.getElementById('dlg'), $dc = document.getElementById('dc');
   try { const th = localStorage.getItem('mea_theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
 
@@ -132,8 +160,8 @@ h3{font-size:16px;margin:16px 0 8px}
     const m = Math.round((Date.now() - new Date(t)) / 60000);
     if (m < 1) return 'هلّق';
     if (m < 60) return `من ${m} دقيقة`;
-    const h = Math.round(m / 60); if (h < 24) return `من ${h} ساعة`;
-    const d = Math.round(h / 24); return `من ${d} ${d === 1 ? 'يوم' : 'أيام'}`;
+    const h = Math.round(m / 60); if (h < 24) return `من ${h} ${h === 1 ? 'ساعة' : 'ساعات'}`;
+    const d = Math.round(h / 24); return d === 1 ? 'مبارح' : `من ${d} ${d <= 10 ? 'أيام' : 'يوم'}`;
   }
   function fmtDur(ms) {
     if (!ms || ms < 0) return '—';
@@ -146,14 +174,16 @@ h3{font-size:16px;margin:16px 0 8px}
     if (d.length <= 8) d = '961' + d.replace(/^0/, '');
     return d;
   }
+  const phoneKey = (p) => String(p || '').replace(/\D/g, '').slice(-8) || String(p);
+  const first = (n) => String(n || '').trim().split(/\s+/)[0];
 
-  // ---------- auth (Supabase Auth: إيميل وكلمة سر) ----------
+  // ---------- auth ----------
   let T = ls.get(TK);
   async function auth(body, grant) {
     const r = await fetch(`${SB_URL}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(j.error_description || j.msg || 'login');
-    T = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000, email: j.user && j.user.email };
+    T = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000 };
     ls.set(TK, T); return T;
   }
   async function token() {
@@ -171,11 +201,10 @@ h3{font-size:16px;margin:16px 0 8px}
     const tx = await r.text(); return tx ? JSON.parse(tx) : null;
   }
   function logout() { T = null; ls.set(TK, null); loginView(); }
-
   function loginView(msg) {
     $app.innerHTML = `<div class="card login">
       <h1>لوحة أنور</h1>
-      <p style="color:var(--muted);font-size:14.5px">لأنور بس: الطلاب، المبيعات، والكتب.</p>
+      <p style="color:var(--muted);font-size:14.5px">لأنور بس: الناس، الزيارات، والمبيعات.</p>
       <form id="lf">
         <label for="em">الإيميل</label><input id="em" type="email" autocomplete="username" dir="ltr" required>
         <label for="pw">كلمة السر</label><input id="pw" type="password" autocomplete="current-password" dir="ltr" required>
@@ -192,99 +221,231 @@ h3{font-size:16px;margin:16px 0 8px}
   }
 
   // ---------- data ----------
-  let ROWS = [], STU = [], BOOKS = [], SALES = [], PUB = null, TAB = 'students', F = { course: 'all', state: 'all', q: '' }, seenAt = ls.get(SEEN) || 0, prevSeen = seenAt;
+  let STU = [], PV = [], BOOKS = [], SALES = [], PUB = null, PEOPLE = [], TAB = 'people', CUR = null;
+  const F = { st: 'all', q: '' };
   async function load(auto) {
-    if (!auto) $app.innerHTML = '<div class="empty">عم نجيب النتائج…</div>';
+    if (!auto) $app.innerHTML = '<div class="empty">عم نجيب الأرقام…</div>';
+    const since = new Date(Date.now() - 30 * 864e5).toISOString();
     try {
-      [ROWS, BOOKS, SALES, PUB] = await Promise.all([
-        api('course_results?select=*&order=created_at.desc&limit=20000'),
+      [STU, PV, BOOKS, SALES, PUB] = await Promise.all([
+        api('students?select=*&order=last_seen.desc&limit=10000'),
+        api('page_views?select=vid,page,part,src,ref,dev,at&at=gte.' + encodeURIComponent(since) + '&order=at.desc&limit=50000'),
         api('books?select=*&order=sort'),
         api('book_sales?select=*&order=sold_at.desc&limit=5000'),
         api('rpc/site_stats', { method: 'POST', body: '{}' }).catch(() => null)]);
-    }
-    catch (x) {
+    } catch (x) {
       if (x.message === 'nologin') return loginView('خلصت الجلسة، فوت من جديد.');
-      $app.innerHTML = `<div class="card"><h2>ما قدرنا نجيب النتائج</h2><p style="color:var(--muted);margin:8px 0 14px">تأكّد إنك متصل بالإنترنت. وإذا ضلّت هيك، ابعت هالرسالة لكلود.</p><pre dir="ltr" style="white-space:pre-wrap;font-size:12px;color:var(--muted)">${esc(x.message).slice(0, 400)}</pre><div class="acts"><button class="btn" id="rt">جرّب مرة تانية</button><button class="btn ghost" id="lo">اطلع</button></div></div>`;
-      document.getElementById('rt').onclick = load; document.getElementById('lo').onclick = logout; return;
+      $app.innerHTML = `<div class="card"><h2>ما قدرنا نجيب الأرقام</h2><p style="color:var(--muted);margin:8px 0 14px">تأكّد إنك متصل بالإنترنت. وإذا ضلّت هيك، ابعت هالرسالة لكلود.</p><pre dir="ltr" style="white-space:pre-wrap;font-size:12px;color:var(--muted)">${esc(x.message).slice(0, 400)}</pre><div class="acts"><button class="btn" id="rt">جرّب مرة تانية</button><button class="btn ghost" id="lo">اطلع</button></div></div>`;
+      document.getElementById('rt').onclick = () => load(); document.getElementById('lo').onclick = logout; return;
     }
-    const m = new Map();
-    ROWS.forEach((r) => { const k = r.client_id + '|' + r.course; if (!m.has(k)) m.set(k, { last: r, events: [] }); m.get(k).events.push(r); });
-    STU = [...m.values()];
-    if (!auto) { prevSeen = seenAt; seenAt = Date.now(); ls.set(SEEN, seenAt); }
+    buildPeople();
     board();
   }
 
-  function filtered() {
-    const q = F.q.trim().toLowerCase(), qd = q.replace(/\D/g, '');
-    return STU.filter(({ last: r }) => (F.course === 'all' || r.course === F.course)
-      && (F.state === 'all' || (F.state === 'done' ? !!r.finished_at : !r.finished_at))
-      && (!q || String(r.name).toLowerCase().includes(q) || (qd.length >= 3 && String(r.phone).replace(/\D/g, '').includes(qd))));
+  // كل شخص (حسب رقم التلفون) مع كورساتو
+  function status(r) {
+    if (r.finished_at) return 'done';
+    const stale = Date.now() - new Date(r.last_seen) > STALL_DAYS * 864e5;
+    if (!r.answers && !r.rules_done) return stale ? 'new' : 'going';
+    return stale ? 'stalled' : 'going';
+  }
+  function sentence(r) {
+    if (r.finished_at) return `خلّص الكورس كلّو ✓ (${r.mistakes} غلطة)`;
+    if (!r.answers && !r.rules_done) return 'سجّل اسمو، وما جاوب ولا سؤال';
+    const tot = r.total || '?';
+    if (r.cur_phase === 'learn' && r.cur_rule) return `بالقاعدة ${r.cur_rule} من ${tot}: جاوب ${r.cur_done} من ${r.cur_of} أسئلة`;
+    if (r.cur_phase === 'check' && r.cur_rule) return `بالقاعدة ${r.cur_rule} من ${tot}: باختبار البصم (${r.cur_done} من ${r.cur_of} صح ورا بعض)`;
+    if (r.cur_phase === 'new' && r.cur_rule) return `خلّص ${r.rules_done} قاعدة، وما فتح القاعدة ${r.cur_rule} بعد`;
+    return `خلّص ${r.rules_done} من ${tot} قاعدة`;
+  }
+  const RANK = { stalled: 0, new: 1, going: 2, done: 3 };
+  function buildPeople() {
+    const m = new Map();
+    STU.forEach((r) => {
+      const k = phoneKey(r.phone);
+      if (!m.has(k)) m.set(k, { key: k, name: r.name, phone: r.phone, rows: [], vids: new Set(), last: r.last_seen, first: r.first_seen });
+      const p = m.get(k); p.rows.push(r); if (r.vid) p.vids.add(r.vid);
+      if (new Date(r.last_seen) > new Date(p.last)) { p.last = r.last_seen; p.name = r.name; }
+      if (new Date(r.first_seen) < new Date(p.first)) p.first = r.first_seen;
+    });
+    PEOPLE = [...m.values()].map((p) => {
+      p.rows.sort((a, b) => (a.course === 'electro' ? -1 : 1));
+      p.st = p.rows.map(status).sort((a, b) => RANK[a] - RANK[b])[0];
+      // منين إجا: أوّل زيارة إلها مصدر
+      const vis = PV.filter((v) => p.vids.has(v.vid));
+      const s = vis.slice().reverse().find((v) => v.src || v.ref);
+      p.from = s ? (s.src || s.ref) : (p.rows.find((r) => r.data && r.data.src) || {}).data?.src || '';
+      p.visits = vis;
+      return p;
+    }).sort((a, b) => new Date(b.last) - new Date(a.last));
+  }
+  function waText(p) {
+    const fn = first(p.name);
+    const r = p.rows.slice().sort((a, b) => RANK[status(a)] - RANK[status(b)])[0];
+    const st = status(r), book = COURSES[r.course], url = CURL[r.course];
+    if (st === 'done' && r.course === 'electro' && !p.rows.some((x) => x.course === 'classic'))
+      return `مرحبا ${fn} 👋 أنا أنور.\nمبروك، خلّصت كورس «${book}» كلّو 🎉\nإذا حابب تكمّل، انفتحلك كورس «${COURSES.classic}»: 25 قاعدة على بناية وحدة.\n${CURL.classic}`;
+    if (st === 'done') return `مرحبا ${fn} 👋 أنا أنور.\nمبروك، خلّصت كورس «${book}» 🎉 شو رأيك فيه؟ رأيك بيهمّني.`;
+    if (!r.answers && !r.rules_done) return `مرحبا ${fn} 👋 أنا أنور.\nشفت إنك سجّلت بكورس «${book}» بس بعدك ما بلّشت. أوّل قاعدة بتاخد كم دقيقة بس، جرّبها:\n${url}`;
+    const n = r.cur_rule || (r.rules_done + 1);
+    return `مرحبا ${fn} 👋 أنا أنور.\nشفت إنك وصلت للقاعدة ${n} بكورس «${book}». كيفك معو؟ إذا في شي مش واضح، اسألني هون.\nوكمّل من وين وقفت:\n${url}`;
   }
 
+  // ---------- head ----------
   function head() {
     return `<div class="top"><h1>لوحة <b>أنور</b></h1>
         <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="ib" id="rf">↻ حدّث</button><button class="ib" id="th">ليلي/نهاري</button><button class="ib" id="pwb">كلمة السر</button><button class="ib" id="lo">اطلع</button></div></div>
-      <div class="bar tabs" id="tabs">${[['students', 'الطلاب'], ['sales', 'المبيعات'], ['books', 'الكتب']].map(([k, l]) => `<button class="chip big ${TAB === k ? 'on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>`;
+      <div class="bar tabs" id="tabs">${[['people', 'الناس'], ['visits', 'الزيارات'], ['sales', 'المبيعات']].map(([k, l]) => `<button class="chip big ${TAB === k ? 'on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>`;
   }
   function wireHead() {
     document.getElementById('rf').onclick = () => load();
     document.getElementById('lo').onclick = logout;
     document.getElementById('pwb').onclick = pwDialog;
     document.getElementById('th').onclick = () => { const n = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = n; try { localStorage.setItem('mea_theme', n); } catch (e) {} };
-    document.getElementById('tabs').onclick = (e) => { const b = e.target.closest('.chip'); if (b) { TAB = b.dataset.t; board(); } };
+    document.getElementById('tabs').onclick = (e) => { const b = e.target.closest('.chip'); if (b) { TAB = b.dataset.t; board(); window.scrollTo(0, 0); } };
   }
   function board() {
+    if (TAB === 'visits') return visitsView();
     if (TAB === 'sales') return salesView();
-    if (TAB === 'books') return booksView();
-    const fin = (c) => STU.filter((s) => s.last.course === c && s.last.finished_at).length;
-    const today = STU.filter((s) => Date.now() - new Date(s.last.created_at) < 864e5).length;
+    return peopleView();
+  }
+  const uniq = (L) => new Set(L.map((v) => v.vid)).size;
+  const dayStart = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+
+  // ---------- الناس ----------
+  function peopleView() {
+    const today = PV.filter((v) => new Date(v.at) >= dayStart());
+    const cnt = (s) => PEOPLE.filter((p) => p.st === s).length;
     $app.innerHTML = head() + `
-      <div class="bar" style="justify-content:flex-end"><button class="ib" id="csv">نزّل Excel</button></div>
       <div class="stats">
-        <div class="stat"><b>${STU.length}</b><span>طالب بلّش</span></div>
-        <div class="stat"><b>${fin('electro')}</b><span>خلّصوا الكهرباء</span></div>
-        <div class="stat"><b>${fin('classic')}</b><span>خلّصوا الكلاسيك</span></div>
-        <div class="stat"><b>${today}</b><span>اشتغلوا آخر 24 ساعة</span></div>
+        <div class="stat"><b>${uniq(today)}</b><span>زاروا الموقع اليوم</span></div>
+        <div class="stat"><b>${PEOPLE.length}</b><span>سجّلوا اسمن</span></div>
+        <div class="stat warn"><b>${cnt('stalled') + cnt('new')}</b><span>وقفوا، بدّن رسالة</span></div>
+        <div class="stat"><b>${cnt('done')}</b><span>خلّصوا</span></div>
       </div>
       <div class="bar" id="fc">
-        ${[['all', 'الكل'], ['electro', 'الكهرباء'], ['classic', 'الكلاسيك']].map(([k, l]) => `<button class="chip ${F.course === k ? 'on' : ''}" data-c="${k}">${l}</button>`).join('')}
-        <span style="width:6px"></span>
-        ${[['all', 'الكل'], ['done', 'خلّصوا'], ['going', 'عم يكمّلوا']].map(([k, l]) => `<button class="chip ${F.state === k ? 'on' : ''}" data-s="${k}">${l}</button>`).join('')}
+        ${[['all', 'الكل'], ['stalled', 'وقفوا 🔔'], ['new', 'ما بلّشوا'], ['going', 'عم يكمّلوا'], ['done', 'خلّصوا']].map(([k, l]) => `<button class="chip ${F.st === k ? 'on' : ''}" data-s="${k}">${l}</button>`).join('')}
       </div>
-      <div class="bar"><input class="search" id="q" type="search" placeholder="فتّش بالاسم أو الرقم" value="${esc(F.q)}"></div>
+      <div class="bar"><input class="search" id="q" type="search" placeholder="فتّش بالاسم أو الرقم" value="${esc(F.q)}"><button class="ib" id="csv">Excel</button></div>
+      <p class="hint">«وقفوا» يعني ما فاتوا على الكورس من ${STALL_DAYS} أيام أو أكتر. كبسة واتساب بتفتحلك رسالة جاهزة، وفيك تعدّلها قبل ما تبعت.</p>
       <div class="list" id="ls"></div>`;
     wireHead();
+    document.getElementById('fc').onclick = (e) => { const b = e.target.closest('.chip'); if (b) { F.st = b.dataset.s; peopleView(); } };
+    const q = document.getElementById('q'); q.oninput = () => { F.q = q.value; plist(); };
     document.getElementById('csv').onclick = csv;
-    document.getElementById('fc').onclick = (e) => { const b = e.target.closest('.chip'); if (!b) return; if (b.dataset.c) F.course = b.dataset.c; if (b.dataset.s) F.state = b.dataset.s; board(); };
-    const q = document.getElementById('q');
-    q.oninput = () => { F.q = q.value; list(); };
-    list();
+    plist();
+  }
+  function pfilter() {
+    const q = F.q.trim().toLowerCase(), qd = q.replace(/\D/g, '');
+    return PEOPLE.filter((p) => (F.st === 'all' || p.st === F.st)
+      && (!q || String(p.name).toLowerCase().includes(q) || (qd.length >= 3 && String(p.phone).replace(/\D/g, '').includes(qd))));
+  }
+  const ST_TAG = { stalled: '<span class="tag stall">وقف</span>', new: '<span class="tag stall">ما بلّش</span>', going: '<span class="tag go">عم يكمّل</span>', done: '<span class="tag done">خلّص ✓</span>' };
+  function plist() {
+    const L = pfilter(), el = document.getElementById('ls');
+    if (!L.length) { el.innerHTML = `<div class="empty">${PEOPLE.length ? 'ما في حدا بهالفلتر.' : 'بعد ما حدا سجّل اسمو. أوّل ما حدا يسجّل، بيطلع هون.'}</div>`; return; }
+    el.innerHTML = L.map((p) => `<div class="person ${p.st}">
+        <div class="ph1"><div><div class="nm">${esc(p.name)} ${ST_TAG[p.st]}</div><div class="phn">${esc(p.phone)}</div></div>
+          <div class="when">${ago(p.last)}</div></div>
+        ${p.rows.map((r) => `<div class="cl"><span class="tag ${r.course === 'electro' ? 'e' : 'c'}">${SHORT[r.course]}</span> ${esc(sentence(r))}
+          <div class="prog"><i style="width:${Math.round(100 * (r.finished_at ? 1 : (r.rules_done || 0) / (r.total || 1)))}%"></i></div></div>`).join('')}
+        <div class="meta">${p.from ? `إجا من: <b>${esc(p.from)}</b> · ` : ''}سجّل ${ago(p.first)}</div>
+        <div class="acts" style="margin:8px 0 0">
+          <a class="btn sm" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?phone=${waNum(p.phone)}&text=${encodeURIComponent(waText(p))}">واتساب</a>
+          <button class="btn ghost sm" data-k="${esc(p.key)}">التفاصيل</button>
+        </div>
+      </div>`).join('');
+    el.onclick = (e) => { const b = e.target.closest('[data-k]'); if (b) detail(PEOPLE.find((p) => p.key === b.dataset.k)); };
   }
 
-  function list() {
-    const L = filtered(), el = document.getElementById('ls');
-    if (!L.length) { el.innerHTML = `<div class="empty">${STU.length ? 'ما في حدا بهالفلتر.' : 'بعد ما حدا بلّش الكورس. أول ما حدا يسجّل، بيطلع هون.'}</div>`; return; }
-    el.innerHTML = L.map(({ last: r }, i) => {
-      const pc = Math.round(100 * (r.rules_done || 0) / (r.total || 1));
-      const isNew = new Date(r.created_at).getTime() > prevSeen && prevSeen > 0;
-      return `<button class="row" data-i="${STU.indexOf(L[i])}">
-        <div><div class="nm">${esc(r.name)} ${isNew ? '<span class="tag new">جديد</span>' : ''}</div><div class="ph">${esc(r.phone)}</div></div>
-        <div style="text-align:end"><span class="tag ${r.course === 'electro' ? 'e' : 'c'}">${r.course === 'electro' ? 'الكهرباء' : 'الكلاسيك'}</span> ${r.finished_at ? '<span class="tag done">خلّص ✓</span>' : ''}</div>
-        <div class="prog"><i style="width:${pc}%"></i></div>
-        <div class="meta"><span>${r.rules_done}/${r.total} قاعدة</span><span>${r.mistakes} غلطة من ${r.answers} جواب</span><span>آخر شي: ${ago(r.created_at)}</span></div>
-      </button>`;
-    }).join('');
-    el.onclick = (e) => { const b = e.target.closest('.row'); if (b) detail(STU[+b.dataset.i]); };
+  // ---------- التفاصيل ----------
+  function detail(p) {
+    CUR = p;
+    const chain = p.visits.slice().reverse().slice(-30);
+    $dc.innerHTML = `
+      <div class="dh"><div><h2>${esc(p.name)}</h2><div style="color:var(--muted);font-size:14px"><bdi dir="ltr">${esc(p.phone)}</bdi>${p.from ? ' · إجا من ' + esc(p.from) : ''}</div></div><button class="ib" id="x">✕</button></div>
+      <div class="acts"><a class="btn" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?phone=${waNum(p.phone)}&text=${encodeURIComponent(waText(p))}">واتساب برسالة جاهزة</a>
+        <a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/${waNum(p.phone)}">واتساب فاضي</a></div>
+      ${p.rows.map((r, i) => {
+        const d = r.data || {}, rules = d.rules || [], weak = d.weak || [];
+        return `<div class="cbox">
+          <h3 style="margin-top:0">${esc(COURSES[r.course])}</h3>
+          <p style="margin-bottom:8px"><b>${esc(sentence(r))}</b></p>
+          <div class="facts">
+            <div><b>بلّش:</b>${fmtDate(r.started_at || r.first_seen)}</div>
+            <div><b>آخر مرة فات:</b>${fmtDate(r.last_seen)}</div>
+            <div><b>خلّص:</b>${fmtDate(r.finished_at)}</div>
+            <div><b>الغلطات:</b>${r.mistakes} من ${r.answers} جواب</div>
+          </div>
+          <button class="btn ghost sm pdf" data-i="${i}">نزّل PDF</button>
+          <details style="margin-top:10px"><summary>القواعد ونقاط الضعف</summary>
+            <div style="overflow-x:auto;margin-top:8px"><table><thead><tr><th>#</th><th>القاعدة</th><th>غلطات</th><th>أجوبة</th><th>الوقت</th></tr></thead><tbody>
+            ${rules.map((x) => `<tr class="${!x.p ? 'np' : x.m >= 3 ? 'hot' : ''}"><td>${x.n}</td><td>${esc(x.t)}</td><td>${x.m}</td><td>${x.a}</td><td>${x.p ? fmtDur(x.e - x.s) : (x.a ? 'عم يكمّل' : '—')}</td></tr>`).join('')}
+            </tbody></table></div>
+            ${weak.length ? `<ol class="weak" style="margin-top:10px">${weak.map((w) => `<li><b>القاعدة ${w.n} (غلط ${w.c}):</b> ${esc(w.q)}<br><span class="ok">الصح: ${esc(w.a)}</span></li>`).join('')}</ol>` : '<p style="color:var(--muted);margin-top:8px">ولا غلطة لهلّق.</p>'}
+          </details></div>`;
+      }).join('')}
+      <h3>شو فتح عالموقع</h3>
+      ${chain.length ? `<ul class="hist">${chain.map((v) => `<li>${fmtDate(v.at)}: ${esc(PAGES[v.page] || v.page)}${v.part ? ' (' + esc(v.part) + ')' : ''}${v.src || v.ref ? ' · من ' + esc(v.src || v.ref) : ''}</li>`).join('')}</ul>` : '<p style="color:var(--muted)">ما في زيارات مسجّلة (يمكن فات قبل ما نبلّش نعدّ).</p>'}`;
+    $dlg.classList.add('on');
+    document.getElementById('x').onclick = close;
+    $dc.querySelectorAll('.pdf').forEach((b) => b.onclick = async () => {
+      const r = p.rows[+b.dataset.i]; b.disabled = true; b.textContent = 'عم نجهّز الملف…';
+      try { const blob = await buildPdf(r); download(blob, `ملخص ${r.name} - ${COURSES[r.course]}.pdf`); }
+      catch (x) { alert('ما زبط الـPDF، جرّب مرة تانية.'); }
+      b.disabled = false; b.textContent = 'نزّل PDF';
+    });
+  }
+  function close() { $dlg.classList.remove('on'); CUR = null; }
+  $dlg.addEventListener('click', (e) => { if (e.target === $dlg) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+  // ---------- الزيارات ----------
+  function visitsView() {
+    const now = Date.now(), d7 = PV.filter((v) => now - new Date(v.at) < 7 * 864e5);
+    const today = PV.filter((v) => new Date(v.at) >= dayStart());
+    const byPage = {}; d7.forEach((v) => { const k = v.page; (byPage[k] = byPage[k] || []).push(v); });
+    const pages = Object.entries(byPage).map(([k, L]) => ({ k, n: L.length, u: uniq(L) })).sort((a, b) => b.u - a.u);
+    const parts = {}; d7.filter((v) => v.page === 'lab' && v.part).forEach((v) => { parts[v.part] = (parts[v.part] || 0) + 1; });
+    const partL = Object.entries(parts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const srcs = {}; PV.forEach((v) => { const s = v.src || v.ref; if (s) { (srcs[s] = srcs[s] || new Set()).add(v.vid); } });
+    const srcL = Object.entries(srcs).map(([k, S]) => [k, S.size]).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const vidName = {}; PEOPLE.forEach((p) => p.vids.forEach((v) => { vidName[v] = p.name; }));
+    const byVid = new Map(); PV.forEach((v) => { if (!byVid.has(v.vid)) byVid.set(v.vid, []); byVid.get(v.vid).push(v); });
+    const recent = [...byVid.entries()].slice(0, 40);
+    const maxU = Math.max(1, ...pages.map((x) => x.u));
+    $app.innerHTML = head() + `
+      <div class="stats">
+        <div class="stat"><b>${uniq(today)}</b><span>زوار اليوم</span></div>
+        <div class="stat"><b>${uniq(d7)}</b><span>زوار آخر 7 أيام</span></div>
+        <div class="stat"><b>${uniq(PV)}</b><span>زوار آخر 30 يوم</span></div>
+        <div class="stat"><b>${PUB ? PUB.sample_reads : '—'}</b><span>نزّلوا العيّنة</span></div>
+      </div>
+      <div class="card" style="margin-bottom:14px"><h3 style="margin-top:0">شو فتحوا (آخر 7 أيام)</h3>
+        ${pages.length ? pages.map((x) => `<div class="hb"><span>${esc(PAGES[x.k] || x.k)}</span><i style="width:${Math.round(100 * x.u / maxU)}%"></i><b>${x.u} زائر</b></div>`).join('') : '<p style="color:var(--muted)">بعد ما في زيارات.</p>'}
+        ${partL.length ? `<h3>قطع المختبر يلي انفتحت (من الـQR بالكتاب)</h3><div class="chips">${partL.map(([k, n]) => `<span class="tag">${esc(k)}: ${n}</span>`).join(' ')}</div>` : ''}
+      </div>
+      <div class="card" style="margin-bottom:14px"><h3 style="margin-top:0">منين إجو</h3>
+        ${srcL.length ? srcL.map(([k, n]) => `<div class="hb"><span>${esc(k)}</span><i style="width:${Math.round(100 * n / srcL[0][1])}%"></i><b>${n}</b></div>`).join('') : '<p style="color:var(--muted)">لهلّق ما في مصدر معروف.</p>'}
+        <p class="hint" style="margin-top:10px">لتعرف مين إجا من الجروب، زيد <bdi dir="ltr">?src=group</bdi> بآخر الرابط، متل:<br><bdi dir="ltr">${SITE}sample/?src=group</bdi><br>وللتيك توك <bdi dir="ltr">?src=tiktok</bdi>، وهيك.</p>
+      </div>
+      <h3>آخر الزوار</h3>
+      <div class="list">${recent.length ? recent.map(([vid, L]) => {
+        const seq = []; L.slice().reverse().forEach((v) => { const n = PAGES[v.page] || v.page; if (seq[seq.length - 1] !== n) seq.push(n); });
+        const s = L.find((v) => v.src || v.ref);
+        return `<div class="sale"><div><b>${vidName[vid] ? esc(vidName[vid]) : 'زائر'}</b> <span class="mt">${L[0].dev === 'mobile' ? '📱' : '💻'}${s ? ' · من ' + esc(s.src || s.ref) : ''}</span>
+          <div class="mt">${esc(seq.slice(-6).join(' ← '))}</div></div><div class="mt" style="text-align:end">${ago(L[0].at)}</div></div>`;
+      }).join('') : '<div class="empty">بعد ما حدا فات. العدّ بلّش اليوم.</div>'}</div>`;
+    wireHead();
   }
 
-  // ---------- المبيعات ----------
+  // ---------- المبيعات + الكتب ----------
   const money = (n) => (Math.round(Number(n) * 100) / 100).toLocaleString('en-US') + '$';
   const bookById = (id) => BOOKS.find((b) => b.id === id) || { title: id, price: 0 };
   function salesView() {
     const now = new Date(), mStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const sum = (L) => L.reduce((a, x) => a + Number(x.price), 0);
     const month = SALES.filter((x) => new Date(x.sold_at) >= mStart);
-    const per = BOOKS.map((b) => { const L = SALES.filter((x) => x.book_id === b.id); return { b, n: L.length, t: sum(L) }; });
     const today = now.toISOString().slice(0, 10);
     $app.innerHTML = head() + `
       <div class="stats">
@@ -293,7 +454,7 @@ h3{font-size:16px;margin:16px 0 8px}
         <div class="stat"><b>${month.length}</b><span>بيعة هالشهر</span></div>
         <div class="stat"><b>${money(sum(month))}</b><span>مدخول هالشهر</span></div>
       </div>
-      ${PUB ? `<div class="pub">العالم بيشوف عالموقع (بلا أسعار): <b>${PUB.books_sold}</b> كتاب انباع · <b>${PUB.sample_reads}</b> قراية للعيّنة · <b>${PUB.students}</b> طالب بالكورسات · <b>${PUB.finished}</b> خلّصوا</div>` : ''}
+      ${PUB ? `<div class="pub">العالم بيشوف عالموقع (بلا أسعار): <b>${PUB.books_sold}</b> كتاب انباع · <b>${PUB.sample_reads}</b> نزّلوا العيّنة · <b>${PUB.students}</b> طالب · <b>${PUB.finished}</b> خلّصوا</div>` : ''}
       <div class="card" style="margin-bottom:14px">
         <h3 style="margin-top:0">سجّل بيعة</h3>
         <form id="sf">
@@ -303,25 +464,30 @@ h3{font-size:16px;margin:16px 0 8px}
             <div><label for="sn">الزبون (اختياري)</label><input id="sn" type="text" maxlength="120" placeholder="الاسم أو الرقم"></div>
             <div><label for="sd">التاريخ</label><input id="sd" type="date" dir="ltr" value="${today}" max="${today}"></div>
           </div>
-          <label for="sx">ملاحظة (اختياري)</label><input id="sx" type="text" maxlength="500" placeholder="مثلاً: دفع بـOMT">
           <div class="err" id="se"></div>
           <button class="btn" style="width:100%" type="submit">سجّل</button>
         </form>
       </div>
-      <h3>حسب الكتاب</h3>
-      <div class="list" style="margin-bottom:14px">${per.map((x) => `<div class="sale"><div><b>${esc(x.b.title)}</b><div class="mt">${x.n} بيعة</div></div><div class="pr">${money(x.t)}</div></div>`).join('')}</div>
       <h3>كل البيعات</h3>
-      <div class="list" id="sl">${SALES.length ? SALES.map((x) => `<div class="sale"><div><b>${esc(bookById(x.book_id).title)}</b><div class="mt">${fmtDate(x.sold_at)}${x.buyer ? ' · ' + esc(x.buyer) : ''}${x.note ? ' · ' + esc(x.note) : ''}</div></div>
-        <div style="text-align:end"><div class="pr">${money(x.price)}</div><button class="del" data-id="${x.id}">امحي</button></div></div>`).join('') : '<div class="empty">بعد ما سجّلت ولا بيعة.</div>'}</div>`;
+      <div class="list" id="sl">${SALES.length ? SALES.map((x) => `<div class="sale"><div><b>${esc(bookById(x.book_id).title)}</b><div class="mt">${fmtDate(x.sold_at)}${x.buyer ? ' · ' + esc(x.buyer) : ''}</div></div>
+        <div style="text-align:end"><div class="pr">${money(x.price)}</div><button class="del" data-id="${x.id}">امحي</button></div></div>`).join('') : '<div class="empty">بعد ما سجّلت ولا بيعة.</div>'}</div>
+      <h3 style="margin-top:22px">الكتب</h3>
+      ${BOOKS.map((b) => { const L = SALES.filter((x) => x.book_id === b.id);
+        return `<div class="card book" data-id="${esc(b.id)}">
+          <div class="dh" style="margin-bottom:0"><div><h2>${esc(b.title)}</h2>
+            <div style="color:var(--muted);font-size:14px">${money(b.price)}${b.rules ? ` · ${b.rules} قاعدة` : ''} · انباع ${L.length} (${money(sum(L))})</div></div>
+            <button class="ib ed">عدّل</button></div>
+          <details><summary>الملخص</summary><div class="sum">${esc(b.summary || '—')}</div></details></div>`; }).join('')}
+      <p class="hint">لتزيد كتاب جديد، ارفعو لكلود، وهوّي بيزيدو هون مع ملخّصو.</p>`;
     wireHead();
     const sb = document.getElementById('sb'), sp = document.getElementById('sp');
     sb.onchange = () => { sp.value = bookById(sb.value).price; };
     document.getElementById('sf').onsubmit = async (e) => {
       e.preventDefault();
       const b = e.target.querySelector('button'), er = document.getElementById('se');
-      const d = document.getElementById('sd').value, isToday = d === today;
-      const row = { book_id: sb.value, price: Number(sp.value), buyer: document.getElementById('sn').value.trim() || null, note: document.getElementById('sx').value.trim() || null };
-      if (!isToday && d) row.sold_at = new Date(d + 'T12:00:00').toISOString();
+      const d = document.getElementById('sd').value;
+      const row = { book_id: sb.value, price: Number(sp.value), buyer: document.getElementById('sn').value.trim() || null };
+      if (d && d !== today) row.sold_at = new Date(d + 'T12:00:00').toISOString();
       b.disabled = true; b.textContent = 'عم نسجّل…'; er.textContent = '';
       try { await api('book_sales', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(row) }); await load(true); }
       catch (x) { er.textContent = 'ما زبط التسجيل، جرّب مرة تانية.'; b.disabled = false; b.textContent = 'سجّل'; }
@@ -332,20 +498,6 @@ h3{font-size:16px;margin:16px 0 8px}
       try { await api('book_sales?id=eq.' + encodeURIComponent(b.dataset.id), { method: 'DELETE', headers: { Prefer: 'return=minimal' } }); await load(true); }
       catch (x) { alert('ما زبط المحي.'); }
     };
-  }
-
-  // ---------- الكتب ----------
-  function booksView() {
-    $app.innerHTML = head() + BOOKS.map((b) => {
-      const L = SALES.filter((x) => x.book_id === b.id), t = L.reduce((a, x) => a + Number(x.price), 0);
-      return `<div class="card book" data-id="${esc(b.id)}">
-        <div class="dh" style="margin-bottom:0"><div><h2>${esc(b.title)}</h2>
-          <div style="color:var(--muted);font-size:14px">${money(b.price)}${b.bundle_price ? ` · مع التاني ${money(b.bundle_price)}` : ''}${b.rules ? ` · ${b.rules} قاعدة` : ''} · انباع ${L.length} (${money(t)})</div></div>
-          <button class="ib ed">عدّل</button></div>
-        <div class="sum">${esc(b.summary || '—')}</div>
-      </div>`;
-    }).join('') + `<p style="color:var(--muted);font-size:14px;margin-top:8px">لتزيد كتاب جديد، ارفعو لكلود، وهوّي بيزيدو هون مع ملخّصو.</p>`;
-    wireHead();
     $app.querySelectorAll('.ed').forEach((btn) => btn.onclick = () => editBook(btn.closest('.book').dataset.id));
   }
   function editBook(id) {
@@ -388,48 +540,6 @@ h3{font-size:16px;margin:16px 0 8px}
       } catch (x) { er.textContent = 'ما زبط. جرّب كلمة سر أطول أو مختلفة.'; }
     };
   }
-
-  // ---------- detail ----------
-  let CUR = null;
-  function detail(s) {
-    CUR = s; const r = s.last, d = r.data || {}, rules = d.rules || [], weak = d.weak || [];
-    const hot = (x) => x.m >= 3;
-    $dc.innerHTML = `
-      <div class="dh"><div><h2>${esc(r.name)}</h2><div style="color:var(--muted);font-size:14px">${esc(COURSES[r.course] || r.course)}</div></div><button class="ib" id="x">✕</button></div>
-      <div class="facts">
-        <div><b>التلفون:</b><bdi dir="ltr">${esc(r.phone)}</bdi></div>
-        <div><b>الحالة:</b>${r.finished_at ? 'خلّص الكورس ✓' : `عم يكمّل (${r.rules_done}/${r.total})`}</div>
-        <div><b>بلّش:</b>${fmtDate(r.started_at)}</div>
-        <div><b>خلّص:</b>${fmtDate(r.finished_at)}</div>
-        <div><b>المدة:</b>${r.finished_at ? fmtDur(new Date(r.finished_at) - new Date(r.started_at)) : '—'}</div>
-        <div><b>الغلطات:</b>${r.mistakes} من ${r.answers} جواب</div>
-        ${d.challenge != null ? `<div><b>تحدّي الخصم:</b>${d.challenge ? 'نجح ✅' : 'ما نجح'}</div>` : ''}
-        <div><b>آخر تحديث:</b>${fmtDate(r.created_at)}</div>
-      </div>
-      <div class="acts">
-        <button class="btn" id="pdf">نزّل PDF</button>
-        <a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/${waNum(r.phone)}">واتساب</a>
-      </div>
-      <h3>القواعد</h3>
-      <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>القاعدة</th><th>غلطات</th><th>أجوبة</th><th>الوقت</th></tr></thead><tbody>
-        ${rules.map((x) => `<tr class="${!x.p ? 'np' : hot(x) ? 'hot' : ''}"><td>${x.n}</td><td>${esc(x.t)}</td><td>${x.m}</td><td>${x.a}</td><td>${x.p ? fmtDur(x.e - x.s) : (x.a ? 'عم يكمّل' : '—')}</td></tr>`).join('')}
-      </tbody></table></div>
-      <h3>نقاط الضعف</h3>
-      ${weak.length ? `<ol class="weak">${weak.map((w) => `<li><b>القاعدة ${w.n} (غلط ${w.c}):</b> ${esc(w.q)}<br><span class="ok">الصح: ${esc(w.a)}</span></li>`).join('')}</ol>` : '<p style="color:var(--muted)">ولا غلطة لهلّق.</p>'}
-      <h3>السجل</h3>
-      <ul class="hist">${s.events.slice(0, 40).map((e) => `<li>${fmtDate(e.created_at)}: ${e.event === 'start' ? 'سجّل وبلّش' : e.event === 'finish' ? 'خلّص الكورس' : 'خلّص القاعدة ' + e.rules_done}</li>`).join('')}</ul>`;
-    $dlg.classList.add('on');
-    document.getElementById('x').onclick = close;
-    document.getElementById('pdf').onclick = async (e) => {
-      const b = e.target; b.disabled = true; b.textContent = 'عم نجهّز الملف…';
-      try { const blob = await buildPdf(r); download(blob, `ملخص ${r.name} - ${COURSES[r.course] || r.course}.pdf`); }
-      catch (x) { alert('ما زبط الـPDF، جرّب مرة تانية.'); }
-      b.disabled = false; b.textContent = 'نزّل PDF';
-    };
-  }
-  function close() { $dlg.classList.remove('on'); CUR = null; }
-  $dlg.addEventListener('click', (e) => { if (e.target === $dlg) close(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
 
   // ---------- PDF (نفس شكل ملخص الكورس) ----------
   function pagesHtml(r) {
@@ -481,21 +591,24 @@ h3{font-size:16px;margin:16px 0 8px}
     stage.innerHTML = '';
     return pdf.output('blob');
   }
+
   function download(blob, name) {
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
   function csv() {
-    const L = filtered().map((s) => s.last);
-    const head = ['الاسم', 'التلفون', 'الكورس', 'القواعد', 'من أصل', 'الغلطات', 'الأجوبة', 'بلّش', 'خلّص', 'آخر تحديث'];
+    const L = pfilter();
+    const head = ['الاسم', 'التلفون', 'الكورس', 'وين وصل', 'القواعد', 'من أصل', 'الغلطات', 'آخر مرة', 'منين إجا'];
     const q = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-    const lines = [head.map(q).join(',')].concat(L.map((r) => [r.name, '⁦' + r.phone, COURSES[r.course] || r.course, r.rules_done, r.total, r.mistakes, r.answers, fmtDate(r.started_at), fmtDate(r.finished_at), fmtDate(r.created_at)].map(q).join(',')));
-    download(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' }), 'نتائج الطلاب.csv');
+    const lines = [head.map(q).join(',')];
+    L.forEach((p) => p.rows.forEach((r) => lines.push([p.name, '⁦' + p.phone, COURSES[r.course], sentence(r), r.rules_done, r.total, r.mistakes, fmtDate(r.last_seen), p.from].map(q).join(','))));
+    download(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' }), 'الناس.csv');
   }
 
   T ? load() : loginView();
-  setInterval(() => { if (T && !CUR && document.visibilityState === 'visible' && document.activeElement.id !== 'q') load(true); }, 120000);
+  setInterval(() => { if (T && !CUR && document.visibilityState === 'visible' && (!document.activeElement || !['q', 'sn', 'sp'].includes(document.activeElement.id))) load(true); }, 120000);
 })();
+
 </script>
 </body>
 </html>

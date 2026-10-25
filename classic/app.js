@@ -78,6 +78,7 @@
   }
   let reporting = false;
   async function report() {
+    progress(true);
     if (!S || !S.name || reporting) return;
     const x = snapshot();
     const sig = x.done + '|' + (S.finishedAt || 0);
@@ -94,6 +95,33 @@
     } catch (e) {} finally { reporting = false; }
   }
   window.addEventListener('online', () => report());
+
+  // ---------- وين وصل بالضبط (بيتحدّث مع كل جواب، كل 15 ثانية بالأكتر) ----------
+  function where() {
+    if (S.finishedAt) return { cur_rule: null, cur_phase: 'done', cur_done: null, cur_of: null };
+    const n = S.current, st = S.rules[n], q = RULES[n - 1] ? RULES[n - 1].q.length : 0;
+    if (!st || !st.start) return { cur_rule: n, cur_phase: 'new', cur_done: 0, cur_of: q };
+    if (st.phase === 'learn') return { cur_rule: n, cur_phase: 'learn', cur_done: Math.max(0, q - st.queue.length), cur_of: q };
+    return { cur_rule: n, cur_phase: 'check', cur_done: st.streak || 0, cur_of: STREAK_TARGET };
+  }
+  let progT = 0, progTimer = null;
+  function progress(now) {
+    if (!S || !S.name) return;
+    clearTimeout(progTimer);
+    const wait = now ? 0 : Math.max(0, 15000 - (Date.now() - progT));
+    progTimer = setTimeout(() => {
+      progT = Date.now();
+      const x = snapshot(); let vid = null; try { vid = localStorage.getItem('mea_vid'); } catch (e) {}
+      const body = Object.assign({ client_id: cid(), course: COURSE_ID, vid, name: String(S.name).slice(0, 80), phone: String(S.phone).slice(0, 25),
+        rules_done: x.done, total: TOTAL, mistakes: x.m, answers: x.a,
+        started_at: S.startedAt ? new Date(S.startedAt).toISOString() : null, finished_at: S.finishedAt ? new Date(S.finishedAt).toISOString() : null,
+        data: { rules: x.rules, weak: x.weak, challenge: CHALLENGE_ON ? challengeOk() : null, src: (() => { try { return localStorage.getItem('mea_src'); } catch (e) { return null; } })() } }, where());
+      fetch(SB_URL + '/rest/v1/rpc/save_progress', { method: 'POST', keepalive: true,
+        headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p: body }) }).catch(() => {});
+    }, wait);
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && progTimer) progress(true); });
   function fresh(name, phone) {
     return { v: 1, name, phone, startedAt: Date.now(), current: 1, finishedAt: null, textSent: false, pdfSent: false, rules: {} };
   }
@@ -296,7 +324,7 @@
 
   function quiz() {
     const n = S.current, r = rule(n), st = R(n);
-    if (!st.start) { st.start = Date.now(); save(); }
+    if (!st.start) { st.start = Date.now(); save(); progress(); }
     const qi = nextIndex(st);
     const item = r.q[qi];
     const correct = item.a[0];
@@ -350,6 +378,7 @@
         else { st.mistakes++; st.missed[qi] = (st.missed[qi] || 0) + 1; st.streak = 0; }
       }
       save();   // بينحفظ قبل ما يطلع الشرح: الريفريش ما بيمحي الغلطة
+      progress();
 
       const fb = document.getElementById('fb');
       const enteringCheck = wasLearn && st.phase === 'check';
