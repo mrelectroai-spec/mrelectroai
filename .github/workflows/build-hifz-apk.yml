@@ -42,10 +42,23 @@ jobs:
           ls "$ANDROID_HOME/build-tools" | tail -3
           ls "$ANDROID_HOME/platforms" | tail -3
 
+      - name: 5a. Fetch Quran text + audio links
+        run: |
+          node hifz-android/fetch-data.mjs
+          ls -la hifz/data
+
+      - name: 5b. Save data to the site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add hifz/data
+          if git diff --cached --quiet; then echo "data unchanged"; else git commit -m "hifz: update bundled Quran data" && git push; fi
+
       - name: 5. Create Capacitor app
         run: |
           mkdir -p cap/www cap/assets
           cp hifz/index.html hifz/manifest.webmanifest hifz/icon-192.png hifz/icon-512.png hifz/apple-touch-icon.png cap/www/
+          cp -r hifz/data cap/www/data
           cp hifz-android/icon-only.png hifz-android/icon-foreground.png hifz-android/icon-background.png hifz-android/splash.png hifz-android/splash-dark.png cap/assets/
           cd cap
           npm init -y > /dev/null

@@ -169,7 +169,7 @@ audio{width:100%;margin-top:8px}
 </head>
 <body>
 <header class="top"><div class="in"><button class="iconbtn" id="backBtn" aria-label="رجوع" hidden>→</button><h1 id="title">رفيق الحفظ</h1><span id="streakTop" class="small muted"></span></div></header>
-<main class="wrap" id="app"><div class="loading"><div><div class="spin"></div><div>عم نحضّر المصحف…</div></div></div></main>
+<main class="wrap" id="app"><div class="loading"><div><div class="spin"></div><div id="loadMsg">عم نحضّر المصحف…</div></div></div></main>
 <nav class="bottom" id="nav" hidden><div class="in">
   <a href="#home" data-r="home"><span class="i">🏠</span>الرئيسية</a>
   <a href="#map" data-r="map"><span class="i">🗺️</span>المراحل</a>
@@ -278,8 +278,12 @@ function stripBasmala(text, s, n){
   }
   return text;
 }
+async function fetchTimeout(url, ms){
+  const c = new AbortController(); const t = setTimeout(()=>c.abort(), ms);
+  try{ return await fetch(url, {signal:c.signal}); } finally { clearTimeout(t); }
+}
 async function fetchJSON(url){
-  const r = await fetch(url);
+  const r = await fetchTimeout(url, 30000);
   if(!r.ok) throw new Error('HTTP '+r.status);
   const j = await r.json();
   if(j.code && j.code!==200) throw new Error('API '+j.code);
@@ -289,6 +293,17 @@ async function loadSurah(s){
   const key='hifz.surah2.'+s.n;
   let arr = lsGet(key);
   if(arr && arr.length===s.count) return arr;
+  // أول شي من الملفات المرفقة مع التطبيق
+  try{
+    const r = await fetchTimeout(`data/s${s.n}.json`, 15000);
+    if(r.ok){
+      const raw = await r.json();
+      if(raw.length===s.count){
+        arr = raw.map(a=>({ s:s.n, n:a.n, g:a.g, p:a.p, j:a.j, t:stripBasmala(a.t, s.n, a.n), tj:a.tj ? stripBasmala(a.tj, s.n, a.n) : '' }));
+        lsSet(key, arr); return arr;
+      }
+    }
+  }catch(e){}
   const j = await fetchJSON(`${API}/surah/${s.n}/editions/quran-uthmani,quran-tajweed`);
   const eds = j.data;
   const u = eds.find(e=>e.edition && e.edition.identifier==='quran-uthmani') || eds[0];
@@ -303,7 +318,10 @@ async function loadSurah(s){
 }
 async function loadData(){
   DB.ayat=[]; DB.pages=new Map();
-  for(const s of SURAHS){ DB.ayat.push(...await loadSurah(s)); }
+  for(const s of SURAHS){
+    const msg = document.getElementById('loadMsg'); if(msg) msg.textContent = `عم نحضّر سورة ${s.name}…`;
+    DB.ayat.push(...await loadSurah(s));
+  }
   for(const a of DB.ayat){ if(!DB.pages.has(a.p)) DB.pages.set(a.p, []); DB.pages.get(a.p).push(a); }
   DB.pageNos = [...DB.pages.keys()].sort((x,y)=>x-y);
 }
@@ -346,6 +364,9 @@ async function audioSrc(a){
   const rec=S.settings.reciter, key=`hifz.aud.${rec}.${a.s}`;
   if(!audioMaps[key]){
     let m = lsGet(key);
+    if(!m){
+      try{ const r = await fetchTimeout(`data/aud-${rec}-${a.s}.json`, 10000); if(r.ok){ m = await r.json(); lsSet(key, m); } }catch(e){ m = null; }
+    }
     if(!m){
       try{
         const j = await fetchJSON(`${API}/surah/${a.s}/${rec}`);
@@ -843,8 +864,8 @@ async function boot(){
     route();
   }catch(e){
     console.error(e);
-    app.innerHTML = `<div class="loading"><div><div style="font-size:44px">📶</div><h2>لازم نت أوّل مرة</h2><p class="muted">لتحميل نصّ سورة البقرة وآل عمران. بعدها التطبيق بيشتغل بلا نت.</p><button class="btn" id="retry">جرّبي كمان مرة</button></div></div>`;
-    $('#retry').onclick = () => { app.innerHTML='<div class="loading"><div><div class="spin"></div><div>عم نحضّر المصحف…</div></div></div>'; boot(); };
+    app.innerHTML = `<div class="loading"><div><div style="font-size:44px">📶</div><h2>ما قدرنا نحمّل المصحف</h2><p class="muted">تأكّدي إنه في نت وجرّبي كمان مرة. بعد أول تحميل، التطبيق بيشتغل بلا نت.</p><button class="btn" id="retry">جرّبي كمان مرة</button></div></div>`;
+    $('#retry').onclick = () => { app.innerHTML='<div class="loading"><div><div class="spin"></div><div id="loadMsg">عم نحضّر المصحف…</div></div></div>'; boot(); };
   }
 }
 if(!IS_APP && 'serviceWorker' in navigator){ window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{})); }
