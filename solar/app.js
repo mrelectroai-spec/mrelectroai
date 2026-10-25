@@ -335,7 +335,7 @@
 
     $app.innerHTML = `
       <div class="rulehead">
-        <div class="tag">القاعدة ${n} من ${TOTAL} · ${GL.h(r.story)}</div>
+        <div class="tag">القاعدة ${n} من ${TOTAL}${r.story ? ' · ' + GL.h(r.story) : ''}</div>
         ${mistakeChip()}
         <h2>${GL.h(r.title)}</h2>
         ${progHtml}
