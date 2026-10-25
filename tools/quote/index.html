@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070F0D">
+<title>عرض سعر طاقة شمسية · MrElectroAI</title>
+<meta name="description" content="اعمل عرض سعر لمنظومة طاقة شمسية: ألواح، انفرتر، بطاريات، كابلات وتابلو، وابعتو PDF للزبون.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--void:#070F0D;--panel:#0E1A17;--panel-2:#14241F;--line:#1E332D;--volt:#22C79B;--volt-ink:#031310;--text:#E8F2EE;--muted:#7B928C;--warn:#E8A33D;--fault:#F06A6A}
+[data-theme="light"]{--void:#F7F9F8;--panel:#FFF;--panel-2:#F0F5F3;--line:#E1EAE6;--volt:#0E8F6E;--volt-ink:#FFF;--text:#0B1613;--muted:#5A6D67;--warn:#B87514;--fault:#C93C3C}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--void);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;font-size:16px;line-height:1.6;min-height:100vh}
+h1,h2,h3{font-family:'Readex Pro',sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 120px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.top a{color:var(--volt);font:700 16px 'Readex Pro',sans-serif;text-decoration:none}
+.ib{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer}
+h1{font-size:24px;margin-bottom:2px}h1 b{color:var(--volt)}
+.lede{color:var(--muted);font-size:14.5px;margin-bottom:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+.card h2{font-size:16px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card h2 .n{width:24px;height:24px;border-radius:50%;background:var(--volt);color:var(--volt-ink);display:grid;place-items:center;font-size:13px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+input,select,textarea{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:11px 12px;font:inherit;font-size:15px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--volt);outline-offset:1px}
+textarea{min-height:70px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 10px}
+.meta{display:flex;gap:12px;align-items:stretch}
+.meta .d{flex:1;background:var(--panel-2);border-radius:12px;padding:10px 12px}
+.meta .d span{display:block;font-size:12.5px;color:var(--muted)}
+.meta .d b{font-family:'Readex Pro',sans-serif;font-size:16px}
+.wheelbox{flex:none;width:132px;text-align:center}
+.wheelbox span{display:block;font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.wheel{position:relative;height:120px;overflow-y:auto;scroll-snap-type:y mandatory;background:var(--panel-2);border-radius:12px;scrollbar-width:none;-webkit-mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent)}
+.wheel::-webkit-scrollbar{display:none}
+.wheel div{height:40px;line-height:40px;scroll-snap-align:center;font:600 17px 'Readex Pro',sans-serif;color:var(--muted)}
+.wheel div.on{color:var(--volt);font-size:20px}
+.wheel .pad{scroll-snap-align:none}
+.wsel{position:relative}
+.wsel:after{content:"";position:absolute;inset-inline:6px;top:40px;height:40px;border-top:1px solid var(--volt);border-bottom:1px solid var(--volt);pointer-events:none;border-radius:4px}
+.item{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px;position:relative}
+.item .hd{display:flex;gap:8px;align-items:center}
+.item .hd select{flex:1;font-weight:600}
+.item .x{flex:none;width:40px;height:40px;border-radius:12px;background:transparent;border:1px solid var(--line);color:var(--fault);font-size:20px;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 12px;font:inherit;font-size:13.5px;cursor:pointer}
+.chip.on{background:var(--volt);color:var(--volt-ink);border-color:var(--volt);font-weight:600}
+.lt{margin-top:8px;text-align:end;font-size:14px;color:var(--muted)}
+.lt b{color:var(--text);font-family:'Readex Pro',sans-serif;direction:ltr;display:inline-block}
+.add{width:100%;border:2px dashed var(--line);background:transparent;color:var(--volt);border-radius:18px;padding:16px;font:700 18px 'Readex Pro',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.add:hover{border-color:var(--volt)}
+.add i{width:34px;height:34px;border-radius:50%;background:var(--volt);color:var(--volt-ink);display:grid;place-items:center;font-style:normal;font-size:24px;line-height:1}
+.hint{font-size:13px;color:var(--muted);margin:6px 2px 12px}
+.bar{position:fixed;bottom:0;inset-inline:0;background:rgba(7,15,13,.94);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));z-index:50}
+[data-theme="light"] .bar{background:rgba(247,249,248,.95)}
+.bar .in{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.bar .tot{flex:1}.bar .tot span{display:block;font-size:12px;color:var(--muted)}.bar .tot b{font:700 22px 'Readex Pro',sans-serif;direction:ltr;display:inline-block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--volt);color:var(--volt-ink);border:0;border-radius:14px;padding:12px 18px;font:600 16px 'Readex Pro',sans-serif;cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn:disabled{opacity:.6}
+.msg{font-size:13.5px;color:var(--muted);margin-top:8px;min-height:20px}
+@media (max-width:560px){.g3{grid-template-columns:1fr 1fr}.g3 .full{grid-column:1/-1}.meta{flex-direction:column}.wheelbox{width:auto}}
+/* PDF */
+#stage{position:fixed;left:-10000px;top:0;width:794px}
+.pg{width:794px;height:1123px;background:#fff;color:#0B1613;position:relative;overflow:hidden;padding:48px 54px 90px;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14.5px;line-height:1.6}
+.pg .wm{position:absolute;inset:-200px;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:90px 70px;transform:rotate(-28deg);pointer-events:none;z-index:0}
+.pg .wm span{font:700 26px 'Readex Pro',sans-serif;color:rgba(14,143,110,.055);white-space:nowrap;direction:ltr}
+.pg>*:not(.wm){position:relative;z-index:1}
+.pg .ph{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #0E8F6E;padding-bottom:14px;margin-bottom:16px}
+.pg .ph h1{font-size:30px;color:#0B1613}
+.pg .ph .no{direction:ltr;text-align:left;font-size:13px;color:#5A6D67;line-height:1.8}
+.pg .ph .no b{color:#0B1613}
+.pg .pp{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.pg .pp div{background:#F0F5F3;border-radius:10px;padding:10px 14px}
+.pg .pp small{display:block;color:#5A6D67;font-size:12px}
+.pg .pp b{font-family:'Readex Pro',sans-serif;font-size:16px}
+.pg table{width:100%;border-collapse:collapse}
+.pg th{background:#070F0D;color:#fff;padding:7px 8px;font-weight:600;font-size:13px;text-align:start}
+.pg td{padding:8px;border-bottom:1px solid #E1EAE6;vertical-align:top;font-size:14px}
+.pg td.num,.pg th.num{text-align:center;direction:ltr;white-space:nowrap}
+.pg td .sp{display:block;color:#5A6D67;font-size:12.5px}
+.pg .tt{display:flex;justify-content:flex-end;margin-top:12px}
+.pg .tt div{background:#0E8F6E;color:#fff;border-radius:10px;padding:10px 18px;font:700 20px 'Readex Pro',sans-serif}
+.pg .tt div span{font-size:13px;font-weight:400;margin-inline-end:10px}
+.pg .nt{margin-top:16px;background:#F0F5F3;border-radius:10px;padding:10px 14px;font-size:13.5px;white-space:pre-wrap}
+.pg .vl{margin-top:14px;font-size:13px;color:#8a5a00;background:#FFF4E0;border-radius:8px;padding:6px 12px;display:inline-block}
+.pg .ft{position:absolute;bottom:26px;inset-inline:54px;border-top:1px solid #E1EAE6;padding-top:8px;font-size:11.5px;color:#5A6D67;display:flex;justify-content:space-between;gap:10px}
+.pg .ft b{color:#0E8F6E}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../">← الأدوات</a><button class="ib" id="th">ليلي/نهاري</button></div>
+  <h1>عرض سعر <b>طاقة شمسية</b></h1>
+  <p class="lede">عبّي المرسل والمستلم، زيد الأصناف بكبسة +، وابعت العرض PDF للزبون.</p>
+
+  <div class="card">
+    <h2><span class="n">1</span>المرسل (إنت)</h2>
+    <div class="g2">
+      <div><label for="fn">الاسم</label><input id="fn" maxlength="60" placeholder="اسمك"></div>
+      <div><label for="fc">الشركة (اختياري)</label><input id="fc" maxlength="60" placeholder="اسم شركتك"></div>
+    </div>
+    <label for="fp">رقمك</label><input id="fp" type="tel" dir="ltr" maxlength="25" placeholder="+961 …">
+  </div>
+
+  <div class="card">
+    <h2><span class="n">2</span>المستلم (الزبون)</h2>
+    <div class="g2">
+      <div><label for="tn">الاسم</label><input id="tn" maxlength="60" placeholder="اسم الزبون"></div>
+      <div><label for="tc">الشركة (اختياري)</label><input id="tc" maxlength="60" placeholder="اسم شركتو"></div>
+    </div>
+    <label for="tp">رقمو (لتبعتلو عالواتساب)</label><input id="tp" type="tel" dir="ltr" maxlength="25" placeholder="+961 …">
+  </div>
+
+  <div class="card">
+    <h2><span class="n">3</span>التاريخ والصلاحية</h2>
+    <div class="meta">
+      <div class="d"><span>تاريخ العرض</span><b id="today"></b><span style="margin-top:8px">صالح لغاية</span><b id="until"></b></div>
+      <div class="wheelbox"><span>صالح لمدة (أيام)</span><div class="wsel"><div class="wheel" id="wheel" aria-label="عدد الأيام"></div></div></div>
+    </div>
+  </div>
+
+  <h2 style="font-size:16px;margin:18px 2px 8px">الأصناف</h2>
+  <div id="items"></div>
+  <button class="add" id="add"><i>+</i> زيد صنف</button>
+  <p class="hint">كل صنف بينختار مرة وحدة بالعرض، و«صنف تاني» فيك تزيدو قدّ ما بدّك. والأسعار إنت بتحطّها.</p>
+
+  <div class="card">
+    <h2>ملاحظات (اختياري)</h2>
+    <textarea id="notes" maxlength="600" placeholder="مثلاً: الكفالة، مدة التركيب، طريقة الدفع"></textarea>
+  </div>
+  <button class="btn ghost" id="clear" style="width:100%">بلّش عرض جديد</button>
+</div>
+
+<div class="bar"><div class="in">
+  <div class="tot"><span>المجموع</span><b id="total">0$</b></div>
+  <button class="btn ghost" id="dl">نزّل PDF</button>
+  <button class="btn" id="send">ابعت PDF</button>
+</div><div class="in"><div class="msg" id="msg"></div></div></div>
+<div id="stage" aria-hidden="true"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(() => {
+  const BRAND = { name: 'أنور الحسن الجاسم', phone: '+961 79 434 479', site: 'mrelectroai-spec.github.io/mrelectroai' };
+  const CATS = [
+    { k: 'panels', n: 'ألواح شمسية', brands: ['Jinko', 'LONGi', 'JA Solar', 'Trina', 'Canadian Solar', 'Risen'], spec: 'قوّة اللوح، مثلاً 590W Mono' },
+    { k: 'inverter', n: 'انفرتر', brands: ['Growatt', 'Voltronic', 'Felicity', 'Deye', 'SRNE', 'Must', 'Huawei', 'Victron'], spec: 'القدرة والنوع، مثلاً 6kW هايبرد' },
+    { k: 'battery', n: 'بطاريات', types: { 'ليثيوم': ['Deye', 'Dyness', 'Felicity', 'Pylontech', 'Growatt', 'Huawei', 'BYD', 'Shoto'], 'جل': ['Felicity', 'Narada', 'Ritar', 'Vision', 'Leoch'], 'أسيد': [] }, spec: 'السعة، مثلاً 5 kWh 51.2V 100Ah' },
+    { k: 'structure', n: 'هيكل وتثبيت', spec: 'مثلاً حديد مغلفن، عدد الصفوف' },
+    { k: 'dc', n: 'كابلات DC و MC4', spec: 'مثلاً 6mm² PV، كم متر' },
+    { k: 'ac', n: 'كابلات AC', spec: 'المقطع والطول' },
+    { k: 'board', n: 'تابلو وحمايات', spec: 'مثلاً فيوز gPV، قاطع DC، SPD، قاطع AC' },
+    { k: 'earth', n: 'تأريض', spec: 'مثلاً سيخ نحاس وكابل' },
+    { k: 'install', n: 'تركيب ويد عاملة', spec: '' },
+    { k: 'transport', n: 'نقل', spec: '' },
+    { k: 'other', n: 'صنف تاني', spec: '', multi: true },
+  ];
+  const cat = (k) => CATS.find((c) => c.k === k);
+  const $ = (i) => document.getElementById(i);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const num = (v) => { const n = parseFloat(String(v).replace(/[^\d.]/g, '')); return isFinite(n) ? n : 0; };
+  const money = (n) => (Math.round(n * 100) / 100).toLocaleString('en-US') + '$';
+  const ls = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+  try { const t = localStorage.getItem('mea_theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  $('th').onclick = () => { const n = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = n; try { localStorage.setItem('mea_theme', n); } catch (e) {} };
+
+  // ---------- state ----------
+  const DK = 'mea_quote_draft', MK = 'mea_quote_me';
+  let D = ls.get(DK) || null;
+  const fresh = () => ({ to: { n: '', c: '', p: '' }, days: 3, items: [], notes: '', no: null });
+  if (!D) D = fresh();
+  const me = ls.get(MK) || { n: '', c: '', p: '' };
+  let uid = Date.now();
+  const save = () => { ls.set(DK, D); ls.set(MK, me); };
+
+  // الاسم من الاشتراك أو التجربة
+  (async () => {
+    if (me.n) return;
+    try { const t = ls.get('mea_lic_quote_trial'); if (t && t.name) { me.n = t.name; $('fn').value = me.n; save(); return; } } catch (e) {}
+    try {
+      const code = localStorage.getItem('mea_lic_quote') || localStorage.getItem('mea_lic_all'); if (!code) return;
+      const K = 'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK';
+      const r = await fetch('https://utjpvjnhffapbwpbkkuc.supabase.co/rest/v1/licenses?select=name,phone&code=eq.' + encodeURIComponent(code), { headers: { apikey: K, Authorization: 'Bearer ' + K } });
+      const j = await r.json(); if (j && j[0]) { me.n = me.n || j[0].name || ''; me.p = me.p || j[0].phone || ''; $('fn').value = me.n; $('fp').value = me.p; save(); }
+    } catch (e) {}
+  })();
+
+  // ---------- header fields ----------
+  const bind = (id, obj, key) => { const el = $(id); el.value = obj[key] || ''; el.oninput = () => { obj[key] = el.value; save(); }; };
+  bind('fn', me, 'n'); bind('fc', me, 'c'); bind('fp', me, 'p');
+  bind('tn', D.to, 'n'); bind('tc', D.to, 'c'); bind('tp', D.to, 'p');
+  $('notes').value = D.notes || ''; $('notes').oninput = () => { D.notes = $('notes').value; save(); };
+  const fmtD = (d) => d.toLocaleDateString('ar-LB-u-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' });
+  function dates() {
+    const t = new Date(); $('today').textContent = fmtD(t);
+    const u = new Date(t); u.setDate(u.getDate() + D.days); $('until').textContent = fmtD(u) + ` (${D.days} ${D.days === 1 ? 'يوم' : D.days === 2 ? 'يومين' : D.days <= 10 ? 'أيام' : 'يوم'})`;
+  }
+  // الدولاب: 1 → 60 يوم
+  const W = $('wheel'), MAXD = 60, H = 40;
+  W.innerHTML = '<div class="pad"></div>' + Array.from({ length: MAXD }, (_, i) => `<div data-d="${i + 1}">${i + 1}</div>`).join('') + '<div class="pad"></div>';
+  const mark = () => { W.querySelectorAll('[data-d]').forEach((el) => el.classList.toggle('on', +el.dataset.d === D.days)); };
+  requestAnimationFrame(() => { W.scrollTop = (D.days - 1) * H; mark(); });
+  let wt; W.addEventListener('scroll', () => { clearTimeout(wt); wt = setTimeout(() => { const d = Math.min(MAXD, Math.max(1, Math.round(W.scrollTop / H) + 1)); if (d !== D.days) { D.days = d; save(); dates(); } mark(); }, 80); });
+  W.addEventListener('click', (e) => { const el = e.target.closest('[data-d]'); if (el) W.scrollTo({ top: (+el.dataset.d - 1) * H, behavior: 'smooth' }); });
+  dates();
+
+  // ---------- items ----------
+  const used = (exceptId) => new Set(D.items.filter((x) => x.id !== exceptId && x.k && !cat(x.k).multi).map((x) => x.k));
+  function addItem() {
+    const taken = used(null);
+    const firstFree = CATS.find((c) => !taken.has(c.k)) || cat('other');
+    D.items.push({ id: ++uid, k: firstFree.k, title: firstFree.n, type: '', brand: '', brandOther: '', spec: '', qty: 1, price: '' });
+    save(); renderItems(); total();
+    const els = document.querySelectorAll('.item'); const last = els[els.length - 1]; if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  function itemHtml(x, i) {
+    const c = cat(x.k), taken = used(x.id);
+    const brandList = c.k === 'battery' ? (c.types[x.type] || null) : (c.brands || null);
+    const brandChips = brandList ? `<label>الماركة</label><div class="chips" data-f="brand">${brandList.map((b) => `<button type="button" class="chip ${x.brand === b ? 'on' : ''}" data-v="${esc(b)}">${esc(b)}</button>`).join('')}<button type="button" class="chip ${x.brand === '*' ? 'on' : ''}" data-v="*">غير ماركة</button></div>
+        ${x.brand === '*' || (c.k === 'battery' && x.type === 'أسيد') ? `<input data-f="brandOther" placeholder="اكتب الماركة" maxlength="40" value="${esc(x.brandOther)}" style="margin-top:8px">` : ''}` : '';
+    return `<div class="item" data-id="${x.id}">
+      <div class="hd"><select data-f="k" aria-label="نوع الصنف">${CATS.map((cc) => `<option value="${cc.k}" ${cc.k === x.k ? 'selected' : ''} ${taken.has(cc.k) ? 'disabled' : ''}>${esc(cc.n)}${taken.has(cc.k) ? ' (مختار)' : ''}</option>`).join('')}</select>
+        <button type="button" class="x" data-del aria-label="امحي الصنف">×</button></div>
+      <label>اسم الصنف بالعرض</label><input data-f="title" maxlength="60" value="${esc(x.title)}">
+      ${c.k === 'battery' ? `<label>نوع البطارية</label><div class="chips" data-f="type">${Object.keys(c.types).map((t) => `<button type="button" class="chip ${x.type === t ? 'on' : ''}" data-v="${t}">${t}</button>`).join('')}</div>` : ''}
+      ${c.k !== 'battery' || x.type ? brandChips : ''}
+      <div class="g3">
+        <div class="full"><label>التفاصيل</label><input data-f="spec" dir="auto" maxlength="80" placeholder="${esc(c.spec || 'اختياري')}" value="${esc(x.spec)}"></div>
+        <div><label>العدد</label><input data-f="qty" inputmode="decimal" dir="ltr" value="${esc(x.qty)}"></div>
+        <div><label>سعر الوحدة ($)</label><input data-f="price" inputmode="decimal" dir="ltr" placeholder="0" value="${esc(x.price)}"></div>
+      </div>
+      <div class="lt">المجموع: <b data-lt>${money(num(x.qty) * num(x.price))}</b></div>
+    </div>`;
+  }
+  function renderItems() {
+    $('items').innerHTML = D.items.map(itemHtml).join('');
+    $('add').hidden = false;
+  }
+  $('items').addEventListener('input', (e) => {
+    const box = e.target.closest('.item'); if (!box) return;
+    const x = D.items.find((y) => y.id === +box.dataset.id), f = e.target.dataset.f; if (!x || !f || f === 'k') return;
+    x[f] = e.target.value; save();
+    if (f === 'qty' || f === 'price') { box.querySelector('[data-lt]').textContent = money(num(x.qty) * num(x.price)); total(); }
+  });
+  $('items').addEventListener('change', (e) => {
+    const box = e.target.closest('.item'); if (!box || e.target.dataset.f !== 'k') return;
+    const x = D.items.find((y) => y.id === +box.dataset.id), old = cat(x.k);
+    x.k = e.target.value; if (!x.title || x.title === old.n) x.title = cat(x.k).n;
+    x.type = ''; x.brand = ''; x.brandOther = ''; save(); renderItems();
+  });
+  $('items').addEventListener('click', (e) => {
+    const box = e.target.closest('.item'); if (!box) return;
+    const x = D.items.find((y) => y.id === +box.dataset.id);
+    if (e.target.closest('[data-del]')) { D.items = D.items.filter((y) => y !== x); save(); renderItems(); total(); return; }
+    const ch = e.target.closest('.chip'); if (!ch) return;
+    const f = ch.parentElement.dataset.f;
+    if (f === 'type') { x.type = ch.dataset.v; x.brand = ''; x.brandOther = ''; }
+    if (f === 'brand') { x.brand = x.brand === ch.dataset.v ? '' : ch.dataset.v; }
+    save(); renderItems();
+  });
+  $('add').onclick = addItem;
+  function total() { const t = D.items.reduce((a, x) => a + num(x.qty) * num(x.price), 0); $('total').textContent = money(t); return t; }
+  renderItems(); total();
+  $('clear').onclick = () => { if (D.items.length && !confirm('بدّك تمحي هالعرض وتبلّش جديد؟ (معلوماتك إنت بتضلّ)')) return; D = fresh(); save(); location.reload(); };
+
+  // ---------- PDF ----------
+  const brandOf = (x) => x.brand === '*' || (x.k === 'battery' && x.type === 'أسيد') ? x.brandOther : x.brand;
+  function details(x) { return [x.k === 'battery' && x.type ? 'بطارية ' + x.type : '', brandOf(x), x.spec].filter(Boolean).join(' · '); }
+  function qno() { if (!D.no) { const d = new Date(); D.no = 'Q-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase(); save(); } return D.no; }
+  function pagesHtml() {
+    const rows = D.items.filter((x) => x.title || x.spec || num(x.price));
+    const per = 11, pages = Math.max(1, Math.ceil(rows.length / per));
+    const t = new Date(), u = new Date(t); u.setDate(u.getDate() + D.days);
+    const wm = '<div class="wm">' + Array.from({ length: 40 }, () => `<span>MrElectroAI · ${BRAND.phone}</span>`).join('') + '</div>';
+    const who = (p) => `<b>${esc(p.n || '—')}</b>${p.c ? `<div>${esc(p.c)}</div>` : ''}${p.p ? `<div dir="ltr" style="text-align:right">${esc(p.p)}</div>` : ''}`;
+    let html = '';
+    for (let pi = 0; pi < pages; pi++) {
+      const part = rows.slice(pi * per, pi * per + per), last = pi === pages - 1;
+      html += `<div class="pg">${wm}
+        <div class="ph"><div><h1>عرض سعر</h1><div style="color:#5A6D67">منظومة طاقة شمسية</div></div>
+          <div class="no">No. <b>${esc(qno())}</b><br>${esc(fmtD(t))}</div></div>
+        ${pi === 0 ? `<div class="pp"><div><small>من</small>${who(me)}</div><div><small>إلى</small>${who(D.to)}</div></div>` : ''}
+        <table><thead><tr><th style="width:34px">#</th><th>الصنف</th><th class="num">العدد</th><th class="num">سعر الوحدة</th><th class="num">المجموع</th></tr></thead><tbody>
+        ${part.map((x, i) => `<tr><td>${pi * per + i + 1}</td><td><b>${esc(x.title || cat(x.k).n)}</b>${details(x) ? `<span class="sp"><bdi>${esc(details(x))}</bdi></span>` : ''}</td>
+          <td class="num">${esc(num(x.qty))}</td><td class="num">${num(x.price) ? money(num(x.price)) : '—'}</td><td class="num">${num(x.price) ? money(num(x.qty) * num(x.price)) : '—'}</td></tr>`).join('')}
+        </tbody></table>
+        ${last ? `<div class="tt"><div><span>المجموع</span>${money(total())}</div></div>
+          <div class="vl">هالعرض صالح لمدة ${D.days} ${D.days === 1 ? 'يوم' : D.days === 2 ? 'يومين' : D.days <= 10 ? 'أيام' : 'يوم'}، لغاية ${esc(fmtD(u))}.</div>
+          ${D.notes ? `<div class="nt">${esc(D.notes)}</div>` : ''}` : ''}
+        <div class="ft"><span>انعمل بأداة <b>MrElectroAI</b> · ${esc(BRAND.name)} · <bdi dir="ltr">${esc(BRAND.phone)}</bdi></span><span dir="ltr">${esc(BRAND.site)}${pages > 1 ? ` · ${pi + 1}/${pages}` : ''}</span></div>
+      </div>`;
+    }
+    return html;
+  }
+  async function buildPdf() {
+    if (!window.html2canvas || !window.jspdf) throw new Error('libs');
+    const st = $('stage'); st.innerHTML = pagesHtml();
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const { jsPDF } = window.jspdf; const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+    const pgs = [...st.querySelectorAll('.pg')];
+    for (let i = 0; i < pgs.length; i++) {
+      const c = await html2canvas(pgs[i], { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false });
+      if (i) pdf.addPage(); pdf.addImage(c.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 210, 297);
+    }
+    st.innerHTML = ''; return pdf.output('blob');
+  }
+  const fname = () => `عرض سعر - ${(D.to.n || 'زبون').replace(/[\\/:*?"<>|]/g, '')} - ${qno()}.pdf`;
+  function check() {
+    if (!me.n.trim()) { $('fn').focus(); return 'اكتب اسمك (المرسل).'; }
+    if (!D.to.n.trim()) { $('tn').focus(); return 'اكتب اسم الزبون (المستلم).'; }
+    if (!D.items.length) return 'زيد صنف واحد عالأقل بكبسة +.';
+    return '';
+  }
+  function download(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
+  function waNum(p) { let d = String(p || '').replace(/\D/g, ''); if (d.startsWith('00')) d = d.slice(2); if (d && d.length <= 8) d = '961' + d.replace(/^0/, ''); return d; }
+  async function run(share) {
+    const m = $('msg'), e = check(); if (e) { m.textContent = e; return; }
+    const bs = [$('dl'), $('send')]; bs.forEach((b) => b.disabled = true); m.textContent = 'عم نجهّز الـPDF…';
+    try {
+      const blob = await buildPdf(), name = fname();
+      if (share) {
+        const file = new File([blob], name, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'عرض سعر', text: `عرض سعر منظومة طاقة شمسية — ${me.c || me.n}` });
+          m.textContent = '✔ انبعت.';
+        } else {
+          download(blob, name);
+          const n = waNum(D.to.p);
+          m.textContent = 'نزل الملف عندك. بالواتساب اكبس 📎 وارفقو.';
+          window.open('https://api.whatsapp.com/send?' + (n ? 'phone=' + n + '&' : '') + 'text=' + encodeURIComponent(`مرحبا ${D.to.n} 👋\nمرفق عرض السعر للمنظومة (${qno()}).`), '_blank');
+        }
+      } else { download(blob, name); m.textContent = `نزل الملف: ${name}`; }
+    } catch (x) { if (x && x.name === 'AbortError') m.textContent = ''; else m.textContent = 'ما زبط الـPDF. تأكّد إنك متصل بالإنترنت وجرّب مرة تانية.'; }
+    bs.forEach((b) => b.disabled = false);
+  }
+  // شريط التجربة تحت: منرفع شريط الأزرار فوقو
+  new MutationObserver(() => {
+    const b = [...document.body.children].find((el) => el.tagName === 'DIV' && el.style.position === 'fixed' && el.style.bottom === '0px' && el.id !== 'meaLock' && !el.classList.contains('bar'));
+    document.querySelector('.bar').style.bottom = b ? b.offsetHeight + 'px' : '0';
+  }).observe(document.body, { childList: true });
+  $('dl').onclick = () => run(false);
+  $('send').onclick = () => run(true);
+})();
+</script>
+<script src="../lock.js" data-tool="quote"></script>
+<script src="../../t.js" data-page="tools" defer></script>
+</body>
+</html>
