@@ -1,0 +1,91 @@
+name: Build Hifz APK (رفيق الحفظ)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'hifz/**'
+      - 'hifz-android/**'
+      - '.github/workflows/build-hifz-apk.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hifz-apk
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    env:
+      KS_PASS: '98377787807098f32db628eb'
+    steps:
+      - name: 1. Checkout
+        uses: actions/checkout@v4
+
+      - name: 2. Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 3. Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: 4. Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 5. Create Capacitor app
+        run: |
+          mkdir -p cap/www cap/assets
+          cp hifz/index.html hifz/manifest.webmanifest hifz/icon-192.png hifz/icon-512.png hifz/apple-touch-icon.png cap/www/
+          cp hifz-android/icon-only.png hifz-android/icon-foreground.png hifz-android/icon-background.png hifz-android/splash.png hifz-android/splash-dark.png cap/assets/
+          cd cap
+          npm init -y > /dev/null
+          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7 @capacitor/app@7
+          cat > capacitor.config.json << 'JSON'
+          {
+            "appId": "com.mrelectroai.hifz",
+            "appName": "رفيق الحفظ",
+            "webDir": "www",
+            "android": { "adjustMarginsForEdgeToEdge": "force" }
+          }
+          JSON
+          npx cap add android
+          npx --yes @capacitor/assets@3 generate --android --iconBackgroundColor '#0F5B4E' --iconBackgroundColorDark '#0F5B4E' --splashBackgroundColor '#F6F2E9' --splashBackgroundColorDark '#0F1715' || echo "icon generation skipped"
+          npx cap sync android
+
+      - name: 6. Permissions + version
+        run: |
+          cd cap/android
+          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n</manifest>#' app/src/main/AndroidManifest.xml
+          sed -i 's/versionCode [0-9]*/versionCode ${{ github.run_number }}/; s/versionName "[^"]*"/versionName "1.${{ github.run_number }}"/' app/build.gradle
+          grep -n "versionCode\|versionName" app/build.gradle
+          grep -n "permission" app/src/main/AndroidManifest.xml
+
+      - name: 7. Build & sign
+        run: |
+          cd cap/android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+          $BT/zipalign -f -p 4 app/build/outputs/apk/release/app-release-unsigned.apk aligned.apk
+          $BT/apksigner sign --ks $GITHUB_WORKSPACE/hifz-android/hifz.keystore --ks-key-alias hifz --ks-pass env:KS_PASS --key-pass env:KS_PASS --out $GITHUB_WORKSPACE/RafiqAlHifz.apk aligned.apk
+          $BT/apksigner verify $GITHUB_WORKSPACE/RafiqAlHifz.apk
+
+      - name: 8. Publish download link
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete hifz-latest -y --cleanup-tag || true
+          gh release create hifz-latest RafiqAlHifz.apk --title "رفيق الحفظ (APK)" --notes "نسخة رقم 1.${{ github.run_number }}. نزّلي الملف وثبّتيه. التحديث بينزل فوق القديم بلا ما يضيع الحفظ." --latest=false
+
+      - name: 9. Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RafiqAlHifz-APK
+          path: RafiqAlHifz.apk
