@@ -187,8 +187,8 @@ textarea{min-height:70px}
     try {
       const code = localStorage.getItem('mea_lic_quote') || localStorage.getItem('mea_lic_all'); if (!code) return;
       const K = 'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK';
-      const r = await fetch('https://utjpvjnhffapbwpbkkuc.supabase.co/rest/v1/licenses?select=name,phone&code=eq.' + encodeURIComponent(code), { headers: { apikey: K, Authorization: 'Bearer ' + K } });
-      const j = await r.json(); if (j && j[0]) { me.n = me.n || j[0].name || ''; me.p = me.p || j[0].phone || ''; $('fn').value = me.n; $('fp').value = me.p; save(); }
+      const r = await fetch('https://utjpvjnhffapbwpbkkuc.supabase.co/rest/v1/rpc/license_profile', { method: 'POST', headers: { apikey: K, Authorization: 'Bearer ' + K, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_code: code }) });
+      const j = await r.json(); if (j && j.name) { me.n = me.n || j.name || ''; me.p = me.p || j.phone || ''; $('fn').value = me.n; $('fp').value = me.p; save(); }
     } catch (e) {}
   })();
 

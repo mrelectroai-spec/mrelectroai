@@ -269,20 +269,12 @@
     return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('').slice(0, 24);
   }
   async function verifyKey(code) {
-    let rows;
-    try { rows = await sb('licenses?code=eq.' + encodeURIComponent(code) + '&select=*'); }
-    catch (e) { return { ok: false, msg: 'ما قدرنا نتحقق من المفتاح. تأكد إنك متصل بالإنترنت وجرّب مرة تانية.' }; }
-    if (!rows || !rows.length) return { ok: false, msg: 'المفتاح غلط. تأكد منو بالرسالة يلي وصلتك.' };
-    const L = rows[0];
-    if (!L.active) return { ok: false, msg: 'هالمفتاح موقوف. تواصل مع أنور عالواتساب.' };
-    if (L.expires && new Date(L.expires) < new Date(new Date().toDateString())) return { ok: false, msg: 'هالمفتاح منتهي.' };
-    const tools = String(L.tools || '').split(',').map((t) => t.trim());
-    if (!tools.includes(BOOK_TOOL)) return { ok: false, msg: 'هالمفتاح للأدوات، مش للكتاب. مفتاح الكورس بيوصلك مع الكتاب.' };
     const fp = await fingerprint();
-    if (L.device && L.device !== fp) return { ok: false, msg: 'هالمفتاح مفعّل على تلفون تاني. إذا بدّلت تلفون، تواصل مع أنور ليفكّو.' };
-    try { await sb('licenses?code=eq.' + encodeURIComponent(code), { method: 'PATCH',
-      body: JSON.stringify({ device: L.device || fp, uses: (L.uses || 0) + 1, last_seen: new Date().toISOString() }) }); } catch (e) {}
-    return { ok: true };
+    let r;
+    try { r = await sb('rpc/verify_license', { method: 'POST', body: JSON.stringify({ p_code: code, p_device: fp, p_tool: BOOK_TOOL }) }); }
+    catch (e) { return { ok: false, msg: 'ما قدرنا نتحقق من المفتاح. تأكد إنك متصل بالإنترنت وجرّب مرة تانية.' }; }
+    if (r && r.ok) return { ok: true };
+    return { ok: false, msg: (r && r.msg) || 'المفتاح غلط. تأكد منو بالرسالة يلي وصلتك.' };
   }
 
   // ---------- the board (18 breakers) ----------

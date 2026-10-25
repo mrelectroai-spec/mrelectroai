@@ -179,7 +179,6 @@ input:focus,select:focus{border-color:var(--volt)}
 <script>
 const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
-const ADMIN_EMAIL="mrelectroai@gmail.com";
 const WA="96179434479";
 const TOOLS={all:'كل الأدوات',roof:'قياس السطح',transformer:'المحوّلات',
   inverters:'الإنفرترات',load:'حساب المنظومة',wirephase:'توزيع الفازات',book:'📘 كتاب الكهرباء + الكورس'};
@@ -220,12 +219,12 @@ async function api(p,o={}){const t=await token();const r=await fetch(SB_URL+'/re
   if(!r.ok)throw new Error(await r.text());return r.status===204?null:r.json();}
 const sb=async fn=>{try{return await fn()}catch(e){say('ما قدرنا نتصل');return null}};
 
-$('email').value=ADMIN_EMAIL;
+try{$('email').value=localStorage.getItem('mea_adm_email')||''}catch(e){}
 $('enter').onclick=async()=>{
   const em=$('email').value.trim(), pw=$('pin').value;
   if(!em||!pw){$('perr').textContent='اكتب الإيميل وكلمة السر';return;}
   $('enter').disabled=true;$('perr').textContent='';
-  try{await auth({email:em,password:pw},'password');$('lock').style.display='none';load();}
+  try{await auth({email:em,password:pw},'password');try{localStorage.setItem('mea_adm_email',em)}catch(e){}$('lock').style.display='none';load();}
   catch(e){$('perr').textContent='الإيميل أو كلمة السر غلط';$('pin').value='';}
   $('enter').disabled=false;};
 $('pin').addEventListener('keydown',e=>{if(e.key==='Enter')$('enter').click()});
