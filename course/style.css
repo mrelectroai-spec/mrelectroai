@@ -169,3 +169,15 @@ input:focus { border-color: var(--volt); outline: none; box-shadow: 0 0 0 3px va
 .sendbox.win { border-color: var(--warn); margin-top: 16px; }
 .sendbox.win b { color: var(--volt); font-family: 'JetBrains Mono', monospace; font-size: 18px; }
 .sendbox + .sendbox { margin-top: 16px; }
+
+/* الكلمات الإنجليزية: رقم فوق الكلمة، والشرح تحت الصفحة */
+.en { font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; unicode-bidi: isolate; }
+sup.gn { font-size: 10px; font-weight: 700; color: var(--volt, #22C79B); margin-inline-start: 1px; vertical-align: super; line-height: 0; }
+.gloss { margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--line, #1E332D); font-size: 13.5px; line-height: 1.75; }
+.gloss .gh { font-weight: 600; margin-bottom: 4px; }
+.gloss .gh span { font-weight: 400; opacity: .7; font-size: 12.5px; }
+.gloss ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+.gloss li sup { font-weight: 700; color: var(--volt, #22C79B); }
+.gloss .en { font-weight: 700; }
+.gloss .rd { opacity: .75; }
+.opt sup.gn { color: inherit; opacity: .8; }

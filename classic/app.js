@@ -331,6 +331,7 @@
     const item = r.q[qi];
     const correct = item.a[0];
     const opts = shuffle(item.a.slice());
+    const GL = window.glossPage ? window.glossPage(esc) : { h: esc, list: () => '' };
 
     const QN = r.q.length;
     const learned = QN - st.queue.length;
@@ -342,9 +343,9 @@
 
     $app.innerHTML = `
       <div class="rulehead">
-        <div class="tag">القاعدة ${n} من ${TOTAL} · ${esc(r.story)}</div>
+        <div class="tag">القاعدة ${n} من ${TOTAL} · ${GL.h(r.story)}</div>
         ${mistakeChip()}
-        <h2>${esc(r.title)}</h2>
+        <h2>${GL.h(r.title)}</h2>
         ${progHtml}
         <div class="tools">
           ${typeof FIGS !== 'undefined' && FIGS[n] ? '<button class="tool" id="figBtn" type="button">📐 شوف رسمة القاعدة</button>' : ''}
@@ -353,9 +354,10 @@
       </div>
       <div class="qcard">
         ${item.t ? `<div class="qtype">${esc(item.t)}</div>` : ''}
-        <div class="qtext">${esc(item.q)}</div>
-        <div id="opts">${opts.map((o, i) => `<button class="opt" data-i="${i}">${esc(o)}</button>`).join('')}</div>
+        <div class="qtext">${GL.h(item.q)}</div>
+        <div id="opts">${opts.map((o, i) => `<button class="opt" data-i="${i}">${GL.h(o)}</button>`).join('')}</div>
         <div id="fb"></div>
+        <div id="gl">${GL.list(false)}</div>
       </div>`;
 
     const figBtn = document.getElementById('figBtn');
@@ -385,9 +387,10 @@
       const fb = document.getElementById('fb');
       const enteringCheck = wasLearn && st.phase === 'check';
       fb.innerHTML = ok
-        ? `<div class="fb ok"><b>✔ صح.</b>${esc(item.why)}</div>`
+        ? `<div class="fb ok"><b>✔ صح.</b>${GL.h(item.why)}</div>`
         : `<div class="fb no"><b>✘ خطأ.</b>${st.phase === 'learn' ? 'فكّر فيه منيح، هالسؤال رح يرجعلك بعد شوي.' : 'انطفت اللمبات. ركّز وبلّش العدّ من جديد.'}</div>`;
       if (!ok && st.mistakes >= ADVICE_AT && !st.advised) { st.advised = true; save(); fb.insertAdjacentHTML('beforeend', adviceHtml(n)); }
+      const $gl = document.getElementById('gl'); if ($gl) $gl.innerHTML = GL.list(ok);
       const next = document.createElement('button');
       next.className = 'btn';
       next.textContent = passedNow ? 'ارفع الديجنتير ⚡' : enteringCheck ? `جاوبت الـ ${r.q.length} صح. عاختبار البصم` : 'كمّل';
