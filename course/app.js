@@ -284,7 +284,7 @@
 
     const QN = r.q.length;
     const learned = QN - st.queue.length;
-    const progress = st.phase === 'learn'
+    const progHtml = st.phase === 'learn'
       ? `<div class="meter" aria-hidden="true">${[...Array(QN)].map((_, i) => `<i class="${i < learned ? 'on' : ''}"></i>`).join('')}</div>
          <div class="phase">${learned} من ${QN} أسئلة جاوبتها صح</div>`
       : `<div class="lamps" aria-hidden="true">${[...Array(STREAK_TARGET)].map((_, i) => `<i class="${i < st.streak ? 'on' : ''}"></i>`).join('')}</div>
@@ -295,7 +295,7 @@
         <div class="tag">القاعدة ${n} من ${TOTAL} · ${esc(r.story)}</div>
         ${mistakeChip()}
         <h2>${esc(r.title)}</h2>
-        ${progress}
+        ${progHtml}
       </div>
       <div class="qcard">
         <div class="qtext">${esc(item.q)}</div>
@@ -464,6 +464,8 @@
         <h2>⚡ انفتحلك الكورس التاني</h2>
         <p>خلّصت الأساس. هلّق فيك تكمّل عكورس «الكلاسيك كنترول بالمختصر المفيد»: 25 قاعدة على بناية وحدة، من الكونتاكتور لمضخة الحريق.</p>
         <a class="btn volt" href="../classic/">كمّل عكورس الكلاسيك كنترول</a>
+        <p style="margin-top:12px">أو إذا شغلك بالسولار: كورس «الطاقة الشمسية بالمختصر المفيد»، 32 قاعدة من اللوح للانفرتر والبطارية والحسابات.</p>
+        <a class="btn ghost" href="../solar/">كمّل عكورس الطاقة الشمسية</a>
       </div>`;
     document.getElementById('mine').addEventListener('click', async () => { if (!pdfBlob) await buildPdf(); download(pdfBlob, pdfName()); });
   }

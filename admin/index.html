@@ -46,7 +46,7 @@ input:focus{outline:2px solid var(--volt);outline-offset:1px}
 .prog{grid-column:1/-1;height:8px;background:var(--panel-2);border-radius:99px;overflow:hidden}
 .prog i{display:block;height:100%;background:var(--volt);border-radius:99px}
 .tag{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12.5px;font-weight:600;border:1px solid var(--line)}
-.tag.e{color:#E8A33D;border-color:rgba(232,163,61,.4)}.tag.c{color:var(--volt);border-color:rgba(34,199,155,.4)}
+.tag.e{color:#E8A33D;border-color:rgba(232,163,61,.4)}.tag.c{color:var(--volt);border-color:rgba(34,199,155,.4)}.tag.s{color:#F5C542;border-color:rgba(245,197,66,.4)}
 .tag.done{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
 .tag.new{background:var(--warn);color:#1b1103;border-color:var(--warn)}
 .chip.big{padding:9px 20px;font-size:15.5px}
@@ -141,10 +141,10 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
   const SB_KEY = 'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK';
   const SITE = 'https://mrelectroai-spec.github.io/mrelectroai/';
   const TK = 'mea_admin_session';
-  const COURSES = { electro: 'الكهرباء بالمختصر المفيد', classic: 'الكلاسيك كنترول بالمختصر المفيد' };
-  const SHORT = { electro: 'الكهرباء', classic: 'الكلاسيك' };
-  const CURL = { electro: SITE + 'course/', classic: SITE + 'classic/' };
-  const PAGES = { home: 'الصفحة الرئيسية', sample: 'صفحة العيّنة', lab: 'مختبر القطع', course: 'كورس الكهرباء', classic: 'كورس الكلاسيك', quiz: 'اختبار المستوى', tools: 'الأدوات', other: 'صفحة تانية' };
+  const COURSES = { electro: 'الكهرباء بالمختصر المفيد', classic: 'الكلاسيك كنترول بالمختصر المفيد', solar: 'الطاقة الشمسية بالمختصر المفيد' };
+  const SHORT = { electro: 'الكهرباء', classic: 'الكلاسيك', solar: 'السولار' };
+  const CURL = { electro: SITE + 'course/', classic: SITE + 'classic/', solar: SITE + 'solar/' };
+  const PAGES = { home: 'الصفحة الرئيسية', sample: 'صفحة العيّنة', lab: 'مختبر القطع', course: 'كورس الكهرباء', classic: 'كورس الكلاسيك', solar: 'كورس الطاقة الشمسية', quote: 'أداة عرض السعر', quiz: 'اختبار المستوى', tools: 'الأدوات', other: 'صفحة تانية' };
   const STALL_DAYS = 2;
   const $app = document.getElementById('app'), $dlg = document.getElementById('dlg'), $dc = document.getElementById('dc');
   try { const th = localStorage.getItem('mea_theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
@@ -284,7 +284,7 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
     const r = p.rows.slice().sort((a, b) => RANK[status(a)] - RANK[status(b)])[0];
     const st = status(r), book = COURSES[r.course], url = CURL[r.course];
     if (st === 'done' && r.course === 'electro' && !p.rows.some((x) => x.course === 'classic'))
-      return `مرحبا ${fn} 👋 أنا أنور.\nمبروك، خلّصت كورس «${book}» كلّو 🎉\nإذا حابب تكمّل، انفتحلك كورس «${COURSES.classic}»: 25 قاعدة على بناية وحدة.\n${CURL.classic}`;
+      return `مرحبا ${fn} 👋 أنا أنور.\nمبروك، خلّصت كورس «${book}» كلّو 🎉\nإذا حابب تكمّل، انفتحلك كورس «${COURSES.classic}»: 25 قاعدة على بناية وحدة.\nوكمان كورس «${COURSES.solar}»: 32 قاعدة.\n${CURL.classic}\n${CURL.solar}`;
     if (st === 'done') return `مرحبا ${fn} 👋 أنا أنور.\nمبروك، خلّصت كورس «${book}» 🎉 شو رأيك فيه؟ رأيك بيهمّني.`;
     if (!r.answers && !r.rules_done) return `مرحبا ${fn} 👋 أنا أنور.\nشفت إنك سجّلت بكورس «${book}» بس بعدك ما بلّشت. أوّل قاعدة بتاخد كم دقيقة بس، جرّبها:\n${url}`;
     const n = r.cur_rule || (r.rules_done + 1);
@@ -347,7 +347,7 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
     el.innerHTML = L.map((p) => `<div class="person ${p.st}">
         <div class="ph1"><div><div class="nm">${esc(p.name)} ${ST_TAG[p.st]}</div><div class="phn">${esc(p.phone)}</div></div>
           <div class="when">${ago(p.last)}</div></div>
-        ${p.rows.map((r) => `<div class="cl"><span class="tag ${r.course === 'electro' ? 'e' : 'c'}">${SHORT[r.course]}</span> ${esc(sentence(r))}
+        ${p.rows.map((r) => `<div class="cl"><span class="tag ${r.course === 'electro' ? 'e' : r.course === 'solar' ? 's' : 'c'}">${SHORT[r.course]}</span> ${esc(sentence(r))}
           <div class="prog"><i style="width:${Math.round(100 * (r.finished_at ? 1 : (r.rules_done || 0) / (r.total || 1)))}%"></i></div></div>`).join('')}
         <div class="meta">${p.from ? `إجا من: <b>${esc(p.from)}</b> · ` : ''}سجّل ${ago(p.first)}</div>
         <div class="acts" style="margin:8px 0 0">

@@ -7,7 +7,7 @@ create function public.is_site_admin() returns boolean language sql stable secur
 
 create table public.course_results (
   id bigint generated always as identity primary key, created_at timestamptz not null default now(),
-  client_id text not null, course text not null check (course in ('electro','classic')),
+  client_id text not null, course text not null check (course in ('electro','classic','solar')),
   event text not null check (event in ('start','rule','finish')),
   name text not null, phone text not null, rules_done int not null default 0, total int not null default 0,
   mistakes int not null default 0, answers int not null default 0, started_at timestamptz, finished_at timestamptz, data jsonb);

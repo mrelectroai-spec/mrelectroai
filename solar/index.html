@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الطاقة الشمسية بالمختصر المفيد — الكورس</title>
+<meta name="description" content="كورس تفاعلي على كتاب الطاقة الشمسية بالمختصر المفيد: 32 قاعدة و320 سؤال، قاعدة قاعدة لحد ما تبصمها.">
+<meta name="theme-color" content="#081311">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></symbol>
+</svg>
+<nav class="nav"><div class="nav-in">
+  <a class="logo" href="../" aria-label="MrElectroAI — الصفحة الرئيسية"><span class="m"><svg><use href="#i-bolt"/></svg></span><b>MrElectroAI</b></a>
+  <div class="nav-r">
+    <span class="who" id="who"></span>
+    <button class="icon-btn" id="theme" aria-label="تبديل الثيم">☾</button>
+  </div>
+</div></nav>
+
+<main id="app" aria-live="polite"></main>
+
+<!-- مكان بناء صفحات الـ PDF (مخفي عن الشاشة) -->
+<div id="pdfStage" aria-hidden="true"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="questions.js"></script>
+<script src="figs.js"></script>
+<script src="app.js"></script>
+<script>
+  // نفس مفتاح الثيم تبع الموقع الرئيسي
+  (function () {
+    var th = document.getElementById('theme');
+    function set(m) { document.documentElement.dataset.theme = m; th.textContent = m === 'light' ? '☀' : '☾'; try { localStorage.setItem('mea_theme', m); } catch (e) {} }
+    try { var s = localStorage.getItem('mea_theme'); if (s) set(s); } catch (e) {}
+    th.onclick = function () { set(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'); };
+  })();
+</script>
+<script src="../t.js" data-page="solar" defer></script>
+</body>
+</html>

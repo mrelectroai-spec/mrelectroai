@@ -332,7 +332,7 @@
 
     const QN = r.q.length;
     const learned = QN - st.queue.length;
-    const progress = st.phase === 'learn'
+    const progHtml = st.phase === 'learn'
       ? `<div class="meter" aria-hidden="true">${[...Array(QN)].map((_, i) => `<i class="${i < learned ? 'on' : ''}"></i>`).join('')}</div>
          <div class="phase">${learned} من ${QN} أسئلة جاوبتها صح</div>`
       : `<div class="lamps" aria-hidden="true">${[...Array(STREAK_TARGET)].map((_, i) => `<i class="${i < st.streak ? 'on' : ''}"></i>`).join('')}</div>
@@ -343,7 +343,7 @@
         <div class="tag">القاعدة ${n} من ${TOTAL} · ${esc(r.story)}</div>
         ${mistakeChip()}
         <h2>${esc(r.title)}</h2>
-        ${progress}
+        ${progHtml}
         <div class="tools">
           ${typeof FIGS !== 'undefined' && FIGS[n] ? '<button class="tool" id="figBtn" type="button">📐 شوف رسمة القاعدة</button>' : ''}
           ${r.lab ? `<a class="tool" href="${LAB}${r.lab}" target="_blank" rel="noopener">🧩 جرّب القطعة بالمختبر</a>` : ''}
