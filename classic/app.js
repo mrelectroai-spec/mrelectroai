@@ -17,6 +17,7 @@
   const PRE_KEY = CFG.preKey || 'electro-course-v1';   // نفس مفتاح الكورس الأول (نفس الموقع)
   const PRE_URL = CFG.preUrl || '../course/';
   const PRE_TOTAL = 18;
+  const GATE = CFG.gate === true;   // الشرط مطفي: الكورس مفتوح للكل. لترجّعو: window.COURSE_CONFIG = { gate: true }
   const ADVICE_AT = 4;   // من كم غلطة بقاعدة منقلّو يرجع للكورس الأول
   const BASICS = { 1: 'الفولت، الأمبير، والأوم', 2: 'الشرايط التلاتة (فاز، نتر، تير)', 4: 'سماكة الشرايط', 5: 'الديجنتير العادي والدفرانسير',
     8: 'حسبة الوات والأمبير', 9: 'التايمر والفوتوسيل', 10: 'الكونتاكتور', 13: 'طابة الأتوماتيك', 14: 'حماية الفولت (البرتيزار)',
@@ -156,9 +157,9 @@
   let view = 'board';
   function render() {
     header();
-    if (!S && !preStatus().done) return gate();
+    if (GATE && !S && !preStatus().done) return gate();
     if (!S) return welcome();
-    if (!S.pre && !preStatus().done) return gate();
+    if (GATE && !S.pre && !preStatus().done) return gate();
     if (NEED_KEY && !S.key) return keyOnly();
     if (S.finishedAt) return finalScreen();
     if (view === 'quiz') return quiz();
@@ -192,6 +193,7 @@
       <p>رح نسألك ${RULES[0].q.length} أسئلة على كل قاعدة من الـ ${TOTAL}. كل سؤال بتغلط فيه بيرجعلك لحتى تجاوبو صح، وبالآخر لازم تجاوب ${STREAK_TARGET} أسئلة صح ورا بعض. ما بتنفتحلك القاعدة يلي بعدها إلا بس تكون باصم يلي قبلها.</p>
       ${CHALLENGE ? `<div class="challenge"><b>🎁 التحدّي:</b> خلّص الـ ${RULES.length * RULES[0].q.length} سؤال بـ ${CHALLENGE_MAX} غلطات أو أقل، وخود الكتاب بخصم: <b>${CHALLENGE_PRICE}$</b> بدل ${BOOK_FULL}$.</div>` : `<div class="challenge"><b>${RULES.length * RULES[0].q.length} سؤال</b> من 6 أنواع: مفهوم، موقف، عطل، أرقام، مخطط، وسلامة. وبكل قاعدة فيك تفتح رسمتها من الكتاب، وتجرّب قطعتها بمختبر القطع.</div>`}
       <p class="muted">بآخر الكورس بتبعت ملخص شغلك لأنور عالواتساب، وبتاخد شهادة باسمك.</p>
+      ${!preStatus().done ? `<p class="muted">جديد بالكهربا؟ الأحسن تبلّش بـ<a href="${PRE_URL}">كورس الكتاب الأول</a> (الفولت والأمبير والتابلو)، بس فيك تبلّش هون إذا حابب.</p>` : ''}
       <form id="f" novalidate>
         <label for="nm">اسمك الكامل</label>
         <input id="nm" type="text" autocomplete="name" placeholder="مثلاً: محمد علي" required value="${esc(preStatus().name || '')}">

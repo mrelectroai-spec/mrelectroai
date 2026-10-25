@@ -284,7 +284,7 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
     const r = p.rows.slice().sort((a, b) => RANK[status(a)] - RANK[status(b)])[0];
     const st = status(r), book = COURSES[r.course], url = CURL[r.course];
     if (st === 'done' && r.course === 'electro' && !p.rows.some((x) => x.course === 'classic'))
-      return `مرحبا ${fn} 👋 أنا أنور.\nمبروك، خلّصت كورس «${book}» كلّو 🎉\nإذا حابب تكمّل، انفتحلك كورس «${COURSES.classic}»: 25 قاعدة على بناية وحدة.\nوكمان كورس «${COURSES.solar}»: 32 قاعدة.\n${CURL.classic}\n${CURL.solar}`;
+      return `مرحبا ${fn} 👋 أنا أنور.\nمبروك، خلّصت كورس «${book}» كلّو 🎉\nإذا حابب تكمّل، في كورس «${COURSES.classic}»: 25 قاعدة على بناية وحدة.\nوكمان كورس «${COURSES.solar}»: 32 قاعدة.\n${CURL.classic}\n${CURL.solar}`;
     if (st === 'done') return `مرحبا ${fn} 👋 أنا أنور.\nمبروك، خلّصت كورس «${book}» 🎉 شو رأيك فيه؟ رأيك بيهمّني.`;
     if (!r.answers && !r.rules_done) return `مرحبا ${fn} 👋 أنا أنور.\nشفت إنك سجّلت بكورس «${book}» بس بعدك ما بلّشت. أوّل قاعدة بتاخد كم دقيقة بس، جرّبها:\n${url}`;
     const n = r.cur_rule || (r.rules_done + 1);
