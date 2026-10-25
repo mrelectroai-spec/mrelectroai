@@ -440,6 +440,7 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
   }
 
   // ---------- المبيعات + الكتب ----------
+  const METHODS = { whish: 'Whish Money', omt: 'OMT', usdt: 'USDT', bank: 'تحويل بنكي', cash: 'نقداً' };
   const money = (n) => (Math.round(Number(n) * 100) / 100).toLocaleString('en-US') + '$';
   const bookById = (id) => BOOKS.find((b) => b.id === id) || { title: id, price: 0 };
   function salesView() {
@@ -463,13 +464,16 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
             <div><label for="sp">السعر ($)</label><input id="sp" type="number" min="0" step="0.5" dir="ltr" required value="${esc(bookById('classic').price)}"></div>
             <div><label for="sn">الزبون (اختياري)</label><input id="sn" type="text" maxlength="120" placeholder="الاسم أو الرقم"></div>
             <div><label for="sd">التاريخ</label><input id="sd" type="date" dir="ltr" value="${today}" max="${today}"></div>
+            <div><label for="sm">طريقة الدفع</label><select id="sm">${Object.entries(METHODS).map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></div>
+            <div id="scw" hidden><label for="sc">البلد (للبنك)</label><input id="sc" type="text" maxlength="40" placeholder="مثلاً: لبنان، سوريا، الإمارات"></div>
           </div>
           <div class="err" id="se"></div>
           <button class="btn" style="width:100%" type="submit">سجّل</button>
         </form>
       </div>
+      ${SALES.length ? `<h3>حسب طريقة الدفع</h3><div class="chips" style="margin-bottom:12px">${Object.entries(METHODS).map(([k, l]) => { const L = SALES.filter((x) => x.method === k); return L.length ? `<span class="tag">${l}: ${L.length} · ${money(sum(L))}</span>` : ''; }).join(' ')}</div>` : ''}
       <h3>كل البيعات</h3>
-      <div class="list" id="sl">${SALES.length ? SALES.map((x) => `<div class="sale"><div><b>${esc(bookById(x.book_id).title)}</b><div class="mt">${fmtDate(x.sold_at)}${x.buyer ? ' · ' + esc(x.buyer) : ''}</div></div>
+      <div class="list" id="sl">${SALES.length ? SALES.map((x) => `<div class="sale"><div><b>${esc(bookById(x.book_id).title)}</b><div class="mt">${fmtDate(x.sold_at)}${x.method ? ' · ' + (METHODS[x.method] || x.method) + (x.country ? ' (' + esc(x.country) + ')' : '') : ''}${x.buyer ? ' · ' + esc(x.buyer) : ''}</div></div>
         <div style="text-align:end"><div class="pr">${money(x.price)}</div><button class="del" data-id="${x.id}">امحي</button></div></div>`).join('') : '<div class="empty">بعد ما سجّلت ولا بيعة.</div>'}</div>
       <h3 style="margin-top:22px">الكتب</h3>
       ${BOOKS.map((b) => { const L = SALES.filter((x) => x.book_id === b.id);
@@ -482,11 +486,14 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
     wireHead();
     const sb = document.getElementById('sb'), sp = document.getElementById('sp');
     sb.onchange = () => { sp.value = bookById(sb.value).price; };
+    const sm = document.getElementById('sm'); sm.onchange = () => { document.getElementById('scw').hidden = sm.value !== 'bank'; };
     document.getElementById('sf').onsubmit = async (e) => {
       e.preventDefault();
       const b = e.target.querySelector('button'), er = document.getElementById('se');
       const d = document.getElementById('sd').value;
-      const row = { book_id: sb.value, price: Number(sp.value), buyer: document.getElementById('sn').value.trim() || null };
+      const mth = document.getElementById('sm').value;
+      const row = { book_id: sb.value, price: Number(sp.value), buyer: document.getElementById('sn').value.trim() || null, method: mth,
+        country: mth === 'bank' ? (document.getElementById('sc').value.trim() || null) : null };
       if (d && d !== today) row.sold_at = new Date(d + 'T12:00:00').toISOString();
       b.disabled = true; b.textContent = 'عم نسجّل…'; er.textContent = '';
       try { await api('book_sales', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(row) }); await load(true); }
