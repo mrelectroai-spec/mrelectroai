@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#070F0D">
 <script>try{var m=localStorage.getItem("mea_theme");if(m)document.documentElement.dataset.theme=m;}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="مختبر القطع من MrElectroAI: 17 قطعة كلاسيك كنترول بالـ3D مع شرح وتجربة ومخطط.">
+<meta name="description" content="مختبر القطع من MrElectroAI: 24 قطعة كلاسيك كنترول وطاقة شمسية بالـ3D مع شرح وتجربة ومخطط.">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
 <title>مختبر القطع</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -147,7 +147,7 @@ button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
   <header>
     <div>
       <h1>مختبر القطع</h1>
-      <p class="lede">17 قطعة كلاسيك كنترول. لفّ كل قطعة، شوف جوّاتها، كبس عأي رقم لتقرا شرحو وتعمل TEST، والمخطط تحت بيتحرّك معها.</p>
+      <p class="lede">24 قطعة: كلاسيك كنترول وطاقة شمسية. لفّ كل قطعة، شوف جوّاتها، كبس عأي رقم لتقرا شرحو وتعمل TEST، والمخطط تحت بيتحرّك معها.</p>
     </div>
     <div class="hdr-r"><button class="theme" id="theme" type="button" aria-label="تبديل الثيم">☾</button><span class="brand">MrElectroAI</span></div>
   </header>
@@ -1122,6 +1122,350 @@ P({
       const on = s.k > .85; return { live: { "s-0": true, "s-1": on }, on: { "s-lp0": on ? "lampon" : "", "s-lp1": on ? "lampon" : "", "s-lp2": on ? "lampon" : "" }, show: { "s-moon": s.k > .5 } };
     },
     cap(s) { return s.k > .85 ? "<b>ليل:</b> الفوتوسيل سكّر واللمبات ضوّت." : "<b>نهار:</b> الفوتوسيل مفتوح واللمبات طافية."; }
+  }
+});
+
+/* ================= الطاقة الشمسية ================= */
+
+/* ---------- 18. PV panel ---------- */
+P({
+  id: "pv", cat: "الطاقة الشمسية", name: "اللوح الشمسي", dist: 5.0,
+  intro: "خلايا سيليكون عالتسلسل ورا زجاج، بتحوّل الضو لـDC. ورا اللوح علبة وصل فيها 3 دايودات Bypass وكابلين MC4: موجب وسالب.",
+  act: ["طلعت الشمس", "غابت الشمس"], st: ["عتمة: ما في فولت عالأطراف.", "<b>شمس:</b> اللوح عم يعطي فولت وتيار DC."],
+  build(A, R) {
+    const tilt = new THREE.Group(); tilt.rotation.x = -0.35; R.add(tilt);
+    const al = A.mat(0xc9cfd1, { metalness: .7, roughness: .3 });
+    [[0, 0.52, 1.72, 0.06], [0, -0.52, 1.72, 0.06]].forEach(([x, y, w, h]) => A.box(w, h, 0.08, al, x, y, 0, tilt));
+    [[-0.84, 0], [0.84, 0]].forEach(([x, y]) => A.box(0.06, 1.1, 0.08, al, x, y, 0, tilt));
+    A.box(1.64, 1.0, 0.01, A.mat(0xf1f3f4, { roughness: .8 }), 0, 0, 0.005, tilt);
+    const cells = [], cellM = A.mat(0x07111f, { roughness: .85, metalness: 0, emissive: 0x000000 });
+    for (let i = 0; i < 12; i++) for (let j = 0; j < 6; j++) {
+      const c = A.box(0.125, 0.15, 0.01, cellM.clone(), -0.75 + i * 0.137, -0.4 + j * 0.16, 0.02, tilt); c.userData.sec = Math.floor(j / 2); cells.push(c);
+    }
+    cells.forEach(c => A.tag(c, "cells", "sec" + c.userData.sec));
+    for (let i = 0; i < 12; i++) A.box(0.006, 0.98, 0.012, A.mat(0xdfe5e8, { metalness: .8 }), -0.75 + i * 0.137, 0, 0.028, tilt);
+    A.tag(A.box(1.64, 1.0, 0.004, A.mat(0xdfefff, { transparent: true, opacity: 0.12, roughness: 0.05, metalness: 0.1 }), 0, 0, 0.05, tilt), "glass");
+    A.tag(A.box(1.72, 0.06, 0.08, al, 0, 0.52, 0, tilt), "frame");
+    // back: junction box + label + cables
+    const jb = A.shell(0x1e2326); A.tag(A.rbox(0.32, 0.18, 0.08, 0.02, jb, 0, 0.32, -0.08, tilt), "jbox");
+    const diodes = [];
+    for (let k = 0; k < 3; k++) diodes.push(A.tag(A.box(0.05, 0.03, 0.03, A.mat(0x222222, { emissive: 0x000000 }), -0.1 + k * 0.1, 0.32, -0.08, tilt), "diode"));
+    A.tag(A.box(0.5, 0.34, 0.005, A.mat(0xffffff), 0.42, -0.12, -0.045, tilt), "label");
+    A.text(["550 W", "Voc 49.6V · Isc 14.0A", "Vmp 41.9V · Imp 13.1A"], 0.46, 0.3, 0.42, -0.12, -0.049, { color: "#1b2422", scale: .42 }, tilt).rotation.y = Math.PI;
+    const cab = A.mat(0x1d2326);
+    [[-0.1, 0xb3261e], [0.1, 0x1d2326]].forEach(([x, c]) => {
+      A.tag(A.cyl(0.018, 0.018, 0.5, A.mat(c), x, 0.05, -0.1, "y", tilt), "cable");
+      A.tag(A.cyl(0.035, 0.035, 0.12, A.mat(0x2a2f33), x, -0.22, -0.1, "y", tilt), "cable");
+    });
+    const sun = new THREE.Mesh(new THREE.SphereGeometry(0.16, 24, 16), new THREE.MeshBasicMaterial({ color: 0xffd54a })); sun.position.set(-0.9, 1.0, 0.6); R.add(sun);
+    return {
+      anim(k, F) {
+        sun.scale.setScalar(lerp(0.4, 1, k)); sun.material.color.set(k > .5 ? 0xffd54a : 0x8c96a8);
+        const shade = F.kind === "shade" ? F.f : 0;
+        cells.forEach(c => { const s = c.userData.sec === 1 ? 1 - shade : 1; c.material.emissive.setRGB(0.005 * k * s, 0.02 * k * s, 0.06 * k * s); });
+        diodes.forEach((d, i) => d.material.emissive.setRGB(i === 1 && shade > .5 ? 0.6 : 0, i === 1 && shade > .5 ? 0.2 : 0, 0));
+        A.ambient(lerp(0.6, 1, k));
+      }
+    };
+  },
+  spots: [
+    { t: "الخلايا", b: "72 خلية (أو 144 نصّ خلية) موصولين تسلسل. كل خلية حوالي نصّ فولت، ومجموعهم بيعطي Voc حوالي 50V. الضو بيحرّك الإلكترونات، والطلعة DC.", p: [-0.3, 0.1, 0.12], yaw: 0, pitch: 0.2, test: { mode: "toggle", key: "cells", msg: "الشمس طلعت: الخلايا عم تعطي DC." } },
+    { t: "الزجاج والإطار", b: "زجاج مقسّى قدّام، وإطار ألمنيوم. الإطار بينشكل بالكلامبات بالمحلّ المكتوب بالكتيّب، وبينوصل عالأرض بكليب تأريض.", p: [0, 0.55, 0.05], yaw: 0, pitch: 0.2, test: { mode: "on", key: "frame", msg: "الإطار لازم ينوصل عالأرض، والزجاج بينغسل بمي وفرشاية ناعمة." } },
+    { t: "الملصق", b: "Pmax وVoc وIsc وVmp وImp بشروط STC (1000 W/m² و25°C)، ومعهن أعلى فولت للنظام وأعلى فيوز. منو بتحسب السترينغ والفيوز والكابل.", p: [0.42, -0.12, -0.1], yaw: Math.PI, pitch: 0.1, test: { mode: "on", key: "label", msg: "Vmp × Imp = Pmax: يعني 41.9 × 13.1 ≈ 550 واط." } },
+    { t: "جوّا: علبة الوصل والدايودات", b: "3 دايودات Bypass، كل واحد لتلت اللوح. إذا قسم صار بالضلّ، الدايود تبعو بيوصّل والتيار بيقفز عنّو، فاللوح بيخسر تلت قدرتو بس.", p: [0, 0.32, -0.12], inner: true, yaw: Math.PI, pitch: 0.2, test: { mode: "trip", kind: "shade", key: "diode", msg: "ضلّ عالقسم الأوسط: الدايود تبعو اشتغل والتيار قفز عنّو." } },
+    { t: "الكابلات وMC4", b: "أحمر موجب وأسود سالب، كل واحد بوصلة MC4. الوصلة بتنشبك بنفس الماركة بس، وما بتنفكّ تحت حمل.", p: [0, -0.22, -0.14], yaw: Math.PI, pitch: -0.2, test: { mode: "toggle", key: "cable", msg: "الفولت طالع عالكابلين: + و−." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(60, 30, "+", "lbl b", "middle", true) + S.g("s-a", S.l(60, 40, 60, 60) + S.l(60, 230, 60, 250)) + S.t(60, 268, "−", "lbl b", "middle", true) +
+      [0, 1, 2].map(i => `<rect id="s-c${i}" x="38" y="${62 + i * 56}" width="44" height="50" rx="4" class="el"/>` + S.t(110, 92 + i * 56, "قسم " + (i + 1), "lbl s", "start")).join("") +
+      S.g("s-chain", S.l(60, 112, 60, 118) + S.l(60, 168, 60, 174) + S.l(60, 224, 60, 230)) +
+      S.g("s-by", S.p("M60,116 H160 V172 H60", "w")) + `<path d="M150,138 l10,12 l10,-12 z M150,150 h20" class="w"/>` + S.t(190, 150, "دايود القسم 2", "lbl s", "start") +
+      S.t(330, 90, "شمس: كل الأقسام عم تعطي", "lbl s") + S.g("s-x", S.t(330, 130, "ضلّ عالقسم 2: الدايود بيوصّل", "lbl r hide"))
+    ),
+    blades: [],
+    update(s) { const sh = s.F.kind === "shade" && s.f > .5, on = s.k > .5; return { live: { "s-a": on, "s-chain": on && !sh, "s-by": on && sh }, on: { "s-c0": on ? "on" : "", "s-c1": on && !sh ? "on" : "", "s-c2": on ? "on" : "" }, show: { "s-x": sh } }; },
+    cap(s) { return s.F.kind === "shade" && s.f > .5 ? "<b>ضلّ:</b> القسم 2 وقف، والتيار قفز عنّو بالدايود." : s.k > .5 ? "<b>شمس:</b> الأقسام التلاتة عالتسلسل عم تعطي DC." : "عتمة: ما في فولت."; }
+  }
+});
+
+/* ---------- 19. MC4 ---------- */
+P({
+  id: "mc4", cat: "الطاقة الشمسية", name: "وصلة MC4", dist: 4.4,
+  intro: "الوصلة تبع كابلات الـPV: ذكر ونتاية بيقفلوا ببعض. بتمرّق DC عالي، بس ما بتنفكّ تحت حمل، وبتنشبك بنفس الماركة بس.",
+  act: ["سكّر الوصلة", "افتح الوصلة"], st: ["الوصلة مفتوحة: ما في تماس.", "<b>الوصلة مسكّرة:</b> التماس محكوم والقفل مسكّر."],
+  build(A, R) {
+    const blk = A.mat(0x1f2427, { roughness: .6 });
+    const male = new THREE.Group(), fem = new THREE.Group(); R.add(male); R.add(fem);
+    A.tag(A.cyl(0.11, 0.11, 0.5, A.shell(0x1f2427), -0.25, 0, 0, "x", male), "male");
+    A.cyl(0.13, 0.13, 0.14, blk, -0.42, 0, 0, "x", male);
+    A.tag(A.cyl(0.05, 0.05, 0.9, A.mat(0xb3261e), -1.0, 0, 0, "x", male), "cable");
+    const pin = A.tag(A.cyl(0.025, 0.025, 0.36, A.brass(), 0.05, 0, 0, "x", male), "pin");
+    A.tag(A.cyl(0.12, 0.12, 0.5, A.shell(0x262b2e), 0.3, 0, 0, "x", fem), "fem");
+    A.cyl(0.13, 0.13, 0.14, blk, 0.48, 0, 0, "x", fem);
+    A.tag(A.cyl(0.05, 0.05, 0.9, A.mat(0x1d2326), 1.0, 0, 0, "x", fem), "cable");
+    A.tag(A.cyl(0.04, 0.04, 0.3, A.copper(), 0.25, 0, 0, "x", fem), "pin");
+    const latch = A.tag(A.box(0.16, 0.03, 0.06, A.mat(0x3a4044), 0.05, 0.12, 0, fem), "latch");
+    A.text(["MC4 · 1500V DC"], 0.4, 0.06, 0.3, 0, 0.125, { color: "#e6f2ee", scale: .6 }, fem);
+    return {
+      anim(k) { male.position.x = lerp(-0.45, 0, k); latch.rotation.z = lerp(0.3, 0, k); pin.material.emissive.setRGB(0.25 * k, 0.12 * k, 0); }
+    };
+  },
+  spots: [
+    { t: "الذكر والنتاية", b: "الذكر فيه دبّوس، والنتاية فيها جلبة. الاتنين لازم من نفس الشركة ونفس الموديل. ماركتين «متل بعض» بيتسكّروا، بس التماس بيسخن مع الوقت.", p: [0, 0, 0.16], yaw: 0, pitch: 0.2, test: { mode: "toggle", key: "male", msg: "الوصلة سكّرت: الذكر فات بالنتاية." } },
+    { t: "القفل", b: "لسانين بيقفلوا لحالهن. بتفتحهن بمفتاح MC4 بس، مش بالمفك، ومش والانفرتر شغّال.", p: [0.05, 0.14, 0.05], yaw: 0, pitch: 0.4, test: { mode: "toggle", key: "latch", msg: "القفل سكّر: الوصلة ما بتفلت بالشدّ." } },
+    { t: "جوّا: الدبّوس والكبس", b: "الكابل بينكبس بالدبّوس بكمّاشة MC4 مخصّصة. كبس بالزرّادية = مقاومة = حرارة = حريق. وبعدين الصامولة بتنشدّ لتسكّر المي.", p: [0.05, 0, 0], inner: true, yaw: 0.3, pitch: 0.2, test: { mode: "toggle", key: "pin", glass: true, msg: "الدبّوس فات بالجلبة: التماس كامل." } },
+    { t: "ما تفكّ تحت حمل", b: "الـDC ما فيه صفر متل الـAC، فالقوس ما بينطفي لحالو. طفّي الانفرتر وافتح عازل الـDC قبل ما تفكّ أي MC4.", p: [0, 0, 0.16], yaw: 0, pitch: 0, test: { mode: "on", key: "cable", msg: "أول شي عازل الـDC، بعدين الوصلة." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(60, 30, "+ PV", "lbl b", "middle", true) + S.g("s-0", S.l(60, 40, 60, 120)) +
+      `<rect x="40" y="120" width="40" height="22" rx="4" class="el"/>` + S.t(100, 136, "ذكر", "lbl s", "start") +
+      S.g("s-1", S.l(60, 142, 60, 158)) +
+      `<rect id="s-f" x="40" y="158" width="40" height="22" rx="4" class="el"/>` + S.t(100, 174, "نتاية", "lbl s", "start") +
+      S.g("s-2", S.l(60, 180, 60, 250)) + S.t(60, 268, "للانفرتر", "lbl b") +
+      S.t(320, 110, "نفس الماركة، كمّاشة مخصّصة", "lbl s") + S.t(320, 140, "وما تفكّها تحت حمل", "lbl r")
+    ),
+    blades: [],
+    update(s) { const c = s.k > .85; return { live: { "s-0": true, "s-1": c, "s-2": c }, on: { "s-f": c ? "on" : "" } }; },
+    cap(s) { return s.k > .85 ? "<b>مسكّرة:</b> التيار مارق من الذكر للنتاية." : "مفتوحة: ما في تماس."; }
+  }
+});
+
+/* ---------- 20. gPV fuse ---------- */
+P({
+  id: "gpv", cat: "الطاقة الشمسية", name: "فيوز الـgPV", dist: 4.8, fault: true,
+  intro: "فيوز DC للسترينغات (IEC 60269-6). بيلزم لما يكون في 3 سترينغات أو أكتر بالتوازي، وقيمتو بين 1.5 × Isc وأعلى فيوز مكتوب عاللوح.",
+  act: ["سكّر الحاملة", "افتح الحاملة"], st: ["الحاملة مفتوحة: السترينغ مفصول.", "<b>الحاملة مسكّرة:</b> تيار السترينغ مارق بالفيوز."],
+  build(A, R) {
+    A.din(R, 1, { noScrew: true });
+    const lid = new THREE.Group(); lid.position.set(0, -0.42, 0.62); R.add(lid);
+    A.tag(A.rbox(0.32, 0.86, 0.12, 0.03, A.mat(0x2b3940, { roughness: .5 }), 0, 0.43, 0, lid), "lid");
+    const win = A.tag(A.box(0.1, 0.06, 0.01, A.mat(0x2e9e5b, { emissive: 0x000000 }), 0, 0.72, 0.065, lid), "led");
+    A.text(["gPV"], 0.28, 0.1, 0, 0.5, 0.065, { color: "#e6f2ee" }, lid);
+    A.text(["25A", "1000V DC"], 0.28, 0.16, 0, 0.3, 0.065, { color: "#e6f2ee", scale: .55 }, lid);
+    const cart = A.tag(A.cyl(0.08, 0.08, 0.56, A.mat(0xe9e2d0, { roughness: .6 }), 0, 0.43, -0.03, "y", lid), "cart");
+    A.cyl(0.085, 0.085, 0.06, A.silver(), 0, 0.71, -0.03, "y", lid); A.cyl(0.085, 0.085, 0.06, A.silver(), 0, 0.15, -0.03, "y", lid);
+    const elem = A.tag(A.box(0.03, 0.4, 0.01, A.mat(0xc9a227, { metalness: .6, emissive: 0x000000 }), 0, 0.43, -0.03, lid), "elem");
+    A.tag(A.screw(0, 0.62, 0.33, R), "path"); A.tag(A.screw(0, -0.62, 0.33, R), "path");
+    return {
+      anim(k, F) {
+        lid.rotation.x = lerp(0.6, 0, k);
+        const blown = F.kind === "short" && F.f > .5;
+        elem.material.color.set(blown ? 0x2a1d10 : 0xc9a227); elem.scale.y = blown ? 0.35 : 1;
+        win.material.color.set(blown ? 0xd63b2f : 0x2e9e5b);
+        elem.material.emissive.setRGB(k * 0.25 * (blown ? 0 : 1), k * 0.15 * (blown ? 0 : 1), 0);
+      }
+    };
+  },
+  spots: [
+    { t: "الحاملة", b: "بتفتحها لتغيّر الخرطوشة، وهيّي فاتحة السترينغ مفصول. ما تفتحها تحت حمل: طفّي الانفرتر وافتح العازل أول.", p: [0, 0, 0.72], yaw: 0, pitch: 0.1, test: { mode: "toggle", key: "lid", msg: "الحاملة سكّرت: السترينغ صار موصول." } },
+    { t: "الكتابة gPV · 25A · 1000V DC", b: "gPV يعني مصمّم للألواح والـDC. 25A: بين 1.5 × Isc (14 × 1.5 = 21) وأعلى فيوز للّوح (25). وفولتو فوق أعلى فولت للسترينغ بالبرد.", p: [0, 0.0, 0.7], yaw: 0, pitch: 0, test: { mode: "on", key: "lid", msg: "الفيوز بين 21A و25A للوح Isc = 14A." } },
+    { t: "جوّا: الخرطوشة 10×38", b: "سلك معدني رفيع جوّا رمل. إذا رجع تيار كبير من باقي السترينغات (شورت بسترينغ)، السلك بيدوب والرمل بيطفي القوس.", p: [0, 0.0, 0.58], inner: true, yaw: 0.4, pitch: 0, test: { mode: "trip", kind: "short", key: "elem", msg: "شورت بالسترينغ: الفيوز داب وفصلو." } },
+    { t: "الشبّاك", b: "بيتغيّر لونو لما الفيوز يدوب، فبتعرف أيّا سترينغ مقطوع بلا ما تفكّ كل الحاملات.", p: [0, 0.3, 0.72], yaw: 0, pitch: 0.2, test: { mode: "trip", kind: "short", key: "led", msg: "الشبّاك صار أحمر: هالفيوز مقطوع." } }
+  ],
+  schem: {
+    svg: S.svg(
+      [70, 150, 230].map((x, i) => S.t(x, 30, "سترينغ " + (i + 1), "lbl s") + S.g("s-s" + i, S.l(x, 40, x, 80)) + `<rect id="s-fu${i}" x="${x - 10}" y="80" width="20" height="40" rx="3" class="el"/>` + S.g("s-o" + i, S.l(x, 120, x, 160))).join("") +
+      S.g("s-bus", S.l(70, 160, 230, 160) + S.l(150, 160, 150, 230)) + S.box("s-inv", 110, 230, 80, 30, "INV") +
+      S.t(380, 90, "3 سترينغات بالتوازي", "lbl s") + S.t(380, 112, "كل واحد إلو فيوز", "lbl s") + S.g("s-x", S.t(380, 160, "الفيوز 2 داب!", "lbl r hide"))
+    ),
+    blades: [],
+    update(s) { const on = s.k > .5, bl = s.F.kind === "short" && s.f > .5; return { live: { "s-s0": on, "s-s1": on, "s-s2": on, "s-o0": on, "s-o1": on && !bl, "s-o2": on, "s-bus": on }, on: { "s-fu1": bl ? "redon" : "" }, show: { "s-x": bl } }; },
+    cap(s) { return s.F.kind === "short" && s.f > .5 ? "<b>داب:</b> الفيوز فصل السترينغ يلّي فيه الشورت، والباقي كمّلوا." : s.k > .5 ? "<b>مسكّر:</b> السترينغات التلاتة مارقين بفيوزاتهن." : "مفصول."; }
+  }
+});
+
+/* ---------- 21. DC isolator ---------- */
+P({
+  id: "dciso", cat: "الطاقة الشمسية", name: "عازل الـDC", dist: 4.8,
+  intro: "قاطع DC بمسكة، قبل الانفرتر. بيفصل الألواح عن الانفرتر للصيانة. لازم يكون DC وبالفولت الصح، وفئة PV (متل DC-PV2 بـIEC 60947-3).",
+  act: ["شغّل (ON)", "افصل (OFF)"], st: ["OFF: الألواح مفصولة عن الانفرتر.", "<b>ON:</b> الألواح موصولة عالانفرتر."],
+  build(A, R) {
+    const enc = A.shell(0xd9dedc); A.rbox(0.9, 1.2, 0.5, 0.06, enc, 0, 0, 0);
+    A.box(0.5, 0.5, 0.02, A.mat(0xf2c200), 0, 0.15, 0.255);
+    const knob = new THREE.Group(); knob.position.set(0, 0.15, 0.28); R.add(knob);
+    A.tag(A.cyl(0.12, 0.12, 0.06, A.mat(0xc0392b), 0, 0, 0, "z", knob), "knob");
+    A.tag(A.box(0.42, 0.09, 0.07, A.mat(0xc0392b), 0, 0, 0.03, knob), "knob");
+    A.text(["ON"], 0.12, 0.06, 0, 0.36, 0.262, { color: "#1b2422" }); A.text(["OFF"], 0.14, 0.06, 0.3, 0.15, 0.262, { color: "#1b2422" });
+    A.text(["DC-PV2 · 1000V DC · 32A"], 0.7, 0.08, 0, -0.3, 0.255, { color: "#1b2422", scale: .55 });
+    A.tag(A.box(0.06, 0.03, 0.02, A.mat(0x6b7375), 0.21, 0.02, 0.32), "lock");
+    const contacts = [];
+    for (let i = 0; i < 4; i++) {
+      const g = new THREE.Group(); g.position.set(-0.27 + i * 0.18, -0.05, 0); R.add(g);
+      contacts.push(A.tag(A.box(0.04, 0.22, 0.04, A.copper(), 0, 0, 0, g), "cont"));
+      A.box(0.06, 0.05, 0.06, A.silver(), -0.27 + i * 0.18, 0.12, 0); A.box(0.06, 0.05, 0.06, A.silver(), -0.27 + i * 0.18, -0.22, 0);
+    }
+    [-0.25, 0.25].forEach(x => A.tag(A.cyl(0.06, 0.06, 0.12, A.mat(0x2a2f33), x, -0.66, 0, "y"), "gland"));
+    return { anim(k) { knob.rotation.z = lerp(-Math.PI / 2, 0, k); contacts.forEach(c => { c.parent.rotation.z = lerp(0.6, 0, k); c.material.emissive.setRGB(0.25 * k, 0.1 * k, 0); }); } };
+  },
+  spots: [
+    { t: "المسكة", b: "لفوق ON، عالجنب OFF. لما تفتحو، بتفصل الموجب والسالب سوا. وبعدين بتتأكّد بالقياس قبل ما تشتغل.", p: [0, 0.15, 0.34], yaw: 0, pitch: 0.1, test: { mode: "toggle", key: "knob", msg: "المسكة عالـON: الألواح وصلت عالانفرتر." } },
+    { t: "الكتابة DC-PV2", b: "يعني مصمّم يقطع DC تبع ألواح تحت حمل. الفولت (مثلاً 1000V DC) لازم فوق أعلى فولت للسترينغ بالبرد، والتيار فوق 1.25 × Isc.", p: [0, -0.3, 0.27], yaw: 0, pitch: 0, test: { mode: "on", key: "knob", msg: "قاطع AC «كبير» ما بيقطع DC بأمان. الكتابة هيي يلّي بتقرّر." } },
+    { t: "قفل الصيانة", b: "فتحة لقفل صغير وهوّي عالـOFF، لحتى ما حدا يرجّعو وانت شغّال (Lockout).", p: [0.21, 0.02, 0.33], yaw: 0, pitch: 0, test: { mode: "on", key: "lock", msg: "OFF وقفل: ما حدا بيقدر يرجّعو." } },
+    { t: "جوّا: الكونتاكتات", b: "كذا قطب بالتسلسل لكل خط، لحتى يكبر مسافة القطع ويطفي القوس. التوصيلة حسب المخطط تبع الشركة.", p: [0, -0.05, 0.05], inner: true, yaw: 0.4, pitch: 0, test: { mode: "toggle", key: "cont", glass: true, msg: "الكونتاكتات سكّرت مع بعض." } },
+    { t: "الغلاندات", b: "الكابلات بتفوت من تحت بغلاند بيسكّر عالكابل، والعلبة IP65 عالأقل وبالضلّ.", p: [0, -0.66, 0.1], yaw: 0, pitch: -0.3, test: { mode: "on", key: "gland", msg: "الكابل من تحت، والغلاند مسكّر ضدّ المي." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(90, 26, "PV +", "lbl b", "middle", true) + S.t(190, 26, "PV −", "lbl b", "middle", true) +
+      S.g("s-in", S.l(90, 34, 90, 90) + S.l(190, 34, 190, 90)) + S.blade("bl0", 90, 90) + S.blade("bl1", 190, 90) +
+      `<line x1="80" y1="100" x2="200" y2="100" class="mech"/>` +
+      S.g("s-out", S.l(90, 110, 90, 200) + S.l(190, 110, 190, 200)) + S.box("s-inv", 70, 200, 140, 40, "INVERTER") +
+      S.t(370, 110, "بيفصل الخطّين سوا", "lbl s") + S.t(370, 132, "DC وبالفولت الصح", "lbl s")
+    ),
+    blades: [["bl0", "k"], ["bl1", "k"]],
+    update(s) { const c = s.k > .85; return { live: { "s-in": true, "s-out": c }, on: { "s-inv": c ? "on" : "" } }; },
+    cap(s) { return s.k > .85 ? "<b>ON:</b> الألواح موصولة عالانفرتر." : "<b>OFF:</b> الانفرتر مفصول عن الألواح، بس الألواح لسّا عليها فولت."; }
+  }
+});
+
+/* ---------- 22. DC SPD ---------- */
+P({
+  id: "dcspd", cat: "الطاقة الشمسية", name: "الـSPD", dist: 5.0, fault: true,
+  intro: "بيحمي من ذروات الفولت (صاعقة قريبة أو تشغيل أحمال). بالعادي ما بيعمل شي، وإذا طلع الفولت فجأة بيفرّغ الزيادة عالأرض.",
+  act: ["ضربة فولت", "هدي"], st: ["عادي: الـSPD ما عم يمرّق شي.", "<b>ضربة:</b> الـSPD فرّغ الزيادة عالأرض."],
+  build(A, R) {
+    A.din(R, 3, { noScrew: true });
+    const carts = [], wins = [];
+    for (let i = 0; i < 3; i++) {
+      const x = -0.36 + i * 0.36;
+      carts.push(A.tag(A.rbox(0.32, 0.7, 0.2, 0.03, A.mat(i === 2 ? 0x2b6cb0 : 0x3a4448), x, 0.02, 0.66), "cart"));
+      wins.push(A.tag(A.box(0.12, 0.08, 0.01, A.mat(0x2e9e5b), x, 0.28, 0.765), "win"));
+      A.text([i === 0 ? "+" : i === 1 ? "−" : "PE"], 0.2, 0.1, x, -0.18, 0.765, { color: "#e6f2ee" });
+      A.tag(A.screw(x, 0.62, 0.33, R), "path"); A.tag(A.screw(x, -0.62, 0.33, R), "pe");
+    }
+    A.text(["Ucpv 1000V DC · Type 2"], 1.0, 0.08, 0, 0.47, 0.585, { color: "#1b2422", scale: .55 });
+    const arc = A.tag(A.box(0.02, 1.1, 0.02, A.mat(0xffd54a, { emissive: 0x000000 }), 0.55, 0, 0.75), "pe");
+    return {
+      anim(k, F) {
+        arc.material.emissive.setRGB(0.9 * k, 0.7 * k, 0); arc.visible = k > 0.05;
+        const eol = F.kind === "eol" && F.f > .5; wins.forEach(w => w.material.color.set(eol ? 0xd63b2f : 0x2e9e5b));
+      }
+    };
+  },
+  spots: [
+    { t: "الخراطيش", b: "جوّا كل وحدة فاريستور (MOV): بالفولت العادي عازل، وبالذروة بيصير موصّل وبيفرّغ عالأرض. الخرطوشة بتتغيّر لحالها.", p: [-0.18, 0.02, 0.78], yaw: 0, pitch: 0.1, test: { mode: "toggle", key: "cart", msg: "ذروة! الخراطيش وصّلت وفرّغت الزيادة." } },
+    { t: "الشبّاك", b: "أخضر: شغّال. أحمر: الخرطوشة خلصت ولازم تتغيّر. افحصو بعد كل عاصفة.", p: [0, 0.28, 0.78], yaw: 0, pitch: 0.2, test: { mode: "trip", kind: "eol", key: "win", msg: "الشبّاك صار أحمر: بدّل الخرطوشة." } },
+    { t: "طرف الأرض PE", b: "شريط أرض قصير ومستقيم للبسبار. كل سنتيم زيادة بيعلّي الفولت يلّي بيوصل للانفرتر.", p: [0.36, -0.62, 0.4], yaw: 0, pitch: -0.2, test: { mode: "toggle", key: "pe", msg: "الزيادة نزلت عالأرض بشريط قصير." } },
+    { t: "Ucpv · Type 2", b: "Ucpv هوّي أعلى فولت DC شغّال، لازم فوق أعلى Voc للسترينغ بالبرد. Type 2 للحماية العادية، وType 1 إذا البناية عليها مانعة صواعق.", p: [0, 0.47, 0.6], yaw: 0, pitch: 0.2, test: { mode: "on", key: "cart", msg: "DC SPD لازم DC، والفولت فوق أعلى فولت للسترينغ." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(90, 26, "+", "lbl b", "middle", true) + S.t(190, 26, "−", "lbl b", "middle", true) +
+      S.g("s-l", S.l(90, 34, 90, 250) + S.l(190, 34, 190, 250)) + S.t(140, 268, "للانفرتر", "lbl s") +
+      S.g("s-t", S.l(90, 120, 130, 120) + S.l(190, 120, 150, 120) + S.l(140, 150, 140, 200)) +
+      `<rect id="s-v" x="125" y="110" width="30" height="40" rx="3" class="el"/>` +
+      S.p("M120,200 h40 M126,208 h28 M132,216 h16", "w") + S.t(260, 140, "SPD عالأرض", "lbl s", "start") +
+      S.g("s-x", S.t(360, 70, "ذروة: تفريغ عالأرض", "lbl r hide"))
+    ),
+    blades: [],
+    update(s) { const on = s.k > .5; return { live: { "s-l": true, "s-t": on }, on: { "s-v": s.F.kind === "eol" && s.f > .5 ? "redon" : on ? "on" : "" }, show: { "s-x": on } }; },
+    cap(s) { return s.F.kind === "eol" && s.f > .5 ? "<b>خلص:</b> الخرطوشة لازم تتغيّر." : s.k > .5 ? "<b>ذروة:</b> الـSPD وصّل وفرّغ الزيادة عالأرض." : "عادي: الـSPD عازل وما عم يعمل شي."; }
+  }
+});
+
+/* ---------- 23. LiFePO4 battery ---------- */
+P({
+  id: "lfp", cat: "الطاقة الشمسية", name: "بطارية الليثيوم", dist: 5.2,
+  intro: "مودول LiFePO4: 16 خلية × 3.2V = 51.2V. فيه BMS بيحمي كل خلية، ومنافذ اتصال CAN وRS485 للانفرتر، وDIP للعنوان.",
+  act: ["شغّل البطارية", "طفّي البطارية"], st: ["طافية: الـBMS فاصل والأطراف بلا فولت.", "<b>شغّالة:</b> الـBMS وصّل، والبطارية عم تحكي مع الانفرتر."],
+  build(A, R) {
+    const shell = A.shell(0xe9ecea); A.rbox(1.5, 0.5, 1.0, 0.04, shell, 0, 0, 0);
+    A.box(1.52, 0.5, 0.02, A.mat(0x2b3940), 0, 0, 0.51);
+    const leds = [];
+    for (let i = 0; i < 4; i++) leds.push(A.tag(A.box(0.06, 0.03, 0.01, A.mat(0x334044, { emissive: 0x000000 }), -0.2 + i * 0.09, 0.12, 0.525), "soc"));
+    const sw = A.tag(A.box(0.12, 0.08, 0.04, A.mat(0x1d2326), -0.55, 0.12, 0.54), "power");
+    A.tag(A.box(0.1, 0.07, 0.02, A.mat(0x9aa5a8), 0.28, 0.1, 0.53), "ports"); A.tag(A.box(0.1, 0.07, 0.02, A.mat(0x9aa5a8), 0.42, 0.1, 0.53), "ports");
+    A.text(["CAN", "RS485"], 0.26, 0.05, 0.35, 0.02, 0.525, { color: "#e6f2ee", split: true, scale: .6 });
+    A.tag(A.box(0.14, 0.05, 0.02, A.mat(0x2b6cb0), 0.6, 0.12, 0.53), "dip"); A.text(["ADD"], 0.12, 0.04, 0.6, 0.06, 0.525, { color: "#e6f2ee" });
+    const tp = A.tag(A.box(0.08, 0.1, 0.06, A.mat(0xc0392b), -0.6, -0.12, 0.54), "term"), tn = A.tag(A.box(0.08, 0.1, 0.06, A.mat(0x1d2326), -0.4, -0.12, 0.54), "term");
+    A.text(["51.2V 100Ah · 5.12kWh"], 0.7, 0.06, 0.25, -0.14, 0.525, { color: "#e6f2ee", scale: .6 });
+    const cells = [];
+    for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) cells.push(A.tag(A.box(0.16, 0.34, 0.4, A.mat(0x5b6fa8, { emissive: 0x000000 }), -0.62 + i * 0.175, -0.02, -0.22 + j * 0.42), "cells"));
+    const bms = A.tag(A.box(0.6, 0.04, 0.3, A.mat(0x1f6b45, { emissive: 0x000000 }), 0.2, 0.2, 0.25), "bms");
+    return {
+      anim(k) {
+        leds.forEach((l, i) => l.material.emissive.setRGB(i < 3 ? 0.1 * k : 0, i < 3 ? 0.8 * k : 0, i < 3 ? 0.4 * k : 0));
+        sw.position.z = 0.54 - 0.015 * k; bms.material.emissive.setRGB(0, 0.25 * k, 0.12 * k);
+        cells.forEach(c => c.material.emissive.setRGB(0.02 * k, 0.04 * k, 0.12 * k));
+        tp.material.emissive.setRGB(0.4 * k, 0, 0);
+      }
+    };
+  },
+  spots: [
+    { t: "زرّ التشغيل", b: "بيشغّل الـBMS. شغّل البطارية أول، بعدين الانفرتر، وبالإطفاء العكس. هيك الاتصال بيقعد صح.", p: [-0.55, 0.12, 0.58], yaw: 0, pitch: 0.1, test: { mode: "toggle", key: "power", msg: "البطارية اشتغلت: الـBMS وصّل الخلايا عالأطراف." } },
+    { t: "لمبات SOC", b: "كل لمبة حوالي ربع. 3 من 4 يعني حوالي 75%. والرقم الدقيق بالتطبيق إذا في اتصال.", p: [-0.07, 0.12, 0.55], yaw: 0, pitch: 0.1, test: { mode: "toggle", key: "soc", msg: "3 لمبات: حوالي 75%." } },
+    { t: "منافذ CAN وRS485", b: "كابل للانفرتر، وكابل للمودول يلّي بعدو. البروتوكول بالانفرتر لازم يطابق، والـPinout تبع الكابل كمان.", p: [0.35, 0.1, 0.55], yaw: 0, pitch: 0.1, test: { mode: "toggle", key: "ports", msg: "الاتصال قعد: الانفرتر عم يقرا SOC والتيار المسموح." } },
+    { t: "DIP العنوان", b: "كل مودول إلو عنوان. الـMaster (غالباً 1) بيحكي مع الانفرتر، والباقي 2 و3... عنوانين متل بعض = الانفرتر بيشوف مودول واحد.", p: [0.6, 0.12, 0.55], yaw: 0, pitch: 0.1, test: { mode: "on", key: "dip", msg: "العنوان مضبوط: Master = 1." } },
+    { t: "الأطراف + و−", b: "كابلات قصيرة وتقيلة، وبراغي مشدودة عالعزم المكتوب. وقاطع أو فيوز DC قريب، لأنّو الشورت بيعطي آلاف الأمبيرات.", p: [-0.5, -0.12, 0.58], yaw: 0, pitch: -0.1, test: { mode: "toggle", key: "term", msg: "الأطراف عليها 51.2V." } },
+    { t: "جوّا: 16 خلية", b: "16 خلية 3.2V بالتسلسل = 51.2V. شحن الخلية الكاملة حوالي 3.5V، وما لازم تنزل تحت حوالي 2.5–2.8V (حسب الداتاشيت).", p: [-0.3, -0.02, 0.1], inner: true, yaw: 0.5, pitch: 0.3, test: { mode: "toggle", key: "cells", glass: true, msg: "الخلايا التلاطعش عالتسلسل." } },
+    { t: "جوّا: الـBMS", b: "بيقيس كل خلية، والتيار، والحرارة، وبيوازن الخلايا. إذا في خطر، بيفصل البطارية من جوّا.", p: [0.2, 0.2, 0.3], inner: true, yaw: -0.4, pitch: 0.5, test: { mode: "toggle", key: "bms", glass: true, msg: "الـBMS عم يراقب كل خلية." } }
+  ],
+  schem: {
+    svg: S.svg(
+      [0, 1, 2, 3].map(i => `<rect x="${40 + i * 50}" y="60" width="40" height="30" rx="3" class="el"/>`).join("") + S.t(140, 50, "16 خلية × 3.2V", "lbl s") +
+      S.g("s-c", S.l(80, 75, 90, 75) + S.l(130, 75, 140, 75) + S.l(180, 75, 190, 75) + S.l(240, 75, 270, 75)) +
+      S.blade("bl0", 270, 75) + S.box("s-bms", 250, 110, 60, 28, "BMS") +
+      S.g("s-o", S.l(270, 95, 270, 108) + S.l(310, 124, 380, 124) + S.l(380, 124, 380, 200)) + S.box("s-inv", 340, 200, 80, 30, "INV") +
+      S.g("s-com", S.p("M250,138 C200,190 260,240 340,215", "w")) + S.t(220, 230, "CAN / RS485", "lbl s", "middle", true)
+    ),
+    blades: [["bl0", "k"]],
+    update(s) { const on = s.k > .85; return { live: { "s-c": true, "s-o": on, "s-com": on }, on: { "s-bms": on ? "on" : "", "s-inv": on ? "on" : "" } }; },
+    cap(s) { return s.k > .85 ? "<b>شغّالة:</b> الـBMS وصّل، والانفرتر عم يقرا الشحن بالاتصال." : "طافية: الـBMS فاتح، والأطراف بلا فولت."; }
+  }
+});
+
+/* ---------- 24. Hybrid inverter ---------- */
+P({
+  id: "hybrid", cat: "الطاقة الشمسية", name: "الانفرتر الهايبرد", dist: 5.4,
+  intro: "بيدير الألواح والبطارية والدولة والمولّد. جوّاتو MPPT للألواح، وشاحن للبطارية، وعاكس DC→AC، وريليه تحويل متل الـATS.",
+  act: ["قطعت الدولة", "رجعت الدولة"], st: ["الدولة موجودة: الريليه مسكّر، والأحمال عالدولة والشمس.", "<b>الدولة قطعت:</b> الريليه فتح، والأحمال عالشمس والبطارية."],
+  build(A, R) {
+    const body = A.shell(0xf2f4f3); A.rbox(1.1, 1.5, 0.4, 0.06, body, 0, 0.05, 0);
+    A.box(0.5, 0.3, 0.01, A.mat(0x0e1a17), 0, 0.4, 0.205);
+    const scr = A.tag(A.text(["PV 3.1kW", "BAT 78%"], 0.44, 0.24, 0, 0.4, 0.212, { color: "#22c79b", bg: "#0e1a17", scale: .6 }), "screen");
+    const names = ["PV1", "PV2", "BAT", "GRID", "LOAD", "GEN"];
+    names.forEach((n, i) => {
+      const x = -0.45 + i * 0.18;
+      A.tag(A.cyl(0.045, 0.045, 0.08, A.mat(i < 2 ? 0xe67e22 : i === 2 ? 0x8e44ad : i === 3 ? 0x2b6cb0 : i === 4 ? 0x0f8a66 : 0xb9770e), x, -0.72, 0.05, "y"), n.toLowerCase());
+      A.text([n], 0.16, 0.05, x, -0.6, 0.205, { color: "#1b2422", scale: .7 });
+    });
+    for (let i = 0; i < 6; i++) A.box(0.6, 0.015, 0.02, A.mat(0x9aa5a8), 0, -0.1 - i * 0.05, 0.205);
+    const relay = new THREE.Group(); relay.position.set(0.25, 0.0, 0.05); R.add(relay);
+    A.tag(A.box(0.16, 0.12, 0.1, A.mat(0x2b6cb0), 0, 0, 0, relay), "relay");
+    const arm = A.tag(A.box(0.02, 0.12, 0.02, A.copper(), 0.0, -0.1, 0.06, relay), "relay");
+    A.tag(A.box(0.3, 0.16, 0.2, A.mat(0x1f6b45, { emissive: 0x000000 }), -0.25, 0.05, 0.0), "mppt");
+    A.tag(A.cyl(0.06, 0.06, 0.18, A.mat(0x5d6568), -0.25, -0.2, 0, "y"), "mppt");
+    const fan = A.tag(A.cyl(0.12, 0.12, 0.04, A.mat(0x2a2f33), 0, 0.72, -0.05, "y"), "fan");
+    return {
+      anim(k, F, t) {
+        arm.rotation.z = lerp(0, 0.6, k);
+        A.ambient(1);
+        fan.rotation.y = (t || 0) / 200;
+      }
+    };
+  },
+  spots: [
+    { t: "الشاشة والتطبيق", b: "بتفرجيك الإنتاج والبطارية والأحمال والدولة. والإعدادات منها أو من التطبيق عبر Wi-Fi: نوع البطارية، الأولويات، والتيارات.", p: [0, 0.4, 0.24], yaw: 0, pitch: 0.1, test: { mode: "on", key: "screen", msg: "PV 3.1kW والبطارية 78%." } },
+    { t: "PV1 · PV2", b: "مدخلين MPPT. كل واحد إلو أعلى فولت وأعلى تيار ومجال MPPT بالداتاشيت. ما تتعدّى أعلى فولت ولا بيوم برد.", p: [-0.36, -0.72, 0.1], yaw: 0, pitch: -0.3, test: { mode: "on", key: "mppt", glass: true, msg: "الـMPPT عم يلحق أعلى قدرة من الألواح." } },
+    { t: "BAT", b: "البطارية، بالاتجاهين: شحن وتفريغ. كابل تقيل وقصير، وقاطع DC قريب من البطارية.", p: [-0.09, -0.72, 0.1], yaw: 0, pitch: -0.3, test: { mode: "toggle", key: "bat", msg: "الدولة قطعت: البطارية صارت تغذّي." } },
+    { t: "GRID · LOAD · GEN", b: "الدولة فايتة على GRID، الأحمال طالعة من LOAD، والمولّد على GEN إذا في. إذا الانفرتر إلو مدخل AC واحد، الدولة والمولّد على ATS قبلو.", p: [0.27, -0.72, 0.1], yaw: 0, pitch: -0.3, test: { mode: "toggle", key: "grid", msg: "الدولة قطعت: GRID فاضي، وLOAD لسّا شغّال." } },
+    { t: "جوّا: ريليه التحويل", b: "متل الـATS بالكلاسيك: ما بيخلّي الدولة والعاكس يلتقوا عالأحمال، وبيحوّل بأجزاء من الثانية لما الدولة تقطع.", p: [0.25, 0, 0.12], inner: true, yaw: -0.4, pitch: 0.1, test: { mode: "toggle", key: "relay", glass: true, msg: "الريليه فتح عن الدولة، والعاكس مسك الأحمال." } },
+    { t: "المروحة", b: "الانفرتر بيسخن. خلّي فوقو وتحتو فاضي، ونضّف الغبرة، وبعيد عن الشمس.", p: [0, 0.72, 0.05], yaw: 0, pitch: 0.4, test: { mode: "on", key: "fan", msg: "المروحة عم تسحب الحرارة لبرّا." } }
+  ],
+  schem: {
+    svg: S.svg(
+      S.t(60, 26, "الدولة", "lbl b") + S.g("s-g", S.l(60, 34, 60, 80)) + S.blade("bl0", 60, 80) + S.t(80, 96, "ريليه", "lbl s", "end") +
+      S.g("s-gl", S.l(60, 100, 60, 150) + S.l(60, 150, 200, 150)) +
+      S.box("s-inv", 200, 130, 100, 40, "DC → AC") + S.t(250, 118, "العاكس", "lbl s") +
+      S.t(250, 26, "ألواح + بطارية", "lbl b") + S.g("s-dc", S.l(250, 34, 250, 130)) +
+      S.g("s-ld", S.l(300, 150, 400, 150) + S.l(400, 150, 400, 200)) + S.lamp("s-lamp", 400, 213) + S.t(400, 250, "الأحمال", "lbl s") +
+      S.g("s-x", S.t(140, 240, "الدولة قطعت!", "lbl r hide"))
+    ),
+    blades: [["bl0", "nk"]],
+    update(s) { const cut = s.k > .5; return { live: { "s-g": !cut, "s-gl": !cut, "s-dc": true, "s-ld": true }, on: { "s-inv": "on", "s-lamp": "lampon" }, show: { "s-x": cut } }; },
+    cap(s) { return s.k > .5 ? "<b>الدولة قطعت:</b> الريليه فتح، والعاكس عم يغذّي الأحمال من الشمس والبطارية بلا ما تحسّ." : "<b>الدولة موجودة:</b> الريليه مسكّر، والأحمال ماشية."; }
   }
 });
 
