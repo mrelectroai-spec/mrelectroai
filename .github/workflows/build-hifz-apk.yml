@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 concurrency:
   group: hifz-apk
@@ -99,6 +100,16 @@ jobs:
         run: |
           gh release delete hifz-latest -y --cleanup-tag || true
           gh release create hifz-latest RafiqAlHifz.apk --title "رفيق الحفظ (APK)" --notes "نسخة رقم 1.${{ github.run_number }}. نزّلي الملف وثبّتيه. التحديث بينزل فوق القديم بلا ما يضيع الحفظ." --latest=false
+
+      - name: 8b. Put APK on the site + redeploy Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git pull --rebase origin main
+          cp RafiqAlHifz.apk hifz/RafiqAlHifz.apk
+          git add hifz/RafiqAlHifz.apk
+          git commit -m "hifz: update APK 1.${{ github.run_number }}" && git push || echo "no change"
+          gh api -X POST repos/${{ github.repository }}/pages/builds || echo "pages rebuild request failed"
 
       - name: 9. Upload artifact
         uses: actions/upload-artifact@v4
