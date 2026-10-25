@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#070F0D">
-<title>نتائج الطلاب · MrElectroAI</title>
+<title>لوحة أنور · MrElectroAI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
@@ -49,6 +49,20 @@ input:focus{outline:2px solid var(--volt);outline-offset:1px}
 .tag.e{color:#E8A33D;border-color:rgba(232,163,61,.4)}.tag.c{color:var(--volt);border-color:rgba(34,199,155,.4)}
 .tag.done{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
 .tag.new{background:var(--warn);color:#1b1103;border-color:var(--warn)}
+.chip.big{padding:9px 20px;font-size:15.5px}
+.tabs{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px}
+select,textarea{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:12px;font:inherit}
+textarea{min-height:240px;line-height:1.7}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.pub{background:var(--panel-2);border:1px dashed var(--line);border-radius:14px;padding:12px 14px;font-size:14.5px;color:var(--muted);margin-bottom:14px}
+.pub b{color:var(--text)}
+.sale{display:grid;grid-template-columns:1fr auto;gap:2px 10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.sale .pr{font:700 18px 'Readex Pro',sans-serif;color:var(--volt);direction:ltr}
+.sale .mt{font-size:13.5px;color:var(--muted)}
+.del{background:none;border:0;color:var(--fault);font:inherit;font-size:13px;cursor:pointer;padding:0}
+.book{margin-bottom:12px}.book h2{font-size:19px;margin-bottom:4px}
+.book .sum{white-space:pre-wrap;font-size:14.5px;line-height:1.8;margin-top:10px;color:var(--text)}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}}
 .empty{text-align:center;color:var(--muted);padding:40px 10px}
 .dlg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-start;justify-content:center;padding:20px 12px;overflow:auto;z-index:9}
 .dlg.on{display:flex}
@@ -147,19 +161,21 @@ h3{font-size:16px;margin:16px 0 8px}
     if (Date.now() > T.exp - 60000) await auth({ refresh_token: T.rt }, 'refresh_token');
     return T.at;
   }
-  async function api(path) {
+  async function api(path, opts) {
     const at = await token();
-    const r = await fetch(`${SB_URL}/rest/v1/${path}`, { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + at } });
+    const o = Object.assign({}, opts || {});
+    o.headers = Object.assign({ apikey: SB_KEY, Authorization: 'Bearer ' + at, 'Content-Type': 'application/json' }, o.headers || {});
+    const r = await fetch(`${SB_URL}/rest/v1/${path}`, o);
     if (r.status === 401) { T = null; ls.set(TK, null); throw new Error('nologin'); }
     if (!r.ok) throw new Error(await r.text());
-    return r.json();
+    const tx = await r.text(); return tx ? JSON.parse(tx) : null;
   }
   function logout() { T = null; ls.set(TK, null); loginView(); }
 
   function loginView(msg) {
     $app.innerHTML = `<div class="card login">
-      <h1>نتائج الطلاب</h1>
-      <p style="color:var(--muted);font-size:14.5px">لأنور بس. فوت بالإيميل وكلمة السر يلي عملتهن بـSupabase.</p>
+      <h1>لوحة أنور</h1>
+      <p style="color:var(--muted);font-size:14.5px">لأنور بس: الطلاب، المبيعات، والكتب.</p>
       <form id="lf">
         <label for="em">الإيميل</label><input id="em" type="email" autocomplete="username" dir="ltr" required>
         <label for="pw">كلمة السر</label><input id="pw" type="password" autocomplete="current-password" dir="ltr" required>
@@ -176,13 +192,19 @@ h3{font-size:16px;margin:16px 0 8px}
   }
 
   // ---------- data ----------
-  let ROWS = [], STU = [], F = { course: 'all', state: 'all', q: '' }, seenAt = ls.get(SEEN) || 0, prevSeen = seenAt;
+  let ROWS = [], STU = [], BOOKS = [], SALES = [], PUB = null, TAB = 'students', F = { course: 'all', state: 'all', q: '' }, seenAt = ls.get(SEEN) || 0, prevSeen = seenAt;
   async function load(auto) {
     if (!auto) $app.innerHTML = '<div class="empty">عم نجيب النتائج…</div>';
-    try { ROWS = await api('course_results?select=*&order=created_at.desc&limit=20000'); }
+    try {
+      [ROWS, BOOKS, SALES, PUB] = await Promise.all([
+        api('course_results?select=*&order=created_at.desc&limit=20000'),
+        api('books?select=*&order=sort'),
+        api('book_sales?select=*&order=sold_at.desc&limit=5000'),
+        api('rpc/site_stats', { method: 'POST', body: '{}' }).catch(() => null)]);
+    }
     catch (x) {
       if (x.message === 'nologin') return loginView('خلصت الجلسة، فوت من جديد.');
-      $app.innerHTML = `<div class="card"><h2>ما قدرنا نجيب النتائج</h2><p style="color:var(--muted);margin:8px 0 14px">إذا هيدي أول مرة، تأكّد إنك شغّلت كود الـSQL بـSupabase، وإنو الإيميل يلي فوّت فيه هوي نفسو يلي بالكود.</p><pre dir="ltr" style="white-space:pre-wrap;font-size:12px;color:var(--muted)">${esc(x.message).slice(0, 400)}</pre><div class="acts"><button class="btn" id="rt">جرّب مرة تانية</button><button class="btn ghost" id="lo">اطلع</button></div></div>`;
+      $app.innerHTML = `<div class="card"><h2>ما قدرنا نجيب النتائج</h2><p style="color:var(--muted);margin:8px 0 14px">تأكّد إنك متصل بالإنترنت. وإذا ضلّت هيك، ابعت هالرسالة لكلود.</p><pre dir="ltr" style="white-space:pre-wrap;font-size:12px;color:var(--muted)">${esc(x.message).slice(0, 400)}</pre><div class="acts"><button class="btn" id="rt">جرّب مرة تانية</button><button class="btn ghost" id="lo">اطلع</button></div></div>`;
       document.getElementById('rt').onclick = load; document.getElementById('lo').onclick = logout; return;
     }
     const m = new Map();
@@ -199,12 +221,25 @@ h3{font-size:16px;margin:16px 0 8px}
       && (!q || String(r.name).toLowerCase().includes(q) || (qd.length >= 3 && String(r.phone).replace(/\D/g, '').includes(qd))));
   }
 
+  function head() {
+    return `<div class="top"><h1>لوحة <b>أنور</b></h1>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="ib" id="rf">↻ حدّث</button><button class="ib" id="th">ليلي/نهاري</button><button class="ib" id="pwb">كلمة السر</button><button class="ib" id="lo">اطلع</button></div></div>
+      <div class="bar tabs" id="tabs">${[['students', 'الطلاب'], ['sales', 'المبيعات'], ['books', 'الكتب']].map(([k, l]) => `<button class="chip big ${TAB === k ? 'on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>`;
+  }
+  function wireHead() {
+    document.getElementById('rf').onclick = () => load();
+    document.getElementById('lo').onclick = logout;
+    document.getElementById('pwb').onclick = pwDialog;
+    document.getElementById('th').onclick = () => { const n = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = n; try { localStorage.setItem('mea_theme', n); } catch (e) {} };
+    document.getElementById('tabs').onclick = (e) => { const b = e.target.closest('.chip'); if (b) { TAB = b.dataset.t; board(); } };
+  }
   function board() {
+    if (TAB === 'sales') return salesView();
+    if (TAB === 'books') return booksView();
     const fin = (c) => STU.filter((s) => s.last.course === c && s.last.finished_at).length;
     const today = STU.filter((s) => Date.now() - new Date(s.last.created_at) < 864e5).length;
-    $app.innerHTML = `
-      <div class="top"><h1>نتائج <b>الطلاب</b></h1>
-        <div style="display:flex;gap:6px"><button class="ib" id="rf">↻ حدّث</button><button class="ib" id="csv">Excel</button><button class="ib" id="th">ليلي/نهاري</button><button class="ib" id="lo">اطلع</button></div></div>
+    $app.innerHTML = head() + `
+      <div class="bar" style="justify-content:flex-end"><button class="ib" id="csv">نزّل Excel</button></div>
       <div class="stats">
         <div class="stat"><b>${STU.length}</b><span>طالب بلّش</span></div>
         <div class="stat"><b>${fin('electro')}</b><span>خلّصوا الكهرباء</span></div>
@@ -218,10 +253,8 @@ h3{font-size:16px;margin:16px 0 8px}
       </div>
       <div class="bar"><input class="search" id="q" type="search" placeholder="فتّش بالاسم أو الرقم" value="${esc(F.q)}"></div>
       <div class="list" id="ls"></div>`;
-    document.getElementById('rf').onclick = () => load();
-    document.getElementById('lo').onclick = logout;
+    wireHead();
     document.getElementById('csv').onclick = csv;
-    document.getElementById('th').onclick = () => { const n = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = n; try { localStorage.setItem('mea_theme', n); } catch (e) {} };
     document.getElementById('fc').onclick = (e) => { const b = e.target.closest('.chip'); if (!b) return; if (b.dataset.c) F.course = b.dataset.c; if (b.dataset.s) F.state = b.dataset.s; board(); };
     const q = document.getElementById('q');
     q.oninput = () => { F.q = q.value; list(); };
@@ -242,6 +275,118 @@ h3{font-size:16px;margin:16px 0 8px}
       </button>`;
     }).join('');
     el.onclick = (e) => { const b = e.target.closest('.row'); if (b) detail(STU[+b.dataset.i]); };
+  }
+
+  // ---------- المبيعات ----------
+  const money = (n) => (Math.round(Number(n) * 100) / 100).toLocaleString('en-US') + '$';
+  const bookById = (id) => BOOKS.find((b) => b.id === id) || { title: id, price: 0 };
+  function salesView() {
+    const now = new Date(), mStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const sum = (L) => L.reduce((a, x) => a + Number(x.price), 0);
+    const month = SALES.filter((x) => new Date(x.sold_at) >= mStart);
+    const per = BOOKS.map((b) => { const L = SALES.filter((x) => x.book_id === b.id); return { b, n: L.length, t: sum(L) }; });
+    const today = now.toISOString().slice(0, 10);
+    $app.innerHTML = head() + `
+      <div class="stats">
+        <div class="stat"><b>${SALES.length}</b><span>بيعة</span></div>
+        <div class="stat"><b>${money(sum(SALES))}</b><span>المدخول كلّو</span></div>
+        <div class="stat"><b>${month.length}</b><span>بيعة هالشهر</span></div>
+        <div class="stat"><b>${money(sum(month))}</b><span>مدخول هالشهر</span></div>
+      </div>
+      ${PUB ? `<div class="pub">العالم بيشوف عالموقع (بلا أسعار): <b>${PUB.books_sold}</b> كتاب انباع · <b>${PUB.sample_reads}</b> قراية للعيّنة · <b>${PUB.students}</b> طالب بالكورسات · <b>${PUB.finished}</b> خلّصوا</div>` : ''}
+      <div class="card" style="margin-bottom:14px">
+        <h3 style="margin-top:0">سجّل بيعة</h3>
+        <form id="sf">
+          <div class="grid2">
+            <div><label for="sb">الكتاب</label><select id="sb">${BOOKS.map((b) => `<option value="${esc(b.id)}" ${b.id === 'classic' ? 'selected' : ''}>${esc(b.title)}</option>`).join('')}</select></div>
+            <div><label for="sp">السعر ($)</label><input id="sp" type="number" min="0" step="0.5" dir="ltr" required value="${esc(bookById('classic').price)}"></div>
+            <div><label for="sn">الزبون (اختياري)</label><input id="sn" type="text" maxlength="120" placeholder="الاسم أو الرقم"></div>
+            <div><label for="sd">التاريخ</label><input id="sd" type="date" dir="ltr" value="${today}" max="${today}"></div>
+          </div>
+          <label for="sx">ملاحظة (اختياري)</label><input id="sx" type="text" maxlength="500" placeholder="مثلاً: دفع بـOMT">
+          <div class="err" id="se"></div>
+          <button class="btn" style="width:100%" type="submit">سجّل</button>
+        </form>
+      </div>
+      <h3>حسب الكتاب</h3>
+      <div class="list" style="margin-bottom:14px">${per.map((x) => `<div class="sale"><div><b>${esc(x.b.title)}</b><div class="mt">${x.n} بيعة</div></div><div class="pr">${money(x.t)}</div></div>`).join('')}</div>
+      <h3>كل البيعات</h3>
+      <div class="list" id="sl">${SALES.length ? SALES.map((x) => `<div class="sale"><div><b>${esc(bookById(x.book_id).title)}</b><div class="mt">${fmtDate(x.sold_at)}${x.buyer ? ' · ' + esc(x.buyer) : ''}${x.note ? ' · ' + esc(x.note) : ''}</div></div>
+        <div style="text-align:end"><div class="pr">${money(x.price)}</div><button class="del" data-id="${x.id}">امحي</button></div></div>`).join('') : '<div class="empty">بعد ما سجّلت ولا بيعة.</div>'}</div>`;
+    wireHead();
+    const sb = document.getElementById('sb'), sp = document.getElementById('sp');
+    sb.onchange = () => { sp.value = bookById(sb.value).price; };
+    document.getElementById('sf').onsubmit = async (e) => {
+      e.preventDefault();
+      const b = e.target.querySelector('button'), er = document.getElementById('se');
+      const d = document.getElementById('sd').value, isToday = d === today;
+      const row = { book_id: sb.value, price: Number(sp.value), buyer: document.getElementById('sn').value.trim() || null, note: document.getElementById('sx').value.trim() || null };
+      if (!isToday && d) row.sold_at = new Date(d + 'T12:00:00').toISOString();
+      b.disabled = true; b.textContent = 'عم نسجّل…'; er.textContent = '';
+      try { await api('book_sales', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(row) }); await load(true); }
+      catch (x) { er.textContent = 'ما زبط التسجيل، جرّب مرة تانية.'; b.disabled = false; b.textContent = 'سجّل'; }
+    };
+    document.getElementById('sl').onclick = async (e) => {
+      const b = e.target.closest('.del'); if (!b) return;
+      if (!confirm('أكيد بدّك تمحي هالبيعة؟')) return;
+      try { await api('book_sales?id=eq.' + encodeURIComponent(b.dataset.id), { method: 'DELETE', headers: { Prefer: 'return=minimal' } }); await load(true); }
+      catch (x) { alert('ما زبط المحي.'); }
+    };
+  }
+
+  // ---------- الكتب ----------
+  function booksView() {
+    $app.innerHTML = head() + BOOKS.map((b) => {
+      const L = SALES.filter((x) => x.book_id === b.id), t = L.reduce((a, x) => a + Number(x.price), 0);
+      return `<div class="card book" data-id="${esc(b.id)}">
+        <div class="dh" style="margin-bottom:0"><div><h2>${esc(b.title)}</h2>
+          <div style="color:var(--muted);font-size:14px">${money(b.price)}${b.bundle_price ? ` · مع التاني ${money(b.bundle_price)}` : ''}${b.rules ? ` · ${b.rules} قاعدة` : ''} · انباع ${L.length} (${money(t)})</div></div>
+          <button class="ib ed">عدّل</button></div>
+        <div class="sum">${esc(b.summary || '—')}</div>
+      </div>`;
+    }).join('') + `<p style="color:var(--muted);font-size:14px;margin-top:8px">لتزيد كتاب جديد، ارفعو لكلود، وهوّي بيزيدو هون مع ملخّصو.</p>`;
+    wireHead();
+    $app.querySelectorAll('.ed').forEach((btn) => btn.onclick = () => editBook(btn.closest('.book').dataset.id));
+  }
+  function editBook(id) {
+    const b = bookById(id);
+    $dc.innerHTML = `<div class="dh"><h2>${esc(b.title)}</h2><button class="ib" id="x">✕</button></div>
+      <form id="bf"><div class="grid2">
+        <div><label for="bp">السعر ($)</label><input id="bp" type="number" min="0" step="0.5" dir="ltr" value="${esc(b.price)}"></div>
+        <div><label for="bb">سعر الباقة ($)</label><input id="bb" type="number" min="0" step="0.5" dir="ltr" value="${esc(b.bundle_price == null ? '' : b.bundle_price)}"></div></div>
+        <label for="bs">الملخص</label><textarea id="bs">${esc(b.summary || '')}</textarea>
+        <div class="err" id="be"></div>
+        <div class="acts"><button class="btn" type="submit">احفظ</button></div></form>`;
+    $dlg.classList.add('on'); CUR = {};
+    document.getElementById('x').onclick = close;
+    document.getElementById('bf').onsubmit = async (e) => {
+      e.preventDefault();
+      const bb = document.getElementById('bb').value;
+      try { await api('books?id=eq.' + encodeURIComponent(id), { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ price: Number(document.getElementById('bp').value), bundle_price: bb === '' ? null : Number(bb), summary: document.getElementById('bs').value }) }); close(); await load(true); }
+      catch (x) { document.getElementById('be').textContent = 'ما زبط الحفظ.'; }
+    };
+  }
+
+  // ---------- كلمة السر ----------
+  function pwDialog() {
+    $dc.innerHTML = `<div class="dh"><h2>غيّر كلمة السر</h2><button class="ib" id="x">✕</button></div>
+      <form id="pf"><label for="p1">كلمة السر الجديدة (8 حروف عالأقل)</label><input id="p1" type="password" autocomplete="new-password" dir="ltr" minlength="8" required>
+      <label for="p2">رجاع اكتبها</label><input id="p2" type="password" autocomplete="new-password" dir="ltr" minlength="8" required>
+      <div class="err" id="pe"></div><div class="acts"><button class="btn" type="submit">غيّر</button></div></form>`;
+    $dlg.classList.add('on'); CUR = {};
+    document.getElementById('x').onclick = close;
+    document.getElementById('pf').onsubmit = async (e) => {
+      e.preventDefault();
+      const a = document.getElementById('p1').value, c = document.getElementById('p2').value, er = document.getElementById('pe');
+      if (a !== c) { er.textContent = 'الكلمتين مش متل بعض.'; return; }
+      try {
+        const at = await token();
+        const r = await fetch(`${SB_URL}/auth/v1/user`, { method: 'PUT', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + at, 'Content-Type': 'application/json' }, body: JSON.stringify({ password: a }) });
+        if (!r.ok) throw new Error(await r.text());
+        $dc.innerHTML = `<div class="dh"><h2>تمام ✓</h2><button class="ib" id="x">✕</button></div><p>تغيّرت كلمة السر. المرة الجاية فوت بالجديدة.</p>`;
+        document.getElementById('x').onclick = close;
+      } catch (x) { er.textContent = 'ما زبط. جرّب كلمة سر أطول أو مختلفة.'; }
+    };
   }
 
   // ---------- detail ----------
