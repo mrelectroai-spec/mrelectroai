@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070F0D">
+<title>محاكي الإنفرتر الهايبرد · MrElectroAI</title>
+<meta name="description" content="محاكي إعدادات إنفرتر هايبرد 5kW متل Deye SUN-5K-SG03LP1: غيّر الإعدادات من الشاشة وشوف شو بيصير بالبيت، بالدولة، وبالبطارية خلال 24 ساعة.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Roboto+Condensed:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--void:#070F0D;--panel:#0E1A17;--panel-2:#14241F;--line:#1E332D;--volt:#22C79B;--volt-ink:#031310;--text:#E8F2EE;--muted:#7B928C;--warn:#E8A33D;--fault:#F06A6A;--sun:#F5C542;--blue:#5AA9F0}
+[data-theme="light"]{--void:#F7F9F8;--panel:#FFF;--panel-2:#F0F5F3;--line:#E1EAE6;--volt:#0E8F6E;--volt-ink:#FFF;--text:#0B1613;--muted:#5A6D67;--warn:#B87514;--fault:#C93C3C;--sun:#C9950E;--blue:#2D7BC4}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--void);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;font-size:15.5px;line-height:1.6;min-height:100vh}
+h1,h2,h3{font-family:'Readex Pro',sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:16px 16px 60px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.top a{color:var(--volt);font:700 16px 'Readex Pro',sans-serif;text-decoration:none}
+.ib{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer}
+h1{font-size:24px;line-height:1.35;margin-bottom:4px}h1 b{color:var(--volt)}
+.lede{color:var(--muted);font-size:14.5px;margin-bottom:14px;max-width:720px}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px}
+.card h2{font-size:16px;margin-bottom:8px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.muted{color:var(--muted)}
+/* device */
+.dev{background:linear-gradient(180deg,#f4f6f7,#dfe4e7);border-radius:22px;padding:16px 16px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 #fff;margin-bottom:12px;color:#33414a}
+.dev-h{display:flex;justify-content:space-between;align-items:center;font:600 12px 'Roboto Condensed',sans-serif;letter-spacing:.08em;color:#5c6b74;margin-bottom:10px;direction:ltr}
+.dev-h i{font-style:normal;background:#22313a;color:#fff;border-radius:6px;padding:2px 8px;letter-spacing:.04em}
+.bezel{background:#1a2228;border-radius:12px;padding:8px;box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
+.lw{position:relative;overflow:hidden;border-radius:4px;background:#000}
+.lcd{position:absolute;top:0;left:0;width:560px;height:336px;transform-origin:0 0;font-family:'Roboto Condensed',Arial,sans-serif;direction:ltr;text-align:left;background:#fff;color:#1f2a30;user-select:none;overflow:hidden}
+.dev-b{display:flex;justify-content:space-between;align-items:center;margin-top:12px;direction:ltr;gap:8px;flex-wrap:wrap}
+.leds{display:flex;gap:12px}
+.led{display:flex;flex-direction:column;align-items:center;font:600 10px 'Roboto Condensed',sans-serif;color:#5c6b74;gap:3px}
+.led span{width:12px;height:12px;border-radius:50%;background:#b7c0c5;box-shadow:inset 0 1px 2px rgba(0,0,0,.3)}
+.led.on span{background:#25d366;box-shadow:0 0 8px #25d366}
+.led.red.on span{background:#ff3b3b;box-shadow:0 0 8px #ff3b3b}
+.keys{display:flex;gap:6px}
+.key{background:#fff;border:1px solid #c3cbd0;border-radius:8px;padding:6px 10px;font:700 11px 'Roboto Condensed',sans-serif;color:#33414a;cursor:pointer;box-shadow:0 2px 0 #b9c2c7}
+.key:active{transform:translateY(2px);box-shadow:none}
+.zoom{background:transparent;border:1px solid #b9c2c7;border-radius:8px;padding:5px 9px;font:600 12px 'IBM Plex Sans Arabic';color:#33414a;cursor:pointer}
+/* LCD content */
+.L-top{height:30px;background:#2b3a44;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:15px}
+.L-top .tt{font-weight:700;font-size:17px}
+.L-x{position:absolute;inset:0}
+.Lbtn{cursor:pointer}
+.gear{width:40px;height:30px;display:grid;place-items:center;cursor:pointer}
+.node{position:absolute;width:120px;text-align:center;cursor:pointer}
+.node .lab{font-size:14px;color:#55646d;font-weight:500}
+.node .val{font-size:21px;font-weight:700;color:#1f2a30}
+.node .sub{font-size:13px;color:#55646d}
+.node svg{display:block;margin:0 auto}
+.inv{position:absolute;left:236px;top:128px;width:88px;height:96px;border-radius:10px;background:#eef2f4;border:2px solid #c8d1d6;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer}
+.inv .st{font-size:14px;font-weight:700;margin-top:4px}
+.flow{fill:none;stroke-width:3;stroke:#c8d1d6}
+.flow.on{stroke:#25b36e;stroke-dasharray:6 7;animation:dash .7s linear infinite}
+.flow.on.rev{animation-direction:reverse}
+.flow.on.hi{stroke:#e5533c}
+@keyframes dash{to{stroke-dashoffset:-13}}
+.pg{position:absolute;left:0;right:96px;top:30px;bottom:0;padding:8px 12px;overflow:hidden}
+.side{position:absolute;right:0;top:30px;bottom:0;width:96px;background:#eef2f4;border-left:1px solid #d3dbe0;display:flex;flex-direction:column;padding:6px;gap:5px}
+.tab{background:#fff;border:1px solid #c8d1d6;border-radius:6px;padding:6px 4px;font-size:14px;text-align:center;cursor:pointer;font-weight:500}
+.tab.on{background:#2b7de9;border-color:#2b7de9;color:#fff}
+.side .sp{flex:1}
+.okx{display:flex;gap:5px}
+.okx div{flex:1;border-radius:6px;padding:5px 0;text-align:center;font-size:20px;font-weight:700;cursor:pointer;color:#fff}
+.okx .ok{background:#25b36e}.okx .no{background:#e5533c}
+.row{display:flex;align-items:center;gap:6px;min-height:31px;font-size:15px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.f{display:inline-flex;align-items:center;justify-content:flex-end;min-width:74px;height:26px;padding:0 6px;border:1px solid #9fb0ba;border-radius:4px;background:#f7fafb;font-size:15px;font-weight:700;cursor:pointer;color:#14365a}
+.sel.dirty{background:#fff4d6;border-color:#e0a12c}
+.f.dirty{background:#fff4d6;border-color:#e0a12c}
+.lbl{flex:1;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u{font-size:13px;color:#6a7a83;min-width:22px}
+.ck{width:20px;height:20px;border:2px solid #6a7a83;border-radius:4px;display:inline-grid;place-items:center;cursor:pointer;flex:none;background:#fff}
+.ck.on{background:#2b7de9;border-color:#2b7de9}
+.ck.on:after{content:"";width:9px;height:5px;border:3px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.rd{width:20px;height:20px;border:2px solid #6a7a83;border-radius:50%;display:inline-grid;place-items:center;cursor:pointer;flex:none;background:#fff}
+.rd.on:after{content:"";width:10px;height:10px;border-radius:50%;background:#2b7de9}
+.sel{display:inline-flex;align-items:center;height:26px;padding:0 8px;border:1px solid #9fb0ba;border-radius:4px;background:#f7fafb;font-size:14.5px;font-weight:700;cursor:pointer;color:#14365a;max-width:260px;white-space:nowrap;overflow:hidden}
+.sel:after{content:"▾";margin-left:6px;color:#6a7a83}
+.sec{font-size:13px;font-weight:700;color:#2b7de9;margin:4px 0 2px;text-transform:none}
+.dis{opacity:.4;pointer-events:none}
+table.tou{border-collapse:collapse;width:100%;font-size:14px}
+table.tou th{font-weight:500;color:#55646d;font-size:12.5px;padding:2px}
+table.tou td{padding:2px;text-align:center}
+table.tou .f{min-width:62px;height:24px;font-size:14px}
+.ico{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px 18px}
+.ico div{background:#eef2f4;border:1px solid #d3dbe0;border-radius:10px;height:118px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600;text-align:center;cursor:pointer;line-height:1.15;padding:4px}
+.ico div:active{background:#dbe9fb}
+.dt{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;font-size:15.5px}
+.dt div{display:flex;justify-content:space-between;border-bottom:1px solid #e3e9ec;padding:3px 0}
+.dt b{font-weight:700}
+.back{position:absolute;right:10px;bottom:10px;background:#2b3a44;color:#fff;border-radius:6px;padding:4px 14px;font-size:14px;cursor:pointer}
+.ov{position:absolute;inset:0;background:rgba(20,30,36,.55);display:flex;align-items:center;justify-content:center;z-index:5}
+.kp{background:#fff;border-radius:10px;width:300px;padding:10px;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.kp .t{font-size:15px;font-weight:700;margin-bottom:2px}
+.kp .r{font-size:12.5px;color:#6a7a83;margin-bottom:6px}
+.kp .disp{height:36px;border:1px solid #9fb0ba;border-radius:5px;font-size:22px;font-weight:700;text-align:right;padding:0 8px;line-height:34px;margin-bottom:6px;color:#14365a}
+.kp .disp.bad{border-color:#e5533c;color:#e5533c}
+.kg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.kg div{background:#eef2f4;border:1px solid #d3dbe0;border-radius:5px;height:36px;display:grid;place-items:center;font-size:17px;font-weight:700;cursor:pointer}
+.kg div:active{background:#cfe0f7}
+.kg .g{background:#25b36e;color:#fff;border-color:#25b36e}.kg .c{background:#e5533c;color:#fff;border-color:#e5533c}
+.lst{background:#fff;border-radius:10px;width:330px;max-height:300px;overflow:auto;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.lst div{padding:8px 12px;border-bottom:1px solid #e3e9ec;font-size:15px;cursor:pointer}
+.lst div.on{background:#2b7de9;color:#fff}
+.toast{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#2b3a44;color:#fff;border-radius:6px;padding:5px 12px;font-size:14px;z-index:6;white-space:nowrap}
+.alm{font-size:13.5px}
+.alm div{display:flex;gap:10px;border-bottom:1px solid #e3e9ec;padding:3px 0}
+/* zoom mode */
+body.zm{overflow:hidden}
+.zmwrap{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100;display:none;align-items:center;justify-content:center}
+body.zm .zmwrap{display:flex}
+.zmclose{position:fixed;top:12px;left:12px;z-index:101;background:#fff;border:0;border-radius:10px;padding:6px 14px;font:700 15px 'IBM Plex Sans Arabic';cursor:pointer;display:none}
+body.zm .zmclose{display:block}
+/* help + controls */
+.help{border-color:color-mix(in srgb,var(--volt) 40%,var(--line))}
+.help h3{font-size:15px;margin-bottom:4px;direction:ltr;text-align:right;color:var(--volt)}
+.help p{font-size:14.5px}
+.help .tip{margin-top:6px;font-size:13.5px;color:var(--warn)}
+.ctl label{display:block;font-size:13px;color:var(--muted);margin:8px 0 4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:5px 11px;font:inherit;font-size:13.5px;cursor:pointer}
+.chip.on{background:var(--volt);color:var(--volt-ink);border-color:var(--volt);font-weight:600}
+.clock{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.clock b{font:700 26px 'Readex Pro',sans-serif;direction:ltr;min-width:84px}
+.btn{background:var(--volt);color:var(--volt-ink);border:0;border-radius:12px;padding:9px 14px;font:700 14.5px 'Readex Pro',sans-serif;cursor:pointer}
+.btn.g{background:var(--panel-2);color:var(--text);border:1px solid var(--line)}
+input[type=range]{width:100%;accent-color:var(--volt)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--panel-2);border-radius:12px;padding:8px 10px}
+.stat span{display:block;font-size:12px;color:var(--muted)}
+.stat b{font:700 17px 'Readex Pro',sans-serif;direction:ltr;display:inline-block}
+.stat.bad b{color:var(--fault)}
+.log{max-height:260px;overflow:auto;font-size:14px}
+.log div{padding:6px 0;border-bottom:1px solid var(--line);display:flex;gap:8px}
+.log time{font:600 13px 'Roboto Condensed',sans-serif;color:var(--muted);direction:ltr;flex:none;min-width:40px}
+.log .w{color:var(--warn)}.log .e{color:var(--fault)}.log .o{color:var(--volt)}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12.5px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;vertical-align:middle;margin-left:4px}
+.ch{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;cursor:pointer;background:var(--panel-2)}
+.ch.on{border-color:var(--volt)}
+.ch b{font-family:'Readex Pro',sans-serif;font-size:14.5px}
+.ch p{font-size:13.5px;color:var(--muted)}
+.ch .ok{color:var(--volt);font-size:13px}
+.res{border-radius:14px;padding:10px 12px;margin-top:8px;font-size:14.5px}
+.res.pass{background:color-mix(in srgb,var(--volt) 16%,transparent);border:1px solid var(--volt)}
+.res.fail{background:color-mix(in srgb,var(--fault) 14%,transparent);border:1px solid var(--fault)}
+.foot{font-size:12.5px;color:var(--muted);margin-top:18px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../">← MrElectroAI</a><button class="ib" id="theme" type="button">🌓</button></div>
+  <h1>محاكي الإنفرتر <b>الهايبرد 5kW</b></h1>
+  <p class="lede">نفس قوائم وإعدادات <span dir="ltr">Deye SUN-5K-SG03LP1</span> حسب الـManual. اضغط عالشاشة متل الإنفرتر الحقيقي، غيّر الإعدادات واحفظ بـ✓، وشوف شو بيصير بالبيت والبطارية والدولة. كل ما تكبس على إعداد، بيطلعلك شرحو تحت.</p>
+
+  <div class="grid">
+    <div>
+      <div class="dev" id="dev">
+        <div class="dev-h"><span>HYBRID INVERTER · 5kW · 48V</span><i>SIMULATOR</i></div>
+        <div class="bezel"><div class="lw" id="lw"><div class="lcd" id="lcd"></div></div></div>
+        <div class="dev-b">
+          <div class="leds"><div class="led" id="ledDC"><span></span>DC</div><div class="led" id="ledAC"><span></span>AC</div><div class="led" id="ledN"><span></span>NORMAL</div><div class="led red" id="ledA"><span></span>ALARM</div></div>
+          <div class="keys"><div class="key" data-k="esc">ESC</div><div class="key" data-k="up">▲</div><div class="key" data-k="down">▼</div><div class="key" data-k="enter">ENTER</div></div>
+          <button class="zoom" id="zoomBtn" type="button">⛶ كبّر الشاشة</button>
+        </div>
+      </div>
+      <div class="card help" id="help"><h3 id="hT">System</h3><p id="hP">اكبس على أي شي عالشاشة: الألواح، الدولة، البطارية، البيت، أو ⚙ لتفوت عالإعدادات.</p><p class="tip" id="hW" hidden></p></div>
+      <div class="card"><h2>شو عم يصير <span class="muted" style="font-size:12.5px;font-weight:400">آخر الأحداث فوق</span></h2><div class="log" id="log"></div></div>
+    </div>
+
+    <div>
+      <div class="card ctl">
+        <h2>الوقت</h2>
+        <div class="clock"><b id="clk">08:00</b>
+          <button class="btn" id="play" type="button">⏸ وقّف</button>
+          <button class="btn g" id="day" type="button">مرّق 24 ساعة</button>
+        </div>
+        <label>السرعة</label>
+        <div class="chips" id="spd"><button class="chip" data-v="1">دقيقة بالثانية</button><button class="chip on" data-v="10">10 دقايق بالثانية</button><button class="chip" data-v="60">ساعة بالثانية</button></div>
+      </div>
+
+      <div class="card"><h2>التحديات</h2>
+        <p class="muted" style="font-size:13.5px;margin-bottom:8px">كل تحدّي فيه مشكلة حقيقية من الشغل. نقّي واحد، صلّح الإعدادات عالشاشة، وبعدين اكبس «جرّب الحل» ليمرّق يوم كامل.</p>
+        <div id="chs"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="chRun" type="button" hidden>جرّب الحل</button><button class="btn g" id="chFree" type="button" hidden>رجوع للوضع الحرّ</button></div>
+        <div id="chRes"></div>
+      </div>
+
+      <div class="card ctl" id="envCard">
+        <h2>البيت والظروف</h2>
+        <label>الفصل والطقس</label>
+        <div class="chips" data-e="season"><button class="chip" data-v="summer">صيف</button><button class="chip" data-v="winter">شتي</button></div>
+        <div class="chips" data-e="weather" style="margin-top:6px"><button class="chip" data-v="clear">شمس</button><button class="chip" data-v="partly">غيم خفيف</button><button class="chip" data-v="overcast">غيم كامل</button></div>
+        <label>مدخل الـGRID</label>
+        <div class="chips" data-e="sched"><button class="chip" data-v="24">دولة 24 ساعة</button><button class="chip" data-v="sub">اشتراك 6 الصبح لـ12 بالليل</button><button class="chip" data-v="edl">دولة 4 ساعات</button><button class="chip" data-v="cut">بتقطع 8 لـ12 بالليل</button><button class="chip" data-v="none">ما في شي</button></div>
+        <label>قاطع الدخلة</label>
+        <div class="chips" data-e="brk"><button class="chip" data-v="5">5A</button><button class="chip" data-v="10">10A</button><button class="chip" data-v="15">15A</button><button class="chip" data-v="32">32A</button></div>
+        <div class="chips" data-e="gv" style="margin-top:6px"><button class="chip" data-v="230">فولت عادي 230V</button><button class="chip" data-v="270">بيطلع 270V بالليل</button></div>
+        <label>الألواح (550W، Voc 49.6V) عالـPV1</label>
+        <div class="chips" data-e="pn"><button class="chip" data-v="4">4</button><button class="chip" data-v="6">6</button><button class="chip" data-v="8">8</button><button class="chip" data-v="9">9</button><button class="chip" data-v="10">10</button></div>
+        <label>البطارية</label>
+        <div class="chips" data-e="bt"><button class="chip" data-v="li">ليثيوم 100Ah مع كابل اتصال</button><button class="chip" data-v="li2">ليثيوم 200Ah مع كابل اتصال</button><button class="chip" data-v="linc">ليثيوم 100Ah بلا كابل</button><button class="chip" data-v="pb">رصاص 4×12V 200Ah</button></div>
+        <label>الأجهزة</label>
+        <div class="chips" id="apps"></div>
+      </div>
+
+      <div class="card"><h2>اليوم</h2>
+        <div class="stats">
+          <div class="stat"><span>من الشمس</span><b id="sPV">0</b></div>
+          <div class="stat"><span>من الدولة</span><b id="sBuy">0</b></div>
+          <div class="stat"><span>للدولة</span><b id="sSell">0</b></div>
+          <div class="stat" id="stBl"><span>عتمة بالبيت</span><b id="sBl">0</b></div>
+          <div class="stat" id="stTr"><span>القاطع فصل</span><b id="sTr">0</b></div>
+          <div class="stat"><span>ضاع من الشمس</span><b id="sCur">0</b></div>
+        </div>
+        <div class="chart" style="margin-top:10px"><svg id="chart" viewBox="0 0 480 190"></svg>
+          <div class="legend"><span><i style="background:var(--sun)"></i>الشمس W</span><span><i style="background:var(--text)"></i>الأحمال W</span><span><i style="background:var(--blue)"></i>من الدولة W</span><span><i style="background:var(--volt)"></i>البطارية %</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="foot">محاكي تعليمي من MrElectroAI، مش تابع لشركة Deye ولا معتمد منها. الأسامي والقيم من الـManual الرسمي للموديل SUN-3.6/5/6K-SG03LP1-EU. الأرقام بالمحاكاة تقريبية للتعليم، وعالشغل الحقيقي ارجع دايماً لكتيّب الإنفرتر والبطارية.</p>
+</div>
+<div class="zmwrap" id="zmwrap"></div><button class="zmclose" id="zmclose" type="button">✕ سكّر</button>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+(function(){const t=ls.get('theme');if(t)document.documentElement.dataset.theme=t;$('theme').onclick=()=>{const n=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=n;ls.set('theme',n);drawChart();}})();
+
+/* ============ SETTINGS (defaults per manual) ============ */
+const SLOT_T=['01:00','05:00','09:00','13:00','17:00','21:00'];
+function defaults(){return {
+  y:2026,mo:10,d:26,h24:1,timeSync:0,beep:1,autoDim:1,locked:0,
+  battMode:'Lithium',battCap:400,maxCh:40,maxDis:40,activate:0,noFloat:0,
+  genStart:30,genA:40,genCharge:0,genSignal:0,gridStart:30,gridA:40,gridCharge:0,gridSignal:0,genForce:0,
+  genStartV:49.0,gridStartV:49.0,
+  liMode:0,liShut:10,liLow:20,liRestart:40,
+  floatV:53.6,absV:57.6,eqV:57.6,eqDays:30,eqHours:3.0,tempco:-5,battR:25,
+  shutV:46.0,lowV:47.5,restartV:52.0,shutP:20,lowP:35,restartP:50,
+  workMode:'Zero Export To Load',solarSell:0,maxSell:5000,zeroExp:20,pattern:'LoadFirst',maxSolar:6500,peak:0,peakW:5000,
+  tou:0,slots:SLOT_T.map(t=>({t,p:5000,b:80,v:49.0,g:0,gen:0})),days:[1,1,1,1,1,1,1],
+  gridMode:'General Standard',gridHz:50,invV:230,gridType:'Single Phase',
+  nLV:185.0,nHV:265.0,nLF:48.00,nHF:51.50,rLV:187.0,rHV:263.0,rLF:48.20,rHF:51.30,reconT:60,pf:1.000,nRamp:60,rRamp:60,
+  hv1:265.0,hv1t:0.10,hv2:265.0,hv2t:0.10,lv1:185.0,lv1t:0.10,lv2:185.0,lv2t:0.10,hf1:51.50,hf1t:0.10,lf1:48.00,lf1t:0.10,ovMean:260.0,
+  genMode:'Generator Input',genRated:8000,slPower:500,slOn:100,slOff:95,onGridOn:0,offGridOff:0,acHigh:52.00,
+  arc:0,bmsErrStop:0,backupDelay:0,ctRatio:2000,drm:0,genPeak:0,island:0,ats:0,expLim:8820,impLim:8320,lowNoise:0,lowPower:0,mpptScan:0
+};}
+let S=defaults();
+try{const sv=JSON.parse(ls.get('simS')||'null');if(sv&&sv.slots)S=Object.assign(defaults(),sv);}catch(e){}
+const clone=o=>JSON.parse(JSON.stringify(o));
+const isPct=s=>s.battMode==='Lithium'||s.battMode==='Use Batt %';
+const pctMode=s=>s.battMode==='Lithium'?'li':(s.battMode==='Use Batt %'?'p':(s.battMode==='Use Batt V'?'v':'n'));
+function thr(s){const m=pctMode(s);if(m==='li')return{sh:s.liShut,lo:s.liLow,re:s.liRestart,u:'%'};if(m==='p')return{sh:s.shutP,lo:s.lowP,re:s.restartP,u:'%'};return{sh:s.shutV,lo:s.lowV,re:s.restartV,u:'V'};}
+
+/* ============ ENVIRONMENT ============ */
+const APPS=[
+ {k:'fridge',n:'برّاد 150W',w:150},{k:'light',n:'إنارة 120W',w:120},{k:'tv',n:'تلفزيون 100W',w:100},{k:'router',n:'راوتر 15W',w:15},
+ {k:'wash',n:'غسّالة 500W',w:500},{k:'pump',n:'ترمبة مي 750W',w:750},{k:'ac',n:'مكيّف 1 طن 900W',w:900},{k:'heater',n:'سخّانة 2000W',w:2000}];
+function envDefaults(){return {season:'summer',weather:'clear',sched:'edl',brk:15,gv:230,pn:8,bt:'li',apps:{fridge:1,light:1,tv:1,router:1,wash:1,pump:1,ac:0,heater:0}};}
+let E=envDefaults();
+try{const ev=JSON.parse(ls.get('simE')||'null');if(ev&&ev.apps)E=Object.assign(envDefaults(),ev);}catch(e){}
+
+function appW(k,h){ // h = hour float
+  const m=Math.round(h*60)%1440;
+  switch(k){
+    case 'fridge':return (m%30)<14?150:5;
+    case 'light':return (h>=18||h<0.5||(h>=6&&h<7))?120:0;
+    case 'tv':return (h>=19&&h<23)?100:0;
+    case 'router':return 15;
+    case 'wash':return (h>=10&&h<11.5)?500:0;
+    case 'pump':return ((h>=8&&h<8.25)||(h>=18&&h<18.25))?750:0;
+    case 'ac':return ((h>=13&&h<17)||(h>=21))?(E.season==='summer'?900:700):0;
+    case 'heater':return (h>=7&&h<8)||(h>=19&&h<19.5)?2000:0;
+  }return 0;}
+function loadW(h){let w=0;for(const a of APPS)if(E.apps[a.k])w+=appW(a.k,h);return w;}
+function gridSched(h){switch(E.sched){case '24':return true;case 'sub':return h>=6;case 'edl':return (h>=6&&h<8)||(h>=20&&h<22);case 'cut':return !(h>=20);case 'none':return false;}return false;}
+function gridVolt(h){return (E.gv===270&&(h>=22||h<6))?270:(E.gv===270?238:229);}
+function battSpec(){switch(E.bt){case 'li':return{chem:'li',ah:100,comm:true,proto:0,chA:50,disA:100};case 'li2':return{chem:'li',ah:200,comm:true,proto:0,chA:100,disA:200};case 'linc':return{chem:'li',ah:100,comm:false,chA:50,disA:100};case 'pb':return{chem:'pb',ah:200,comm:false,chA:40,disA:100};}}
+// PV
+const PANEL={w:550,voc:49.6,vmp:41.9,imp:13.1,kv:-0.0027,kp:-0.0035};
+function sunTimes(){return E.season==='summer'?{sr:5.6,ss:19.6,psh:7,tmin:20,tmax:33}:{sr:6.7,ss:16.9,psh:3,tmin:4,tmax:15};}
+let shapeNorm={};
+function shape(h){const s=sunTimes();if(h<=s.sr||h>=s.ss)return 0;return Math.pow(Math.sin(Math.PI*(h-s.sr)/(s.ss-s.sr)),1.4);}
+function norm(){const k=E.season;if(shapeNorm[k])return shapeNorm[k];let a=0;for(let m=0;m<1440;m++)a+=shape(m/60)/60;return shapeNorm[k]=sunTimes().psh/a;}
+function weatherF(h){if(E.weather==='clear')return 1;if(E.weather==='overcast')return 0.18+0.04*Math.sin(h*3.1);const x=Math.sin(h*2.3)+Math.sin(h*5.7+1)*0.6;return x>0.4?0.35:0.85;}
+function irr(h){return shape(h)*norm()*weatherF(h);} // kW/kWp equivalent (1 = 1000W/m2)
+function cellT(h){const s=sunTimes();const amb=s.tmin+(s.tmax-s.tmin)*Math.max(0,Math.sin(Math.PI*(h-6)/15));return amb+28*irr(h);}
+
+/* ============ SIM STATE ============ */
+let R; // runtime
+function resetRuntime(startSoc){const b=battSpec();R={min:8*60,soc:startSoc??0.6,est:startSoc??0.6,gridOk:false,trip:0,tripCnt:0,overA:0,recon:0,offLatch:false,f56:0,bmsTrip:0,olTrip:0,
+  pvFault:false,warned:{},alarms:[],day:newDay(),hist:new Array(1440).fill(null),bv:52,bi:0,pv:0,load:0,grid:0,batt:0,curt:0,status:'Normal',faults:new Set(),gcLatch:false,vHigh:false,lastSpec:E.bt};}
+function newDay(){return {pv:0,buy:0,sell:0,load:0,dis:0,ch:0,black:0,trips:0,curt:0,f58:0,f56:0,bms:0,ol:0,ghv:0};}
+function addAlarm(code,txt){const t=fmtT(R.min);R.alarms.unshift({t,code,txt});if(R.alarms.length>30)R.alarms.pop();}
+const fmtT=m=>{m=((Math.round(m)%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');};
+let LOG=[];
+function ev(cls,txt,key,gap){ // dedupe by key within gap minutes
+  if(key){const last=R.warned[key];if(last!=null&&R.absMin-last<(gap||180))return;R.warned[key]=R.absMin;}
+  LOG.unshift({t:fmtT(R.min),cls,txt});if(LOG.length>80)LOG.pop();logDirty=true;}
+let logDirty=true;
+
+function slotAt(h){const mins=S.slots.map(s=>{const [a,b]=s.t.split(':').map(Number);return (a%24)*60+b;});const m=Math.round(h*60);let idx=-1,best=-1;for(let i=0;i<6;i++){if(mins[i]<=m&&mins[i]>best){best=mins[i];idx=i;}}if(idx<0){let mx=-1;for(let i=0;i<6;i++)if(mins[i]>mx){mx=mins[i];idx=i;}}return S.slots[idx];}
+
+function battV(soc,I,chem){ // I + charge
+  if(chem==='li'){const ocv=48.0+5.6*Math.min(1,Math.max(0,soc))+(soc>0.97?(soc-0.97)*30:0)-(soc<0.08?(0.08-soc)*25:0);return ocv+I*0.0035*(100/battSpec().ah)*2.5;}
+  const ocv=46.4+4.8*Math.min(1,Math.max(0,soc));return ocv+I*(I>0?0.02:0.022)*(200/battSpec().ah);}
+
+function step(){
+  const h=R.min/60, b=battSpec(), cap=b.ah*(b.chem==='li'?51.2:48)/1000; // kWh
+  R.absMin=(R.absMin||0)+1;
+  const mode=pctMode(S), th=thr(S);
+  const faults=new Set();
+  // --- battery availability
+  let battOk=mode!=='n';
+  let commFault=false;
+  if(mode==='li'){ if(!b.comm||b.chem!=='li'||S.liMode!==b.proto){commFault=true;battOk=false;}}
+  if(commFault){faults.add('F58');R.day.f58++;
+    ev('e',b.chem==='pb'?'F58: Batt Mode على Lithium وبطارية الرصاص ما فيها BMS. الإنفرتر مش شايف البطارية. حطّ Use Batt V أو Use Batt %.':(!b.comm?'F58: Batt Mode على Lithium بس ما في كابل اتصال مع الـBMS. يا بتركّب الكابل، يا بتشتغل Use Batt V.':'F58: رقم Lithium Mode (البروتوكول) مش مطابق للبطارية. البطارية بدها 00.'),'f58',600);}
+  if(R.bmsTrip>0){R.bmsTrip--;battOk=false;}
+  // --- grid
+  const gv=gridVolt(h); const sched=gridSched(h);
+  if(R.trip>0){R.trip--; if(R.trip===0)ev('o','رجّعوا القاطع.','',0);}
+  let gridPresent=sched&&R.trip===0;
+  if(gridPresent){
+    if(gv>S.nHV||gv<S.nLV){ if(!R.vHigh){R.vHigh=true;ev('w',`فولت الدولة ${gv}V طلع برّا مجال الإنفرتر (${S.nLV}–${S.nHV}V). فصل عنها وكمّل عالبطارية.`,'ghv',240);addAlarm('—','Grid voltage out of range');} R.recon=0; R.day.ghv++;}
+    else if(R.vHigh){ if(gv<=S.rHV&&gv>=S.rLV){R.recon++; if(R.recon*60>=S.reconT){R.vHigh=false;R.recon=0;ev('o',`الفولت رجع منيح (${gv}V)، والإنفرتر رجع عالدولة بعد ${S.reconT} ثانية.`,'',0);}}}
+    if(R.vHigh)gridPresent=false;
+  } else {R.vHigh=false;}
+  if(!sched&&R.gridOk)ev('w','الدولة قطعت. الإنفرتر حوّل عالبطارية والشمس.','',0);
+  if(sched&&!R.gridOk&&R.trip===0&&!R.vHigh&&R.absMin>1)ev('o','إجت الكهربا عمدخل الـGRID.','',0);
+  R.gridOk=sched;
+  if(!gridPresent&&!sched)faults.add('F35');
+  // --- PV
+  const n=E.pn, T=cellT(h), ir=irr(h);
+  const vocT=n*PANEL.voc*(1+PANEL.kv*(Math.min(T,25)-25)), vmpT=n*PANEL.vmp*(1+PANEL.kv*(T-25));
+  let pv=0;
+  if(ir>0.002){
+    if(vocT>500){ if(!R.pvFault)ev('e',`خطر: فولت الـString ${vocT.toFixed(0)}V بالبرد (${n} ألواح) فوق حدّ الإنفرتر 500V. المدخل ممكن ينحرق! نقّص ألواح أو قسّمهن على PV1 وPV2.`,'pvov',720); R.pvFault=true; faults.add('PV');}
+    else if(vmpT<125){ev('w',`فولت الألواح ${vmpT.toFixed(0)}V أقل من فولت الإقلاع 125V. ${n} ألواح عالتسلسل قليلين، الإنفرتر ما عم يقلع عليهن.`,'pvlow',720);}
+    else{R.pvFault=false; pv=n*PANEL.w*ir*(1+PANEL.kp*(T-25))*0.92; if(vmpT<150)pv*=0.8; pv=Math.min(pv,13*vmpT,S.maxSolar,6500);}
+  }
+  pv=Math.max(0,pv);
+  // --- load
+  let load=loadW(h);
+  // --- battery measurement
+  const Vrest=battV(R.soc,0,b.chem);
+  const meas=mode==='li'?R.soc*100:(mode==='p'?R.est*100:R.bv);
+  // charge limits (W)
+  let chA=S.maxCh, disA=S.maxDis;
+  if(mode==='li'&&battOk){chA=Math.min(chA,b.chA);disA=Math.min(disA,b.disA);}
+  let full=R.soc>=0.999;
+  if(mode==='v'&&R.bv>=S.absV-0.05&&R.soc>0.97)full=true;
+  if(mode==='li'&&R.soc>=0.999)full=true;
+  const Vb=Math.max(Vrest,44);
+  let chHead=battOk&&!full?chA*Vb:0;
+  // tapering near full
+  if(chHead>0&&R.soc>0.95)chHead*=Math.max(0.15,(1-R.soc)/0.05);
+  let disHead=battOk?disA*Vb:0;
+  // thresholds
+  let gridFloor;
+  if(gridPresent){ gridFloor=th.lo; if(S.tou){const sl=slotAt(h);gridFloor=(mode==='v')?sl.v:sl.b; disHead=Math.min(disHead,sl.p);} }
+  // off-grid latch
+  if(gridPresent)R.offLatch=false;
+  if(!gridPresent&&battOk){ if(!R.offLatch&&meas<=th.sh){R.offLatch=true;ev('e',`البطارية وصلت لحدّ الـShutdown (${th.sh}${th.u}). الإنفرتر طفى الأحمال ليحمي البطارية. بترجع لما توصل ${th.re}${th.u}.`,'shut',120);} if(R.offLatch&&meas>=th.re){R.offLatch=false;ev('o',`البطارية وصلت لـ${th.re}${th.u} (Restart)، والأحمال رجعت.`,'',0);} }
+  if(!gridPresent&&battOk&&!R.offLatch&&meas<=th.lo)ev('w',`Low Batt: البطارية تحت ${th.lo}${th.u}.`,'lowb',240);
+  // hardware empty
+  if(R.soc<=(b.chem==='li'?0.02:0.05)){ if(battOk){faults.add('F56');R.day.f56++; ev('e',b.chem==='li'?'الـBMS فصل البطارية لأنها فضيت عالآخر (F56).':'F56: فولت البطارية وقع كتير. البطارية فضيت لآخرها مع إنو الشاشة كانت عم تقول '+Math.round(R.est*100)+'%.','f56',300);} disHead=0; }
+  // --- allocation
+  let pvLoad=0,pvBatt=0,pvGrid=0,dis=0,gch=0,imp=0;
+  const sellOK=gridPresent&&S.workMode==='Selling First'&&S.solarSell;
+  if(S.pattern==='LoadFirst'){pvLoad=Math.min(pv,load);pvBatt=Math.min(pv-pvLoad,chHead);}
+  else{pvBatt=Math.min(pv,chHead);pvLoad=Math.min(pv-pvBatt,load);}
+  let rem=pv-pvLoad-pvBatt;
+  if(sellOK){pvGrid=Math.min(rem,S.maxSell);rem-=pvGrid;}
+  let deficit=load-pvLoad;
+  let outOn=true;
+  if(gridPresent){
+    const canDis=battOk&&meas>gridFloor;
+    if(canDis)dis=Math.min(deficit,disHead);
+    // grid charging
+    let want=false; const startV=mode==='v'?S.gridStartV:S.gridStart;
+    if(S.gridCharge&&battOk){ if(meas<startV)R.gcLatch=true; if(R.gcLatch&&meas>=startV+(mode==='v'?2:15))R.gcLatch=false; want=R.gcLatch;
+      if(S.tou){const sl=slotAt(h);if(sl.g&&meas<(mode==='v'?sl.v:sl.b))want=true;} }
+    if(want){gch=Math.min(S.gridA*Vb,Math.max(0,chHead-pvBatt));}
+    imp=deficit-dis+gch-pvGrid;
+    if(S.workMode==='Zero Export To Load'||S.workMode==='Zero Export To CT'){ if(imp<0)imp=0; }
+    // peak shaving
+    if(S.peak&&imp>S.peakW){let over=imp-S.peakW;const cut=Math.min(gch,over);gch-=cut;over-=cut;if(over>0&&battOk&&meas>th.sh){const extra=Math.min(over,disHead-dis);dis+=extra;over-=extra;}imp=deficit-dis+gch-pvGrid;}
+  } else {
+    // off-grid
+    const empty=R.soc<=(b.chem==='li'?0.02:0.05);
+    if(!battOk||empty){ outOn=pv>=load; if(!outOn&&load>0&&!empty)ev('e',mode==='n'?'ما في بطارية بالإعدادات (No Batt) وما في دولة. الشمس لحالها ما كفّت.':'ما في دولة والبطارية مش شغّالة، فالبيت عتم.','nobat',120); }
+    else if(R.offLatch){outOn=false;}
+    else { dis=Math.min(deficit,disHead); if(deficit>disHead+1){outOn=false; R.day.ol++; ev('e',`الأحمال ${Math.round(load)}W أكبر من الشمس ${Math.round(pv)}W + أعلى تفريغ للبطارية (Max A Discharge ${disA}A ≈ ${Math.round(disHead)}W). الإنفرتر طفى (Overload).`,'olbat',60); addAlarm('—','Overload / Batt discharge limit');} }
+    if(load>5000*1.1&&outOn){outOn=false;R.day.ol++;ev('e',`Overload: الأحمال ${Math.round(load)}W فوق قدرة الإنفرتر 5000W.`,'ol5',60);addAlarm('—','Overload');}
+    if(!outOn){pvBatt=Math.min(pv,chHead);pvLoad=0;dis=0;}
+  }
+  if(gridPresent&&load>5000*1.1){ev('w',`الأحمال ${Math.round(load)}W فوق 5kW. عالدولة بيمرقها bypass، بس بالانقطاع بيطفي.`,'olg',240);}
+  // breaker
+  if(gridPresent){
+    const A=imp/gv;
+    if(A>E.brk*1.13){R.overA++; if(R.overA>=2){R.trip=12;R.tripCnt++;R.day.trips++;R.overA=0;
+        ev('e',`القاطع ${E.brk}A فصل! سحبت ${A.toFixed(1)}A: أحمال ${Math.round(Math.max(0,load-pvLoad-dis))}W`+(gch>0?` + شحن البطارية من الدولة ${Math.round(gch)}W (Grid Charge ${S.gridA}A).`:'.'),'',0);addAlarm('—','Grid input breaker tripped');}}
+    else R.overA=0;
+  }
+  // --- battery update
+  let battW=pvBatt+gch-dis; // + charge
+  // BMS / chemistry protections
+  const Ich=battW>0?battW/Vb:0;
+  if(battOk&&b.chem==='li'&&!b.comm&&Ich>b.chA*1.08){R.bmsTrip=40;R.day.bms++;ev('e',`الـBMS بالبطارية فصل: تيار الشحن ${Ich.toFixed(0)}A أكبر من المسموح ${b.chA}A (0.5C). بلا كابل اتصال، الإنفرتر ما بيعرف حدّ البطارية: لازم Max A Charge يكون ${b.chA}A أو أقل.`,'',0);addAlarm('—','Batt over current (BMS)');battW=0;}
+  if(battOk&&b.chem==='li'&&mode==='v'&&R.soc>0.985&&battW>0&&S.absV>57.0){R.bmsTrip=60;R.day.bms++;ev('e',`الـBMS فصل من فولت عالي: Absorption V ${S.absV}V كتير على ليثيوم 16 خلية (أكتر من 3.56V للخلية). خلّيها حوالي 56.0–56.8V حسب الـDatasheet.`,'',0);addAlarm('—','Batt over voltage (BMS)');battW=0;}
+  if(battOk&&b.chem==='pb'&&Ich>b.ah*0.25)ev('w',`تيار الشحن ${Ich.toFixed(0)}A كبير على رصاص ${b.ah}Ah (أكتر من 0.2C). البطارية بتسخن وعمرها بيقصر.`,'pbhi',600);
+  if(mode==='li'&&battOk&&S.maxCh>b.chA)ev('w',`Max A Charge ${S.maxCh}A أكبر من حدّ البطارية ${b.chA}A، بس الـBMS عم يحدّد التيار بالكابل، فما في خطر.`,'bmslim',720);
+  const eff=0.95;
+  const dE=(battW>0?battW*eff:battW/eff)/60/1000; // kWh
+  R.soc=Math.min(1,Math.max(0,R.soc+dE/cap));
+  const capSet=S.battCap*48/1000; R.est=Math.min(1,Math.max(0,R.est+dE/capSet));
+  if(R.soc>=0.999&&mode==='p')R.est=Math.max(R.est,R.soc*0.999); // full charge resync
+  const I=battW/Vb; R.bv=battV(R.soc,I,b.chem); if(mode==='v'&&battW>0)R.bv=Math.min(R.bv,S.absV);
+  R.bi=I;
+  // --- accounting
+  const served=outOn?load:0;
+  if(!outOn&&load>0)R.day.black++;
+  const curt=Math.max(0,pv-pvLoad-pvBatt-pvGrid);
+  R.pv=pvLoad+pvBatt+pvGrid; R.load=served; R.grid=gridPresent?imp:0; R.batt=-battW; R.curt=curt; R.pvAvail=pv; R.gch=gch;
+  R.day.pv+=R.pv/60000; R.day.load+=served/60000; if(R.grid>0)R.day.buy+=R.grid/60000; if(R.grid<0)R.day.sell+=-R.grid/60000; R.day.curt+=curt/60000;
+  R.out=outOn; R.gridPresent=gridPresent; R.Vg=gridPresent?gv:0; R.T=T;
+  if(!outOn)faults.add('OFF');
+  R.faults=faults;
+  const m=R.min%1440; R.hist[m]={pv:R.pv,load:load,grid:Math.max(0,R.grid),soc:R.soc*100};
+  // advance
+  R.min++; if(R.min%1440===0){R.prevDay=R.day;R.day=newDay();}
+}
+
+/* ============ LCD UI ============ */
+const lcd=$('lcd'), lw=$('lw');
+let UI={pg:'main',tab:0,draft:null,ov:null,toast:null,gridUnlocked:false};
+function fit(){const w=lw.clientWidth;const s=w/560;lcd.style.transform=`scale(${s})`;lw.style.height=(336*s)+'px';}
+window.addEventListener('resize',()=>{fit();if(document.body.classList.contains('zm'))fitZoom();});
+
+const IC={
+ sun:'<svg width="56" height="44" viewBox="0 0 56 44"><rect x="6" y="6" width="44" height="30" rx="2" fill="#1d3b6e" stroke="#7d96b8"/><path d="M6 16h44M6 26h44M17 6v30M28 6v30M39 6v30" stroke="#7d96b8" stroke-width="1"/><path d="M24 36l-3 7M32 36l3 7" stroke="#55646d" stroke-width="2"/></svg>',
+ grid:'<svg width="44" height="46" viewBox="0 0 44 46"><path d="M22 2L10 44M22 2l12 42M6 12h32M9 22h26M14 12l16 10M30 12L14 22M12 32h20" stroke="#4b5a63" stroke-width="2.2" fill="none"/></svg>',
+ bat:(p)=>`<svg width="58" height="34" viewBox="0 0 58 34"><rect x="2" y="4" width="48" height="26" rx="4" fill="none" stroke="#4b5a63" stroke-width="2.5"/><rect x="51" y="12" width="5" height="10" rx="1" fill="#4b5a63"/><rect x="6" y="8" width="${Math.max(1,40*p/100)}" height="18" rx="2" fill="${p<20?'#e5533c':(p<45?'#e0a12c':'#25b36e')}"/></svg>`,
+ home:'<svg width="50" height="44" viewBox="0 0 50 44"><path d="M5 22L25 4l20 18" stroke="#4b5a63" stroke-width="2.6" fill="none"/><path d="M10 19v22h30V19" stroke="#4b5a63" stroke-width="2.6" fill="none"/><rect x="21" y="28" width="9" height="13" fill="#4b5a63"/></svg>',
+ gear:'<svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M19.4 13a7.6 7.6 0 000-2l2.1-1.6-2-3.4-2.5 1a7.4 7.4 0 00-1.7-1l-.4-2.7h-4l-.4 2.7a7.4 7.4 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2.1 1.6 2 3.4 2.5-1a7.4 7.4 0 001.7 1l.4 2.7h4l.4-2.7a7.4 7.4 0 001.7-1l2.5 1 2-3.4zM12 15.5A3.5 3.5 0 1112 8.5a3.5 3.5 0 010 7z"/></svg>',
+};
+const SI={
+ work:'<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="none" stroke="#2b7de9" stroke-width="3"/><path d="M20 10v10l7 5" stroke="#2b7de9" stroke-width="3" fill="none"/></svg>',
+ batt:'<svg width="44" height="40" viewBox="0 0 44 40"><rect x="4" y="10" width="32" height="20" rx="3" fill="none" stroke="#25b36e" stroke-width="3"/><rect x="37" y="15" width="4" height="10" fill="#25b36e"/><rect x="8" y="14" width="18" height="12" fill="#25b36e"/></svg>',
+ grid:'<svg width="40" height="40" viewBox="0 0 44 46"><path d="M22 2L10 44M22 2l12 42M6 12h32M9 22h26M14 12l16 10M30 12L14 22" stroke="#e0a12c" stroke-width="3" fill="none"/></svg>',
+ gen:'<svg width="44" height="40" viewBox="0 0 44 40"><rect x="4" y="12" width="36" height="20" rx="3" fill="#e5533c"/><circle cx="14" cy="22" r="5" fill="#fff"/><path d="M28 16l-4 7h5l-3 6" stroke="#fff" stroke-width="2" fill="none"/></svg>',
+ basic:'<svg width="40" height="40" viewBox="0 0 24 24" fill="#55646d"><path d="M19.4 13a7.6 7.6 0 000-2l2.1-1.6-2-3.4-2.5 1a7.4 7.4 0 00-1.7-1l-.4-2.7h-4l-.4 2.7a7.4 7.4 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2.1 1.6 2 3.4 2.5-1a7.4 7.4 0 001.7 1l.4 2.7h4l.4-2.7a7.4 7.4 0 001.7-1l2.5 1 2-3.4zM12 15.5A3.5 3.5 0 1112 8.5a3.5 3.5 0 010 7z"/></svg>',
+ info:'<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#2b7de9"/><rect x="18" y="17" width="4" height="13" fill="#fff"/><circle cx="20" cy="12" r="2.5" fill="#fff"/></svg>',
+ adv:'<svg width="40" height="40" viewBox="0 0 40 40"><path d="M6 12h28M6 20h28M6 28h28" stroke="#6b4fd8" stroke-width="3"/><circle cx="14" cy="12" r="4" fill="#6b4fd8"/><circle cx="26" cy="20" r="4" fill="#6b4fd8"/><circle cx="18" cy="28" r="4" fill="#6b4fd8"/></svg>',
+};
+
+// field defs: k,l,u,min,max,dec
+const F={
+ battCap:{l:'Batt Capacity',u:'Ah',min:0,max:2000,dec:0},maxCh:{l:'Max A Charge',u:'A',min:0,max:120,dec:0},maxDis:{l:'Max A Discharge',u:'A',min:0,max:120,dec:0},
+ genStart:{l:'Start',u:'%',min:0,max:100,dec:0},genA:{l:'A',u:'A',min:0,max:120,dec:0},gridStart:{l:'Start',u:'%',min:0,max:100,dec:0},gridA:{l:'A',u:'A',min:0,max:120,dec:0},
+ genStartV:{l:'Start',u:'V',min:40,max:60,dec:1},gridStartV:{l:'Start',u:'V',min:40,max:60,dec:1},
+ liMode:{l:'Lithium Mode',u:'',min:0,max:99,dec:0,pad:2},liShut:{l:'Shutdown',u:'%',min:0,max:100,dec:0},liLow:{l:'Low Batt',u:'%',min:0,max:100,dec:0},liRestart:{l:'Restart',u:'%',min:0,max:100,dec:0},
+ floatV:{l:'Float V',u:'V',min:38,max:61,dec:1},absV:{l:'Absorption V',u:'V',min:38,max:61,dec:1},eqV:{l:'Equalization V',u:'V',min:38,max:61,dec:1},eqDays:{l:'Equalization Days',u:'days',min:0,max:90,dec:0},eqHours:{l:'Equalization Hours',u:'h',min:0,max:10,dec:1},tempco:{l:'TEMPCO',u:'mV/C/Cell',min:-5,max:0,dec:0},battR:{l:'Batt Resistance',u:'mΩ',min:0,max:6000,dec:0},
+ shutV:{l:'Shutdown',u:'V',min:40,max:60,dec:1},lowV:{l:'Low Batt',u:'V',min:40,max:60,dec:1},restartV:{l:'Restart',u:'V',min:40,max:60,dec:1},
+ shutP:{l:'Shutdown',u:'%',min:0,max:100,dec:0},lowP:{l:'Low Batt',u:'%',min:0,max:100,dec:0},restartP:{l:'Restart',u:'%',min:0,max:100,dec:0},
+ maxSell:{l:'Max Sell Power',u:'W',min:0,max:5000,dec:0},zeroExp:{l:'Zero-export Power',u:'W',min:0,max:500,dec:0},maxSolar:{l:'Max Solar Power',u:'W',min:0,max:6500,dec:0},peakW:{l:'Power',u:'W',min:0,max:16000,dec:0},
+ nLV:{l:'Low voltage',u:'V',min:100,max:300,dec:1},nHV:{l:'High voltage',u:'V',min:100,max:300,dec:1},nLF:{l:'Low frequency',u:'Hz',min:45,max:65,dec:2},nHF:{l:'High frequency',u:'Hz',min:45,max:65,dec:2},
+ rLV:{l:'Low voltage',u:'V',min:100,max:300,dec:1},rHV:{l:'High voltage',u:'V',min:100,max:300,dec:1},rLF:{l:'Low frequency',u:'Hz',min:45,max:65,dec:2},rHF:{l:'High frequency',u:'Hz',min:45,max:65,dec:2},
+ reconT:{l:'Reconnection Time',u:'s',min:0,max:1000,dec:0},pf:{l:'PF',u:'',min:-1,max:1,dec:3},nRamp:{l:'Normal Ramp rate',u:'s',min:0,max:1000,dec:0},rRamp:{l:'Reconnect Ramp rate',u:'s',min:0,max:1000,dec:0},
+ hv1:{l:'HV1',u:'V',min:100,max:300,dec:1},hv1t:{l:'',u:'s',min:0,max:100,dec:2},hv2:{l:'HV2',u:'V',min:100,max:300,dec:1},hv2t:{l:'',u:'s',min:0,max:100,dec:2},
+ lv1:{l:'LV1',u:'V',min:0,max:300,dec:1},lv1t:{l:'',u:'s',min:0,max:100,dec:2},lv2:{l:'LV2',u:'V',min:0,max:300,dec:1},lv2t:{l:'',u:'s',min:0,max:100,dec:2},
+ hf1:{l:'HF1',u:'Hz',min:45,max:65,dec:2},hf1t:{l:'',u:'s',min:0,max:100,dec:2},lf1:{l:'LF1',u:'Hz',min:45,max:65,dec:2},lf1t:{l:'',u:'s',min:0,max:100,dec:2},ovMean:{l:'Over voltage U>(10 min. running mean)',u:'V',min:100,max:300,dec:1},
+ genRated:{l:'Rated Power',u:'W',min:0,max:16000,dec:0},slPower:{l:'Power',u:'W',min:0,max:16000,dec:0},slOn:{l:'ON',u:'%',min:0,max:100,dec:0},slOff:{l:'OFF',u:'%',min:0,max:100,dec:0},acHigh:{l:'AC Couple Fre High',u:'Hz',min:50,max:55,dec:2},
+ backupDelay:{l:'Backup Delay',u:'ms',min:0,max:30000,dec:0},ctRatio:{l:'CT Ratio',u:':1',min:1,max:10000,dec:0},expLim:{l:'Export power limiter',u:'W',min:0,max:20000,dec:0},impLim:{l:'Import power limiter',u:'W',min:0,max:20000,dec:0},
+ y:{l:'Year',u:'',min:2000,max:2099,dec:0},mo:{l:'Month',u:'',min:1,max:12,dec:0},d:{l:'Day',u:'',min:1,max:31,dec:0},
+};
+const SEL={workMode:['Selling First','Zero Export To Load','Zero Export To CT'],gridMode:['General Standard','UL1741 & IEEE1547','CPUC RULE21','SRD-UL-1741','CEI 0-21','EN50549_CZ-PPDS','Australia_A','Australia_B','Australia_C','NewZealand','VDE4105','OVE_Directive_R25','EN50549_CZ_PPDS_L16A','NRS097','G98/G99','G99-NI','ESB Networks (Ireland)','IEEE1547a-2014'],
+ gridHz:[50,60],invV:[200,220,230,240],gridType:['Single Phase','120/240V Split Phase','120/208V 3 Phase'],genMode:['Generator Input','SmartLoad Output','Micro Inv Input']};
+const fmtV=(k,v)=>{const f=F[k];if(!f)return v;let s=Number(v).toFixed(f.dec);if(f.pad)s=s.padStart(f.pad,'0');return s;};
+
+function dv(k){return UI.draft?UI.draft[k]:S[k];}
+function isDirty(k){return UI.draft&&JSON.stringify(UI.draft[k])!==JSON.stringify(S[k]);}
+function fld(k,opts={}){const f=F[k];const v=dv(k);return `<span class="f${isDirty(k)?' dirty':''}" data-a="num" data-k="${k}">${fmtV(k,v)}</span>${opts.nou?'':`<span class="u">${f.u}</span>`}`;}
+function row(k,lbl){const f=F[k];return `<div class="row"><span class="lbl" data-a="help" data-k="${k}">${lbl||f.l}</span>${fld(k)}</div>`;}
+function ck(k,l){return `<div class="row"><span class="ck${dv(k)?' on':''}" data-a="ck" data-k="${k}"></span><span class="lbl" data-a="ck" data-k="${k}">${l}</span></div>`;}
+function rd(k,val,l){return `<div class="row"><span class="rd${dv(k)===val?' on':''}" data-a="rd" data-k="${k}" data-v="${val}"></span><span class="lbl" data-a="rd" data-k="${k}" data-v="${val}">${l||val}</span></div>`;}
+function sel(k,l){return `<div class="row"><span class="lbl" data-a="help" data-k="${k}" style="flex:none;min-width:120px">${l}</span><span class="sel${isDirty(k)?' dirty':''}" data-a="sel" data-k="${k}">${dv(k)}${k==='gridHz'?'Hz':(k==='invV'?'V':'')}</span></div>`;}
+
+const PAGES={
+ batt:{title:'Battery Setting',tabs:['Batt Set1','Batt Set2','Batt Set3']},
+ work:{title:'System Work Mode',tabs:['Work Mode1','Work Mode2','Work Mode3']},
+ gridset:{title:'Grid Setting',tabs:['Grid Set1','Grid Set2','Grid Set3']},
+ gen:{title:'GEN PORT USE',tabs:['Port Set1']},
+ adv:{title:'Advanced Function',tabs:['Func Set1','Func Set4']},
+ basic:{title:'Basic Setting',tabs:['Basic Set1']},
+};
+function tabBody(pg,t){
+ const m=pctMode(UI.draft);
+ if(pg==='batt'){
+  if(t===0)return `<div class="cols"><div>
+   <div class="sec">Batt Mode</div>${rd('battMode','Lithium')}${rd('battMode','Use Batt V')}${rd('battMode','Use Batt %')}${rd('battMode','No Batt')}</div><div>
+   ${row('battCap')}${row('maxCh')}${row('maxDis')}${ck('activate','Activate Battery')}${ck('noFloat','Disable Float Charge')}</div></div>`;
+  if(t===1){const v=m==='v';return `<div class="cols"><div><div class="sec">Gen</div>
+   ${row(v?'genStartV':'genStart')}${row('genA')}${ck('genCharge','Gen Charge')}${ck('genSignal','Gen Signal')}${ck('genForce','Gen Force')}</div><div><div class="sec">Grid</div>
+   ${row(v?'gridStartV':'gridStart')}${row('gridA')}${ck('gridCharge','Grid Charge')}<div class="row dis"><span class="ck${dv('gridSignal')?' on':''}"></span><span class="lbl">Grid Signal</span></div></div></div>`;}
+  if(t===2){
+   if(m==='li')return `<div class="cols"><div>${row('liMode')}<div class="row" style="font-size:13px;color:#6a7a83">00 = CAN (Pylon)</div></div><div>${row('liShut')}${row('liLow')}${row('liRestart')}</div></div>`;
+   if(m==='n')return `<div style="padding:30px;color:#6a7a83;font-size:16px">No Batt: battery functions disabled.</div>`;
+   const v=m==='v';return `<div class="cols"><div>${row('floatV')}${row('absV')}${row('eqV')}${row('eqDays')}${row('eqHours')}</div><div>${row('tempco')}${row('battR')}${row(v?'shutV':'shutP')}${row(v?'lowV':'lowP')}${row(v?'restartV':'restartP')}</div></div>`;}
+ }
+ if(pg==='work'){
+  if(t===0)return `<div class="cols"><div>${sel('workMode','Work Mode')}${ck('solarSell','Solar Sell')}${row('maxSell')}${row('zeroExp')}</div><div>
+   <div class="sec">Energy pattern</div>${rd('pattern','BattFirst')}${rd('pattern','LoadFirst')}${row('maxSolar')}${ck('peak','Grid Peak Shaving')}${row('peakW','Peak Power')}</div></div>`;
+  if(t===1){const v=m==='v';return `${ck('tou','Time Of Use')}<table class="tou"><tr><th>Grid</th><th>Gen</th><th>Time</th><th>Power</th><th>Batt</th></tr>`+
+   UI.draft.slots.map((s,i)=>`<tr><td><span class="ck${s.g?' on':''}" data-a="slck" data-i="${i}" data-f="g"></span></td><td><span class="ck${s.gen?' on':''}" data-a="slck" data-i="${i}" data-f="gen"></span></td>
+   <td><span class="f${JSON.stringify(s.t)!==JSON.stringify(S.slots[i].t)?' dirty':''}" data-a="sltime" data-i="${i}">${s.t}</span></td>
+   <td><span class="f${s.p!==S.slots[i].p?' dirty':''}" data-a="slnum" data-i="${i}" data-f="p">${s.p}</span> W</td>
+   <td><span class="f${(v?s.v!==S.slots[i].v:s.b!==S.slots[i].b)?' dirty':''}" data-a="slnum" data-i="${i}" data-f="${v?'v':'b'}">${v?s.v.toFixed(1):s.b}</span> ${v?'V':'%'}</td></tr>`).join('')+'</table>';}
+  if(t===2){const dn=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];return `<div class="sec">Time of use applies on</div>`+dn.map((d,i)=>`<div class="row"><span class="ck${UI.draft.days[i]?' on':''}" data-a="day" data-i="${i}"></span><span class="lbl">${d}</span></div>`).join('');}
+ }
+ if(pg==='gridset'){
+  const lock=!UI.gridUnlocked?' dis':'';
+  if(t===0)return `<div class="${lock}">${sel('gridMode','Grid Mode')}${sel('gridHz','Grid Frequency')}${sel('invV','INV Output Voltage')}${sel('gridType','Grid Type')}</div>`+(UI.gridUnlocked?'':`<div class="row" style="margin-top:8px"><span class="sel" data-a="unlock" style="background:#2b7de9;color:#fff">Unlock Grid Setting</span></div>`);
+  if(t===1)return `<div class="cols${lock}"><div><div class="sec">Normal connect</div>${row('nLV')}${row('nHV')}${row('nLF')}${row('nHF')}${row('reconT')}</div><div><div class="sec">Reconnect after trip</div>${row('rLV')}${row('rHV')}${row('rLF')}${row('rHF')}${row('pf')}</div></div>`+(UI.gridUnlocked?'':`<div class="row"><span class="sel" data-a="unlock" style="background:#2b7de9;color:#fff">Unlock Grid Setting</span></div>`);
+  if(t===2)return `<div class="cols${lock}"><div><div class="sec">IP Protection</div><div class="row"><span class="lbl">HV1</span>${fld('hv1')}${fld('hv1t')}</div><div class="row"><span class="lbl">HV2</span>${fld('hv2')}${fld('hv2t')}</div><div class="row"><span class="lbl">HF1</span>${fld('hf1')}${fld('hf1t')}</div></div><div><div class="sec">&nbsp;</div><div class="row"><span class="lbl">LV1</span>${fld('lv1')}${fld('lv1t')}</div><div class="row"><span class="lbl">LV2</span>${fld('lv2')}${fld('lv2t')}</div><div class="row"><span class="lbl">LF1</span>${fld('lf1')}${fld('lf1t')}</div></div></div><div class="${lock}">${row('ovMean','Over voltage U> (10 min mean)')}</div>`+(UI.gridUnlocked?'':`<div class="row"><span class="sel" data-a="unlock" style="background:#2b7de9;color:#fff">Unlock Grid Setting</span></div>`);
+ }
+ if(pg==='gen')return `<div class="cols"><div>${rd('genMode','Generator Input')}${row('genRated')}${rd('genMode','SmartLoad Output')}${ck('onGridOn','On Grid always on')}${rd('genMode','Micro Inv Input')}${row('acHigh')}</div><div>
+   <div class="sec">Smart Load</div>${row('slPower')}${row('slOn')}${row('slOff')}${ck('offGridOff','off grid immediately off')}</div></div>`;
+ if(pg==='adv'){
+  if(t===0)return `<div class="cols"><div>${ck('arc','Solar Arc Fault ON')}${ck('bmsErrStop','BMS_Err_Stop')}${row('backupDelay')}${row('ctRatio')}${ck('drm','DRM')}</div><div>${ck('genPeak','Gen peak-shaving')}${ck('island','Signal ISLAND MODE')}<div class="row dis"><span class="lbl">System selfcheck</span><span class="sel">Disable</span></div></div></div>`;
+  if(t===1)return `<div class="cols"><div>${ck('ats','ATS')}${row('expLim')}${row('impLim')}</div><div>${ck('lowNoise','Low Noise Mode')}${ck('lowPower','Low Power Mode < Low Batt')}${ck('mpptScan','MPPT Multi-Point Scanning')}</div></div>`;
+ }
+ if(pg==='basic')return `<div class="cols"><div><div class="sec">Time Syncs</div><div class="row"><span class="lbl">Year</span>${fld('y',{nou:1})}</div><div class="row"><span class="lbl">Month</span>${fld('mo',{nou:1})}</div><div class="row"><span class="lbl">Day</span>${fld('d',{nou:1})}</div>${ck('timeSync','Time Syncs')}</div><div>
+   ${ck('beep','Beep')}${ck('autoDim','Auto Dim')}${ck('h24','24-Hour')}<div class="row" style="margin-top:8px"><span class="sel" data-a="pw" data-v="reset">Factory Reset</span></div><div class="row"><span class="sel" data-a="pw" data-v="lock">${S.locked?'Unlock all changes':'Lock out all changes'}</span></div></div></div>`;
+ return '';
+}
+
+function flowPath(a,b){return `M${a[0]} ${a[1]} L${b[0]} ${b[1]}`;}
+function renderMain(){
+ const d=new Date(2026,9,26);const clk=fmtT(R.min);
+ const st=statusText();
+ const pv=Math.round(R.pv), g=Math.round(R.grid), ld=Math.round(R.load), bt=Math.round(R.batt);
+ const soc=pctMode(S)==='li'?R.soc*100:(pctMode(S)==='p'?R.est*100:R.soc*100);
+ const fl=(on,rev,hi)=>`flow${on?' on':''}${rev?' rev':''}${hi?' hi':''}" style="animation-delay:${-(performance.now()%700)/1000}s`;
+ return `<div class="L-top"><span>${S.y}-${String(S.mo).padStart(2,'0')}-${String(S.d).padStart(2,'0')}&nbsp;&nbsp;${clk}</span><span class="tt">${R.gridPresent?'On-Grid':'Off-Grid'}</span><span class="gear" data-a="go" data-p="setup">${IC.gear}</span></div>
+ <svg class="L-x" width="560" height="336" style="top:0">
+  <path class="${fl(pv>10,false,pv>4500)}" d="${flowPath([140,95],[238,160])}"/>
+  <path class="${fl(Math.abs(g)>10,g>0,Math.abs(g)>4500)}" d="${flowPath([322,160],[420,95])}"/>
+  <path class="${fl(Math.abs(bt)>10,bt<0,Math.abs(bt)>4500)}" d="${flowPath([140,265],[238,200])}"/>
+  <path class="${fl(ld>10,false,ld>4500)}" d="${flowPath([322,200],[420,265])}"/>
+ </svg>
+ <div class="node" data-a="go" data-p="solar" style="left:24px;top:42px">${IC.sun}<div class="val">${pv}W</div><div class="sub">${(R.day.pv).toFixed(1)}kWh</div></div>
+ <div class="node" data-a="go" data-p="grid" style="left:416px;top:40px">${IC.grid}<div class="val" style="color:${g<0?'#25b36e':'#1f2a30'}">${g}W</div><div class="sub">${R.gridPresent?Math.round(R.Vg)+'V 50.00Hz':'— —'}</div></div>
+ <div class="node" data-a="go" data-p="battery" style="left:24px;top:208px">${IC.bat(soc)}<div class="val">${Math.round(soc)}%</div><div class="sub">${bt}W ${R.bv.toFixed(1)}V</div></div>
+ <div class="node" data-a="go" data-p="load" style="left:416px;top:206px">${IC.home}<div class="val">${ld}W</div><div class="sub">${(R.day.load).toFixed(1)}kWh</div></div>
+ <div class="inv" data-a="go" data-p="inverter" style="border-color:${st.c}"><svg width="40" height="40" viewBox="0 0 40 40"><rect x="6" y="4" width="28" height="32" rx="4" fill="#fff" stroke="#4b5a63" stroke-width="2"/><rect x="11" y="9" width="18" height="10" rx="1" fill="${st.c}"/><circle cx="20" cy="27" r="3" fill="#4b5a63"/></svg><div class="st" style="color:${st.c}">${st.t}</div></div>`;
+}
+function statusText(){const f=R.faults||new Set();
+ if(f.has('F58'))return{t:'comm./F58',c:'#e5533c'};
+ if(f.has('F56'))return{t:'F56',c:'#e5533c'};
+ if(f.has('PV'))return{t:'PV Over V',c:'#e5533c'};
+ if(f.has('OFF'))return{t:'Off',c:'#e5533c'};
+ if(R.bmsTrip>0)return{t:'BMS Prot.',c:'#e5533c'};
+ if(R.vHigh)return{t:'Grid V Err',c:'#e0a12c'};
+ if(f.has('F35'))return{t:'F35',c:'#e0a12c'};
+ return{t:'Normal',c:'#25b36e'};}
+function detail(title,rows,extra=''){return `<div class="L-top"><span class="tt">${title}</span><span>${fmtT(R.min)}</span></div><div style="padding:12px 16px"><div class="dt">${rows.map(r=>`<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>${extra}</div><div class="back" data-a="go" data-p="main">Esc</div>`;}
+function renderPage(){
+ const pg=UI.pg;
+ if(pg==='main')return renderMain();
+ const b=battSpec(), T=R.T||25;
+ if(pg==='solar'){const v=R.pvAvail>0?(E.pn*PANEL.vmp*(1+PANEL.kv*(T-25))):0;return detail('Solar',[['Power',Math.round(R.pv)+'W'],['Energy Today',R.day.pv.toFixed(1)+'kWh'],['PV1-V',v.toFixed(1)+'V'],['PV1-I',(v?R.pv/v:0).toFixed(1)+'A'],['P1',Math.round(R.pv)+'W'],['PV2-V','0.0V'],['PV2-I','0.0A'],['P2','0W'],['Grid Tie Power',Math.round(Math.max(0,-R.grid))+'W'],['Not used (curtailed)',Math.round(R.curt)+'W']]);}
+ if(pg==='grid')return detail('Grid',[['Status',R.gridPresent?'Normal':(R.vHigh?'V Fault':'Disconnected')],['Power',Math.round(R.grid)+'W'],['Frequency',R.gridPresent?'50.00Hz':'0.00Hz'],['L1 Voltage',(R.gridPresent?R.Vg:gridSched(R.min/60)&&R.trip===0?gridVolt(R.min/60):0).toFixed(1)+'V'],['BUY Today',R.day.buy.toFixed(1)+'kWh'],['SELL Today',R.day.sell.toFixed(1)+'kWh'],['CT',Math.round(R.grid)+'W'],['LD',Math.round(R.load)+'W']]);
+ if(pg==='inverter'){const p=Math.round(R.load+Math.max(0,-R.grid));return detail('Inverter',[['Power',p+'W'],['DC-T',(28+p/5000*22).toFixed(1)+'C'],['AC-T',(30+p/5000*25).toFixed(1)+'C'],['Frequency','50.00Hz'],['L1 Voltage',R.out?S.invV.toFixed?S.invV+'.0V':S.invV+'V':'0.0V'],['L1 Current',(p/S.invV).toFixed(1)+'A'],['L1 Power',p+'W'],['Status',statusText().t]]);}
+ if(pg==='load')return detail('Load',[['Power',Math.round(R.load)+'W'],['L1 Voltage',R.out?S.invV+'.0V':'0.0V'],['L1 Power',Math.round(R.load)+'W'],['Today',R.day.load.toFixed(1)+'kWh']]);
+ if(pg==='battery'){const m=pctMode(S);const soc=m==='li'?R.soc*100:(m==='p'?R.est*100:R.soc*100);
+  const st=R.bmsTrip>0?'BMS Protect':(R.batt<-10?'Charging':(R.batt>10?'Discharging':'Static'));
+  return detail('Battery',[['Status',st],['SOC',Math.round(soc)+'%'],['U',R.bv.toFixed(2)+'V'],['I',(-R.bi).toFixed(1)+'A'],['Power',Math.round(R.batt)+'W'],['Temp','25.0C'],['Batt Mode',S.battMode],['Grid charging',Math.round(R.gch||0)+'W']],(m==='li'&&b.comm)?'<div class="row" style="margin-top:8px"><span class="sel" data-a="go" data-p="bms">Li-BMS</span></div>':'');}
+ if(pg==='bms'){const ok=!(R.faults&&R.faults.has('F58'));return detail('Li-BMS',[['Mean Voltage',ok?R.bv.toFixed(2)+'V':'--'],['Total Current',ok?(-R.bi).toFixed(1)+'A':'--'],['Mean Temp',ok?'25.0C':'--'],['Total SOC',ok?Math.round(R.soc*100)+'%':'--'],['Dump Energy',ok?Math.round(R.soc*b.ah)+'Ah':'--'],['Charge Volt','56.8V'],['Charge Curr Limit',ok?b.chA+'A':'--'],['Discharge Curr Limit',ok?b.disA+'A':'--']]);}
+ if(pg==='setup'){return `<div class="L-top"><span class="tt">System Setup</span><span>${fmtT(R.min)}</span></div><div class="ico">
+  <div data-a="open" data-p="work">${SI.work}System<br>Work Mode</div><div data-a="open" data-p="batt">${SI.batt}Battery<br>Setting</div><div data-a="open" data-p="gridset">${SI.grid}Grid<br>Setting</div><div data-a="open" data-p="gen">${SI.gen}Gen Port<br>Use</div>
+  <div data-a="open" data-p="basic">${SI.basic}Basic<br>Setting</div><div data-a="go" data-p="info">${SI.info}Device<br>Info</div><div data-a="open" data-p="adv">${SI.adv}Advanced<br>Function</div><div data-a="go" data-p="main" style="background:#2b3a44;color:#fff">Esc</div></div>`;}
+ if(pg==='info')return `<div class="L-top"><span class="tt">Device Info</span><span>${fmtT(R.min)}</span></div><div style="padding:10px 14px"><div class="dt" style="margin-bottom:6px"><div><span>Inverter ID</span><b>2610260501</b></div><div><span>HMI</span><b>Ver 1001-SIM</b></div><div><span>MAIN</span><b>Ver 2002-SIM</b></div><div><span>Rated</span><b>5000W</b></div></div>
+  <div class="sec">Alarms Code</div><div class="alm">${R.alarms.length?R.alarms.slice(0,6).map(a=>`<div><span>${a.t}</span><b>${a.code}</b><span>${a.txt}</span></div>`).join(''):'<div>No alarm</div>'}</div></div><div class="back" data-a="go" data-p="setup">Esc</div>`;
+ if(PAGES[pg]){const P=PAGES[pg];return `<div class="L-top"><span class="tt">${P.title}</span><span>${fmtT(R.min)}</span></div><div class="pg">${tabBody(pg,UI.tab)}</div>
+  <div class="side">${P.tabs.map((t,i)=>`<div class="tab${i===UI.tab?' on':''}" data-a="tab" data-i="${i}">${t}</div>`).join('')}<div class="sp"></div><div class="okx"><div class="ok" data-a="save">✓</div><div class="no" data-a="cancel">✕</div></div></div>`;}
+ return '';
+}
+function renderOv(){const o=UI.ov;if(!o)return '';
+ if(o.t==='kp'){const keys=['1','2','3','DEL','4','5','6','.','7','8','9','-','CANCEL','0','OK'];
+  return `<div class="ov"><div class="kp"><div class="t">${o.title}</div><div class="r">${o.range||''}</div><div class="disp${o.bad?' bad':''}">${o.buf===''?'&nbsp;':o.buf}</div><div class="kg">${keys.map(k=>`<div class="${k==='OK'?'g':(k==='CANCEL'?'c':'')}" data-a="kk" data-v="${k}" ${k==='CANCEL'?'style="grid-column:span 1"':''}${k==='OK'?' style="grid-column:span 2"':''}>${k}</div>`).join('')}</div></div></div>`;}
+ if(o.t==='list')return `<div class="ov" data-a="ovx"><div class="lst">${o.opts.map(v=>`<div class="${String(v)===String(dv(o.k))?'on':''}" data-a="pick" data-v="${v}">${v}</div>`).join('')}</div></div>`;
+ return '';}
+function draw(){
+ let h=renderPage()+renderOv();
+ if(UI.toast)h+=`<div class="toast">${UI.toast}</div>`;
+ lcd.innerHTML=h;
+ const z=document.querySelector('#zmwrap .lcd');if(z){z.innerHTML=h;}
+ leds();}
+function leds(){const f=R.faults||new Set();
+ $('ledDC').classList.toggle('on',R.pv>5);$('ledAC').classList.toggle('on',!!R.gridPresent);
+ const bad=f.has('F58')||f.has('F56')||f.has('PV')||f.has('OFF')||R.bmsTrip>0;
+ $('ledN').classList.toggle('on',!bad);$('ledA').classList.toggle('on',bad||f.has('F35')||R.vHigh);}
+function toast(t){UI.toast=t;draw();clearTimeout(toast.h);toast.h=setTimeout(()=>{UI.toast=null;draw();},1600);}
+
+/* ============ LCD interaction ============ */
+function onLcd(e){
+ const el=e.target.closest('[data-a]');if(!el)return;
+ const a=el.dataset.a,k=el.dataset.k;
+ if(a==='go'){UI.pg=el.dataset.p;UI.tab=0;help(el.dataset.p);draw();return;}
+ if(a==='open'){if(S.locked&&el.dataset.p!=='basic'){toast('Locked: unlock in Basic Setting');help('locked');return;}UI.pg=el.dataset.p;UI.tab=0;UI.draft=clone(S);help(el.dataset.p);draw();return;}
+ if(a==='tab'){UI.tab=+el.dataset.i;draw();return;}
+ if(a==='save'){commit();return;}
+ if(a==='cancel'){UI.draft=null;UI.pg='setup';UI.gridUnlocked=false;draw();return;}
+ if(a==='help'){help(k);return;}
+ if(a==='ck'){UI.draft[k]=UI.draft[k]?0:1;help(k);draw();return;}
+ if(a==='rd'){UI.draft[k]=el.dataset.v;help(k+':'+el.dataset.v);draw();return;}
+ if(a==='sel'){if(UI.pg==='gridset'&&!UI.gridUnlocked){toast('Unlock Grid Setting first');return;}help(k);UI.ov={t:'list',k,opts:SEL[k]};draw();return;}
+ if(a==='pick'){const v=el.dataset.v;UI.draft[UI.ov.k]=isNaN(+v)||UI.ov.k==='workMode'||UI.ov.k==='gridMode'||UI.ov.k==='gridType'||UI.ov.k==='genMode'?v:+v;help(UI.ov.k+(UI.ov.k==='workMode'?':'+v:''));UI.ov=null;draw();return;}
+ if(a==='ovx'){if(e.target===el){UI.ov=null;draw();}return;}
+ if(a==='num'){if(UI.pg==='gridset'&&!UI.gridUnlocked){toast('Unlock Grid Setting first');return;}const f=F[k];help(k);UI.ov={t:'kp',k,title:(f.l||k)+(f.u?' ('+f.u+')':''),range:`Range: ${f.min} – ${f.max} ${f.u}`,buf:''};draw();return;}
+ if(a==='slck'){const s=UI.draft.slots[+el.dataset.i];s[el.dataset.f]=s[el.dataset.f]?0:1;help(el.dataset.f==='g'?'touGrid':'touGen');draw();return;}
+ if(a==='slnum'){const f=el.dataset.f;help('tou'+f);const rg=f==='p'?[0,5000,'W']:(f==='v'?[40,60,'V']:[0,100,'%']);UI.ov={t:'kp',slot:+el.dataset.i,f,title:(f==='p'?'Power':'Batt')+' ('+rg[2]+')',range:`Range: ${rg[0]} – ${rg[1]} ${rg[2]}`,buf:'',min:rg[0],max:rg[1]};draw();return;}
+ if(a==='sltime'){help('touTime');UI.ov={t:'kp',slot:+el.dataset.i,f:'t',title:'Time (hhmm)',range:'e.g. 0530 = 05:30',buf:''};draw();return;}
+ if(a==='day'){const i=+el.dataset.i;UI.draft.days[i]=UI.draft.days[i]?0:1;draw();return;}
+ if(a==='unlock'){help('unlock');UI.ov={t:'kp',pw:'grid',title:'Password',range:'Grid setting password',buf:''};draw();return;}
+ if(a==='pw'){help(el.dataset.v==='reset'?'reset':'lock');UI.ov={t:'kp',pw:el.dataset.v,title:'Password',range:el.dataset.v==='reset'?'Factory Reset':'Lock out all changes',buf:''};draw();return;}
+ if(a==='kk'){keypad(el.dataset.v);return;}
+}
+lcd.addEventListener('pointerdown',onLcd);
+function keypad(v){const o=UI.ov;
+ if(v==='CANCEL'){UI.ov=null;draw();return;}
+ if(v==='DEL'){o.buf=o.buf.slice(0,-1);o.bad=false;draw();return;}
+ if(v!=='OK'){if(o.buf.length<9)o.buf+=v;o.bad=false;draw();return;}
+ // OK
+ if(o.pw){ if(o.pw==='grid'&&o.buf==='7777'){UI.gridUnlocked=true;UI.ov=null;toast('Grid Setting unlocked');return;}
+  if(o.pw==='reset'&&o.buf==='9999'){const keep={y:S.y,mo:S.mo,d:S.d};S=Object.assign(defaults(),keep);UI.draft=clone(S);save();UI.ov=null;ev('w','Factory Reset: رجعت كل الإعدادات لإعدادات المصنع.','',0);toast('Factory reset done');return;}
+  if(o.pw==='lock'&&o.buf==='7777'){S.locked=S.locked?0:1;UI.draft&&(UI.draft.locked=S.locked);save();UI.ov=null;toast(S.locked?'All changes locked':'Unlocked');return;}
+  o.bad=true;o.buf='';draw();return;}
+ if(o.f==='t'){const s=o.buf.padStart(4,'0');const hh=+s.slice(0,2),mm=+s.slice(2,4);if(s.length!==4||hh>24||mm>59){o.bad=true;draw();return;}UI.draft.slots[o.slot].t=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');UI.ov=null;draw();return;}
+ const n=parseFloat(o.buf);
+ if(o.slot!=null){if(isNaN(n)||n<o.min||n>o.max){o.bad=true;draw();return;}UI.draft.slots[o.slot][o.f]=o.f==='v'?Math.round(n*10)/10:Math.round(n);UI.ov=null;draw();return;}
+ const f=F[o.k];if(isNaN(n)||n<f.min||n>f.max){o.bad=true;o.buf='';UI.ov.range=`Out of range! ${f.min} – ${f.max} ${f.u}`;draw();return;}
+ UI.draft[o.k]=Math.round(n*Math.pow(10,f.dec))/Math.pow(10,f.dec);UI.ov=null;draw();}
+function commit(){const before=clone(S);S=clone(UI.draft);save();
+ const ch=[];for(const k in S){if(k==='slots'||k==='days'){if(JSON.stringify(S[k])!==JSON.stringify(before[k]))ch.push(k==='slots'?'Time Of Use table':'TOU days');continue;}if(S[k]!==before[k])ch.push((F[k]&&F[k].l?F[k].l:k)+': '+before[k]+' → '+S[k]);}
+ if(ch.length)ev('o','حفظت الإعدادات: '+ch.join('، ')+'.','',0);
+ UI.draft=null;UI.pg='setup';UI.gridUnlocked=false;toast(ch.length?'Saved':'No change');}
+function save(){ls.set('simS',JSON.stringify(S));}
+// physical keys
+document.querySelector('.keys').addEventListener('click',e=>{const k=e.target.closest('[data-k]');if(!k)return;const v=k.dataset.k;
+ if(UI.ov){UI.ov=null;draw();return;}
+ if(v==='esc'){if(PAGES[UI.pg]){UI.draft=null;UI.gridUnlocked=false;UI.pg='setup';}else if(UI.pg==='bms')UI.pg='battery';else UI.pg='main';draw();}
+ else if(v==='enter'){if(UI.pg==='main'){UI.pg='setup';draw();}else if(PAGES[UI.pg])commit();}
+ else if(PAGES[UI.pg]){const n=PAGES[UI.pg].tabs.length;UI.tab=(UI.tab+(v==='down'?1:n-1))%n;draw();}
+ else if(UI.pg==='main'){const order=['solar','grid','battery','load','inverter'];UI.pg=order[v==='down'?0:3];draw();}
+});
+// zoom
+function fitZoom(){const z=document.querySelector('#zmwrap .lcd');if(!z)return;const W=innerWidth,H=innerHeight;const rot=H>W;const s=rot?Math.min(H*0.94/560,W*0.94/336):Math.min(W*0.96/560,H*0.9/336);
+ z.style.transform=rot?`translate(${(W+336*s)/2}px,${(H-560*s)/2}px) rotate(90deg) scale(${s})`:`translate(${(W-560*s)/2}px,${(H-336*s)/2}px) scale(${s})`;z.style.position='fixed';}
+$('zoomBtn').onclick=()=>{const z=document.createElement('div');z.className='lcd';$('zmwrap').innerHTML='';$('zmwrap').appendChild(z);z.addEventListener('pointerdown',onLcd);document.body.classList.add('zm');fitZoom();draw();};
+$('zmclose').onclick=()=>{document.body.classList.remove('zm');$('zmwrap').innerHTML='';};
+
+/* ============ HELP (Arabic) ============ */
+const H={
+ main:['الشاشة الرئيسية','فوق الشمال الألواح، فوق اليمين الدولة، تحت الشمال البطارية، وتحت اليمين البيت. الأسهم بتمشي باتجاه الكهربا. الدولة بالسالب يعني عم تبيعلها، والبطارية بالسالب يعني عم تشحن.'],
+ solar:['Solar','قدرة الألواح هلّق، وطاقة اليوم. PV1-V هوّي فولت الـString وهوّي شغّال (قريب من Vmp × عدد الألواح). «Not used» هيّي شمس ضايعة لأنو البطارية مليانة وما في مين ياخدها.'],
+ grid:['Grid','حالة الدولة وقديش عم تسحب منها (موجب) أو تبيعلها (سالب). BUY وSELL هنّي طاقة اليوم.'],
+ battery:['Battery','SOC نسبة الشحن. U الفولت. I التيار: سالب يعني شحن. بوضع Lithium مع كابل اتصال، كل هالأرقام جاية من الـBMS.'],
+ bms:['Li-BMS','الأرقام يلّي البطارية عم تبعتها للإنفرتر بكابل الاتصال: حدود الشحن والتفريغ، والنسبة. الإنفرتر ما بيتعدّى هالحدود.'],
+ load:['Load','الأحمال على مخرج LOAD (البيت). إذا صفر والبيت مولّع، يعني الإنفرتر طافي.'],
+ inverter:['Inverter','حرارة الـDC والـAC والقدرة الطالعة. إذا الحرارة عالية، الإنفرتر بيخفّف قدرتو لحالو.'],
+ setup:['System Setup','سبع قوائم متل الإنفرتر: Work Mode، Battery، Grid، Gen Port، Basic، Device Info، Advanced. أي تغيير ما بينحفظ إلّا لما تكبس ✓ الخضرا.'],
+ info:['Device Info','رقم الإنفرتر ونسخة البرنامج، وتحت لائحة الأعطال يلّي صارت مع الوقت. أوّل شي بتشوفو بأي عطل.'],
+ locked:['Locked','الإعدادات مقفولة. افتحها من Basic Setting ← Lock out all changes بالباسوورد 7777.'],
+ batt:['Battery Setting','3 صفحات: Set1 نوع البطارية والتيارات، Set2 الشحن من الدولة والمولّد، Set3 الفولتات والحدود.'],
+ work:['System Work Mode','كيف بيوزّع الإنفرتر الشمس: عالبيت، عالبطارية، أو عالشبكة. وبصفحة Work Mode2 جدول Time Of Use.'],
+ gridset:['Grid Setting','إعدادات الشبكة: الفولت والتردّد ومجال القبول. لازم Unlock بالباسوورد 7777 قبل ما تغيّر.'],
+ gen:['Gen Port Use','مدخل GEN: مولّد، أو حمل ذكي (Smart Load) متل سخّانة، أو Micro Inverter. بهالنسخة من المحاكي المولّد مش مركّب، والإعدادات للتعرّف عليها بس.'],
+ adv:['Advanced Function','إعدادات متقدّمة. أغلبها بتضلّ عالافتراضي إلّا إذا عندك سبب.'],
+ basic:['Basic Setting','التاريخ والوقت والصوت. Factory Reset بالباسوورد 9999 بيرجّع كل شي متل المصنع.'],
+ 'battMode:Lithium':['Batt Mode: Lithium','الإنفرتر بياخد كل شي من الـBMS بكابل الاتصال (CAN أو RS485): النسبة وحدود الشحن والتفريغ. إذا ما في كابل، أو البروتوكول غلط، بيطلع F58 والبطارية ما بتشتغل.','بدّها كابل اتصال، ورقم Lithium Mode الصح بصفحة Set3.'],
+ 'battMode:Use Batt V':['Batt Mode: Use Batt V','الإنفرتر بيشتغل على فولت البطارية. للرصاص، أو لليثيوم بلا كابل اتصال. كل الحدود (Shutdown، Low Batt، Restart، والجدول) بتصير بالفولت.','الفولت بينزل وقت السحب القوي، فالإنفرتر ممكن يطفي أبكر من المتوقّع.'],
+ 'battMode:Use Batt %':['Batt Mode: Use Batt %','الإنفرتر بيعدّ الأمبيرات الداخلة والطالعة ليقدّر النسبة. لهيك Batt Capacity لازم تكون قدّ البطارية الحقيقية، وإلّا النسبة عالشاشة بتكذب.'],
+ 'battMode:No Batt':['Batt Mode: No Batt','ما في بطارية. بالانقطاع، البيت عالشمس لحالها، وأي غيمة بتطفيه.'],
+ battCap:['Batt Capacity','سعة البطارية بالأمبير ساعة على 48V. بـUse Batt % منها بيحسب النسبة. 4 بطاريات 12V × 200Ah عالتسلسل = 200Ah، مش 800.'],
+ maxCh:['Max A Charge','أعلى تيار شحن للبطارية. ما يتعدّى المسموح: ليثيوم غالباً 0.5C (50A لكل 100Ah)، ورصاص حوالي 0.1 لـ0.2C. مع كابل الاتصال، الـBMS كمان بيحدّد.','بلا كابل اتصال، الإنفرتر ما بيعرف حدّ البطارية: إنت المسؤول عن هالرقم.'],
+ maxDis:['Max A Discharge','أعلى تيار سحب من البطارية. 40A × 51V ≈ 2kW بس. إذا أحمال البيت أكتر، بالانقطاع الإنفرتر بيطفي.'],
+ activate:['Activate Battery','لبطارية ليثيوم فضيت كتير والـBMS فاصلها: الإنفرتر بيحاول يصحّيها بشحنة صغيرة.'],
+ noFloat:['Disable Float Charge','بيوقّف شحن التعويم. أوقات بيستعملوه لليثيوم لحتى ما تضلّ عفولت عالي عطول. ارجع لكتيّب البطارية.'],
+ genStart:['Gen: Start','تحت هالنسبة، المولّد بيبلّش يشحن البطارية (إذا Gen Charge معلّم).'],genStartV:['Gen: Start (V)','تحت هالفولت، المولّد بيبلّش يشحن البطارية.'],
+ genA:['Gen: A','تيار شحن البطارية من المولّد.'],
+ gridStart:['Grid: Start','تحت هالنسبة، الدولة بتبلّش تشحن البطارية (إذا Grid Charge معلّم).'],gridStartV:['Grid: Start (V)','تحت هالفولت، الدولة بتبلّش تشحن البطارية.'],
+ gridA:['Grid: A','تيار شحن البطارية من الدولة. 40A × 52V ≈ 2kW فوق أحمال البيت. على اشتراك 5A (حوالي 1.1kW) القاطع بيفصل أكيد.','قاعدة: (أمبير القاطع × 230 − أحمال البيت) ÷ 52 = أعلى تيار شحن آمن.'],
+ gridCharge:['Grid Charge','بيسمح للدولة تشحن البطارية. بدونو، الدولة بتغذّي البيت بس.'],genCharge:['Gen Charge','بيسمح للمولّد يشحن البطارية.'],
+ genSignal:['Gen Signal','Contact بيعطي أمر تشغيل للمولّد لما البطارية توصل لحدّ الـStart. متل كبسة Start بالكلاسيك.'],genForce:['Gen Force','بيشغّل المولّد بالقوّة.'],
+ liMode:['Lithium Mode','رقم بروتوكول الاتصال حسب نوع البطارية. الرقم الغلط = F58 والبطارية ما بتشتغل. الرقم من جدول الإنفرتر أو شركة البطارية. بالمحاكي البطارية بدها 00.'],
+ liShut:['Shutdown','بالانقطاع، لما البطارية توصل لهون الإنفرتر بيطفي الأحمال ليحميها.'],liLow:['Low Batt','تحت هالحدّ بيطلع إنذار. ومع وجود الدولة، الإنفرتر ما بيفضّي البطارية تحتو (إذا Time Of Use مش معلّم).'],liRestart:['Restart','بعد الـShutdown، الأحمال ما بترجع إلّا لما البطارية تشحن لهون.'],
+ shutV:['Shutdown (V)','بالانقطاع، تحت هالفولت الإنفرتر بيطفي الأحمال.'],lowV:['Low Batt (V)','إنذار، ومع الدولة ما بيفضّي تحتو.'],restartV:['Restart (V)','الأحمال بترجع لما الفولت يوصل لهون.'],
+ shutP:['Shutdown %','بالانقطاع، تحت هالنسبة الإنفرتر بيطفي الأحمال.'],lowP:['Low Batt %','إنذار، ومع الدولة ما بيفضّي تحتها.'],restartP:['Restart %','الأحمال بترجع لما البطارية توصل لهون.'],
+ floatV:['Float V','فولت التعويم بعد ما تتعبّى البطارية. AGM 53.6V، Gel 54.0V، Wet 55.0V حسب الـManual.'],
+ absV:['Absorption V','أعلى فولت شحن. رصاص AGM 57.6V. لليثيوم 16 خلية بلا اتصال حوالي 56.0–56.8V حسب الـDatasheet، مش 57.6.','57.6V على ليثيوم يعني 3.6V للخلية، والـBMS ممكن يفصل من فولت عالي.'],
+ eqV:['Equalization V','شحنة موازنة للرصاص المفتوح كل فترة. ما بتنعمل لليثيوم ولا للـGel.'],eqDays:['Equalization Days','كل قديش يوم بتنعمل الموازنة.'],eqHours:['Equalization Hours','مدة الموازنة.'],
+ tempco:['TEMPCO','تعويض الحرارة للرصاص: كل ما سخنت البطارية بيوطّي فولت الشحن.'],battR:['Batt Resistance','مقاومة البطارية الداخلية، بيستعملها ليعوّض هبوط الفولت.'],
+ 'workMode:Selling First':['Selling First','الشمس للبيت، بعدين للبطارية، والزيادة بتنباع للشبكة (إذا Solar Sell معلّم). تأكّد من شركة الكهربا إذا التصدير مسموح وكيف بينحسب.'],
+ 'workMode:Zero Export To Load':['Zero Export To Load','الإنفرتر بيغذّي الأحمال يلّي على مخرج LOAD بس، وما بيطلّع شي عالشبكة. الأشهر عنّا.'],
+ 'workMode:Zero Export To CT':['Zero Export To CT','متل يلّي قبلو، بس بيغذّي كمان أحمال على جهة الدولة. بيقيسها بـCT على كابل الدولة، وبيخفّف لحتى ما يطلع شي لبرّا.','لازم الـCT يكون بالاتجاه الصح.'],
+ workMode:['Work Mode','نقّي كيف بيتعامل الإنفرتر مع الشبكة: يبيع، أو صفر تصدير.'],
+ solarSell:['Solar Sell','بيسمح يبيع زيادة الشمس للشبكة.'],maxSell:['Max Sell Power','أعلى قدرة بيبيعها للشبكة.'],zeroExp:['Zero-export Power','كم واط بيضلّ ياخد من الشبكة لحتى ما يطلع ولا واط لبرّا. الـManual بينصح 20 لـ100W.'],
+ 'pattern:BattFirst':['BattFirst','الشمس بتشحن البطارية أوّل، والباقي للبيت.'],'pattern:LoadFirst':['LoadFirst','الشمس للبيت أوّل، والزيادة للبطارية. الأشهر.'],pattern:['Energy pattern','مين أوّل بياخد الشمس: البطارية أو البيت.'],
+ maxSolar:['Max Solar Power','أعلى قدرة بياخدها من الألواح.'],
+ peak:['Grid Peak Shaving','بيحدّد أعلى سحب من الدولة. إذا البيت بدّو أكتر، الباقي من البطارية، وشحن البطارية من الدولة بيخفّ. ممتاز للاشتراك الصغير.'],peakW:['Peak Power','أعلى قدرة بيسحبها من الدولة لما Grid Peak Shaving معلّم. للاشتراك 5A تقريباً 1000W.'],
+ tou:['Time Of Use','إذا مش معلّم، الجدول كلّو ما بيشتغل. كل سطر بيبلّش من ساعتو لساعة السطر يلّي بعدو.'],
+ touTime:['Time','بداية الفترة. الفترة بتخلص عند ساعة السطر يلّي بعدو.'],
+ toup:['Power','أعلى قدرة بتطلع من البطارية بهالفترة.'],
+ toub:['Batt %','طول ما في دولة، البطارية ما بتفضي تحت هالنسبة. ومع Grid معلّم، الدولة بتشحنها لهون. هيك بتخلّي احتياط للانقطاع.'],
+ touv:['Batt V','متل النسبة بس بالفولت (بوضع Use Batt V).'],
+ touGrid:['Grid','بهالفترة، الدولة بتشحن البطارية لحدّ الـBatt.'],touGen:['Gen','بهالفترة، المولّد بيشحن البطارية لحدّ الـBatt.'],
+ gridMode:['Grid Mode','معيار الشبكة. عنّا عادةً General Standard.'],gridHz:['Grid Frequency','لبنان 50Hz.'],invV:['INV Output Voltage','فولت الطلعة. لبنان 230V (أو 220V).'],gridType:['Grid Type','Single Phase للبيوت عنّا.'],
+ unlock:['Unlock Grid Setting','باسوورد 7777. بعدها بتقدر تغيّر إعدادات الشبكة.'],
+ nLV:['Normal connect: Low voltage','إذا فولت الدولة نزل تحت هالحدّ، الإنفرتر بيفصل عنها.'],nHV:['Normal connect: High voltage','إذا فولت الدولة طلع فوق هالحدّ، الإنفرتر بيفصل عنها وبيكمّل عالبطارية. الدولة بلبنان أوقات بتطلع فوق 260V بالليل.','رفع الحدّ كتير بيعرّض الأجهزة لفولت عالي. حلّ الفولت العالي بالـStabilizer أو مع الشركة.'],
+ nLF:['Low frequency','أقل تردّد بيقبلو.'],nHF:['High frequency','أعلى تردّد بيقبلو.'],
+ rLV:['Reconnect: Low voltage','بعد الفصل، ما بيرجع إلا إذا الفولت فوق هالحدّ.'],rHV:['Reconnect: High voltage','بعد الفصل، ما بيرجع إلا إذا الفولت تحت هالحدّ.'],rLF:['Reconnect: Low frequency',''],rHF:['Reconnect: High frequency',''],
+ reconT:['Reconnection Time','كم ثانية بينطر بعد ما ترجع الدولة منيحة قبل ما يرجع عليها.'],pf:['PF','معامل القدرة للتصدير. 1.000 عادةً.'],
+ hv1:['HV1','حماية من الفولت العالي مع وقت الفصل.'],lv1:['LV1','حماية من الفولت الواطي مع وقت الفصل.'],hv1t:['Trip time','وقت الفصل.'],
+ genRated:['Rated Power','قدرة المولّد يلّي على مدخل GEN.'],slPower:['Smart Load Power','أقل شمس لحتى يشغّل الحمل الذكي.'],slOn:['Smart Load ON','بيشغّل الحمل الذكي لما البطارية فوق هالنسبة.'],slOff:['Smart Load OFF','بيطفيه لما تنزل لهون.'],
+ 'genMode:Generator Input':['Generator Input','مدخل GEN للمولّد.'],'genMode:SmartLoad Output':['SmartLoad Output','مدخل GEN بيصير مخرج لحمل بيشتغل بس على زيادة الشمس، متل سخّانة.'],'genMode:Micro Inv Input':['Micro Inv Input','لتشبك On-grid أو Micro Inverter على مدخل GEN (AC-Coupling).'],
+ bmsErrStop:['BMS_Err_Stop','إذا الـBMS بعت عطل، الإنفرتر بيوقف.'],ctRatio:['CT Ratio','نسبة الـCT. لازم تطابق الـCT يلّي معك.'],ats:['ATS','الـManual بينصح ما تعلّمو.'],backupDelay:['Backup Delay','تأخير التحويل للبطارية.'],
+ expLim:['Export power limiter','أعلى تصدير للشبكة.'],impLim:['Import power limiter','أعلى سحب من الشبكة.'],
+ reset:['Factory Reset','باسوورد 9999. بيرجّع كل الإعدادات متل المصنع.'],lock:['Lock out all changes','باسوورد 7777. بيقفل الإعدادات لحتى ما حدا يغيّر.'],
+ timeSync:['Time Syncs','بيضبط الساعة من الإنترنت.'],beep:['Beep','صوت الكبسات.'],autoDim:['Auto Dim','بيخفّف ضو الشاشة.'],h24:['24-Hour','ساعة 24.'],
+};
+function help(k){const h=H[k]||H[(k||'').split(':')[0]];if(!h)return;$('hT').textContent=h[0];$('hP').textContent=h[1];const w=$('hW');if(h[2]){w.hidden=false;w.textContent='⚠ '+h[2];}else w.hidden=true;}
+
+/* ============ ENV UI ============ */
+function envUI(){
+ document.querySelectorAll('[data-e]').forEach(g=>{const k=g.dataset.e;g.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',String(E[k])===c.dataset.v));});
+ $('apps').innerHTML=APPS.map(a=>`<button class="chip${E.apps[a.k]?' on':''}" data-app="${a.k}">${a.n}</button>`).join('');}
+document.querySelectorAll('[data-e]').forEach(g=>g.addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;const k=g.dataset.e;let v=c.dataset.v;if(['brk','gv','pn'].includes(k))v=+v;
+ const old=E[k];E[k]=v;ls.set('simE',JSON.stringify(E));envUI();
+ if(k==='bt'&&old!==v){R.warned={};ev('o','غيّرت البطارية. شيك إعدادات Battery Setting إذا بتناسبها.','',0);}
+ if(k==='season')shapeNorm={};}));
+$('apps').addEventListener('click',e=>{const c=e.target.closest('[data-app]');if(!c)return;E.apps[c.dataset.app]=E.apps[c.dataset.app]?0:1;ls.set('simE',JSON.stringify(E));envUI();});
+
+/* ============ CHART / STATS / LOG ============ */
+function drawChart(){
+ const svg=$('chart');const W=480,Hh=190,pl=34,pr=30,pt=8,pb=20;const cs=getComputedStyle(document.documentElement);
+ const col=n=>cs.getPropertyValue(n).trim();
+ const maxW=Math.max(1000,...R.hist.filter(Boolean).map(p=>Math.max(p.pv,p.load,p.grid)));const top=Math.ceil(maxW/1000)*1000;
+ const x=m=>pl+(W-pl-pr)*m/1440, y=v=>pt+(Hh-pt-pb)*(1-v/top), ys=v=>pt+(Hh-pt-pb)*(1-v/100);
+ const line=(f,sc)=>{let d='',pen=false;for(let m=0;m<1440;m+=4){const p=R.hist[m];if(!p){pen=false;continue;}d+=(pen?'L':'M')+x(m).toFixed(1)+' '+sc(f(p)).toFixed(1);pen=true;}return d;};
+ let g='';for(let i=0;i<=4;i++){const v=top*i/4;g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="${col('--line')}"/><text x="${pl-4}" y="${y(v)+4}" font-size="10" text-anchor="end" fill="${col('--muted')}">${v>=1000?(v/1000)+'k':v}</text><text x="${W-pr+4}" y="${ys(25*i)+4}" font-size="10" fill="${col('--volt')}">${25*i}%</text>`;}
+ for(let hh=0;hh<=24;hh+=6)g+=`<text x="${x(hh*60)}" y="${Hh-5}" font-size="10" text-anchor="middle" fill="${col('--muted')}">${hh}:00</text>`;
+ const nm=R.min%1440;g+=`<line x1="${x(nm)}" x2="${x(nm)}" y1="${pt}" y2="${Hh-pb}" stroke="${col('--muted')}" stroke-dasharray="3 3"/>`;
+ g+=`<path d="${line(p=>p.pv,y)}" fill="none" stroke="${col('--sun')}" stroke-width="2"/><path d="${line(p=>p.load,y)}" fill="none" stroke="${col('--text')}" stroke-width="1.4" opacity=".8"/><path d="${line(p=>p.grid,y)}" fill="none" stroke="${col('--blue')}" stroke-width="1.6"/><path d="${line(p=>p.soc,ys)}" fill="none" stroke="${col('--volt')}" stroke-width="2.4"/>`;
+ svg.innerHTML=g;}
+function stats(){const d=R.day;const k=v=>v.toFixed(1)+' kWh';$('sPV').textContent=k(d.pv);$('sBuy').textContent=k(d.buy);$('sSell').textContent=k(d.sell);$('sCur').textContent=k(d.curt);
+ $('sBl').textContent=d.black+' د';$('stBl').classList.toggle('bad',d.black>0);$('sTr').textContent=d.trips;$('stTr').classList.toggle('bad',d.trips>0);$('clk').textContent=fmtT(R.min);}
+function drawLog(){if(!logDirty)return;logDirty=false;$('log').innerHTML=LOG.length?LOG.slice(0,40).map(l=>`<div><time>${l.t}</time><span class="${l.cls}">${l.txt}</span></div>`).join(''):'<div class="muted">لسّا ما صار شي.</div>';}
+
+/* ============ LOOP ============ */
+let running=true,speed=10,acc=0,fast=null;
+function tick(){
+ if(fast){for(let i=0;i<24&&fast.left>0;i++,fast.left--)step();if(fast.left<=0){const cb=fast.cb;fast=null;running=false;$('play').textContent='▶ شغّل';cb&&cb();}}
+ else if(running){acc+=speed/10;while(acc>=1){step();acc--;}}
+ tick.n=(tick.n||0)+1; if(!UI.ov&&!UI.toast&&tick.n%3===0&&(UI.pg==='main'||['solar','grid','battery','load','inverter','bms','info'].includes(UI.pg)))draw();else leds();
+ stats();drawLog();if(!tick.c||++tick.c%3===0)drawChart();tick.c=tick.c||1;}
+setInterval(tick,100);
+$('play').onclick=()=>{running=!running;$('play').textContent=running?'⏸ وقّف':'▶ شغّل';};
+$('spd').addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;speed=+c.dataset.v;$('spd').querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));});
+$('day').onclick=()=>{fast={left:1440,cb:()=>ev('o',`خلص يوم كامل: شمس ${R.prevDay?R.prevDay.pv.toFixed(1):R.day.pv.toFixed(1)}kWh.`,'',0)};};
+
+/* ============ CHALLENGES ============ */
+const CH=[
+ {id:'trip',t:'الاشتراك 5A عم يفصل',d:'زبون عندو اشتراك 5A عمدخل الـGRID، وكل ما تجي الكهربا الصبح القاطع بيفصل. صلّح الإعدادات من غير ما يعتم البيت بالليل.',
+  env:{season:'winter',weather:'overcast',sched:'sub',brk:5,gv:230,pn:8,bt:'li',apps:{fridge:1,light:1,tv:1,router:1,wash:1,pump:1,ac:0,heater:0}},
+  set:{battMode:'Lithium',liMode:0,maxCh:50,maxDis:50,gridCharge:1,gridA:40,tou:1,slots:SLOT_T.map(t=>({t,p:5000,b:100,v:53.0,g:1,gen:0}))},soc:0.35,
+  check:d=>d.trips===0&&d.black===0,ok:'ما فصل القاطع ولا مرّة، والبيت ما عتم.',bad:d=>d.trips?`القاطع فصل ${d.trips} مرّات. شوف قديش عم تسحب من الدولة وقت الشحن.`:`القاطع ما فصل، بس البيت عتم ${d.black} دقيقة. البطارية ما لحقت تتعبّى.`,
+  hint:'5A × 230V ≈ 1150W بس، وشحن 40A × 52V ≈ 2kW فوق الأحمال. أحسن حلّ: Work Mode1 ← Grid Peak Shaving على 1000W، والإنفرتر بيخفّف الشحن لحالو. أو نزّل Grid Charge A كتير.'},
+ {id:'res',t:'خلّي احتياط للانقطاع',d:'الدولة موجودة كل النهار بس بتقطع من 8 لـ12 بالليل. البطارية 200Ah بتكون فاضية وقت ما تقطع، والبيت بيعتم. خلّي الإنفرتر يحتفظ بنص البطارية للانقطاع.',
+  env:{season:'winter',weather:'overcast',sched:'cut',brk:32,gv:230,pn:8,bt:'li2',apps:{fridge:1,light:1,tv:1,router:1,wash:1,pump:1,ac:1,heater:0}},
+  set:{battMode:'Lithium',liMode:0,maxCh:80,maxDis:80,gridCharge:0,tou:0,slots:SLOT_T.map(t=>({t,p:5000,b:20,v:48.0,g:0,gen:0}))},soc:0.6,
+  check:d=>d.black===0,ok:'البيت ضلّ مضوّي كل فترة الانقطاع.',bad:d=>`البيت عتم ${d.black} دقيقة. البطارية فضيت قبل ما تقطع الدولة.`,
+  hint:'Work Mode2: علّم Time Of Use، وحطّ Batt 50% بالسطور. هيك طول ما في دولة، البطارية ما بتنزل تحت النص.'},
+ {id:'f58',t:'F58 وبطارية ليثيوم بلا كابل',d:'ركّبت ليثيوم 100Ah بس ما معك كابل الاتصال. الإنفرتر عم يطلّع F58 والبطارية مش شغّالة. شغّلها بلا كابل، وبأمان.',
+  env:{season:'summer',weather:'clear',sched:'edl',brk:15,gv:230,pn:8,bt:'linc',apps:{fridge:1,light:1,tv:1,router:1,wash:1,pump:1,ac:0,heater:0}},
+  set:{battMode:'Lithium',liMode:0,maxCh:40,maxDis:80,absV:57.6,floatV:53.6,shutV:46.0,lowV:47.5,restartV:52.0,gridCharge:0,tou:0},soc:0.5,
+  check:d=>d.f58===0&&d.bms===0&&d.black===0,ok:'البطارية اشتغلت طول النهار والليل، وما فصل الـBMS.',bad:d=>d.f58?'لسّا في F58: الإنفرتر ناطر اتصال ما رح يجي.':(d.bms?'البطارية اشتغلت، بس الـBMS تبعها فصل. شوف فولت الشحن وتيار الشحن.':`البيت عتم ${d.black} دقيقة.`),
+  hint:'Batt Set1: Use Batt V. بعدين Batt Set3: Absorption V حوالي 56.4V وFloat V حوالي 54.0V (مش 57.6V للرصاص).'},
+ {id:'cap',t:'البطارية بتقول 50% وبتطفي',d:'4 بطاريات رصاص 12V 200Ah، والبيت بلا دولة بالشتي. الزبون بيقول: «الشاشة بتقول 50% وفجأة بيطفي، والبطاريات عم تموت».',
+  env:{season:'winter',weather:'overcast',sched:'none',brk:15,gv:230,pn:8,bt:'pb',apps:{fridge:1,light:1,tv:1,router:1,wash:1,pump:1,ac:1,heater:0}},
+  set:{battMode:'Use Batt %',battCap:800,maxCh:40,maxDis:80,shutP:20,lowP:35,restartP:50,absV:57.6,floatV:53.6,gridCharge:0,tou:0},soc:0.45,
+  check:d=>d.f56===0,ok:'الشاشة صارت صادقة: الإنفرتر بيطفي على حدّ الـShutdown (20%) ويحمي البطارية، بدل ما يفضّيها لآخرها. البيت رح يعتم وقت ما توصل 20%، وهيدا صح: معناها هالبيت بدّو ألواح أو بطاريات أكتر للشتي.',bad:()=>'البطارية فضيت لآخرها (F56) والشاشة كانت عم تقول أكتر بكتير. الإنفرتر عم يحسب على سعة غلط.',
+  hint:'4 × 12V × 200Ah عالتسلسل = 48V 200Ah. حطّ Batt Capacity = 200Ah.'},
+ {id:'chg',t:'الـBMS بيفصل الصبح',d:'ليثيوم 100Ah بلا كابل اتصال، عالـUse Batt V. الفني حطّ شحن الدولة قوي «لتتعبّى بسرعة بالساعتين». كل صبح أوّل ما تجي الدولة، البطارية بتفصل لحالها.',
+  env:{season:'summer',weather:'clear',sched:'edl',brk:32,gv:230,pn:8,bt:'linc',apps:{fridge:1,light:1,tv:1,router:1,wash:0,pump:1,ac:0,heater:0}},
+  set:{battMode:'Use Batt V',maxCh:100,maxDis:80,absV:56.4,floatV:54.0,shutV:47.0,lowV:48.0,restartV:51.0,gridCharge:1,gridA:80,gridStartV:52.0,tou:0},soc:0.35,
+  check:d=>d.bms===0,ok:'الشحن صار ضمن حدّ البطارية، والـBMS ما فصل.',bad:d=>`الـBMS فصل ${d.bms} مرّات. الشحن أكبر من المسموح للبطارية.`,
+  hint:'بطارية ليثيوم 100Ah: الشحن عادةً 0.5C = 50A. بلا كابل اتصال، الإنفرتر ما بيعرف هالحدّ. حطّ Max A Charge = 50A (Batt Set1)، وهيك ولا مصدر بيقدر يتعدّاه.'},
+ {id:'hv',t:'الإنفرتر بيفصل عن الدولة بالليل',d:'الدولة بتطلع 270V بالليل. الإنفرتر بيفصل عنها وبيفضّي البطارية. افهم ليش، وشو الحلّ الصح.',
+  env:{season:'summer',weather:'clear',sched:'24',brk:32,gv:270,pn:8,bt:'li',apps:{fridge:1,light:1,tv:1,router:1,wash:1,pump:1,ac:1,heater:0}},
+  set:{battMode:'Lithium',liMode:0,maxCh:50,maxDis:80,gridCharge:0,tou:0},soc:0.5,quiz:true,
+  check:d=>d.ghv>0,ok:'بالضبط: الإنفرتر عم يحمي البيت. فولت 270V فوق حدّ الـNormal connect (265V). رفع الحدّ مش الحلّ، الحلّ مع الشركة أو بـStabilizer قبل الإنفرتر. هالتحدّي للفهم: شوف Grid Setting ← Grid Set2.',bad:()=>'',
+  hint:'فوت على Grid Setting ← Grid Set2 وشوف High voltage. ما تغيّرها: هيدي حماية.'},
+];
+let curCh=ls.get('simCh')||null, doneCh={};try{doneCh=JSON.parse(ls.get('simDone')||'{}')}catch(e){}
+function chUI(){$('chs').innerHTML=CH.map(c=>`<div class="ch${c.id===curCh?' on':''}" data-c="${c.id}"><b>${doneCh[c.id]?'✓ ':''}${c.t}</b>${c.id===curCh?`<p>${c.d}</p><p style="margin-top:4px"><a href="#" data-hint="${c.id}" style="color:var(--volt);font-size:13px">بدّي تلميح</a></p>`:''}</div>`).join('');
+ $('chRun').hidden=!curCh;$('chFree').hidden=!curCh;}
+function loadCh(id){const c=CH.find(x=>x.id===id);curCh=id;ls.set('simCh',id);
+ E=Object.assign(envDefaults(),clone(c.env));ls.set('simE',JSON.stringify(E));shapeNorm={};
+ S=Object.assign(defaults(),clone(c.set));save();UI={pg:'main',tab:0,draft:null,ov:null,toast:null,gridUnlocked:false};
+ resetRuntime(c.soc);R.min=0;LOG=[];ev('w','تحدّي جديد: '+c.t+'. '+c.d,'',0);
+ running=false;$('play').textContent='▶ شغّل';$('chRes').innerHTML='';envUI();chUI();draw();help('main');
+ fast={left:1440,cb:()=>{$('chRes').innerHTML=`<div class="res fail">هيدا يوم كامل بالإعدادات الغلط. شوف شو صار بالسجلّ والرسمة، وبعدين صلّح عالشاشة واكبس «جرّب الحل».</div>`;}};}
+function runCh(){const c=CH.find(x=>x.id===curCh);if(!c)return;
+ if(UI.draft){toast('Press ✓ to save first');help('setup');$('chRes').innerHTML='<div class="res fail">في إعدادات غيّرتها وما حفظتها. اكبس ✓ الخضرا عالشاشة أوّل.</div>';return;}
+ const sv=clone(S);E=Object.assign(envDefaults(),clone(c.env));resetRuntime(c.soc);R.min=0;LOG=[];
+ ev('o','تجربة الحل: يوم كامل من 00:00.','',0);
+ fast={left:1440,cb:()=>{const d=R.prevDay||R.day;const ok=c.check(d);
+  if(ok&&!c.quiz){doneCh[c.id]=1;ls.set('simDone',JSON.stringify(doneCh));}
+  if(c.quiz){doneCh[c.id]=1;ls.set('simDone',JSON.stringify(doneCh));}
+  $('chRes').innerHTML=ok?`<div class="res pass">✓ زبطت! ${c.ok}</div>`:`<div class="res fail">✗ لسّا. ${c.bad(d)}</div>`;chUI();}};}
+$('chs').addEventListener('click',e=>{const hnt=e.target.closest('[data-hint]');if(hnt){e.preventDefault();const c=CH.find(x=>x.id===hnt.dataset.hint);$('chRes').innerHTML=`<div class="res" style="border:1px solid var(--warn)">💡 ${c.hint}</div>`;return;}
+ const el=e.target.closest('[data-c]');if(!el||el.dataset.c===curCh)return;loadCh(el.dataset.c);});
+$('chRun').onclick=runCh;
+$('chFree').onclick=()=>{curCh=null;ls.set('simCh','');$('chRes').innerHTML='';chUI();ev('o','رجعت عالوضع الحرّ. غيّر الظروف والإعدادات متل ما بدّك.','',0);running=true;$('play').textContent='⏸ وقّف';};
+
+/* ============ INIT ============ */
+resetRuntime(0.6);
+if(curCh&&!CH.find(x=>x.id===curCh))curCh=null;
+envUI();chUI();fit();
+for(let i=0;i<1;i++)step();
+ev('o','الإنفرتر اشتغل. اكبس على أي شي عالشاشة لتعرف شو هوّي.','',0);
+draw();help('main');
+</script>
+</body>
+</html>
