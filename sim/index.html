@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#070F0D">
-<title>محاكي الإنفرتر الهايبرد · MrElectroAI</title>
+<title>مختبر الطاقة الشمسية · MrElectroAI</title>
 <meta name="description" content="محاكي إعدادات إنفرتر هايبرد 5kW متل Deye SUN-5K-SG03LP1: غيّر الإعدادات من الشاشة وشوف شو بيصير بالبيت، بالدولة، وبالبطارية خلال 24 ساعة.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +46,7 @@ h1{font-size:24px;line-height:1.35;margin-bottom:4px}h1 b{color:var(--volt)}
 /* LCD content */
 .L-top{height:30px;background:#2b3a44;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:15px}
 .L-top .tt{font-weight:700;font-size:17px}
-.L-x{position:absolute;inset:0}
+.L-x{position:absolute;inset:0;pointer-events:none}
 .Lbtn{cursor:pointer}
 .gear{width:40px;height:30px;display:grid;place-items:center;cursor:pointer}
 .node{position:absolute;width:120px;text-align:center;cursor:pointer}
@@ -152,14 +152,60 @@ input[type=range]{width:100%;accent-color:var(--volt)}
 .res{border-radius:14px;padding:10px 12px;margin-top:8px;font-size:14.5px}
 .res.pass{background:color-mix(in srgb,var(--volt) 16%,transparent);border:1px solid var(--volt)}
 .res.fail{background:color-mix(in srgb,var(--fault) 14%,transparent);border:1px solid var(--fault)}
+.modes{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.mode{flex:1;min-width:160px;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:14px;padding:11px 12px;font:700 15px 'Readex Pro',sans-serif;cursor:pointer}
+.mode.on{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
+.wtools{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.wtools button{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:6px 11px;font:600 14px 'IBM Plex Sans Arabic';cursor:pointer;min-width:38px}
+.wtools button:disabled{opacity:.4}
+.wtools #wsol{border-color:var(--volt);color:var(--volt)}
+.board{overflow:auto;border-radius:14px;border:1px solid var(--line);max-height:78vh;direction:ltr;-webkit-overflow-scrolling:touch}
+.board svg{display:block}
+.board text{font-family:'Roboto Condensed',Arial,sans-serif}
+.board .bt{text-anchor:middle;font-weight:700;font-size:12px}
+.board .tl{font-size:11px;font-weight:700;text-anchor:start}
+.board .tl2{text-anchor:middle;font-size:11px;font-weight:700;fill:#33414a}
+.board .cn{font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14px;font-weight:700;fill:#33414a;text-anchor:middle;direction:rtl;unicode-bidi:embed}
+.board .zn{font-family:'IBM Plex Sans Arabic',sans-serif;font-size:12px;fill:#8a96a0;direction:rtl;unicode-bidi:embed}
+.board [data-t],.board [data-sw],.board [data-w]{cursor:pointer}
+.board .tm.on circle:last-child{animation:pulse 1s infinite}
+@keyframes pulse{50%{stroke:#ff6a00}}
+.wmsg{position:sticky;top:6px;z-index:5;border-radius:12px;padding:8px 12px;margin-bottom:8px;font-size:14.5px;background:var(--panel-2);border:1px solid var(--line)}
+.wmsg.o{border-color:var(--volt)}.wmsg.w{border-color:var(--warn)}.wmsg.e{border-color:var(--fault);background:color-mix(in srgb,var(--fault) 14%,var(--panel-2))}
+.wlg{display:flex;flex-wrap:wrap;gap:10px;font-size:12.5px;color:var(--muted);margin-top:8px}
+.wlg i{display:inline-block;width:16px;height:5px;border-radius:3px;vertical-align:middle;margin-left:4px}
+.wgrid{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}
+@media(max-width:900px){.wgrid{grid-template-columns:1fr}}
+.wc{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px}
+.wc b{flex:none;width:18px;text-align:center}
+.wc.ok b{color:var(--volt)}.wc.warn b{color:var(--warn)}.wc.bad b,.wc.bad span{color:var(--fault)}.wc.todo b{color:var(--muted)}
+.wsum{border-radius:10px;padding:7px 10px;margin-bottom:6px;background:var(--panel-2);font-weight:600;font-size:14px}
+.wsum.ok{color:var(--volt)}.wsum.bad{color:var(--fault)}.wsum.warn{color:var(--warn)}
+.steps{padding-right:20px;font-size:14.5px}.steps li{margin:3px 0}
 .foot{font-size:12.5px;color:var(--muted);margin-top:18px;text-align:center}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top"><a href="../">← MrElectroAI</a><button class="ib" id="theme" type="button">🌓</button></div>
-  <h1>محاكي الإنفرتر <b>الهايبرد 5kW</b></h1>
+  <h1>مختبر الطاقة الشمسية: <b>وصّل، شغّل، وبرمج</b></h1>
   <p class="lede">نفس قوائم وإعدادات <span dir="ltr">Deye SUN-5K-SG03LP1</span> حسب الـManual. اضغط عالشاشة متل الإنفرتر الحقيقي، غيّر الإعدادات واحفظ بـ✓، وشوف شو بيصير بالبيت والبطارية والدولة. كل ما تكبس على إعداد، بيطلعلك شرحو تحت.</p>
+
+  <div class="modes" id="modes"><button class="mode" data-m="wire" type="button">🔧 المشروع: وصّل وشغّل</button><button class="mode" data-m="free" type="button">🧪 المحاكي الحرّ والتحديات</button></div>
+  <section id="wireSec">
+    <div class="card">
+      <h2>وصّل المنظومة بإيدك</h2>
+      <p class="muted" style="font-size:14px">اكبس على طرف، وبعدين عالطرف التاني ليمتدّ شريط. اكبس على أي شريط لتنقّيه وتحذفو. القواطع والعازل وكبسة POWER عالإنفرتر بينكبسوا. بس تخلّص، شغّل بالترتيب، وشاشة الإنفرتر تحت بتضوّي.</p>
+      <div class="wtools"><button id="wzout" type="button">−</button><button id="wzin" type="button">+</button><button id="wundo" type="button">↶ تراجع</button><button id="wdel" type="button" disabled>🗑 احذف الشريط</button><button id="wclear" type="button">امسح الكل</button><button id="wnew" type="button">🔧 جهاز جديد</button><button id="wsol" type="button">ورجيني الحل</button></div>
+      <div class="wmsg" id="wmsg" hidden></div>
+      <div class="board" id="board"></div>
+      <div class="wlg"><span><i style="background:#d32f2f"></i>موجب DC</span><span><i style="background:#1b1b1b"></i>سالب DC</span><span><i style="background:#8a4b14"></i>فاز L</span><span><i style="background:#1f6fd1"></i>نوترال N</span><span><i style="background:linear-gradient(90deg,#2e9d3a 50%,#f2d03b 50%)"></i>أرض PE</span><span><i style="background:#8a96a0"></i>اتصال CAN</span></div>
+    </div>
+    <div class="wgrid">
+      <div class="card"><h2>فحص التوصيل</h2><div id="wcheck"></div></div>
+      <div class="card"><h2>ترتيب التشغيل</h2><ol class="steps"><li>قاطع البطارية ON</li><li>كبسة POWER عالإنفرتر ON</li><li>عازل الـDC ON (الألواح)</li><li>قاطع الدولة ON</li><li>قاطع البيت ON</li></ol><p class="muted" style="font-size:13.5px;margin-top:6px">وللإطفاء بالعكس: البيت، الدولة، العازل، الإنفرتر، وآخر شي البطارية.</p></div>
+    </div>
+  </section>
 
   <div class="grid">
     <div>
@@ -204,10 +250,10 @@ input[type=range]{width:100%;accent-color:var(--volt)}
         <label>قاطع الدخلة</label>
         <div class="chips" data-e="brk"><button class="chip" data-v="5">5A</button><button class="chip" data-v="10">10A</button><button class="chip" data-v="15">15A</button><button class="chip" data-v="32">32A</button></div>
         <div class="chips" data-e="gv" style="margin-top:6px"><button class="chip" data-v="230">فولت عادي 230V</button><button class="chip" data-v="270">بيطلع 270V بالليل</button></div>
-        <label>الألواح (550W، Voc 49.6V) عالـPV1</label>
-        <div class="chips" data-e="pn"><button class="chip" data-v="4">4</button><button class="chip" data-v="6">6</button><button class="chip" data-v="8">8</button><button class="chip" data-v="9">9</button><button class="chip" data-v="10">10</button></div>
-        <label>البطارية</label>
-        <div class="chips" data-e="bt"><button class="chip" data-v="li">ليثيوم 100Ah مع كابل اتصال</button><button class="chip" data-v="li2">ليثيوم 200Ah مع كابل اتصال</button><button class="chip" data-v="linc">ليثيوم 100Ah بلا كابل</button><button class="chip" data-v="pb">رصاص 4×12V 200Ah</button></div>
+        <div id="envPV"><label>الألواح (550W، Voc 49.6V) عالـPV1</label>
+        <div class="chips" data-e="pn"><button class="chip" data-v="4">4</button><button class="chip" data-v="6">6</button><button class="chip" data-v="8">8</button><button class="chip" data-v="9">9</button><button class="chip" data-v="10">10</button></div></div>
+        <div id="envBT"><label>البطارية</label>
+        <div class="chips" data-e="bt"><button class="chip" data-v="li">ليثيوم 100Ah مع كابل اتصال</button><button class="chip" data-v="li2">ليثيوم 200Ah مع كابل اتصال</button><button class="chip" data-v="linc">ليثيوم 100Ah بلا كابل</button><button class="chip" data-v="pb">رصاص 4×12V 200Ah</button></div></div>
         <label>الأجهزة</label>
         <div class="chips" id="apps"></div>
       </div>
@@ -285,7 +331,9 @@ function appW(k,h){ // h = hour float
 function loadW(h){let w=0;for(const a of APPS)if(E.apps[a.k])w+=appW(a.k,h);return w;}
 function gridSched(h){switch(E.sched){case '24':return true;case 'sub':return h>=6;case 'edl':return (h>=6&&h<8)||(h>=20&&h<22);case 'cut':return !(h>=20);case 'none':return false;}return false;}
 function gridVolt(h){return (E.gv===270&&(h>=22||h<6))?270:(E.gv===270?238:229);}
-function battSpec(){switch(E.bt){case 'li':return{chem:'li',ah:100,comm:true,proto:0,chA:50,disA:100};case 'li2':return{chem:'li',ah:200,comm:true,proto:0,chA:100,disA:200};case 'linc':return{chem:'li',ah:100,comm:false,chA:50,disA:100};case 'pb':return{chem:'pb',ah:200,comm:false,chA:40,disA:100};}}
+let MODE=ls.get('simMode')||'wire';
+const PJ=()=>(MODE==='wire'&&window.WS)?window.WS:{free:true};
+function battSpec(){if(MODE==='wire')return{chem:'li',ah:100,comm:!!PJ().comm,proto:0,chA:50,disA:100};switch(E.bt){case 'li':return{chem:'li',ah:100,comm:true,proto:0,chA:50,disA:100};case 'li2':return{chem:'li',ah:200,comm:true,proto:0,chA:100,disA:200};case 'linc':return{chem:'li',ah:100,comm:false,chA:50,disA:100};case 'pb':return{chem:'pb',ah:200,comm:false,chA:40,disA:100};}}
 // PV
 const PANEL={w:550,voc:49.6,vmp:41.9,imp:13.1,kv:-0.0027,kp:-0.0035};
 function sunTimes(){return E.season==='summer'?{sr:5.6,ss:19.6,psh:7,tmin:20,tmax:33}:{sr:6.7,ss:16.9,psh:3,tmin:4,tmax:15};}
@@ -315,20 +363,33 @@ function battV(soc,I,chem){ // I + charge
   if(chem==='li'){const ocv=48.0+5.6*Math.min(1,Math.max(0,soc))+(soc>0.97?(soc-0.97)*30:0)-(soc<0.08?(0.08-soc)*25:0);return ocv+I*0.0035*(100/battSpec().ah)*2.5;}
   const ocv=46.4+4.8*Math.min(1,Math.max(0,soc));return ocv+I*(I>0?0.02:0.022)*(200/battSpec().ah);}
 
+function deadStep(h,P){
+  const houseW=loadW(h), sched=gridSched(h)&&P.grid&&R.trip===0;
+  const houseOn=P.load==='grid'&&sched;
+  R.pv=0;R.load=houseOn?houseW:0;R.grid=houseOn?houseW:0;R.batt=0;R.bi=0;R.out=false;R.gridPresent=false;R.dead=true;R.houseOn=houseOn;R.faults=new Set();R.pvS=[];R.curt=0;R.gch=0;
+  if(houseOn){R.day.buy+=houseW/60000;R.day.load+=houseW/60000;}
+  if(!houseOn&&houseW>0)R.day.black++;
+  R.hist[R.min%1440]={pv:0,load:houseW,grid:R.grid,soc:R.soc*100};
+  R.min++; if(R.min%1440===0){R.prevDay=R.day;R.day=newDay();}
+}
 function step(){
   const h=R.min/60, b=battSpec(), cap=b.ah*(b.chem==='li'?51.2:48)/1000; // kWh
   R.absMin=(R.absMin||0)+1;
+  const P=PJ();
+  if(!P.free&&!P.powered){deadStep(h,P);return;}
+  R.dead=false;
   const mode=pctMode(S), th=thr(S);
   const faults=new Set();
   // --- battery availability
-  let battOk=mode!=='n';
+  let battOk=mode!=='n'&&(P.free||P.batt);
+  if(!P.free&&!P.batt&&mode!=='n'){faults.add('F56');ev('w','الإنفرتر مش شايف بطارية على BAT+ وBAT−. شيك القاطع والتوصيل، أو إذا ما في بطارية حطّ Batt Mode على No Batt.','nobatt',600);}
   let commFault=false;
-  if(mode==='li'){ if(!b.comm||b.chem!=='li'||S.liMode!==b.proto){commFault=true;battOk=false;}}
+  if(mode==='li'&&battOk){ if(!b.comm||b.chem!=='li'||S.liMode!==b.proto){commFault=true;battOk=false;}}
   if(commFault){faults.add('F58');R.day.f58++;
     ev('e',b.chem==='pb'?'F58: Batt Mode على Lithium وبطارية الرصاص ما فيها BMS. الإنفرتر مش شايف البطارية. حطّ Use Batt V أو Use Batt %.':(!b.comm?'F58: Batt Mode على Lithium بس ما في كابل اتصال مع الـBMS. يا بتركّب الكابل، يا بتشتغل Use Batt V.':'F58: رقم Lithium Mode (البروتوكول) مش مطابق للبطارية. البطارية بدها 00.'),'f58',600);}
   if(R.bmsTrip>0){R.bmsTrip--;battOk=false;}
   // --- grid
-  const gv=gridVolt(h); const sched=gridSched(h);
+  const gv=gridVolt(h); const sched=gridSched(h)&&(P.free||P.grid);
   if(R.trip>0){R.trip--; if(R.trip===0)ev('o','رجّعوا القاطع.','',0);}
   let gridPresent=sched&&R.trip===0;
   if(gridPresent){
@@ -341,17 +402,18 @@ function step(){
   R.gridOk=sched;
   if(!gridPresent&&!sched)faults.add('F35');
   // --- PV
-  const n=E.pn, T=cellT(h), ir=irr(h);
-  const vocT=n*PANEL.voc*(1+PANEL.kv*(Math.min(T,25)-25)), vmpT=n*PANEL.vmp*(1+PANEL.kv*(T-25));
-  let pv=0;
-  if(ir>0.002){
-    if(vocT>500){ if(!R.pvFault)ev('e',`خطر: فولت الـString ${vocT.toFixed(0)}V بالبرد (${n} ألواح) فوق حدّ الإنفرتر 500V. المدخل ممكن ينحرق! نقّص ألواح أو قسّمهن على PV1 وPV2.`,'pvov',720); R.pvFault=true; faults.add('PV');}
-    else if(vmpT<125){ev('w',`فولت الألواح ${vmpT.toFixed(0)}V أقل من فولت الإقلاع 125V. ${n} ألواح عالتسلسل قليلين، الإنفرتر ما عم يقلع عليهن.`,'pvlow',720);}
-    else{R.pvFault=false; pv=n*PANEL.w*ir*(1+PANEL.kp*(T-25))*0.92; if(vmpT<150)pv*=0.8; pv=Math.min(pv,13*vmpT,S.maxSolar,6500);}
-  }
+  const T=cellT(h), ir=irr(h); const strs=P.free?[E.pn,0]:P.strings;
+  let pv=0; R.pvS=[];
+  strs.forEach((n,k)=>{let ps=0,vm=0;
+    if(n>0&&ir>0.002){const vocT=n*PANEL.voc*(1+PANEL.kv*(Math.min(T,25)-25)), vmpT=n*PANEL.vmp*(1+PANEL.kv*(T-25));const nm='PV'+(k+1);
+      if(vocT>500){ev('e',`خطر: فولت ${nm} ${vocT.toFixed(0)}V بالبرد (${n} ألواح عالتسلسل) فوق حدّ الإنفرتر 500V. المدخل ممكن ينحرق! نقّص ألواح أو قسّمهن على PV1 وPV2.`,'pvov'+k,720);faults.add('PV');}
+      else if(vmpT<125){ev('w',`فولت ${nm} ${vmpT.toFixed(0)}V أقل من فولت الإقلاع 125V. ${n} ألواح عالتسلسل قليلين، الإنفرتر ما عم يقلع عليهن.`,'pvlow'+k,720);}
+      else{ps=n*PANEL.w*ir*(1+PANEL.kp*(T-25))*0.92; if(vmpT<150){ps*=0.8;ev('w',`فولت ${nm} ${vmpT.toFixed(0)}V تحت مجال الـMPPT (150–425V). عم يشتغل بس مش على أحسن نقطة.`,'mppt'+k,720);} ps=Math.min(ps,13*vmpT);vm=vmpT;}}
+    R.pvS[k]={v:vm,p:ps};pv+=ps;});
+  pv=Math.min(pv,S.maxSolar,6500);
   pv=Math.max(0,pv);
   // --- load
-  let load=loadW(h);
+  const houseW=loadW(h); let load=(P.free||P.load==='inv')?houseW:0;
   // --- battery measurement
   const Vrest=battV(R.soc,0,b.chem);
   const meas=mode==='li'?R.soc*100:(mode==='p'?R.est*100:R.bv);
@@ -393,6 +455,7 @@ function step(){
       if(S.tou){const sl=slotAt(h);if(sl.g&&meas<(mode==='v'?sl.v:sl.b))want=true;} }
     if(want){gch=Math.min(S.gridA*Vb,Math.max(0,chHead-pvBatt));}
     imp=deficit-dis+gch-pvGrid;
+    if(!P.free&&P.load==='grid')imp+=houseW;
     if(S.workMode==='Zero Export To Load'||S.workMode==='Zero Export To CT'){ if(imp<0)imp=0; }
     // peak shaving
     if(S.peak&&imp>S.peakW){let over=imp-S.peakW;const cut=Math.min(gch,over);gch-=cut;over-=cut;if(over>0&&battOk&&meas>th.sh){const extra=Math.min(over,disHead-dis);dis+=extra;over-=extra;}imp=deficit-dis+gch-pvGrid;}
@@ -429,15 +492,17 @@ function step(){
   const I=battW/Vb; R.bv=battV(R.soc,I,b.chem); if(mode==='v'&&battW>0)R.bv=Math.min(R.bv,S.absV);
   R.bi=I;
   // --- accounting
-  const served=outOn?load:0;
-  if(!outOn&&load>0)R.day.black++;
+  let served=outOn?load:0, houseOn=outOn;
+  if(!P.free&&P.load!=='inv'){houseOn=P.load==='grid'&&gridPresent;served=houseOn?houseW:0;}
+  R.houseOn=houseOn;
+  if(!houseOn&&houseW>0)R.day.black++;
   const curt=Math.max(0,pv-pvLoad-pvBatt-pvGrid);
   R.pv=pvLoad+pvBatt+pvGrid; R.load=served; R.grid=gridPresent?imp:0; R.batt=-battW; R.curt=curt; R.pvAvail=pv; R.gch=gch;
   R.day.pv+=R.pv/60000; R.day.load+=served/60000; if(R.grid>0)R.day.buy+=R.grid/60000; if(R.grid<0)R.day.sell+=-R.grid/60000; R.day.curt+=curt/60000;
   R.out=outOn; R.gridPresent=gridPresent; R.Vg=gridPresent?gv:0; R.T=T;
   if(!outOn)faults.add('OFF');
   R.faults=faults;
-  const m=R.min%1440; R.hist[m]={pv:R.pv,load:load,grid:Math.max(0,R.grid),soc:R.soc*100};
+  const m=R.min%1440; R.hist[m]={pv:R.pv,load:houseW,grid:Math.max(0,R.grid),soc:R.soc*100};
   // advance
   R.min++; if(R.min%1440===0){R.prevDay=R.day;R.day=newDay();}
 }
@@ -580,7 +645,7 @@ function renderPage(){
  const pg=UI.pg;
  if(pg==='main')return renderMain();
  const b=battSpec(), T=R.T||25;
- if(pg==='solar'){const v=R.pvAvail>0?(E.pn*PANEL.vmp*(1+PANEL.kv*(T-25))):0;return detail('Solar',[['Power',Math.round(R.pv)+'W'],['Energy Today',R.day.pv.toFixed(1)+'kWh'],['PV1-V',v.toFixed(1)+'V'],['PV1-I',(v?R.pv/v:0).toFixed(1)+'A'],['P1',Math.round(R.pv)+'W'],['PV2-V','0.0V'],['PV2-I','0.0A'],['P2','0W'],['Grid Tie Power',Math.round(Math.max(0,-R.grid))+'W'],['Not used (curtailed)',Math.round(R.curt)+'W']]);}
+ if(pg==='solar'){const a=R.pvS[0]||{v:0,p:0},c=R.pvS[1]||{v:0,p:0};return detail('Solar',[['Power',Math.round(R.pv)+'W'],['Energy Today',R.day.pv.toFixed(1)+'kWh'],['PV1-V',a.v.toFixed(1)+'V'],['PV1-I',(a.v?a.p/a.v:0).toFixed(1)+'A'],['P1',Math.round(a.p)+'W'],['PV2-V',c.v.toFixed(1)+'V'],['PV2-I',(c.v?c.p/c.v:0).toFixed(1)+'A'],['P2',Math.round(c.p)+'W'],['Grid Tie Power',Math.round(Math.max(0,-R.grid))+'W'],['Not used (curtailed)',Math.round(R.curt)+'W']]);}
  if(pg==='grid')return detail('Grid',[['Status',R.gridPresent?'Normal':(R.vHigh?'V Fault':'Disconnected')],['Power',Math.round(R.grid)+'W'],['Frequency',R.gridPresent?'50.00Hz':'0.00Hz'],['L1 Voltage',(R.gridPresent?R.Vg:gridSched(R.min/60)&&R.trip===0?gridVolt(R.min/60):0).toFixed(1)+'V'],['BUY Today',R.day.buy.toFixed(1)+'kWh'],['SELL Today',R.day.sell.toFixed(1)+'kWh'],['CT',Math.round(R.grid)+'W'],['LD',Math.round(R.load)+'W']]);
  if(pg==='inverter'){const p=Math.round(R.load+Math.max(0,-R.grid));return detail('Inverter',[['Power',p+'W'],['DC-T',(28+p/5000*22).toFixed(1)+'C'],['AC-T',(30+p/5000*25).toFixed(1)+'C'],['Frequency','50.00Hz'],['L1 Voltage',R.out?S.invV.toFixed?S.invV+'.0V':S.invV+'V':'0.0V'],['L1 Current',(p/S.invV).toFixed(1)+'A'],['L1 Power',p+'W'],['Status',statusText().t]]);}
  if(pg==='load')return detail('Load',[['Power',Math.round(R.load)+'W'],['L1 Voltage',R.out?S.invV+'.0V':'0.0V'],['L1 Power',Math.round(R.load)+'W'],['Today',R.day.load.toFixed(1)+'kWh']]);
@@ -603,12 +668,13 @@ function renderOv(){const o=UI.ov;if(!o)return '';
  if(o.t==='list')return `<div class="ov" data-a="ovx"><div class="lst">${o.opts.map(v=>`<div class="${String(v)===String(dv(o.k))?'on':''}" data-a="pick" data-v="${v}">${v}</div>`).join('')}</div></div>`;
  return '';}
 function draw(){
+ if(R.dead){const off='<div style="position:absolute;inset:0;background:#06090b"></div>';lcd.innerHTML=off;const z=document.querySelector('#zmwrap .lcd');if(z)z.innerHTML=off;leds();return;}
  let h=renderPage()+renderOv();
  if(UI.toast)h+=`<div class="toast">${UI.toast}</div>`;
  lcd.innerHTML=h;
  const z=document.querySelector('#zmwrap .lcd');if(z){z.innerHTML=h;}
  leds();}
-function leds(){const f=R.faults||new Set();
+function leds(){if(R.dead){['ledDC','ledAC','ledN','ledA'].forEach(i=>$(i).classList.remove('on'));return;}const f=R.faults||new Set();
  $('ledDC').classList.toggle('on',R.pv>5);$('ledAC').classList.toggle('on',!!R.gridPresent);
  const bad=f.has('F58')||f.has('F56')||f.has('PV')||f.has('OFF')||R.bmsTrip>0;
  $('ledN').classList.toggle('on',!bad);$('ledA').classList.toggle('on',bad||f.has('F35')||R.vHigh);}
@@ -775,6 +841,8 @@ function tick(){
  if(fast){for(let i=0;i<24&&fast.left>0;i++,fast.left--)step();if(fast.left<=0){const cb=fast.cb;fast=null;running=false;$('play').textContent='▶ شغّل';cb&&cb();}}
  else if(running){acc+=speed/10;while(acc>=1){step();acc--;}}
  tick.n=(tick.n||0)+1; if(!UI.ov&&!UI.toast&&tick.n%3===0&&(UI.pg==='main'||['solar','grid','battery','load','inverter','bms','info'].includes(UI.pg)))draw();else leds();
+ if(R.dead!==tick.lastDead){tick.lastDead=R.dead;draw();}
+ if(MODE==='wire'&&window.WIRE&&tick.n%5===0)WIRE.updateLive();
  stats();drawLog();if(!tick.c||++tick.c%3===0)drawChart();tick.c=tick.c||1;}
 setInterval(tick,100);
 $('play').onclick=()=>{running=!running;$('play').textContent=running?'⏸ وقّف':'▶ شغّل';};
@@ -817,7 +885,7 @@ const CH=[
 let curCh=ls.get('simCh')||null, doneCh={};try{doneCh=JSON.parse(ls.get('simDone')||'{}')}catch(e){}
 function chUI(){$('chs').innerHTML=CH.map(c=>`<div class="ch${c.id===curCh?' on':''}" data-c="${c.id}"><b>${doneCh[c.id]?'✓ ':''}${c.t}</b>${c.id===curCh?`<p>${c.d}</p><p style="margin-top:4px"><a href="#" data-hint="${c.id}" style="color:var(--volt);font-size:13px">بدّي تلميح</a></p>`:''}</div>`).join('');
  $('chRun').hidden=!curCh;$('chFree').hidden=!curCh;}
-function loadCh(id){const c=CH.find(x=>x.id===id);curCh=id;ls.set('simCh',id);
+function loadCh(id){if(typeof setMode==='function'&&MODE!=='free')setMode('free');const c=CH.find(x=>x.id===id);curCh=id;ls.set('simCh',id);
  E=Object.assign(envDefaults(),clone(c.env));ls.set('simE',JSON.stringify(E));shapeNorm={};
  S=Object.assign(defaults(),clone(c.set));save();UI={pg:'main',tab:0,draft:null,ov:null,toast:null,gridUnlocked:false};
  resetRuntime(c.soc);R.min=0;LOG=[];ev('w','تحدّي جديد: '+c.t+'. '+c.d,'',0);
@@ -837,12 +905,22 @@ $('chRun').onclick=runCh;
 $('chFree').onclick=()=>{curCh=null;ls.set('simCh','');$('chRes').innerHTML='';chUI();ev('o','رجعت عالوضع الحرّ. غيّر الظروف والإعدادات متل ما بدّك.','',0);running=true;$('play').textContent='⏸ وقّف';};
 
 /* ============ INIT ============ */
-resetRuntime(0.6);
+R={};resetRuntime(0.6);
 if(curCh&&!CH.find(x=>x.id===curCh))curCh=null;
 envUI();chUI();fit();
 for(let i=0;i<1;i++)step();
 ev('o','الإنفرتر اشتغل. اكبس على أي شي عالشاشة لتعرف شو هوّي.','',0);
 draw();help('main');
+</script>
+<script src="wire.js"></script>
+<script>
+function setMode(m){MODE=m;ls.set('simMode',m);document.querySelectorAll('.mode').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+ $('wireSec').hidden=m!=='wire';$('envPV').hidden=m==='wire';$('envBT').hidden=m==='wire';
+ if(m==='wire'){if(curCh){curCh=null;ls.set('simCh','');chUI();$('chRes').innerHTML='';}WIRE.compute();WIRE.setZoom();running=true;$('play').textContent='⏸ وقّف';}
+ draw();}
+$('modes').addEventListener('click',e=>{const b=e.target.closest('.mode');if(b&&b.dataset.m!==MODE)setMode(b.dataset.m);});
+WIRE.init();setMode(MODE);
+let lastW=innerWidth;window.addEventListener('resize',()=>{if(MODE==='wire'&&Math.abs(innerWidth-lastW)>40){lastW=innerWidth;WIRE.setZoom();}});
 </script>
 </body>
 </html>
