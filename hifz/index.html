@@ -7,6 +7,7 @@
 <meta name="description" content="حفظ سورتي البقرة وآل عمران بالمراحل مع التجويد والتسميع والمراجعة">
 <meta name="theme-color" content="#0F5B4E">
 <link rel="manifest" href="manifest.webmanifest">
+<script>if(window.Capacitor){document.write('<script src="cap-bridge.js"><\/script>');}</script>
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -164,6 +165,22 @@ nav.bottom a .badge{position:absolute;top:0;right:calc(50% - 22px);background:va
 audio{width:100%;margin-top:8px}
 .tip{background:var(--gold-soft);border-radius:14px;padding:12px;font-size:14px}
 .sticky-play{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom));z-index:3}
+/* التسميع بالمايك */
+.rca{padding:8px 6px;border-bottom:1px dashed var(--line)}
+.rca:last-of-type{border-bottom:0}
+.rca.cur{background:var(--pri-soft);border-radius:14px;border-bottom:0}
+.wl{color:var(--mid);text-decoration:underline wavy var(--mid);text-underline-offset:6px}
+.we{color:var(--bad);text-decoration:underline var(--bad);text-underline-offset:6px}
+.wh{color:var(--gold)}
+.fast{font-family:"IBM Plex Sans Arabic",sans-serif;font-size:12px;color:var(--gold);white-space:nowrap}
+.rcbar{display:flex;gap:8px}
+.rcbar .sq{flex:none;width:54px;background:var(--card);padding:0;font-size:20px}
+.mic.on{background:var(--bad);color:#fff}
+.legend{display:grid;gap:6px;margin-top:10px}
+.lg{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:8px 10px;text-align:right;display:flex;gap:10px;align-items:center;font-size:13px;width:100%}
+.lg .dot{margin-top:0}
+.linkbtn{background:none;border:0;color:var(--pri);font-weight:500;padding:6px 2px;font-size:14px;text-decoration:underline;text-underline-offset:4px}
+.howto{margin:0 0 12px;padding-inline-start:22px;color:var(--muted);font-size:14px;line-height:1.9}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -249,7 +266,7 @@ let toastT;
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
 
 /* ============ الحالة ============ */
-const DEFAULT_STATE = { v:1, name:'', settings:{reciter:'ar.husary', reps:3, speed:1, tajweed:true, free:false, qsize:28}, pages:{}, streak:{last:'',count:0}, tj:{right:0,total:0}, days:{} };
+const DEFAULT_STATE = { v:1, name:'', settings:{reciter:'ar.husary', reps:3, speed:1, tajweed:true, free:false, qsize:28, errSound:true, vibe:true, tjAlert:true}, pages:{}, streak:{last:'',count:0}, tj:{right:0,total:0}, days:{} };
 let S = Object.assign({}, DEFAULT_STATE, lsGet('hifz.state.v1') || {});
 S.settings = Object.assign({}, DEFAULT_STATE.settings, S.settings||{});
 S.pages = S.pages || {}; S.streak = S.streak || {last:'',count:0}; S.tj = S.tj || {right:0,total:0}; S.days = S.days || {};
@@ -360,8 +377,8 @@ document.addEventListener('pointerdown', ()=>{
   try{ player.el.src=SILENT; const pr=player.el.play(); if(pr) pr.catch(()=>{}); }catch(e){}
 }, {capture:true});
 const audioMaps = {};
-async function audioSrc(a){
-  const rec=S.settings.reciter, key=`hifz.aud.${rec}.${a.s}`;
+async function audioSrc(a, rec){
+  rec = rec || S.settings.reciter; const key=`hifz.aud.${rec}.${a.s}`;
   if(!audioMaps[key]){
     let m = lsGet(key);
     if(!m){
@@ -392,29 +409,224 @@ async function getAudio(a){
   }catch(e){ return url; }
 }
 function stopAudio(){ player.token++; try{ player.el.pause(); }catch(e){} document.querySelectorAll('.ayah.playing').forEach(x=>x.classList.remove('playing')); }
-function playOne(a, tok){
-  return new Promise(async (res, rej) => {
-    const url = await getAudio(a);
-    if(tok!==player.token) return res();
-    const el = player.el;
-    el.onended = () => res();
-    el.onerror = () => rej(new Error('audio'));
+function playUrl(url, tok){
+  return new Promise((res, rej) => {
+    const el = player.el; let last = -1, still = 0, done = false;
+    const fin = (ok, err) => { if(done) return; done = true; clearInterval(wd); el.onended = el.onerror = null; ok ? res() : rej(err || new Error('audio')); };
+    // حارس: إذا الصوت علِق أو ما طلع حدث النهاية، منكمّل لحالنا
+    const wd = setInterval(() => {
+      if(tok !== player.token) return fin(true);
+      if(el.paused) return;
+      const t = el.currentTime;
+      if(el.duration && isFinite(el.duration) && t >= el.duration - 0.15){ if(++still >= 2) fin(true); return; }
+      if(t === last){ if(++still >= 8) fin(false, new Error('stall')); } else { still = 0; last = t; }
+    }, 1500);
+    el.onended = () => fin(true);
+    el.onerror = () => fin(false);
     el.src = url; el.defaultPlaybackRate = S.settings.speed; el.playbackRate = S.settings.speed;
-    const pr = el.play(); if(pr) pr.catch(err => rej(err));
+    const pr = el.play(); if(pr) pr.catch(err => { if(err && err.name === 'AbortError') return; fin(false, err); });
   });
 }
+async function playOne(a, tok){
+  const url = await getAudio(a);
+  if(tok !== player.token) return;
+  try{ await playUrl(url, tok); }
+  catch(e){
+    if(tok !== player.token) return;
+    const remote = await audioSrc(a);
+    if(remote === url) throw e;
+    await playUrl(remote, tok);
+  }
+}
 async function playSeq(items, reps, onAyah, onDone){
-  stopAudio(); const tok = player.token;
+  stopAudio(); const tok = player.token; let fails = 0;
   for(let k=0;k<items.length;k++){
     if(items[k+1]) getAudio(items[k+1]).catch(()=>{});
     for(let r=0;r<reps;r++){
       if(tok!==player.token) return;
       if(onAyah) onAyah(items[k], k, r);
-      try{ await playOne(items[k], tok); }
-      catch(e){ if(tok!==player.token) return; stopAudio(); toast('ما قدرنا نشغّل الصوت، تأكّدي من النت'); if(onDone) onDone(false); return; }
+      try{ await playOne(items[k], tok); fails = 0; }
+      catch(e){
+        if(tok!==player.token) return;
+        if(++fails >= 2){ stopAudio(); toast('الصوت ما عم يشتغل. تأكّدي من النت وجرّبي كمان مرة'); if(onDone) onDone(false); return; }
+        break; // منتخطّى هالآية ومنكمّل
+      }
     }
   }
   if(tok===player.token){ document.querySelectorAll('.ayah.playing').forEach(x=>x.classList.remove('playing')); if(onDone) onDone(true); }
+}
+
+/* ============ أصوات التنبيه ============ */
+let actx = null, lastErrT = 0;
+function beep(notes){
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if(actx.state === 'suspended') actx.resume();
+    const t0 = actx.currentTime + 0.01;
+    for(const n of notes){
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = n.type || 'sine'; o.frequency.setValueAtTime(n.f, t0 + n.at);
+      g.gain.setValueAtTime(0.0001, t0 + n.at);
+      g.gain.exponentialRampToValueAtTime(n.g || 0.2, t0 + n.at + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + n.at + n.d);
+      o.connect(g); g.connect(actx.destination); o.start(t0 + n.at); o.stop(t0 + n.at + n.d + 0.05);
+    }
+  }catch(e){}
+}
+function vib(p){ if(!S.settings.vibe) return; try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
+// صوت ١: غلط بكلمة أو حرف — «طنّة» منخفضة + اهتزاز طويل
+function errFeedback(){
+  const now = Date.now(); if(now - lastErrT < 700) return; lastErrT = now;
+  if(S.settings.errSound) beep([{f:196,d:0.13,type:'square',g:0.10,at:0},{f:147,d:0.18,type:'square',g:0.10,at:0.16}]);
+  vib(250);
+}
+// صوت ٢: تنبيه تجويد — جرس + ٣ اهتزازات قصيرة
+function tjFeedback(){
+  if(S.settings.errSound) beep([{f:1318,d:0.6,g:0.16,at:0},{f:988,d:0.9,g:0.13,at:0.2}]);
+  vib([70,90,70,90,70]);
+}
+
+/* ============ التعرّف على التلاوة ============ */
+const Speech = {
+  native(){ return IS_APP && window.CapX && window.CapX.SpeechRecognition; },
+  webCtor(){ return window.SpeechRecognition || window.webkitSpeechRecognition; },
+  supported(){ return !!(this.native() || (!IS_APP && this.webCtor())); },
+  active:false, committed:'', cur:'', onText:null, onState:null, _r:null, _wd:null, _fails:0, _ls:[], _restarting:false,
+  emit(){ if(this.onText) this.onText((this.committed + ' ' + this.cur).trim()); },
+  commit(){ if(this.cur){ this.committed = (this.committed + ' ' + this.cur).trim(); this.cur = ''; } },
+  async start(onText, onState){
+    this.stop(true);
+    this.onText = onText; this.onState = onState; this.committed = ''; this.cur = ''; this._fails = 0;
+    const SR = this.native();
+    if(SR){
+      const perm = await SR.checkPermissions().catch(() => ({}));
+      if(!perm || perm.speechRecognition !== 'granted'){
+        const r = await SR.requestPermissions();
+        if(!r || r.speechRecognition !== 'granted') throw new Error('perm');
+      }
+      const av = await SR.available().catch(() => ({available:false}));
+      if(!av.available) throw new Error('unavailable');
+      this.active = true;
+      this._ls.push(await SR.addListener('partialResults', d => {
+        if(!this.active) return; const m = d && d.matches && d.matches[0];
+        if(m != null){ this.cur = m; this._fails = 0; this.emit(); }
+      }));
+      try{ this._ls.push(await SR.addListener('listeningState', s => { if(s && s.status === 'stopped') this._restart(); })); }catch(e){}
+      this._wd = setInterval(async () => {
+        if(!this.active || this._restarting) return;
+        try{ const l = await SR.isListening(); if(l && l.listening === false) this._restart(); }catch(e){}
+      }, 1500);
+      this._go();
+    } else {
+      const R = this.webCtor(); if(!R) throw new Error('unsupported');
+      const r = new R(); r.lang = 'ar-SA'; r.continuous = true; r.interimResults = true; r.maxAlternatives = 1;
+      r.onresult = e => { let t = ''; for(let i=0;i<e.results.length;i++) t += ' ' + e.results[i][0].transcript; this.cur = t.trim(); this.emit(); };
+      r.onerror = e => { if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){ this.active = false; if(this.onState) this.onState('denied'); } };
+      r.onend = () => {
+        this.commit();
+        if(this.active){ setTimeout(() => { try{ if(this.active) r.start(); }catch(_){} }, 150); }
+      };
+      this.active = true; this._r = r; r.start();
+    }
+    if(this.onState) this.onState('listening');
+  },
+  _restart(){
+    if(!this.active || this._restarting) return;
+    this._restarting = true; this.commit();
+    setTimeout(() => { this._restarting = false; if(this.active) this._go(); }, 250);
+  },
+  _go(){
+    const SR = this.native(); if(!SR || !this.active) return;
+    SR.start({language:'ar-SA', maxResults:1, partialResults:true, popup:false})
+      .then(res => { if(this.active && res && res.matches && res.matches[0]){ this.cur = res.matches[0]; this.emit(); } })
+      .catch(() => { if(!this.active) return; if(++this._fails > 10){ this.stop(); if(this.onState) this.onState('error'); } });
+  },
+  stop(silent){
+    const was = this.active; this.active = false;
+    clearInterval(this._wd); this._wd = null;
+    const SR = this.native();
+    if(SR){ try{ SR.stop(); }catch(e){} this._ls.forEach(l => { try{ l.remove(); }catch(e){} }); this._ls = []; }
+    if(this._r){ try{ this._r.onend = null; this._r.stop(); }catch(e){} this._r = null; }
+    this.commit();
+    if(was && !silent && this.onState) this.onState('stopped');
+  }
+};
+
+/* ============ مقارنة التلاوة بالنص ============ */
+const AR_MARKS = /[ؐ-ًؚ-ٟۖ-ۭـ࣓-ࣿ]/g;
+function normW(w){
+  return String(w).replace(/ىٰ/g,'ى').replace(/ٰ/g,'ا').replace(AR_MARKS,'')
+    .replace(/[ٱأإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/ء/g,'')
+    .replace(/[^ء-ي]/g,'').replace(/ا+/g,'ا');
+}
+function normTranscript(t){
+  let s = ' ' + String(t).split(/\s+/).map(normW).filter(Boolean).join(' ') + ' ';
+  s = s.replace(/ الف لام ميم /g, ' الم ').replace(/ الف لام را /g, ' الر ');
+  return s.trim() ? s.trim().split(' ') : [];
+}
+function lev(a, b){
+  const m = a.length, n = b.length; if(!m) return n; if(!n) return m;
+  let prev = Array.from({length:n+1}, (_, j) => j);
+  for(let i=1;i<=m;i++){
+    const cur = [i];
+    for(let j=1;j<=n;j++) cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1] + (a[i-1]===b[j-1]?0:1));
+    prev = cur;
+  }
+  return prev[n];
+}
+// ٢ = صح، ١ = غلط بحرف، ٠ = كلمة غلط
+function cmpW(e, h){
+  if(!e || !h) return 0;
+  if(e === h) return 2;
+  const ea = e.replace(/ا/g,''), ha = h.replace(/ا/g,'');
+  if(ea === ha) return 2;
+  const ev = e.replace(/[اوي]/g,''), hv = h.replace(/[اوي]/g,'');
+  if(ev && ev === hv) return 2;
+  const L = Math.max(ea.length, ha.length, 1);
+  return (1 - lev(ea, ha) / L) >= 0.5 ? 1 : 0;
+}
+function alignWords(E, H, freeEnd){
+  const n = E.length, m = H.length, D = [], B = [], COST = [1.3, 0.5, 0];
+  for(let i=0;i<=n;i++){ D.push(new Float64Array(m+1)); B.push(new Int8Array(m+1)); }
+  for(let j=1;j<=m;j++){ D[0][j] = j*0.7; B[0][j] = 3; }
+  for(let i=1;i<=n;i++){ D[i][0] = i; B[i][0] = 2; }
+  for(let i=1;i<=n;i++) for(let j=1;j<=m;j++){
+    let best = D[i-1][j-1] + COST[cmpW(E[i-1], H[j-1])], b = 1, v;
+    v = D[i-1][j] + 1;   if(v < best){ best = v; b = 2; }
+    v = D[i][j-1] + 0.7; if(v < best){ best = v; b = 3; }
+    if(j >= 2 && cmpW(E[i-1], H[j-2] + H[j-1]) === 2){ v = D[i-1][j-2] + 0.05; if(v < best){ best = v; b = 4; } }
+    if(i >= 2 && cmpW(E[i-2] + E[i-1], H[j-1]) === 2){ v = D[i-2][j-1] + 0.05; if(v < best){ best = v; b = 5; } }
+    D[i][j] = best; B[i][j] = b;
+  }
+  let ei = n;
+  if(freeEnd){ ei = 0; let bv = D[0][m]; for(let i=1;i<=n;i++) if(D[i][m] <= bv + 1e-9){ bv = D[i][m]; ei = i; } }
+  const st = new Array(n).fill(null), hj = new Array(n).fill(-1);
+  let i = ei, j = m;
+  while(i > 0 || j > 0){
+    const b = (i>0 && j>0) ? B[i][j] : (i>0 ? 2 : 3);
+    if(b === 1){ const c = cmpW(E[i-1], H[j-1]); st[i-1] = c===2?'ok':(c===1?'letter':'wrong'); hj[i-1] = j-1; i--; j--; }
+    else if(b === 2){ st[i-1] = 'miss'; i--; }
+    else if(b === 3){ j--; }
+    else if(b === 4){ st[i-1] = 'ok'; hj[i-1] = j-1; i--; j -= 2; }
+    else { st[i-1] = 'ok'; st[i-2] = 'ok'; hj[i-1] = j-1; hj[i-2] = j-1; i -= 2; j--; }
+  }
+  return {st, hj, end:ei};
+}
+// مدّة تلاوة الحصري (مرتّل) للآية، لتنبيه السرعة
+const refDur = lsGet('hifz.refdur') || {};
+function refDuration(a){
+  if(refDur[a.g]) return Promise.resolve(refDur[a.g]);
+  return audioSrc(a, 'ar.husary').then(url => new Promise(res => {
+    const el = new Audio(); el.preload = 'metadata';
+    const t = setTimeout(() => res(null), 8000);
+    el.onloadedmetadata = () => {
+      clearTimeout(t); const d = el.duration;
+      if(d && isFinite(d)){ refDur[a.g] = Math.round(d*10)/10; lsSet('hifz.refdur', refDur); res(refDur[a.g]); } else res(null);
+      el.removeAttribute('src');
+    };
+    el.onerror = () => { clearTimeout(t); res(null); };
+    el.src = url;
+  })).catch(() => null);
 }
 
 /* ============ التسجيل ============ */
@@ -545,7 +757,7 @@ function viewPage(p, tab, review){
   if(!isUnlocked(p)){ toast('هالمرحلة لسّا مقفولة'); location.hash='#map'; return; }
   const st = pg(p);
   if(!tab) tab = review ? 'test' : (st.status==='done' ? 'test' : (!st.steps.listen ? 'listen' : (!st.steps.mem ? 'mem' : 'test')));
-  if(!pageCtx || pageCtx.p!==p) pageCtx = { p, memIdx:0, memLevel:0, memCount:{}, test:{}, quiz:null };
+  if(!pageCtx || pageCtx.p!==p){ Speech.stop(true); pageCtx = { p, memIdx:0, memHide:false, test:{}, rc:null, manual:false }; }
   pageCtx.review = !!review; pageCtx.tab = tab;
   setTitle(review ? `مراجعة: ${pageLabel(p)}` : `المرحلة ${toAr(stageNo(p))} · ${pageLabel(p)}`, true);
   setNav(review ? 'review' : 'map');
@@ -555,7 +767,7 @@ function viewPage(p, tab, review){
     ${review ? '' : `<div class="steps">${stepsOn.map(x=>`<span class="${x?'on':''}"></span>`).join('')}</div>`}
     <div class="tabs">${tabs.map(([k,l,ok])=>`<button data-t="${k}" class="${k===tab?'on':''}">${l}${ok?' <span class="ck">✓</span>':''}</button>`).join('')}</div>
     <div id="pane"></div>`;
-  app.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { stopAudio(); const t=b.dataset.t; history.replaceState(null,'',`#${review?'review':'page'}/${p}/${t}`); viewPage(p, t, review); });
+  app.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { stopAudio(); Speech.stop(true); const t=b.dataset.t; history.replaceState(null,'',`#${review?'review':'page'}/${p}/${t}`); viewPage(p, t, review); });
   const pane = $('#pane');
   ({listen:paneListen, mem:paneMem, test:paneTest, tj:paneTj})[tab](pane, p);
 }
@@ -564,71 +776,257 @@ function paneListen(pane, p){
   const list = DB.pages.get(p); const reps = S.settings.reps;
   pane.innerHTML = `
     <div class="card">
-      <div class="tip" style="margin-bottom:12px">الخطوة الأولى: اسمعي الصفحة كاملة وانتي عم تتطلّعي عالآيات، بلا ما تحاولي تحفظي. بس خلّي أذنك تتعوّد عاللفظ.</div>
-      <div class="row between wrapf" style="gap:12px">
-        <div><div class="small muted">تكرار كل آية</div><div class="chips" id="reps">${[1,3,5,7,10].map(n=>`<button class="chip ${n===reps?'on':''}" data-n="${n}">${toAr(n)}×</button>`).join('')}</div></div>
-      </div>
+      <div class="tip" style="margin-bottom:12px">اسمعي الصفحة كلها وانتي عم تتطلّعي عالآيات. ما تحاولي تحفظي هلّق، بس عوّدي أذنك عاللفظ.</div>
+      <div class="small muted">كم مرة تتكرّر كل آية؟</div>
+      <div class="chips" id="reps">${[1,3,5,7,10].map(n=>`<button class="chip ${n===reps?'on':''}" data-n="${n}">${toAr(n)}×</button>`).join('')}</div>
     </div>
     <div class="card q ayah-list" id="alist">${list.map((a,i)=>`${basmalaIfNeeded(a)}<span class="ayah" data-i="${i}">${ayahHtml(a)}</span>`).join('')}</div>
     <div class="sticky-play"><button class="btn block" id="playAll">▶️ شغّلي الصفحة</button></div>
-    <p class="small muted center">كبسي على أي آية لتسمعيها لحالها</p>`;
+    <p class="small muted center">كبسي على أي آية لتبلّشي التلاوة منها</p>`;
   let playing=false;
   pane.querySelectorAll('#reps .chip').forEach(c => c.onclick = () => { S.settings.reps=+c.dataset.n; save(); pane.querySelectorAll('#reps .chip').forEach(x=>x.classList.toggle('on', x===c)); });
   const hl = (i) => { pane.querySelectorAll('.ayah').forEach(x=>x.classList.toggle('playing', +x.dataset.i===i)); const el=pane.querySelector(`.ayah[data-i="${i}"]`); if(el) el.scrollIntoView({block:'center',behavior:'smooth'}); };
   const btn = $('#playAll', pane);
   const setBtn = () => { btn.textContent = playing ? '⏹️ وقّفي' : '▶️ شغّلي الصفحة'; };
-  btn.onclick = () => {
-    if(playing){ stopAudio(); playing=false; setBtn(); return; }
+  const start = (from) => {
     playing=true; setBtn();
-    playSeq(list, S.settings.reps, (a,k)=>hl(k), (ok)=>{ playing=false; setBtn(); if(ok){ const st=pg(p); if(!st.steps.listen){ st.steps.listen=true; markActive(); toast('ممتاز! هلّق روحي على «حفظ» 🧠'); viewPage(p,'listen',pageCtx.review); } } });
+    playSeq(list.slice(from), S.settings.reps, (a,k)=>hl(from+k), (ok)=>{
+      playing=false; setBtn();
+      if(ok){ const st=pg(p); if(!st.steps.listen){ st.steps.listen=true; markActive(); toast('ممتاز! هلّق روحي على «حفظ» 🧠'); viewPage(p,'listen',pageCtx.review); } }
+    });
   };
-  pane.querySelectorAll('.ayah').forEach(el => el.onclick = () => { const i=+el.dataset.i; playing=true; setBtn(); playSeq([list[i]], S.settings.reps, ()=>hl(i), ()=>{ playing=false; setBtn(); }); });
+  btn.onclick = () => { if(playing){ stopAudio(); playing=false; setBtn(); return; } start(0); };
+  pane.querySelectorAll('.ayah').forEach(el => el.onclick = () => start(+el.dataset.i));
 }
 
 function paneMem(pane, p){
   const list = DB.pages.get(p); const C = pageCtx;
   if(C.memIdx>=list.length) C.memIdx=list.length-1;
   const a = list[C.memIdx]; const words = splitWords(a.t);
-  const cnt = C.memCount[C.memIdx]||0;
-  const levels = ['ظاهرة','نصّها مخفي','أول كلمة','كلها مخفية'];
-  const hideAt = (i) => C.memLevel===1 ? i%2===1 : (C.memLevel===2 ? i>0 : C.memLevel===3);
-  const textHtml = C.memLevel===0 ? ayahHtml(a) : words.map((w,i)=> hideAt(i) ? hidPill(w,i) : `<span class="w">${esc(w)}</span>`).join(' ') + endMark(a.n);
   const last = C.memIdx===list.length-1;
+  const textHtml = C.memHide ? words.map((w,i)=>hidPill(w,i)).join(' ') + endMark(a.n) : ayahHtml(a);
   pane.innerHTML = `
     <div class="card">
-      <div class="row between"><span class="small muted">الآية ${toAr(C.memIdx+1)} من ${toAr(list.length)}</span><span class="small muted">${esc(surahName(a.s))} · ${toAr(a.n)}</span></div>
+      <div class="row between small muted"><span>الآية ${toAr(C.memIdx+1)} من ${toAr(list.length)}</span><span>${esc(surahName(a.s))} · ${toAr(a.n)}</span></div>
       <div class="bar" style="margin:8px 0 14px"><i style="width:${Math.round((C.memIdx+1)/list.length*100)}%"></i></div>
       ${basmalaIfNeeded(a)}
       <div class="q" id="memText" style="min-height:120px">${textHtml}</div>
-      <div class="chips" style="margin-top:12px" id="lv">${levels.map((l,i)=>`<button class="chip ${i===C.memLevel?'on':''}" data-l="${i}">${l}</button>`).join('')}</div>
     </div>
     <div class="card">
-      <div class="row between">
-        <button class="btn soft" id="lis">🔊 اسمعيها ${toAr(S.settings.reps)}×</button>
-        <div class="counter"><span class="small muted">قريتيها</span><b>${toAr(cnt)}</b><button class="btn ghost" id="plus" style="min-height:40px;padding:6px 14px">+١</button></div>
+      <ol class="howto"><li>اسمعيها</li><li>اقريها ٣ مرات وهي ظاهرة</li><li>خبّيها وقريها من حفظك</li></ol>
+      <div class="row" style="gap:10px">
+        <button class="btn soft" id="lis" style="flex:1">🔊 اسمعي ${toAr(S.settings.reps)}×</button>
+        <button class="btn ${C.memHide?'gold':'ghost'}" id="hide" style="flex:1">${C.memHide?'👁 اظهري':'🙈 خبّيها'}</button>
       </div>
-      <button class="btn ghost block" id="link" style="margin-top:10px" ${C.memIdx===0?'disabled':''}>🔗 ربط: اسمعي من أول الصفحة لهون</button>
-      <div class="tip" style="margin-top:12px">الطريقة: اسمعيها وهي ظاهرة ← اقرئيها ٣ مرات ← خبّي نصّها وقريها ← خبّي كلها وقريها ← اربطيها باللي قبلها. كبسي عالكلمة المخفية لتشوفيها.</div>
+      ${C.memIdx>0?'<button class="linkbtn" id="link">🔗 اسمعي من أول الصفحة لهون</button>':''}
     </div>
     <div class="row" style="gap:10px">
       <button class="btn ghost" id="prev" style="flex:1" ${C.memIdx===0?'disabled':''}>→ السابقة</button>
-      <button class="btn" id="next" style="flex:2">${last?'خلّصت الصفحة ✓':'الآية الجاية ←'}</button>
+      <button class="btn" id="next" style="flex:2">${last?'خلّصت، يلّا سمّعي 🎙️':'الآية الجاية ←'}</button>
     </div>`;
-  pane.querySelectorAll('#lv .chip').forEach(c => c.onclick = () => { C.memLevel=+c.dataset.l; paneMem(pane,p); });
   pane.querySelectorAll('#memText .hid').forEach(h => h.onclick = () => { const i=+h.dataset.i; h.outerHTML = `<span class="w peek">${esc(words[i])}</span>`; });
   $('#lis',pane).onclick = () => playSeq([a], S.settings.reps);
-  $('#plus',pane).onclick = () => { C.memCount[C.memIdx]=cnt+1; if(cnt+1===3 && C.memLevel===0){ C.memLevel=1; toast('حلو! هلّق خبّينا نصّ الكلمات 👀'); } else if(cnt+1===5 && C.memLevel===1){ C.memLevel=3; toast('يلّا جرّبي بلا ما تشوفي 💪'); } paneMem(pane,p); };
-  $('#link',pane).onclick = () => playSeq(list.slice(0, C.memIdx+1), 1);
-  $('#prev',pane).onclick = () => { stopAudio(); C.memIdx--; C.memLevel=0; paneMem(pane,p); };
+  $('#hide',pane).onclick = () => { stopAudio(); C.memHide=!C.memHide; paneMem(pane,p); };
+  if($('#link',pane)) $('#link',pane).onclick = () => playSeq(list.slice(0, C.memIdx+1), 1);
+  $('#prev',pane).onclick = () => { stopAudio(); C.memIdx--; C.memHide=false; paneMem(pane,p); };
   $('#next',pane).onclick = () => {
     stopAudio();
-    if(!last){ C.memIdx++; C.memLevel=0; paneMem(pane,p); window.scrollTo({top:0}); return; }
+    if(!last){ C.memIdx++; C.memHide=false; paneMem(pane,p); window.scrollTo({top:0}); playSeq([list[C.memIdx]], S.settings.reps); return; }
     const st=pg(p); if(!st.steps.mem){ st.steps.mem=true; if(st.status==='new') st.status='learning'; markActive(); }
-    toast('يا سلام! هلّق وقت التسميع 🎙️'); history.replaceState(null,'',`#page/${p}/test`); viewPage(p,'test',pageCtx.review);
+    history.replaceState(null,'',`#page/${p}/test`); viewPage(p,'test',pageCtx.review);
   };
 }
 
+/* ---------- النتيجة (مشتركة بين التسميعين) ---------- */
+async function finishTest(p, ratio, weakNums, isRev){
+  stopAudio(); Speech.stop(true);
+  const C = pageCtx;
+  const wasDone = pg(p).status==='done';
+  applyResult(p, ratio, isRev);
+  const pct = toAr(Math.round(ratio*100));
+  const weakTxt = weakNums.length ? `<p class="small muted">ركّزي على الآيات: ${weakNums.map(toAr).join('، ')}</p>` : '';
+  C.test = {}; C.rc = null;
+  if(isRev){
+    await modal(`<div class="big">${ratio>=0.9?'🌟':ratio>=0.7?'👍':'🌱'}</div><h2>${pct}٪</h2><p>${ratio>=0.9?'حفظ قوي ما شاء الله!':ratio>=0.7?'منيح، بس بدها شوية تثبيت.':'لا تزعلي، رح ترجع هالصفحة بكرا لتثبّتيها.'}</p>${weakTxt}<p class="small muted">المراجعة الجاية بعد ${toAr(pg(p).interval)} ${pg(p).interval===1?'يوم':'أيام'}</p>`, 'تمام');
+    const due = duePages(); location.hash = due.length ? '#review/'+due[0] : '#review';
+  } else if(ratio>=0.8){
+    const np = nextPage();
+    const juzDone = (() => { const j=DB.pages.get(p)[0].j; return DB.pageNos.filter(x=>DB.pages.get(x)[0].j===j).every(x=>pg(x).status==='done'); })();
+    await modal(`<div class="big">${juzDone?'🏆':'🎉'}</div><h2>${juzDone?'خلّصتي محطّة كاملة!':'نجحتي بالمرحلة!'}</h2><p>نتيجتك ${pct}٪. ${juzDone?'ختمتي الجزء '+toAr(DB.pages.get(p)[0].j)+'، الله يتقبّل منك.':'الله يبارك بحفظك.'}</p>${weakTxt}<p class="small muted">بكرا رح تراجعيها مرة، وبعدين المراجعات بتتباعد لحالها.</p>`, np?'يلّا عالمرحلة الجاية':'الحمد لله');
+    location.hash = wasDone ? '#map' : (np ? '#page/'+np : '#home');
+  } else {
+    await modal(`<div class="big">🌱</div><h2>${pct}٪</h2><p>قرّبتي! بدك 80٪ لتنفتح المرحلة الجاية. ارجعي لـ«حفظ» عالآيات اللي تعثّرتي فيها وجرّبي كمان مرة.</p>${weakTxt}`, 'رح جرّب كمان مرة');
+    history.replaceState(null,'',`#page/${p}/mem`); viewPage(p,'mem');
+  }
+}
+
 function paneTest(pane, p){
+  if(!pageCtx.manual && Speech.supported()) paneRecite(pane, p);
+  else paneTestManual(pane, p);
+}
+
+/* ---------- التسميع بالمايك ---------- */
+function rcInit(p){
+  return { p, idx:0, offset:0, tokens:[], last:'', ayat: DB.pages.get(p).map(a => {
+    const w = splitWords(a.t);
+    return { w, E:w.map(normW), st:[], hj:[], m:0, fired:new Set(), hints:new Set(), done:false, t0:0, dur:0, fast:false };
+  }) };
+}
+function rcScore(R){
+  let tot=0, pts=0; const weak=[]; const list = DB.pages.get(R.p);
+  R.ayat.forEach((A,i) => {
+    let ap=0;
+    A.w.forEach((_,k) => { const s=A.st[k]; let v = s==='ok'?1:(s==='letter'?0.5:0); if(A.hints.has(k)) v=Math.min(v,0.5); ap+=v; });
+    tot+=A.w.length; pts+=ap;
+    if(ap < A.w.length) weak.push(list[i].n);
+  });
+  return { ratio: tot ? pts/tot : 0, weak };
+}
+function rcUpdate(R, full, settled){
+  R.last = full;
+  const tokens = normTranscript(full); R.tokens = tokens;
+  const list = DB.pages.get(R.p); const now = Date.now(); let changed = false;
+  while(R.idx < list.length){
+    const A = R.ayat[R.idx];
+    if(R.offset > tokens.length) R.offset = tokens.length;
+    const H = tokens.slice(R.offset); const m = H.length;
+    if(!m) break;
+    if(!A.t0) A.t0 = now;
+    const res = alignWords(A.E, H, true);
+    A.st = res.st; A.hj = res.hj; A.m = m; changed = true;
+    let lastI = -1; res.hj.forEach((j,k) => { if(j >= 0) lastI = k; });
+    for(let k=0;k<=lastI;k++){
+      const s = res.st[k]; if(!s || s==='ok' || A.fired.has(k) || A.hints.has(k)) continue;
+      const stable = settled || s==='miss' || res.hj[k] < m-1;
+      if(stable){ A.fired.add(k); errFeedback(); }
+    }
+    const n = A.E.length;
+    const complete = res.hj[n-1] >= 0 && (res.st[n-1]==='ok' || settled || res.hj[n-1] < m-1);
+    if(!complete) break;
+    const used = res.hj[n-1] + 1;
+    const fin = alignWords(A.E, H.slice(0, used), false);
+    A.st = fin.st; A.hj = fin.hj; A.done = true; A.dur = now - A.t0;
+    let newErr = false;
+    fin.st.forEach((s,k) => { if(s!=='ok' && !A.fired.has(k) && !A.hints.has(k)){ A.fired.add(k); newErr = true; } });
+    if(newErr) errFeedback();
+    rcSpeedCheck(R, R.idx);
+    R.offset += used; R.idx++;
+  }
+  return changed;
+}
+function rcSpeedCheck(R, i){
+  if(!S.settings.tjAlert) return;
+  const A = R.ayat[i], a = DB.pages.get(R.p)[i];
+  if(A.E.length < 5 || !A.dur) return;
+  refDuration(a).then(ref => {
+    if(!ref || R !== pageCtx.rc) return;
+    if(A.dur/1000 < ref*0.45){ A.fast = true; tjFeedback(); if(R.render) R.render(); }
+  });
+}
+function paneRecite(pane, p){
+  const list = DB.pages.get(p); const C = pageCtx;
+  if(!C.rc || C.rc.p !== p) C.rc = rcInit(p);
+  const R = C.rc; const isRev = C.review || pg(p).status==='done';
+  pane.innerHTML = `
+    <div class="card">
+      <div class="tip">${isRev?'مراجعة: ':''}كبسي عالمايك وسمّعي من حفظك، آية ورا آية. الكلمات بتبيّن لحالها وانتي عم تقري.</div>
+      <div class="legend small">
+        <button class="lg" id="lgErr"><span class="dot" style="background:var(--bad)"></span><span><b>«طنّة» + اهتزاز</b> = غلط بكلمة أو بحرف. كبسي لتسمعيها</span></button>
+        <button class="lg" id="lgTj"><span class="dot" style="background:var(--gold)"></span><span><b>جرس 🔔</b> = قريتي بسرعة كتير، انتبهي للمدّ والغنّة</span></button>
+      </div>
+    </div>
+    <div class="card q" id="rcList"></div>
+    <div class="sticky-play"><div class="rcbar">
+      <button class="btn ghost sq" id="rcHint" aria-label="ورجيني كلمة">💡</button>
+      <button class="btn mic" id="rcMic" style="flex:1"></button>
+      <button class="btn ghost sq" id="rcSkip" aria-label="تخطّي الآية">⏭</button>
+    </div></div>
+    <p class="small muted center" style="margin-top:6px">💡 كلمة · ⏭ تخطّي الآية · <button class="linkbtn" id="rcRedo">🔄 أعيدي الآية</button> · <button class="linkbtn" id="rcManual">بلا مايك</button></p>`;
+  const box = $('#rcList', pane), mic = $('#rcMic', pane);
+  let settleT = null;
+  const wordHtml = (A, k, cur) => {
+    const w = A.w[k], s = A.st[k], hint = A.hints.has(k);
+    const stable = A.done || (s && (s==='ok' || s==='miss' || A.fired.has(k) || A.hj[k] < A.m-1));
+    if(s && stable){
+      const cls = (s==='ok') ? (hint?'wh':'') : (s==='letter' ? 'wl' : 'we');
+      return `<span class="w ${cls}">${esc(w)}</span>`;
+    }
+    if(hint) return `<span class="w wh">${esc(w)}</span>`;
+    return cur ? hidPill(w, k) : '';
+  };
+  const render = () => {
+    let html = '';
+    const upto = Math.min(R.idx, list.length-1);
+    for(let i=0;i<=upto;i++){
+      const a = list[i], A = R.ayat[i], cur = (i===R.idx);
+      html += basmalaIfNeeded(a) + `<div class="rca ${cur?'cur':''}" data-i="${i}">` + A.w.map((_,k)=>wordHtml(A,k,cur)).join(' ') + endMark(a.n) + (A.fast?' <span class="fast">🔔 سريعة</span>':'') + `</div>`;
+    }
+    if(R.idx < list.length){
+      const left = list.length - R.idx - 1;
+      if(left > 0) html += `<div class="small muted center" style="font-family:inherit;margin-top:8px">باقي ${toAr(left)} ${left===1?'آية':'آيات'} بعد هيدي</div>`;
+    } else {
+      const sc = rcScore(R);
+      html += `<div class="center" style="font-family:inherit;margin-top:12px"><b>خلّصتي الصفحة ✨ ${toAr(Math.round(sc.ratio*100))}٪</b></div>`;
+    }
+    box.innerHTML = html;
+    box.querySelectorAll('.rca.cur .hid').forEach(h => h.onclick = () => { R.ayat[R.idx].hints.add(+h.dataset.i); render(); });
+    const curEl = box.querySelector('.rca.cur'); if(curEl && Speech.active) curEl.scrollIntoView({block:'center', behavior:'smooth'});
+    setMic();
+  };
+  R.render = render;
+  const setMic = () => {
+    if(R.idx >= list.length){ mic.className='btn gold mic'; mic.textContent='شوفي النتيجة ✨'; return; }
+    if(Speech.active){ mic.className='btn mic on'; mic.innerHTML='<span class="recdot" style="background:#fff"></span> عم سمعك… كبسي لتوقّفي'; }
+    else { mic.className='btn mic'; mic.textContent = (R.idx>0 || R.ayat[0].st.length) ? '🎙️ كمّلي التسميع' : '🎙️ ابدئي التسميع'; }
+  };
+  const onText = (full) => {
+    if(pageCtx.rc !== R) return;
+    clearTimeout(settleT);
+    if(rcUpdate(R, full, false)) render();
+    settleT = setTimeout(() => { if(pageCtx.rc===R && Speech.active && rcUpdate(R, R.last, true)) render(); }, 1600);
+    if(R.idx >= list.length){ Speech.stop(true); render(); }
+  };
+  const onState = (s) => {
+    if(s==='denied') toast('لازم تسمحي للتطبيق يستعمل المايك');
+    if(s==='error') toast('وقف المايك. كبسي ليرجع يسمعك');
+    setMic();
+  };
+  mic.onclick = async () => {
+    if(R.idx >= list.length){ const sc = rcScore(R); finishTest(p, sc.ratio, sc.weak, isRev); return; }
+    if(Speech.active){ Speech.stop(); clearTimeout(settleT); if(rcUpdate(R, R.last, true)) render(); setMic(); return; }
+    stopAudio(); beep([]);
+    R.offset = 0; R.tokens = []; R.last = '';
+    const A = R.ayat[R.idx]; if(!A.done){ A.st=[]; A.hj=[]; A.m=0; A.t0=0; }
+    try{ await Speech.start(onText, onState); }
+    catch(e){ toast(e && e.message==='perm' ? 'لازم تسمحي للتطبيق يستعمل المايك' : 'التعرّف عالصوت مش متوفّر عهالموبايل. جرّبي «بلا مايك»'); }
+    setMic();
+  };
+  $('#rcHint', pane).onclick = () => {
+    if(R.idx >= list.length) return;
+    const A = R.ayat[R.idx]; const k = A.w.findIndex((_,i) => !(A.st[i]==='ok' && A.hj[i] < A.m-1) && !A.hints.has(i));
+    if(k >= 0){ A.hints.add(k); render(); }
+  };
+  $('#rcSkip', pane).onclick = () => {
+    if(R.idx >= list.length) return;
+    const A = R.ayat[R.idx];
+    A.w.forEach((_,k) => { if(!(A.st[k] && A.hj[k] >= 0)) A.st[k] = 'miss'; });
+    A.done = true; R.idx++; R.offset = R.tokens.length; render();
+  };
+  $('#rcRedo', pane).onclick = () => {
+    if(R.idx >= list.length) return;
+    const A = R.ayat[R.idx];
+    Object.assign(A, { st:[], hj:[], m:0, fired:new Set(), hints:new Set(), done:false, t0:0, dur:0, fast:false });
+    R.offset = R.tokens.length; render();
+  };
+  $('#lgErr', pane).onclick = () => { lastErrT = 0; errFeedback(); };
+  $('#lgTj', pane).onclick = () => tjFeedback();
+  $('#rcManual', pane).onclick = () => { Speech.stop(true); pageCtx.manual = true; paneTestManual(pane, p); };
+  render();
+  list.reduce((pr, a) => pr.then(() => refDuration(a)), Promise.resolve());
+}
+
+/* ---------- التسميع اليدوي ---------- */
+function paneTestManual(pane, p){
   const list = DB.pages.get(p); const C = pageCtx; const T = C.test;
   list.forEach((a,i)=>{ if(!T[i]) T[i]={shown:1, grade:null}; });
   const words = list.map(a=>splitWords(a.t));
@@ -643,11 +1041,12 @@ function paneTest(pane, p){
   };
   const recHtml = () => recState.rec
     ? `<button class="btn danger block" id="recBtn"><span class="recdot"></span> وقّفي التسجيل</button>`
-    : `<button class="btn soft block" id="recBtn">🎙️ سجّلي تسميعك</button>${recState.url?`<audio controls src="${recState.url}"></audio><button class="btn ghost block" id="cmp" style="margin-top:8px">🎧 اسمعي القارئ للمقارنة</button>`:''}`;
+    : `<button class="btn soft block" id="recBtn">⏺ سجّلي صوتك</button>${recState.url?`<audio controls src="${recState.url}"></audio><button class="btn ghost block" id="cmp" style="margin-top:8px">🎧 اسمعي القارئ للمقارنة</button>`:''}`;
   pane.innerHTML = `
     <div class="card">
-      <div class="tip" style="margin-bottom:12px">${isRev?'مراجعة: ':''}سمّعي كل آية من حفظك. أول كلمة ظاهرة كتلميح. اكشفي كلمة كلمة إذا علّقتي، وبعدها قيّمي حالك بصدق.</div>
+      <div class="tip" style="margin-bottom:12px">${isRev?'مراجعة: ':''}سمّعي كل آية من حفظك. اكشفي كلمة كلمة إذا علّقتي، وبعدها قيّمي حالك بصدق.</div>
       <div id="recBox">${recHtml()}</div>
+      ${Speech.supported()?'<button class="linkbtn" id="toMic">🎙️ رجعي للتسميع بالمايك</button>':''}
     </div>
     <div class="card" id="tlist">${list.map(ayahBlock).join('')}</div>
     <div class="sticky-play"><button class="btn block ${graded===list.length?'gold':''}" id="finish" ${graded===list.length?'':'disabled'}>${graded===list.length?'شوفي النتيجة ✨':`قيّمتي ${toAr(graded)} من ${toAr(list.length)}`}</button></div>`;
@@ -656,9 +1055,10 @@ function paneTest(pane, p){
     const cmp=$('#cmp',pane); if(cmp) cmp.onclick = () => playSeq(list, 1);
   };
   bindRec();
+  if($('#toMic',pane)) $('#toMic',pane).onclick = () => { pageCtx.manual = false; paneRecite(pane, p); };
+  const redraw = () => { const y=window.scrollY; paneTestManual(pane,p); window.scrollTo({top:y}); };
   pane.querySelectorAll('.tcard').forEach(card => {
     const i=+card.dataset.i; const t=T[i];
-    const redraw = () => { const y=window.scrollY; paneTest(pane,p); window.scrollTo({top:y}); };
     card.querySelectorAll('.hid').forEach(h => h.onclick = () => { t.shown = Math.max(t.shown, +h.dataset.i+1); redraw(); });
     card.querySelectorAll('.tools button').forEach(b => b.onclick = () => {
       const act=b.dataset.a;
@@ -666,29 +1066,11 @@ function paneTest(pane, p){
       else if(act==='all'){ t.shown=words[i].length; redraw(); }
       else playSeq([list[i]],1);
     });
-    card.querySelectorAll('.gradebar button').forEach(b => b.onclick = () => { t.grade=+b.dataset.g; t.shown=words[i].length; const y=window.scrollY; paneTest(pane,p); window.scrollTo({top:y}); });
+    card.querySelectorAll('.gradebar button').forEach(b => b.onclick = () => { t.grade=+b.dataset.g; t.shown=words[i].length; redraw(); });
   });
-  $('#finish',pane).onclick = async () => {
-    stopAudio();
+  $('#finish',pane).onclick = () => {
     const pts = list.reduce((s,a,i)=>s+T[i].grade,0); const ratio = pts/(list.length*2);
-    const wasDone = pg(p).status==='done';
-    applyResult(p, ratio, isRev);
-    const pct = toAr(Math.round(ratio*100));
-    const weak = list.filter((a,i)=>T[i].grade<2).map(a=>toAr(a.n));
-    const weakTxt = weak.length ? `<p class="small muted">ركّزي على الآيات: ${weak.join('، ')}</p>` : '';
-    C.test = {};
-    if(isRev){
-      await modal(`<div class="big">${ratio>=0.9?'🌟':ratio>=0.7?'👍':'🌱'}</div><h2>${pct}٪</h2><p>${ratio>=0.9?'حفظ قوي ما شاء الله!':ratio>=0.7?'منيح، بس بدها شوية تثبيت.':'لا تزعلي، رح ترجع هالصفحة بكرا لتثبّتيها.'}</p>${weakTxt}<p class="small muted">المراجعة الجاية بعد ${toAr(pg(p).interval)} ${pg(p).interval===1?'يوم':'أيام'}</p>`, 'تمام');
-      const due = duePages(); location.hash = due.length ? '#review/'+due[0] : '#review';
-    } else if(ratio>=0.8){
-      const np = nextPage();
-      const juzDone = (() => { const j=DB.pages.get(p)[0].j; return DB.pageNos.filter(x=>DB.pages.get(x)[0].j===j).every(x=>pg(x).status==='done'); })();
-      await modal(`<div class="big">${juzDone?'🏆':'🎉'}</div><h2>${juzDone?'خلّصتي محطّة كاملة!':'نجحتي بالمرحلة!'}</h2><p>نتيجتك ${pct}٪. ${juzDone?'ختمتي الجزء '+toAr(DB.pages.get(p)[0].j)+'، الله يتقبّل منك.':'الله يبارك بحفظك.'}</p>${weakTxt}<p class="small muted">بكرا رح تراجعيها مرة، وبعدين المراجعات بتتباعد لحالها.</p>`, np?'يلّا عالمرحلة الجاية':'الحمد لله');
-      location.hash = wasDone ? '#map' : (np ? '#page/'+np : '#home');
-    } else {
-      await modal(`<div class="big">🌱</div><h2>${pct}٪</h2><p>قرّبتي! بدك 80٪ لتنفتح المرحلة الجاية. ارجعي لـ«حفظ» عالآيات اللي تعثّرتي فيها وجرّبي كمان مرة.</p>${weakTxt}`, 'رح جرّب كمان مرة');
-      history.replaceState(null,'',`#page/${p}/mem`); viewPage(p,'mem');
-    }
+    finishTest(p, ratio, list.filter((a,i)=>T[i].grade<2).map(a=>a.n), isRev);
   };
 }
 
@@ -803,6 +1185,10 @@ function viewSettings(){
     </div>
     <div class="card">
       <label class="switch"><span>تلوين أحكام التجويد<br><span class="small muted">إذا شفتي الحروف مقطّعة عالآيفون، سكّريه</span></span><input type="checkbox" id="tj" ${s.tajweed?'checked':''}></label>
+      <label class="switch"><span>صوت عند الغلط</span><input type="checkbox" id="es" ${s.errSound?'checked':''}></label>
+      <label class="switch"><span>اهتزاز عند الغلط</span><input type="checkbox" id="vb" ${s.vibe?'checked':''}></label>
+      <label class="switch"><span>جرس التجويد<br><span class="small muted">بيرنّ إذا قريتي الآية أسرع بكتير من الحصري</span></span><input type="checkbox" id="ta" ${s.tjAlert?'checked':''}></label>
+      <div class="row" style="gap:8px;padding:10px 0"><button class="btn ghost" id="tryErr" style="flex:1">جرّبي صوت الغلط</button><button class="btn ghost" id="tryTj" style="flex:1">جرّبي الجرس</button></div>
       <label class="switch"><span>فتح كل المراحل<br><span class="small muted">إذا حافظة شي من قبل وبدّك تبلّشي من نصّ السورة</span></span><input type="checkbox" id="fr" ${s.free?'checked':''}></label>
     </div>
     <div class="card">
@@ -822,6 +1208,11 @@ function viewSettings(){
   $('#qs').onchange = save;
   $('#tj').onchange = e => { s.tajweed=e.target.checked; save(); };
   $('#fr').onchange = e => { s.free=e.target.checked; save(); };
+  $('#es').onchange = e => { s.errSound=e.target.checked; save(); };
+  $('#vb').onchange = e => { s.vibe=e.target.checked; save(); };
+  $('#ta').onchange = e => { s.tjAlert=e.target.checked; save(); };
+  $('#tryErr').onclick = () => { lastErrT=0; errFeedback(); };
+  $('#tryTj').onclick = () => tjFeedback();
   $('#exp').onclick = async () => {
     if(IS_APP){
       try{ await navigator.clipboard.writeText(JSON.stringify(S)); toast('انسخت النسخة ✓ الصقيها برسالة لحالك عالواتساب'); }
@@ -843,7 +1234,7 @@ function viewSettings(){
 
 /* ============ التوجيه ============ */
 function route(){
-  stopAudio(); if(recState.rec) stopRecording();
+  stopAudio(); Speech.stop(true); if(recState.rec) stopRecording();
   const h = (location.hash||'#home').slice(1).split('/');
   const r = h[0];
   window.scrollTo({top:0});
@@ -872,7 +1263,7 @@ if(!IS_APP && 'serviceWorker' in navigator){ window.addEventListener('load', () 
 // زر الرجوع بالأندرويد
 if(IS_APP){
   try{
-    const AppP = window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+    const AppP = (window.CapX && window.CapX.App) || (window.Capacitor.Plugins && window.Capacitor.Plugins.App);
     if(AppP) AppP.addListener('backButton', () => {
       const r=(location.hash||'#home').slice(1).split('/')[0];
       if(document.querySelector('.modal')) return;

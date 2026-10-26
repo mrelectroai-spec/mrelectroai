@@ -1,6 +1,6 @@
 // رفيق الحفظ — Service Worker
 // غيّر الرقم لما تعدّل index.html حتى ينزل التحديث عالموبايل
-const SHELL_CACHE = 'hifz-shell-v2';
+const SHELL_CACHE = 'hifz-shell-v3';
 const DATA_CACHE = 'hifz-data-v1';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
