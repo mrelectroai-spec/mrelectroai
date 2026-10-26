@@ -165,6 +165,20 @@ nav.bottom a .badge{position:absolute;top:0;right:calc(50% - 22px);background:va
 audio{width:100%;margin-top:8px}
 .tip{background:var(--gold-soft);border-radius:14px;padding:12px;font-size:14px}
 .sticky-play{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom));z-index:3}
+/* الفهرس والدولاب */
+.wheel-head{display:flex;gap:12px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.wheel-head span:first-child{flex:2;text-align:center}.wheel-head span:last-child{flex:1;text-align:center}
+.wheels{display:flex;gap:12px}
+.wheel-wrap{position:relative;flex:2}
+.wheel-wrap.narrow{flex:1}
+.wheel-wrap::before{content:"";position:absolute;left:0;right:0;top:88px;height:44px;background:var(--pri-soft);border-radius:12px;pointer-events:none}
+.wheel{position:relative;height:220px;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain;-webkit-mask-image:linear-gradient(transparent,#000 32%,#000 68%,transparent);mask-image:linear-gradient(transparent,#000 32%,#000 68%,transparent)}
+.wheel::-webkit-scrollbar{display:none}
+.wheel .pad{height:88px}
+.wheel .it{height:44px;display:flex;align-items:center;justify-content:center;gap:6px;scroll-snap-align:center;font-size:16px;color:var(--muted);white-space:nowrap;cursor:pointer;transition:font-size .12s,color .12s}
+.wheel .it.sel{color:var(--pri);font-weight:700;font-size:19px}
+.wheel .sn{font-size:12px;opacity:.7}
+.sel{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font:inherit;color:inherit}
 /* التسميع بالمايك */
 .rca{padding:8px 6px;border-bottom:1px dashed var(--line)}
 .rca:last-of-type{border-bottom:0}
@@ -190,6 +204,7 @@ audio{width:100%;margin-top:8px}
 <nav class="bottom" id="nav" hidden><div class="in">
   <a href="#home" data-r="home"><span class="i">🏠</span>الرئيسية</a>
   <a href="#map" data-r="map"><span class="i">🗺️</span>المراحل</a>
+  <a href="#index" data-r="index"><span class="i">📑</span>الفهرس</a>
   <a href="#review" data-r="review"><span class="i">🔁</span>المراجعة<span class="badge" id="revBadge" hidden></span></a>
   <a href="#tajweed" data-r="tajweed"><span class="i">🎨</span>التجويد</a>
   <a href="#settings" data-r="settings"><span class="i">⚙️</span>الإعدادات</a>
@@ -203,12 +218,20 @@ const API = 'https://api.alquran.cloud/v1';
 const IS_APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const SURAHS = [{n:2,name:'البقرة',count:286},{n:3,name:'آل عمران',count:200}];
 const RECITERS = [
-  {id:'ar.husary',name:'محمود خليل الحصري (مرتّل)'},
-  {id:'ar.husarymujawwad',name:'الحصري (مجوّد)'},
-  {id:'ar.minshawi',name:'محمد صدّيق المنشاوي'},
-  {id:'ar.alafasy',name:'مشاري العفاسي'},
-  {id:'ar.abdulbasitmurattal',name:'عبد الباسط عبد الصمد (مرتّل)'}
+  {id:'ar.husary', name:'محمود خليل الحصري (مرتّل)', g:'slow'},
+  {id:'ar.minshawi', name:'محمد صدّيق المنشاوي (مرتّل)', g:'slow'},
+  {id:'ar.abdulbasitmurattal', name:'عبد الباسط عبد الصمد (مرتّل)', g:'slow'},
+  {id:'ar.husarymujawwad', name:'الحصري (مجوّد)', g:'slow'},
+  {id:'ar.alafasy', name:'مشاري العفاسي', g:'mid'},
+  {id:'ar.shaatree', name:'أبو بكر الشاطري', g:'mid'},
+  {id:'ar.ahmedajamy', name:'أحمد العجمي', g:'mid'},
+  {id:'ar.muhammadayyoub', name:'محمد أيوب', g:'mid'},
+  {id:'ar.hudhaify', name:'علي الحذيفي', g:'mid'},
+  {id:'ar.mahermuaiqly', name:'ماهر المعيقلي', g:'fast'},
+  {id:'ar.abdurrahmaansudais', name:'عبد الرحمن السديس', g:'fast'},
+  {id:'ar.saoodshuraym', name:'سعود الشريم', g:'fast'}
 ];
+const RGROUPS = {slow:'🐢 هادئ وواضح (للحفظ الجديد)', mid:'🚶 وسط', fast:'🏃 سريع (للمراجعة)'};
 const SILENT = 'data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YZABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA';
 
 const RULE_GROUPS = [
@@ -367,7 +390,7 @@ function hidPill(w, i, cls=''){
   const len = w.replace(MARKS_RE,'').length;
   return `<span class="hid ${cls}" data-i="${i}" style="width:${Math.max(1.4, len*0.5).toFixed(1)}em" role="button" aria-label="كلمة مخفية"></span>`;
 }
-function basmalaIfNeeded(a){ return (a.n===1 && a.s!==9) ? `<div class="basmala">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>` : ''; }
+function basmalaIfNeeded(a){ return (a.n===1 && a.s!==9 && a.s!==1) ? `<div class="basmala">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>` : ''; }
 
 /* ============ الصوت ============ */
 const player = { el:new Audio(), token:0, unlocked:false };
@@ -434,8 +457,9 @@ async function playOne(a, tok){
   catch(e){
     if(tok !== player.token) return;
     const remote = await audioSrc(a);
-    if(remote === url) throw e;
-    await playUrl(remote, tok);
+    if(remote !== url){ try{ await playUrl(remote, tok); return; }catch(e2){ if(tok !== player.token) return; } }
+    if(remote.includes('/128/')){ await playUrl(remote.replace('/128/','/64/'), tok); return; }
+    throw e;
   }
 }
 async function playSeq(items, reps, onAyah, onDone){
@@ -723,6 +747,7 @@ function viewHome(){
       ${np ? `<button class="task" onclick="location.hash='#page/${np}'"><span class="ic">📖</span><span><b>المرحلة ${toAr(stageNo(np))}: ${esc(pageLabel(np))}</b><span class="small muted">${pg(np).status==='learning'?'كمّلي من وين وقفتي':'حفظ جديد'}</span></span><span class="go">←</span></button>` : `<div class="task"><span class="ic">🏆</span><span><b>ما شاء الله! خلّصتي السورتين</b><span class="small muted">ضلّي ثابتة على المراجعة</span></span></div>`}
     </div>
     ${juzHtml}
+    <button class="task" onclick="location.hash='${S.lastRead?`#read/${S.lastRead.s}/${S.lastRead.a}`:'#index'}'" style="background:var(--card);margin:0 0 14px"><span class="ic">📑</span><span><b>${S.lastRead?`كمّلي القراءة: ${qName(S.lastRead.s)} ${toAr(S.lastRead.a)}`:'فهرس القرآن'}</b><span class="small muted">${S.lastRead?'من وين وقفتي':'اختاري أي سورة وأي آية واسمعيها'}</span></span><span class="go">←</span></button>
     <div class="tip">💡 ${esc(tip)}</div>`;
 }
 
@@ -777,6 +802,7 @@ function paneListen(pane, p){
   pane.innerHTML = `
     <div class="card">
       <div class="tip" style="margin-bottom:12px">اسمعي الصفحة كلها وانتي عم تتطلّعي عالآيات. ما تحاولي تحفظي هلّق، بس عوّدي أذنك عاللفظ.</div>
+      <select id="rcL" class="sel" style="margin-bottom:10px">${reciterOptions()}</select>
       <div class="small muted">كم مرة تتكرّر كل آية؟</div>
       <div class="chips" id="reps">${[1,3,5,7,10].map(n=>`<button class="chip ${n===reps?'on':''}" data-n="${n}">${toAr(n)}×</button>`).join('')}</div>
     </div>
@@ -784,6 +810,7 @@ function paneListen(pane, p){
     <div class="sticky-play"><button class="btn block" id="playAll">▶️ شغّلي الصفحة</button></div>
     <p class="small muted center">كبسي على أي آية لتبلّشي التلاوة منها</p>`;
   let playing=false;
+  bindReciter($('#rcL', pane));
   pane.querySelectorAll('#reps .chip').forEach(c => c.onclick = () => { S.settings.reps=+c.dataset.n; save(); pane.querySelectorAll('#reps .chip').forEach(x=>x.classList.toggle('on', x===c)); });
   const hl = (i) => { pane.querySelectorAll('.ayah').forEach(x=>x.classList.toggle('playing', +x.dataset.i===i)); const el=pane.querySelector(`.ayah[data-i="${i}"]`); if(el) el.scrollIntoView({block:'center',behavior:'smooth'}); };
   const btn = $('#playAll', pane);
@@ -1156,6 +1183,144 @@ function viewTajweed(){
   });
 }
 
+/* ============ فهرس القرآن ============ */
+const QURAN = [
+['الفاتحة',7],['البقرة',286],['آل عمران',200],['النساء',176],['المائدة',120],['الأنعام',165],['الأعراف',206],['الأنفال',75],['التوبة',129],['يونس',109],
+['هود',123],['يوسف',111],['الرعد',43],['إبراهيم',52],['الحجر',99],['النحل',128],['الإسراء',111],['الكهف',110],['مريم',98],['طه',135],
+['الأنبياء',112],['الحج',78],['المؤمنون',118],['النور',64],['الفرقان',77],['الشعراء',227],['النمل',93],['القصص',88],['العنكبوت',69],['الروم',60],
+['لقمان',34],['السجدة',30],['الأحزاب',73],['سبأ',54],['فاطر',45],['يس',83],['الصافات',182],['ص',88],['الزمر',75],['غافر',85],
+['فصلت',54],['الشورى',53],['الزخرف',89],['الدخان',59],['الجاثية',37],['الأحقاف',35],['محمد',38],['الفتح',29],['الحجرات',18],['ق',45],
+['الذاريات',60],['الطور',49],['النجم',62],['القمر',55],['الرحمن',78],['الواقعة',96],['الحديد',29],['المجادلة',22],['الحشر',24],['الممتحنة',13],
+['الصف',14],['الجمعة',11],['المنافقون',11],['التغابن',18],['الطلاق',12],['التحريم',12],['الملك',30],['القلم',52],['الحاقة',52],['المعارج',44],
+['نوح',28],['الجن',28],['المزمل',20],['المدثر',56],['القيامة',40],['الإنسان',31],['المرسلات',50],['النبأ',40],['النازعات',46],['عبس',42],
+['التكوير',29],['الانفطار',19],['المطففين',36],['الانشقاق',25],['البروج',22],['الطارق',17],['الأعلى',19],['الغاشية',26],['الفجر',30],['البلد',20],
+['الشمس',15],['الليل',21],['الضحى',11],['الشرح',8],['التين',8],['العلق',19],['القدر',5],['البينة',8],['الزلزلة',8],['العاديات',11],
+['القارعة',11],['التكاثر',8],['العصر',3],['الهمزة',9],['الفيل',5],['قريش',4],['الماعون',7],['الكوثر',3],['الكافرون',6],['النصر',3],
+['المسد',5],['الإخلاص',4],['الفلق',5],['الناس',6]
+];
+const qName = s => QURAN[s-1][0];
+const qCount = s => QURAN[s-1][1];
+
+function reciterOptions(){
+  return Object.entries(RGROUPS).map(([g,label]) => `<optgroup label="${label}">${RECITERS.filter(r=>r.g===g).map(r=>`<option value="${r.id}" ${r.id===S.settings.reciter?'selected':''}>${r.name}</option>`).join('')}</optgroup>`).join('');
+}
+function bindReciter(sel){ sel.onchange = e => { stopAudio(); S.settings.reciter = e.target.value; save(); toast('تغيّر القارئ: ' + RECITERS.find(r=>r.id===e.target.value).name); }; }
+
+// دولاب: لائحة بتلفّ وبتوقف عالعنصر اللي بالنص
+function makeWheel(el, items, sel, onChange){
+  const H = 44;
+  el.innerHTML = '<div class="pad"></div>' + items.map((t,i)=>`<div class="it" data-i="${i}">${t}</div>`).join('') + '<div class="pad"></div>';
+  let cur = Math.max(0, Math.min(items.length-1, sel)), t = null;
+  const mark = () => { const o = el.querySelector('.it.sel'); if(o) o.classList.remove('sel'); const it = el.children[cur+1]; if(it) it.classList.add('sel'); };
+  el.scrollTop = cur * H; mark();
+  el.onscroll = () => {
+    const i = Math.max(0, Math.min(items.length-1, Math.round(el.scrollTop / H)));
+    if(i !== cur){ cur = i; mark(); }
+    clearTimeout(t); t = setTimeout(() => onChange(cur), 140);
+  };
+  el.onclick = e => { const it = e.target.closest('.it'); if(it) el.scrollTo({top: +it.dataset.i * H, behavior:'smooth'}); };
+  return { get: () => cur };
+}
+
+function stageOf(s, a){ const x = DB.ayat.find(y => y.s===s && y.n===a); return x ? x.p : null; }
+
+function viewIndex(){
+  setTitle('فهرس القرآن'); setNav('index');
+  const last = S.lastRead || {s:2, a:1};
+  let s = last.s, a = last.a;
+  app.innerHTML = `
+    <div class="card">
+      <div class="wheel-head"><span>السورة</span><span>الآية</span></div>
+      <div class="wheels">
+        <div class="wheel-wrap"><div class="wheel" id="wS" aria-label="السورة"></div></div>
+        <div class="wheel-wrap narrow"><div class="wheel" id="wA" aria-label="الآية"></div></div>
+      </div>
+      <p class="center muted small" id="selInfo" style="margin:10px 0"></p>
+      <button class="btn block" id="goRead">📖 اقرئي واسمعي</button>
+      <button class="btn soft block" id="goStage" style="margin-top:8px" hidden>🧠 روحي لمرحلة الحفظ تبع هالآية</button>
+    </div>
+    <div class="card">
+      <h2>القارئ</h2>
+      <select id="rcI" class="sel">${reciterOptions()}</select>
+      <p class="small muted" style="margin:8px 0 0">للحفظ الجديد اختاري قارئ هادئ، وللمراجعة قارئ سريع.</p>
+    </div>
+    <div class="card"><h2>سور سريعة</h2><div class="chips">${[1,2,3,18,36,55,56,67,112,113,114].map(n=>`<button class="chip" data-s="${n}">${qName(n)}</button>`).join('')}</div></div>`;
+  bindReciter($('#rcI'));
+  const info = () => {
+    $('#selInfo').textContent = `سورة ${qName(s)} · ${toAr(qCount(s))} آية · من الآية ${toAr(a)}`;
+    const p = (s===2 || s===3) ? stageOf(s, a) : null;
+    const gs = $('#goStage'); gs.hidden = !p;
+    if(p) gs.textContent = `🧠 روحي للمرحلة ${toAr(stageNo(p))} (حفظ)`;
+  };
+  let wA;
+  const buildAyat = (keep) => {
+    if(!keep) a = 1;
+    wA = makeWheel($('#wA'), Array.from({length:qCount(s)}, (_,i)=>toAr(i+1)), a-1, i => { a = i+1; info(); });
+    info();
+  };
+  makeWheel($('#wS'), QURAN.map((q,i)=>`<span class="sn">${toAr(i+1)}</span> ${q[0]}`), s-1, i => { if(i+1 !== s){ s = i+1; buildAyat(false); } });
+  buildAyat(true);
+  $('#goRead').onclick = () => { location.hash = `#read/${s}/${a}`; };
+  $('#goStage').onclick = () => {
+    const p = stageOf(s, a); if(!p) return;
+    if(!isUnlocked(p)){ toast('هالمرحلة لسّا مقفولة. فيكي تفتحي كل المراحل من الإعدادات'); return; }
+    location.hash = `#page/${p}/listen`;
+  };
+  app.querySelectorAll('.chip[data-s]').forEach(c => c.onclick = () => { location.hash = `#read/${c.dataset.s}/1`; });
+}
+
+async function getSurahAyat(s){
+  if(s===2 || s===3) return DB.ayat.filter(x => x.s===s);
+  return loadSurah({n:s, name:qName(s), count:qCount(s)});
+}
+
+let readTok = 0;
+async function viewRead(s, a){
+  if(!(s>=1 && s<=114)){ location.hash = '#index'; return; }
+  a = Math.max(1, Math.min(qCount(s), a||1));
+  setTitle(`سورة ${qName(s)}`, true); setNav('index');
+  const tok = ++readTok;
+  app.innerHTML = '<div class="loading"><div><div class="spin"></div><div>عم نجيب السورة…</div></div></div>';
+  let list;
+  try{ list = await getSurahAyat(s); }
+  catch(e){
+    if(tok !== readTok) return;
+    app.innerHTML = `<div class="loading"><div><div style="font-size:44px">📶</div><h2>ما قدرنا نجيب السورة</h2><p class="muted">هالسورة بدها نت أوّل مرة. بعدها بتنحفظ عالموبايل.</p><button class="btn" id="retry">جرّبي كمان مرة</button></div></div>`;
+    $('#retry').onclick = () => viewRead(s, a); return;
+  }
+  if(tok !== readTok) return;
+  S.lastRead = {s, a}; save();
+  let from = a - 1, playing = false;
+  app.innerHTML = `
+    <div class="card">
+      <div class="row" style="gap:8px">
+        <select id="rcR" class="sel" style="flex:1">${reciterOptions()}</select>
+        <button class="btn ghost" id="toIdx" style="flex:none">📑 الفهرس</button>
+      </div>
+      <div class="small muted" style="margin-top:10px">كم مرة تتكرّر كل آية؟</div>
+      <div class="chips" id="repsR">${[1,3,5,7,10].map(n=>`<button class="chip ${n===S.settings.reps?'on':''}" data-n="${n}">${toAr(n)}×</button>`).join('')}</div>
+    </div>
+    <div class="card q ayah-list" id="rlist">${list.map((x,i)=>`${basmalaIfNeeded(x)}<span class="ayah" data-i="${i}">${ayahHtml(x)}</span>`).join('')}</div>
+    <div class="sticky-play"><button class="btn block" id="playR"></button></div>
+    <p class="small muted center">كبسي على أي آية لتبلّشي منها</p>`;
+  bindReciter($('#rcR'));
+  $('#toIdx').onclick = () => { location.hash = '#index'; };
+  app.querySelectorAll('#repsR .chip').forEach(c => c.onclick = () => { S.settings.reps = +c.dataset.n; save(); app.querySelectorAll('#repsR .chip').forEach(x=>x.classList.toggle('on', x===c)); });
+  const btn = $('#playR');
+  const hl = (i, scroll) => { app.querySelectorAll('#rlist .ayah').forEach(x => x.classList.toggle('playing', +x.dataset.i===i)); const el = app.querySelector(`#rlist .ayah[data-i="${i}"]`); if(el && scroll) el.scrollIntoView({block:'center', behavior:'smooth'}); };
+  const setBtn = () => { btn.textContent = playing ? '⏹️ وقّفي' : `▶️ شغّلي من الآية ${toAr(from+1)}`; };
+  const start = (i) => {
+    from = i; playing = true; setBtn();
+    playSeq(list.slice(i), S.settings.reps, (x,k) => { hl(i+k, true); S.lastRead = {s, a:i+k+1}; save(); }, () => { playing = false; setBtn(); });
+  };
+  btn.onclick = () => { if(playing){ stopAudio(); playing = false; setBtn(); return; } start(from); };
+  app.querySelectorAll('#rlist .ayah').forEach(el => el.onclick = () => start(+el.dataset.i));
+  setBtn();
+  hl(from, false);
+  const target = app.querySelector(`#rlist .ayah[data-i="${from}"]`);
+  if(target && from > 0) setTimeout(() => target.scrollIntoView({block:'center'}), 50);
+}
+
 /* ============ المراجعة ============ */
 function viewReview(){
   setTitle('المراجعة'); setNav('review');
@@ -1178,8 +1343,8 @@ function viewSettings(){
   app.innerHTML = `
     <div class="card">
       <label class="field"><span>اسمك (للترحيب)</span><input type="text" id="nm" value="${esc(S.name)}" placeholder="اختياري"></label>
-      <label class="field"><span>القارئ</span><select id="rc">${RECITERS.map(r=>`<option value="${r.id}" ${r.id===s.reciter?'selected':''}>${r.name}</option>`).join('')}</select></label>
-      <div class="field"><span>سرعة التلاوة</span><div class="chips" id="sp">${[0.75,0.9,1].map(v=>`<button class="chip ${v===s.speed?'on':''}" data-v="${v}">${v===1?'عادية':toAr(v)+'×'}</button>`).join('')}</div></div>
+      <label class="field"><span>القارئ</span><select id="rc">${reciterOptions()}</select></label>
+      <div class="field"><span>سرعة التلاوة</span><div class="chips" id="sp">${[0.75,0.9,1,1.25].map(v=>`<button class="chip ${v===s.speed?'on':''}" data-v="${v}">${v===1?'عادية':toAr(v)+'×'}</button>`).join('')}</div></div>
       <label class="field"><span>حجم خط المصحف: <b id="qsv">${toAr(s.qsize)}</b></span><input type="range" id="qs" min="20" max="40" value="${s.qsize}"></label>
       <div class="q" style="font-size:var(--qsize);text-align:center">ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَٰلَمِينَ</div>
     </div>
@@ -1244,6 +1409,8 @@ function route(){
   else if(r==='map') viewMap();
   else if(r==='tajweed') viewTajweed();
   else if(r==='settings') viewSettings();
+  else if(r==='index') viewIndex();
+  else if(r==='read') viewRead(+h[1], +h[2]||1);
   else viewHome();
   updateChrome();
 }

@@ -1,13 +1,13 @@
 name: Build Hifz APK (رفيق الحفظ)
 
+# الـ APK ما بينبنى لحاله مع كل تعديل عالموقع.
+# لتبني نسخة جديدة: غيّر الرقم بملف hifz-android/BUILD (أو Actions ← Run workflow)
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'hifz/**'
-      - 'hifz-android/**'
-      - '.github/workflows/build-hifz-apk.yml'
+      - 'hifz-android/BUILD'
 
 permissions:
   contents: write
