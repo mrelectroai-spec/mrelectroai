@@ -221,18 +221,19 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
   }
 
   // ---------- data ----------
-  let STU = [], PV = [], BOOKS = [], SALES = [], PUB = null, PEOPLE = [], TAB = 'people', CUR = null;
+  let STU = [], PV = [], BOOKS = [], SALES = [], LEADS = [], PUB = null, PEOPLE = [], TAB = 'people', CUR = null;
   const F = { st: 'all', q: '' };
   async function load(auto) {
     if (!auto) $app.innerHTML = '<div class="empty">عم نجيب الأرقام…</div>';
     const since = new Date(Date.now() - 30 * 864e5).toISOString();
     try {
-      [STU, PV, BOOKS, SALES, PUB] = await Promise.all([
+      [STU, PV, BOOKS, SALES, PUB, LEADS] = await Promise.all([
         api('students?select=*&order=last_seen.desc&limit=10000'),
         api('page_views?select=vid,page,part,src,ref,dev,at&at=gte.' + encodeURIComponent(since) + '&order=at.desc&limit=50000'),
         api('books?select=*&order=sort'),
         api('book_sales?select=*&order=sold_at.desc&limit=5000'),
-        api('rpc/site_stats', { method: 'POST', body: '{}' }).catch(() => null)]);
+        api('rpc/site_stats', { method: 'POST', body: '{}' }).catch(() => null),
+        api('sample_leads?select=*&order=at.desc&limit=5000').catch(() => [])]);
     } catch (x) {
       if (x.message === 'nologin') return loginView('خلصت الجلسة، فوت من جديد.');
       $app.innerHTML = `<div class="card"><h2>ما قدرنا نجيب الأرقام</h2><p style="color:var(--muted);margin:8px 0 14px">تأكّد إنك متصل بالإنترنت. وإذا ضلّت هيك، ابعت هالرسالة لكلود.</p><pre dir="ltr" style="white-space:pre-wrap;font-size:12px;color:var(--muted)">${esc(x.message).slice(0, 400)}</pre><div class="acts"><button class="btn" id="rt">جرّب مرة تانية</button><button class="btn ghost" id="lo">اطلع</button></div></div>`;
@@ -295,7 +296,7 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
   function head() {
     return `<div class="top"><h1>لوحة <b>أنور</b></h1>
         <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="ib" id="rf">↻ حدّث</button><button class="ib" id="th">ليلي/نهاري</button><button class="ib" id="pwb">كلمة السر</button><button class="ib" id="lo">اطلع</button></div></div>
-      <div class="bar tabs" id="tabs">${[['people', 'الناس'], ['visits', 'الزيارات'], ['sales', 'المبيعات']].map(([k, l]) => `<button class="chip big ${TAB === k ? 'on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>`;
+      <div class="bar tabs" id="tabs">${[['people', 'الناس'], ['leads', 'العيّنات' + (LEADS.length ? ' (' + new Set(LEADS.map((x) => phoneKey(x.phone))).size + ')' : '')], ['visits', 'الزيارات'], ['sales', 'المبيعات']].map(([k, l]) => `<button class="chip big ${TAB === k ? 'on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>`;
   }
   function wireHead() {
     document.getElementById('rf').onclick = () => load();
@@ -305,6 +306,7 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
     document.getElementById('tabs').onclick = (e) => { const b = e.target.closest('.chip'); if (b) { TAB = b.dataset.t; board(); window.scrollTo(0, 0); } };
   }
   function board() {
+    if (TAB === 'leads') return leadsView();
     if (TAB === 'visits') return visitsView();
     if (TAB === 'sales') return salesView();
     return peopleView();
@@ -399,6 +401,30 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
   function close() { $dlg.classList.remove('on'); CUR = null; }
   $dlg.addEventListener('click', (e) => { if (e.target === $dlg) close(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+  // ---------- العيّنات: مين نزّل عيّنة ----------
+  const LBOOK = { classic: 'الكلاسيك كنترول', solar: 'الطاقة الشمسية', electricity: 'الكهرباء' };
+  function leadsView() {
+    const m = new Map();
+    LEADS.forEach((x) => { const k = phoneKey(x.phone); if (!m.has(k)) m.set(k, { name: x.name, phone: x.phone, books: new Set(), at: x.at, src: x.src }); const p = m.get(k); p.books.add(x.book); if (!p.src && x.src) p.src = x.src; });
+    const L = [...m.values()];
+    const inCourse = new Set(PEOPLE.map((p) => p.key));
+    const bought = new Set(SALES.map((x) => String(x.buyer || '') + ' ' + String(x.note || '')).filter((t) => t.replace(/\D/g, '').length >= 7).map(phoneKey));
+    const now = Date.now(), d7 = L.filter((p) => now - new Date(p.at) < 7 * 864e5).length;
+    const msg = (p) => { const fn = String(p.name).split(' ')[0]; const b = [...p.books].map((k) => '«' + (LBOOK[k] || k) + '»').join(' و');
+      return `مرحبا ${fn} 👋 أنا أنور.\nشفت إنك نزّلت عيّنة ${b}. شو رأيك فيها؟\nإذا عندك أي سؤال أو بدّك الكتاب كامل، أنا هون 🙏`; };
+    $app.innerHTML = head() + `
+      <div class="stats">
+        <div class="stat"><b>${L.length}</b><span>نزّلوا عيّنة</span></div>
+        <div class="stat"><b>${d7}</b><span>آخر 7 أيام</span></div>
+        <div class="stat"><b>${L.filter((p) => inCourse.has(phoneKey(p.phone))).length}</b><span>كمان بالكورس</span></div>
+      </div>
+      <div class="list">${L.length ? L.map((p) => `<div class="sale"><div><b>${esc(p.name)}</b> <bdi class="mt" dir="ltr">${esc(p.phone)}</bdi>
+          <div class="mt">${[...p.books].map((k) => esc(LBOOK[k] || k)).join(' · ')}${p.src ? ' · من ' + esc(p.src) : ''}${inCourse.has(phoneKey(p.phone)) ? ' · بالكورس ✓' : ''}${bought.has(phoneKey(p.phone)) ? ' · اشترى ✓' : ''}</div></div>
+          <div style="text-align:end"><div class="mt">${ago(p.at)}</div><a class="btn sm" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?phone=${waNum(p.phone)}&text=${encodeURIComponent(msg(p))}">واتساب</a></div></div>`).join('')
+        : '<div class="empty">لسّا ما حدا نزّل عيّنة من وقت ما زدنا الاسم والرقم.</div>'}</div>`;
+    wireHead();
+  }
 
   // ---------- الزيارات ----------
   function visitsView() {

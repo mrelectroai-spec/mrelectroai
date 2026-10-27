@@ -39,6 +39,18 @@ li:before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background
 .more a:hover{border-color:var(--volt)}
 .more b{display:block;font-family:'Readex Pro',sans-serif;margin-bottom:4px}
 .more span{font-size:14px;color:var(--muted)}
+.lead{position:fixed;inset:0;z-index:50;background:rgba(3,10,8,.72);display:flex;align-items:center;justify-content:center;padding:16px}
+.lead[hidden]{display:none}
+.lead .bx{width:min(400px,100%);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.lead h2{font:700 21px 'Readex Pro',sans-serif;margin-bottom:4px}
+.lead p{color:var(--muted);font-size:14.5px;margin-bottom:14px}
+.lead label{display:block;font-size:14px;font-weight:600;margin:10px 0 5px}
+.lead input{width:100%;background:var(--void);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:12px 13px;font:inherit;font-size:16px}
+.lead input:focus{outline:2px solid var(--volt);border-color:transparent}
+.lead .er{color:#e5484d;font-size:13.5px;min-height:20px;margin-top:6px}
+.lead .btn{max-width:none;margin-top:4px}
+.lead .x{background:none;border:0;color:var(--muted);font:inherit;font-size:14px;margin-top:10px;width:100%;cursor:pointer}
+.lead .pv{font-size:12.5px;color:var(--muted);margin-top:8px;text-align:center}
 @media (max-width:700px){.grid{grid-template-columns:1fr}.cv{max-width:260px;margin:0 auto}.more{grid-template-columns:1fr}.btn{max-width:none}}
 </style>
 </head>
@@ -86,12 +98,61 @@ li:before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background
     <a href="../course/"><b>الكورس المجاني</b><span>تلات كورسات مجانية: الكهرباء، الكلاسيك كنترول، والطاقة الشمسية. بلّش بأيّا واحد بدّك.</span></a>
   </div>
 </div>
+<div class="lead" id="lead" hidden role="dialog" aria-modal="true" aria-labelledby="ldh">
+  <form class="bx" id="lf" novalidate>
+    <h2 id="ldh">العيّنة جاهزة 📘</h2>
+    <p>اكتب اسمك ورقمك، وبتنزل دغري.</p>
+    <label for="ln">اسمك</label><input id="ln" type="text" autocomplete="name" placeholder="مثلاً: محمد علي" required>
+    <label for="lp">رقمك (واتساب)</label><input id="lp" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="70 123 456" required>
+    <div class="er" id="le"></div>
+    <button class="btn" type="submit">نزّل العيّنة</button>
+    <button class="x" type="button" id="lx">رجوع</button>
+    <div class="pv">رقمك بيوصل لأنور بس، لحتى يتابع معك إذا عندك سؤال.</div>
+  </form>
+</div>
 <script>
 (() => {
   try { const t = localStorage.getItem('mea_theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
   document.getElementById('th').onclick = () => { const n = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = n; try { localStorage.setItem('mea_theme', n); } catch (e) {} };
   const K = 'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK';
-  document.querySelectorAll('.dlb').forEach((a) => a.addEventListener('click', () => {
+  // ---- اسم ورقم قبل العيّنة ----
+  const LU = 'https://utjpvjnhffapbwpbkkuc.supabase.co/rest/v1/sample_leads';
+  const lsg = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lss = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  function known() {
+    try { const l = JSON.parse(lsg('mea_lead') || 'null'); if (l && l.name && l.phone) return l; } catch (e) {}
+    for (const k of ['electro-course-v1', 'classic-course-v1', 'solar-course-v1']) {
+      try { const o = JSON.parse(lsg(k) || 'null'); if (o && o.name && o.phone) return { name: o.name, phone: o.phone }; } catch (e) {}
+    }
+    return null;
+  }
+  function sendLead(l, book) {
+    if (lsg('mea_lead_' + book) === '1') return;
+    lss('mea_lead_' + book, '1');
+    fetch(LU, { method: 'POST', keepalive: true, headers: { apikey: K, Authorization: 'Bearer ' + K, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ name: l.name.slice(0, 80), phone: l.phone.slice(0, 25), book, vid: (lsg('mea_vid') || '').slice(0, 64) || null, src: (lsg('mea_src') || '').slice(0, 80) || null }) }).catch(() => {});
+  }
+  const $lead = document.getElementById('lead'), $lf = document.getElementById('lf'), $le = document.getElementById('le');
+  let pending = null, pass = false;
+  document.getElementById('lx').onclick = () => { $lead.hidden = true; pending = null; };
+  $lead.addEventListener('click', (e) => { if (e.target === $lead) { $lead.hidden = true; pending = null; } });
+  $lf.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('ln').value.trim().replace(/\s+/g, ' ');
+    const phone = document.getElementById('lp').value.trim();
+    if (name.length < 2) { $le.textContent = 'اكتب اسمك.'; return; }
+    if (phone.replace(/\D/g, '').length < 7) { $le.textContent = 'اكتب رقمك كامل.'; return; }
+    const l = { name, phone }; lss('mea_lead', JSON.stringify(l));
+    $lead.hidden = true;
+    if (pending) { const a = pending; pending = null; sendLead(l, a.dataset.k); pass = true; a.click(); pass = false; }
+  });
+  document.querySelectorAll('.dlb').forEach((a) => a.addEventListener('click', (e) => {
+    if (!pass) {
+      const l = known();
+      if (!l) { e.preventDefault(); pending = a; $le.textContent = ''; $lead.hidden = false; setTimeout(() => document.getElementById('ln').focus(), 50); return; }
+      sendLead(l, a.dataset.k);
+    }
+
     const k = a.dataset.k, nt = document.querySelector('[data-n="' + k + '"]');
     if (nt) nt.textContent = 'عم ينزل الملف… إذا ما نزل، اكبس مرة تانية.';
     let counted = false; try { counted = localStorage.getItem('mea_sample_counted_' + k) === '1' || (k === 'classic' && localStorage.getItem('mea_sample_counted') === '1'); } catch (e) {}
