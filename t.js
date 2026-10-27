@@ -5,6 +5,7 @@
     var K = 'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK';
     var U = 'https://utjpvjnhffapbwpbkkuc.supabase.co/rest/v1/page_views';
     var ls = window.localStorage;
+    if (ls.getItem('mea_owner') === '1') return;   // جهاز أنور (فات عاللوحة): ما منعدّو وما منسألو
     var v = ls.getItem('mea_vid');
     if (!v) { v = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 12); ls.setItem('mea_vid', v); }
     window.MEA_VID = v;
