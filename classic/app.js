@@ -26,6 +26,7 @@
   const NEEDS = { 1: [10, 1], 2: [16, 2], 3: [5, 2], 4: [14], 5: [16, 17], 6: [14, 8], 7: [10], 8: [5, 4, 8], 9: [10], 10: [10],
     11: [9], 12: [9, 13], 13: [2, 17], 14: [9], 15: [13], 16: [13], 17: [9], 18: [8, 1], 19: [10], 20: [16],
     21: [18], 22: [18], 23: [5, 16], 24: [2], 25: [17, 18] };
+  const LEAD = (() => { try { return JSON.parse(localStorage.getItem('mea_lead') || 'null') || {}; } catch (e) { return {}; } })();
   function preData() { try { const raw = localStorage.getItem(PRE_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
   function preStatus() {
     const o = preData();
@@ -196,9 +197,9 @@
       ${!preStatus().done ? `<p class="muted">جديد بالكهربا؟ الأحسن تبلّش بـ<a href="${PRE_URL}">كورس الكتاب الأول</a> (الفولت والأمبير والتابلو)، بس فيك تبلّش هون إذا حابب.</p>` : ''}
       <form id="f" novalidate>
         <label for="nm">اسمك الكامل</label>
-        <input id="nm" type="text" autocomplete="name" placeholder="مثلاً: محمد علي" required value="${esc(preStatus().name || '')}">
+        <input id="nm" type="text" autocomplete="name" placeholder="مثلاً: محمد علي" required value="${esc(preStatus().name || LEAD.name || '')}">
         <label for="ph">رقم تلفونك (واتساب)</label>
-        <input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="مثلاً: 70 123 456" dir="ltr" required value="${esc(preStatus().phone || '')}">
+        <input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="مثلاً: 70 123 456" dir="ltr" required value="${esc(preStatus().phone || LEAD.phone || '')}">
         <div class="hint">الاسم بينكتب عالشهادة متل ما بتكتبو هون.</div>
         ${NEED_KEY ? keyField() : ''}
         <div class="err" id="err" role="alert"></div>

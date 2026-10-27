@@ -221,19 +221,20 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
   }
 
   // ---------- data ----------
-  let STU = [], PV = [], BOOKS = [], SALES = [], LEADS = [], PUB = null, PEOPLE = [], TAB = 'people', CUR = null;
+  let STU = [], PV = [], BOOKS = [], SALES = [], LEADS = [], SITE_L = [], PUB = null, PEOPLE = [], TAB = 'people', CUR = null;
   const F = { st: 'all', q: '' };
   async function load(auto) {
     if (!auto) $app.innerHTML = '<div class="empty">عم نجيب الأرقام…</div>';
     const since = new Date(Date.now() - 30 * 864e5).toISOString();
     try {
-      [STU, PV, BOOKS, SALES, PUB, LEADS] = await Promise.all([
+      [STU, PV, BOOKS, SALES, PUB, LEADS, SITE_L] = await Promise.all([
         api('students?select=*&order=last_seen.desc&limit=10000'),
         api('page_views?select=vid,page,part,src,ref,dev,at&at=gte.' + encodeURIComponent(since) + '&order=at.desc&limit=50000'),
         api('books?select=*&order=sort'),
         api('book_sales?select=*&order=sold_at.desc&limit=5000'),
         api('rpc/site_stats', { method: 'POST', body: '{}' }).catch(() => null),
-        api('sample_leads?select=*&order=at.desc&limit=5000').catch(() => [])]);
+        api('sample_leads?select=*&order=at.desc&limit=5000').catch(() => []),
+        api('site_leads?select=*&order=at.desc&limit=10000').catch(() => [])]);
     } catch (x) {
       if (x.message === 'nologin') return loginView('خلصت الجلسة، فوت من جديد.');
       $app.innerHTML = `<div class="card"><h2>ما قدرنا نجيب الأرقام</h2><p style="color:var(--muted);margin:8px 0 14px">تأكّد إنك متصل بالإنترنت. وإذا ضلّت هيك، ابعت هالرسالة لكلود.</p><pre dir="ltr" style="white-space:pre-wrap;font-size:12px;color:var(--muted)">${esc(x.message).slice(0, 400)}</pre><div class="acts"><button class="btn" id="rt">جرّب مرة تانية</button><button class="btn ghost" id="lo">اطلع</button></div></div>`;
@@ -296,7 +297,7 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
   function head() {
     return `<div class="top"><h1>لوحة <b>أنور</b></h1>
         <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="ib" id="rf">↻ حدّث</button><button class="ib" id="th">ليلي/نهاري</button><button class="ib" id="pwb">كلمة السر</button><button class="ib" id="lo">اطلع</button></div></div>
-      <div class="bar tabs" id="tabs">${[['people', 'الناس'], ['leads', 'العيّنات' + (LEADS.length ? ' (' + new Set(LEADS.map((x) => phoneKey(x.phone))).size + ')' : '')], ['visits', 'الزيارات'], ['sales', 'المبيعات']].map(([k, l]) => `<button class="chip big ${TAB === k ? 'on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>`;
+      <div class="bar tabs" id="tabs">${[['people', 'الناس'], ['leads', 'المسجّلين' + (LEADS.length + SITE_L.length ? ' (' + new Set([...LEADS, ...SITE_L].map((x) => phoneKey(x.phone))).size + ')' : '')], ['visits', 'الزيارات'], ['sales', 'المبيعات']].map(([k, l]) => `<button class="chip big ${TAB === k ? 'on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>`;
   }
   function wireHead() {
     document.getElementById('rf').onclick = () => load();
@@ -406,23 +407,27 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
   const LBOOK = { classic: 'الكلاسيك كنترول', solar: 'الطاقة الشمسية', electricity: 'الكهرباء' };
   function leadsView() {
     const m = new Map();
-    LEADS.forEach((x) => { const k = phoneKey(x.phone); if (!m.has(k)) m.set(k, { name: x.name, phone: x.phone, books: new Set(), at: x.at, src: x.src }); const p = m.get(k); p.books.add(x.book); if (!p.src && x.src) p.src = x.src; });
-    const L = [...m.values()];
+    const addL = (x, book) => { const k = phoneKey(x.phone); if (!m.has(k)) m.set(k, { name: x.name, phone: x.phone, books: new Set(), at: x.at, src: x.src, vids: new Set() }); const p = m.get(k); if (book) p.books.add(book); if (x.vid) p.vids.add(x.vid); if (!p.src && x.src) p.src = x.src; if (new Date(x.at) > new Date(p.at)) p.at = x.at; };
+    SITE_L.forEach((x) => addL(x, null)); LEADS.forEach((x) => addL(x, x.book));
+    const L = [...m.values()].sort((a, b) => new Date(b.at) - new Date(a.at));
+    const pagesOf = (p) => { const seq = []; PV.filter((v) => p.vids.has(v.vid)).slice().reverse().forEach((v) => { const n = PAGES[v.page] || v.page; if (!seq.includes(n)) seq.push(n); }); return seq; };
     const inCourse = new Set(PEOPLE.map((p) => p.key));
     const bought = new Set(SALES.map((x) => String(x.buyer || '') + ' ' + String(x.note || '')).filter((t) => t.replace(/\D/g, '').length >= 7).map(phoneKey));
     const now = Date.now(), d7 = L.filter((p) => now - new Date(p.at) < 7 * 864e5).length;
     const msg = (p) => { const fn = String(p.name).split(' ')[0]; const b = [...p.books].map((k) => '«' + (LBOOK[k] || k) + '»').join(' و');
-      return `مرحبا ${fn} 👋 أنا أنور.\nشفت إنك نزّلت عيّنة ${b}. شو رأيك فيها؟\nإذا عندك أي سؤال أو بدّك الكتاب كامل، أنا هون 🙏`; };
+      return b ? `مرحبا ${fn} 👋 أنا أنور.\nشفت إنك نزّلت عيّنة ${b}. شو رأيك فيها؟\nإذا عندك أي سؤال أو بدّك الكتاب كامل، أنا هون 🙏`
+        : `مرحبا ${fn} 👋 أنا أنور من MrElectroAI.\nشكراً إنك فتت عالموقع 🙏 شو عم تدوّر عليه؟ كهربا من الصفر، كلاسيك كنترول، أو طاقة شمسية؟\nفيك تشوف العيّنات ببلاش هون:\n${SITE}sample/`; };
     $app.innerHTML = head() + `
       <div class="stats">
-        <div class="stat"><b>${L.length}</b><span>نزّلوا عيّنة</span></div>
+        <div class="stat"><b>${L.length}</b><span>سجّلوا</span></div>
+        <div class="stat"><b>${L.filter((p) => p.books.size).length}</b><span>نزّلوا عيّنة</span></div>
         <div class="stat"><b>${d7}</b><span>آخر 7 أيام</span></div>
         <div class="stat"><b>${L.filter((p) => inCourse.has(phoneKey(p.phone))).length}</b><span>كمان بالكورس</span></div>
       </div>
       <div class="list">${L.length ? L.map((p) => `<div class="sale"><div><b>${esc(p.name)}</b> <bdi class="mt" dir="ltr">${esc(p.phone)}</bdi>
-          <div class="mt">${[...p.books].map((k) => esc(LBOOK[k] || k)).join(' · ')}${p.src ? ' · من ' + esc(p.src) : ''}${inCourse.has(phoneKey(p.phone)) ? ' · بالكورس ✓' : ''}${bought.has(phoneKey(p.phone)) ? ' · اشترى ✓' : ''}</div></div>
+          <div class="mt">${p.books.size ? 'عيّنة: ' + [...p.books].map((k) => esc(LBOOK[k] || k)).join(' · ') : 'سجّل بالموقع'}${p.src ? ' · من ' + esc(p.src) : ''}${inCourse.has(phoneKey(p.phone)) ? ' · بالكورس ✓' : ''}${pagesOf(p).length ? '<br>فتح: ' + esc(pagesOf(p).slice(0, 6).join('، ')) : ''}${bought.has(phoneKey(p.phone)) ? ' · اشترى ✓' : ''}</div></div>
           <div style="text-align:end"><div class="mt">${ago(p.at)}</div><a class="btn sm" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?phone=${waNum(p.phone)}&text=${encodeURIComponent(msg(p))}">واتساب</a></div></div>`).join('')
-        : '<div class="empty">لسّا ما حدا نزّل عيّنة من وقت ما زدنا الاسم والرقم.</div>'}</div>`;
+        : '<div class="empty">لسّا ما حدا سجّل من وقت ما زدنا الاسم والرقم.</div>'}</div>`;
     wireHead();
   }
 
@@ -436,7 +441,7 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
     const partL = Object.entries(parts).sort((a, b) => b[1] - a[1]).slice(0, 10);
     const srcs = {}; PV.forEach((v) => { const s = v.src || v.ref; if (s) { (srcs[s] = srcs[s] || new Set()).add(v.vid); } });
     const srcL = Object.entries(srcs).map(([k, S]) => [k, S.size]).sort((a, b) => b[1] - a[1]).slice(0, 10);
-    const vidName = {}; PEOPLE.forEach((p) => p.vids.forEach((v) => { vidName[v] = p.name; }));
+    const vidName = {}, vidPh = {}; SITE_L.concat(LEADS).forEach((x) => { if (x.vid) { vidName[x.vid] = x.name; vidPh[x.vid] = x.phone; } }); PEOPLE.forEach((p) => p.vids.forEach((v) => { vidName[v] = p.name; vidPh[v] = p.phone; }));
     const byVid = new Map(); PV.forEach((v) => { if (!byVid.has(v.vid)) byVid.set(v.vid, []); byVid.get(v.vid).push(v); });
     const recent = [...byVid.entries()].slice(0, 40);
     const maxU = Math.max(1, ...pages.map((x) => x.u));
@@ -459,8 +464,8 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
       <div class="list">${recent.length ? recent.map(([vid, L]) => {
         const seq = []; L.slice().reverse().forEach((v) => { const n = PAGES[v.page] || v.page; if (seq[seq.length - 1] !== n) seq.push(n); });
         const s = L.find((v) => v.src || v.ref);
-        return `<div class="sale"><div><b>${vidName[vid] ? esc(vidName[vid]) : 'زائر'}</b> <span class="mt">${L[0].dev === 'mobile' ? '📱' : '💻'}${s ? ' · من ' + esc(s.src || s.ref) : ''}</span>
-          <div class="mt">${esc(seq.slice(-6).join(' ← '))}</div></div><div class="mt" style="text-align:end">${ago(L[0].at)}</div></div>`;
+        return `<div class="sale"><div><b>${vidName[vid] ? esc(vidName[vid]) : 'زائر'}</b>${vidPh[vid] ? ' <bdi class="mt" dir="ltr">' + esc(vidPh[vid]) + '</bdi>' : ''} <span class="mt">${L[0].dev === 'mobile' ? '📱' : '💻'}${s ? ' · من ' + esc(s.src || s.ref) : ''}</span>
+          <div class="mt">${esc(seq.slice(-6).join(' ← '))}</div></div><div style="text-align:end"><div class="mt">${ago(L[0].at)}</div>${vidPh[vid] ? `<a class="btn sm" target="_blank" rel="noopener" href="https://wa.me/${waNum(vidPh[vid])}">واتساب</a>` : ''}</div></div>`;
       }).join('') : '<div class="empty">بعد ما حدا فات. العدّ بلّش اليوم.</div>'}</div>`;
     wireHead();
   }

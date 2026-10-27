@@ -2,6 +2,7 @@
    قاعدة قاعدة: كل سؤال غلط بيرجع، وبعدين 5 صح ورا بعض لحتى تنفتح القاعدة يلي بعدها. */
 (function () {
   'use strict';
+  const LEAD = (() => { try { return JSON.parse(localStorage.getItem('mea_lead') || 'null') || {}; } catch (e) { return {}; } })();
 
   const WA_NUMBER = '96179434479';           // رقم أنور (واتساب)
   const WA_DISPLAY = '+961 79 434 479';
@@ -146,9 +147,9 @@
       <p class="muted">بآخر الكورس بتبعت ملخص شغلك لأنور عالواتساب، وبتاخد شهادة باسمك.</p>
       <form id="f" novalidate>
         <label for="nm">اسمك الكامل</label>
-        <input id="nm" type="text" autocomplete="name" placeholder="مثلاً: محمد علي" required>
+        <input id="nm" type="text" autocomplete="name" placeholder="مثلاً: محمد علي" required value="${esc(LEAD.name || '')}">
         <label for="ph">رقم تلفونك (واتساب)</label>
-        <input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="مثلاً: 70 123 456" dir="ltr" required>
+        <input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="مثلاً: 70 123 456" dir="ltr" required value="${esc(LEAD.phone || '')}">
         <div class="hint">الاسم بينكتب عالشهادة متل ما بتكتبو هون.</div>
         ${NEED_KEY ? keyField() : ''}
         <div class="err" id="err" role="alert"></div>
