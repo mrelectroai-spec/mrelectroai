@@ -428,9 +428,10 @@ details summary{cursor:pointer;color:var(--volt);font-size:14.5px}
       </div>
       <div class="list">${L.length ? L.map((p) => `<div class="sale"><div><b>${esc(p.name)}</b> <bdi class="mt" dir="ltr">${esc(p.phone)}</bdi>
           <div class="mt">${p.books.size ? 'عيّنة: ' + [...p.books].map((k) => esc(LBOOK[k] || k)).join(' · ') : 'سجّل بالموقع'}${p.src ? ' · من ' + esc(p.src) : ''}${inCourse.has(phoneKey(p.phone)) ? ' · بالكورس ✓' : ''}${pagesOf(p).length ? '<br>فتح: ' + esc(pagesOf(p).slice(0, 6).join('، ')) : ''}${bought.has(phoneKey(p.phone)) ? ' · اشترى ✓' : ''}</div></div>
-          <div style="text-align:end"><div class="mt">${ago(p.at)}</div><a class="btn sm" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?phone=${waNum(p.phone)}&text=${encodeURIComponent(msg(p))}">واتساب</a></div></div>`).join('')
+          <div style="text-align:end"><div class="mt">${ago(p.at)}</div><a class="btn sm" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?phone=${waNum(p.phone)}&text=${encodeURIComponent(msg(p))}">واتساب</a>${inCourse.has(phoneKey(p.phone)) ? `<button class="btn ghost sm" style="margin-top:6px" data-pk="${esc(phoneKey(p.phone))}">الكورس و PDF</button>` : ''}</div></div>`).join('')
         : '<div class="empty">لسّا ما حدا سجّل من وقت ما زدنا الاسم والرقم.</div>'}</div>`;
     wireHead();
+    $app.querySelector('.list').onclick = (e) => { const b = e.target.closest('[data-pk]'); if (b) { const pp = PEOPLE.find((x) => x.key === b.dataset.pk); if (pp) detail(pp); } };
   }
 
   // ---------- الزيارات ----------
