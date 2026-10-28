@@ -29,7 +29,9 @@
     send(hashPart());
 
     // ---------- أوّل ما يفوت: اسمو ورقمو (مرّة وحدة عهالتلفون) ----------
-    var GATE = { home: 1, sample: 1, lab: 1, course: 1, classic: 1, solar: 1, quiz: 1, tools: 1 };
+    // الكورسات إلها فورم اسم ورقم لحالها، فما منسأل فيها
+    var GATE = { home: 1, sample: 1, lab: 1, quiz: 1, tools: 1 };
+    var WAIT = 40000;   // أوّل صفحة: منسأل بعد 40 ثانية. تاني صفحة: دغري
     var LU = 'https://utjpvjnhffapbwpbkkuc.supabase.co/rest/v1/site_leads';
     function known() {
       try { var l = JSON.parse(ls.getItem('mea_lead') || 'null'); if (l && l.name && l.phone) return l; } catch (e) {}
@@ -82,9 +84,13 @@
         d.remove(); document.documentElement.style.overflow = '';
       });
     }
-    if (GATE[page]) {
-      var kl = known();
-      if (kl) record(kl); else if (document.body) gate(); else document.addEventListener('DOMContentLoaded', gate);
+    var pages = (+(ls.getItem('mea_pages') || 0)) + 1; ls.setItem('mea_pages', String(pages));
+    var kl = known();
+    if (kl) record(kl);
+    else if (GATE[page]) {
+      var ask = function () { if (known() || document.getElementById('meaGate')) { var k2 = known(); if (k2) record(k2); return; } gate(); };
+      var go = function () { if (pages >= 2) ask(); else setTimeout(ask, WAIT); };
+      if (document.body) go(); else document.addEventListener('DOMContentLoaded', go);
     }
     if (me && me.hasAttribute('data-hash')) window.addEventListener('hashchange', function () { send(hashPart()); });
   } catch (e) {}
