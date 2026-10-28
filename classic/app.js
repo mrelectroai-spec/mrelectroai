@@ -193,7 +193,7 @@
       ${CFG.banner ? `<p class="err">${CFG.banner}</p>` : ''}
       <p>رح نسألك ${RULES[0].q.length} أسئلة على كل قاعدة من الـ ${TOTAL}. كل سؤال بتغلط فيه بيرجعلك لحتى تجاوبو صح، وبالآخر لازم تجاوب ${STREAK_TARGET} أسئلة صح ورا بعض. ما بتنفتحلك القاعدة يلي بعدها إلا بس تكون باصم يلي قبلها.</p>
       ${CHALLENGE ? `<div class="challenge"><b>🎁 التحدّي:</b> خلّص الـ ${RULES.length * RULES[0].q.length} سؤال بـ ${CHALLENGE_MAX} غلطات أو أقل، وخود الكتاب بخصم: <b>${CHALLENGE_PRICE}$</b> بدل ${BOOK_FULL}$.</div>` : `<div class="challenge"><b>${RULES.length * RULES[0].q.length} سؤال</b> من 6 أنواع: مفهوم، موقف، عطل، أرقام، مخطط، وسلامة. وبكل قاعدة فيك تفتح رسمتها من الكتاب، وتجرّب قطعتها بمختبر القطع.</div>`}
-      <p class="muted">بآخر الكورس بتبعت ملخص شغلك لأنور عالواتساب، وبتاخد شهادة باسمك.</p>
+      <p class="muted">بآخر الكورس بتبعت ملخص شغلك لأنور عالواتساب، وإذا خلّصت بـ5 غلطات أو أقل، أنور بيبعتلك شهادة باسمك 🎓</p>
       ${!preStatus().done ? `<p class="muted">جديد بالكهربا؟ الأحسن تبلّش بـ<a href="${PRE_URL}">كورس الكتاب الأول</a> (الفولت والأمبير والتابلو)، بس فيك تبلّش هون إذا حابب.</p>` : ''}
       <form id="f" novalidate>
         <label for="nm">اسمك الكامل</label>
@@ -424,7 +424,7 @@
         ${last ? '<p>هيدي كانت آخر قاعدة. خلّصت الكتاب كلو!</p>' : `<p class="muted">القاعدة ${n + 1} انفتحتلك: ${esc(rule(n + 1).title)}.</p>`}
       </div>
       ${st.mistakes >= ADVICE_AT ? adviceHtml(n) : ''}
-      <button class="btn volt" id="nx">${last ? 'شوف شهادتك' : 'عالقاعدة ' + (n + 1)}</button>
+      <button class="btn volt" id="nx">${last ? 'شوف نتيجتك' : 'عالقاعدة ' + (n + 1)}</button>
       ${last ? '' : '<button class="btn ghost" id="bd">شوف التابلو</button>'}`;
     document.getElementById('nx').addEventListener('click', () => { view = 'quiz'; render(); top(); });
     const bd = document.getElementById('bd');
@@ -443,7 +443,7 @@
     const m = totalMistakes();
     if (!CHALLENGE) return `<div class="chip">غلطاتك لهلّق: ${m}</div>`;
     if (m <= CHALLENGE_MAX) return `<div class="chip ${m >= CHALLENGE_MAX - 1 ? 'warn' : ''}">🎁 غلطاتك: ${m} من ${CHALLENGE_MAX}${m === CHALLENGE_MAX ? ' (ولا غلطة كمان!)' : ''}</div>`;
-    return `<div class="chip lost">غلطاتك: ${m}. راح خصم التحدّي، بس كمّل لتاخد الشهادة 💪</div>`;
+    return `<div class="chip lost">غلطاتك: ${m}. راح خصم التحدّي، بس كمّل للآخر 💪</div>`;
   }
 
   function totals() {
@@ -468,7 +468,7 @@
       </div>
       <div class="sendbox">
         <h2>آخر خطوة: ابعت ملخصك لأنور</h2>
-        <p class="muted">شهادتك بتنفتحلك بس تبعت الملخص.</p>
+        <p class="muted">بعد ما تبعت الملخص، أنور بيشوف نتيجتك. وإذا غلطاتك 5 أو أقل، بيبعتلك شهادة باسمك 🎓</p>
         <button class="btn wa" id="s1">1. افتح محادثة أنور وابعت الرسالة</button>
         <button class="btn wa" id="s2" ${step2 ? '' : 'disabled'}>2. ابعت ملف الملخص PDF</button>
         <div class="status" id="st">${step2 ? '' : 'بلّش بالخطوة 1.'}</div>
@@ -506,7 +506,7 @@
         <h2>🎁 ربحت خصم التحدّي!</h2>
         <p>خلّصت بـ ${t.mistakes} ${t.mistakes === 1 ? 'غلطة' : 'غلطات'} بس. الكتاب إلك بـ <b>${CHALLENGE_PRICE}$</b> بدل <s>${BOOK_FULL}$</s> (خصم 30%).</p>
         <a class="btn volt" href="https://api.whatsapp.com/send?phone=${WA_NUMBER}&text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">اطلب الكتاب بـ ${CHALLENGE_PRICE}$</a>
-        <p class="muted" style="margin-top:10px">عندك الكتاب من قبل؟ ما عليك شي، شهادتك محفوظة.</p>
+        <p class="muted" style="margin-top:10px">عندك الكتاب من قبل؟ ما عليك شي، نتيجتك محفوظة.</p>
       </div>`;
     }
     return `<div class="sendbox">
@@ -540,7 +540,7 @@
     const box = document.getElementById('after');
     if (!box) return;
     box.innerHTML = `<p class="status">✔ تمام، وصل الملخص لأنور (إذا ما وصل، كرّر الخطوة 2).</p>
-      <button class="btn volt" id="mine">نزّل شهادتك والملخص إلك</button>`;
+      <button class="btn volt" id="mine">نزّل ملخص نتيجتك</button>`;
     document.getElementById('mine').addEventListener('click', async () => { if (!pdfBlob) await buildPdf(); download(pdfBlob, pdfName()); });
   }
 
@@ -566,17 +566,8 @@
       : '<p>ولا غلطة بكل الكورس. شغل معلّم!</p>';
     const rev = new Set(); RULES.forEach((r) => { if (R(r.n).mistakes >= ADVICE_AT) (NEEDS[r.n] || []).forEach((k) => rev.add(k)); });
     const revHtml = rev.size ? `<h2 style="margin-top:18px">بيفيدو يراجع من الكتاب الأول</h2><p>${[...rev].sort((a, b) => a - b).map((k) => `القاعدة ${k}: ${esc(BASICS[k] || '')}`).join(' · ')}</p>` : '';
-    const foot = (p) => `<div class="foot"><span>${BOOK} — MrElectroAI</span><span>صفحة ${p} من 3</span></div>`;
+    const foot = (p) => `<div class="foot"><span>${BOOK} — MrElectroAI</span><span>صفحة ${p} من 2</span></div>`;
     return `
-      <div class="pg cert">
-        <div class="bolt"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg></div>
-        <h1>شهادة إتمام</h1>
-        <p>هالشهادة بتأكّد إنو</p>
-        <div class="name">${esc(S.name)}</div>
-        <p>بصم كل القواعد الـ ${TOTAL} بكتاب «${BOOK}»، وجاوب على كل الأسئلة صح، وعدّى اختبار البصم (${STREAK_TARGET} أجوبة صح ورا بعض) بكل قاعدة.</p>
-        <p style="font-size:17px;color:#5B6B7D">تاريخ الإتمام: ${fmtDate(S.finishedAt)}</p>
-        <div class="sig">أنور الحسن الجاسم — <b>MrElectroAI</b></div>
-      </div>
       <div class="pg">
         <h2>ملخص شغل الطالب</h2>
         <div class="facts">
@@ -593,13 +584,13 @@
           <tbody>${rows}</tbody>
         </table>
         <p style="font-size:13px;color:#5B6B7D;margin-top:10px">الصفوف الحمرا: قواعد غلط فيها 3 مرات أو أكتر. «الوقت» من أول سؤال لآخر سؤال بالقاعدة، ومنها الاستراحات.</p>
-        ${foot(2)}
+        ${foot(1)}
       </div>
       <div class="pg">
         <h2>نقاط الضعف: الأسئلة يلي غلط فيها أكتر شي</h2>
         ${weakHtml}
         ${revHtml}
-        ${foot(3)}
+        ${foot(2)}
       </div>`;
   }
 
