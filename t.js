@@ -30,7 +30,7 @@
 
     // ---------- أوّل ما يفوت: اسمو ورقمو (مرّة وحدة عهالتلفون) ----------
     // الكورسات إلها فورم اسم ورقم لحالها، فما منسأل فيها
-    var GATE = { home: 1, sample: 1, lab: 1, quiz: 1, tools: 1 };
+    var GATE = { home: 1, sample: 1, lab: 1, quiz: 1, tools: 1, sim: 1 };
     var WAIT = 40000;   // أوّل صفحة: منسأل بعد 40 ثانية. تاني صفحة: دغري
     var LU = 'https://utjpvjnhffapbwpbkkuc.supabase.co/rest/v1/site_leads';
     function known() {

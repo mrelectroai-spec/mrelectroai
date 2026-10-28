@@ -920,7 +920,15 @@ function setMode(m){MODE=m;ls.set('simMode',m);document.querySelectorAll('.mode'
  draw();}
 $('modes').addEventListener('click',e=>{const b=e.target.closest('.mode');if(b&&b.dataset.m!==MODE)setMode(b.dataset.m);});
 WIRE.init();setMode(MODE);
+// روابط مباشرة: #wire (التوصيل) · #screen (واجهة الإنفرتر) · #battery (إعدادات البطارية)
+function route(){const h=location.hash.slice(1).toLowerCase();if(!h)return;
+ if(h==='wire'){setMode('wire');}
+ else if(h==='screen'||h==='free'){setMode('free');UI.pg='main';UI.tab=0;draw();}
+ else if(h==='battery'||h==='batt'){setMode('free');UI.pg='batt';UI.tab=0;UI.draft=clone(S);if(typeof help==='function')help('batt');draw();}
+ const el=document.getElementById(h==='wire'?'wireSec':'modes');if(el)setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),200);}
+route();window.addEventListener('hashchange',route);
 let lastW=innerWidth;window.addEventListener('resize',()=>{if(MODE==='wire'&&Math.abs(innerWidth-lastW)>40){lastW=innerWidth;WIRE.setZoom();}});
 </script>
+<script src="../t.js" data-page="sim" data-hash defer></script>
 </body>
 </html>
