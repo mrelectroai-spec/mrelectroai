@@ -180,6 +180,9 @@ input[type=range]{width:100%;accent-color:var(--volt)}
 
 .fsb{position:absolute;top:8px;left:8px;z-index:3;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:20px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 .card.wfs{position:fixed;inset:0;z-index:90;margin:0;border-radius:0;display:flex;flex-direction:column;gap:4px;padding:8px;overflow:hidden}
+.card.wfs{padding-top:calc(max(36px,env(safe-area-inset-top)) + 6px);padding-bottom:max(8px,env(safe-area-inset-bottom))}
+.card.wfs::before{content:"";position:absolute;top:0;left:0;right:0;height:max(36px,env(safe-area-inset-top));background:#000;z-index:5}
+.card.wfs .tgrp{flex:0 0 auto}
 .card.wfs>h2,.card.wfs>p.muted,.card.wfs .wlg,.card.wfs .pjbar{display:none}
 .card.wfs .bwrap{flex:1;min-height:0}.card.wfs .board{height:100%}
 .card.wfs .wsec,.card.wfs .wtools{flex-wrap:nowrap;overflow-x:auto;margin:0;padding-bottom:2px}.card.wfs .wtools button{flex:0 0 auto;padding:5px 9px;font-size:13px}
