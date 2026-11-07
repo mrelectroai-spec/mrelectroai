@@ -238,25 +238,53 @@ body.nofs{overflow:hidden}
 .pjc{border:1px solid;border-radius:12px;padding:10px;margin-top:10px;font-size:14px}.pjc p{margin-top:4px}
 .pjs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.pjs span{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:13px;font-weight:600}
 .pjgo{display:block;width:100%;margin-top:14px;background:var(--volt);color:var(--volt-ink);border:0;border-radius:12px;padding:12px;font:700 16px 'IBM Plex Sans Arabic';cursor:pointer}
+
+/* ===== سهولة وانتقالات متل الآيفون ===== */
+html{-webkit-tap-highlight-color:transparent}
+button,.mode,[data-sw],[data-act]{touch-action:manipulation}
+button{transition:transform .14s cubic-bezier(.2,.8,.2,1),background-color .2s,color .2s,border-color .2s,opacity .2s}
+button:active:not(:disabled){transform:scale(.95)}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.tin{animation:tin .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes sheet{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.pjm:not([hidden]){animation:fade .2s ease-out}.pjm:not([hidden]) .pjbox{animation:sheet .32s cubic-bezier(.32,.72,0,1)}
+@keyframes sl{from{transform:translateX(-36px);opacity:0}to{transform:none;opacity:1}}@keyframes sr{from{transform:translateX(36px);opacity:0}to{transform:none;opacity:1}}
+#pjin.sl{animation:sl .26s cubic-bezier(.32,.72,0,1)}#pjin.sr{animation:sr .26s cubic-bezier(.32,.72,0,1)}
+@keyframes fsin{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}.card.wfs{animation:fsin .24s cubic-bezier(.32,.72,0,1)}
+.ttabs button{transition:color .2s,border-color .25s cubic-bezier(.2,.8,.2,1)}
+.wmsg{animation:tin .2s cubic-bezier(.2,.8,.2,1)}
+@media (max-width:620px){.pjm{align-items:flex-end;padding:0}.pjbox{border-radius:20px 20px 0 0;max-height:92vh;overflow:auto;padding-bottom:max(16px,env(safe-area-inset-bottom))}}
+.pjdots{display:flex;gap:6px;justify-content:center;margin:6px 0 4px}.pjdots i{width:7px;height:7px;border-radius:9px;background:var(--line);transition:all .25s}.pjdots i.on{width:22px;background:var(--volt)}
+.pjo button{min-width:146px;padding:10px 12px}.pjo button b{font-size:14.5px}
+.pjback{background:none;border:0;color:var(--volt);font:700 14px 'IBM Plex Sans Arabic';cursor:pointer;padding:6px 0}
+.pjsel{font-size:13.5px;color:var(--muted);margin:2px 0 4px}
+.pjn{display:flex;align-items:center;gap:10px;margin:14px 0 6px;font-size:14px}.pjn button{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font-size:20px;cursor:pointer}.pjn>b{font-size:18px;min-width:18px;text-align:center}
+.pjok{border:1px solid;border-radius:12px;padding:8px 12px;font-weight:700;font-size:14px;margin-top:8px}
+.pjdet{margin-top:10px;font-size:14px}.pjdet summary{cursor:pointer;color:var(--muted);font-weight:600}
+.ks{display:flex;flex-direction:column;gap:6px}.ksr{display:grid;grid-template-columns:22px auto auto 1fr;gap:8px;align-items:baseline;padding:8px 10px;border-radius:10px;border:1px solid var(--line);font-size:14px}
+.ksr.ok b{color:#22c79b}.ksr.no{border-color:#e5533c66}.ksr.no>b{color:#e5533c}.ksn{font-weight:700}.ksv{color:var(--muted)}.ksw{font-size:13px;color:var(--muted)}.ksok{font-size:13px;color:#22c79b;font-weight:700;margin-inline-start:6px}
+@media (max-width:520px){.ksr{grid-template-columns:22px 1fr auto}.ksw{grid-column:2/4}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top"><a href="../">← MrElectroAI</a><button class="ib" id="theme" type="button">🌓</button></div>
   <h1>مختبر الطاقة الشمسية: <b>وصّل، شغّل، وبرمج</b></h1>
-  <p class="lede">حدّد مشروعك: إنفرتر Deye أو Felicity أو Growatt أو Voltronic، مع بطارية Deye أو Dyness أو Felicity أو Blue Carbon. وصّل الشرايط، شغّل، وبرمج الشاشة. كل ما تكبس على إعداد، بيطلعلك شرحو تحت.</p>
+  <p class="lede">اختار الإنفرتر والبطارية، وصّل، شغّل، وبرمج. بس هيك.</p>
 
   <div class="modes" id="modes"><button class="mode" data-m="wire" type="button">🔧 المشروع: وصّل وشغّل</button><button class="mode" data-m="free" type="button">🧪 المحاكي الحرّ والتحديات</button></div>
   <section id="wireSec">
     <div class="card">
       <h2>وصّل المنظومة بإيدك</h2>
-      <p class="muted" style="font-size:14px">متل الأوتوكاد: كبّر وصغّر الرسمة بإصبعين أو بعجلة الماوس، واسحب بمحل فاضي لتمشي فيها. اختار مشروع جاهز أو ابدأ من الصفر وزيد القطع من المكتبة. اكبس على طرف وبعدين عالطرف التاني ليمتدّ شريط، ونقّي الشريط لتحدّد مشيو. «✋ عدّل القطع» بيخلّيك تنقل كل قطعة وتكبّرها أو تصغّرها لحالها. القواطع مش إجبارية: الفحص بيقلّك شو الخطر.</p>
+      <p class="muted" style="font-size:14px">اسحب إصبعك من طرف لطرف ليمتدّ شريط. إصبعين للزوم.</p>
       <div class="pjbar" id="pjbar"></div>
       <div class="tpanel">
-        <div class="ttabs" role="tablist"><button type="button" role="tab" data-tt="proj" class="on">📂 مشاريع جاهزة</button><button type="button" role="tab" data-tt="lib">🧩 مكتبة القطع</button><button type="button" role="tab" data-tt="tools">🛠 الأدوات</button></div>
-        <div class="tbody" data-tb="proj"><div class="tgrp"><div class="tbtns" id="wready"></div></div></div>
+        <div class="ttabs" role="tablist"><button type="button" role="tab" data-tt="proj" class="on">📂 مشاريع جاهزة</button><button type="button" role="tab" data-tt="lib">🧩 مكتبة القطع</button></div>
+        <div class="tbody" data-tb="proj"><div class="tgrp"><div class="tbtns" id="wready"></div></div><div class="tgrp"><div class="tbtns"><button type="button" onclick="document.getElementById('wclear').click()">🧹 امسح الشرايط ووصّل إنت</button></div></div></div>
         <div class="tbody" data-tb="lib" hidden><div id="wlib"></div></div>
-        <div class="tbody" data-tb="tools" hidden>
+        <div class="tbody" data-tb="tools" hidden style="display:none!important">
           <div class="tgrp"><h5>العرض</h5><div class="tbtns"><button id="wzin" type="button">＋ قرّب</button><button id="wzout" type="button">－ بعّد</button><button id="wfit" type="button">⤢ كل الرسمة</button></div></div>
           <div class="tgrp"><h5>الشرايط</h5><div class="tbtns"><button id="wundo" type="button">↶ تراجع</button><button id="wdel" type="button" disabled>🗑 احذف الشريط</button><button id="wstraight" type="button" disabled>〰 رجّع الشريط متل الأول</button><button id="wclear" type="button">امسح كل الشرايط</button></div></div>
           <div class="tgrp"><h5>القطع</h5><div class="tbtns"><button id="wmove" type="button">✋ عدّل القطع</button><button id="wbig" type="button" disabled>➕ كبّر القطعة</button><button id="wsmall" type="button" disabled>➖ صغّر القطعة</button><button id="wdelc" type="button" disabled>🗑 شيل القطعة</button></div></div>
@@ -285,6 +313,7 @@ body.nofs{overflow:hidden}
           <button class="zoom" id="zoomBtn" type="button">⛶ كبّر الشاشة</button>
         </div>
       </div>
+      <div class="card" id="keyset"></div>
       <div class="card help" id="help"><h3 id="hT">System</h3><p id="hP">اكبس على أي شي عالشاشة: الألواح، الدولة، البطارية، البيت، أو ⚙ لتفوت عالإعدادات.</p><p class="tip" id="hW" hidden></p></div>
       <div class="card"><h2>شو عم يصير <span class="muted" style="font-size:12.5px;font-weight:400">آخر الأحداث فوق</span></h2><div class="log" id="log"></div></div>
     </div>
@@ -1058,33 +1087,35 @@ draw();help('main');
 <script>
 /* ============ حدّد المشروع: الإنفرتر + البطارية ============ */
 const LV={ok:['✓ متوافقين رسمياً','#22c79b'],chk:['⚠ بيشتغلوا، تأكّد من الوكيل','#e0a12c'],none:['○ بلا اتصال: عالفولت','#8fa3ad']};
-let PK=PROJ?Object.assign({},PROJ):{inv:'deye5',bat:'deyeg5',n:1};
+let PK=PROJ?Object.assign({},PROJ):{inv:'deye66',bat:'deyeg5',n:1};
 function specInv(i){return [['النوع',i.type==='hybrid'?'هايبرد (بيبيع للشبكة)':'أوف غريد'],['القدرة',i.kw+' kW'],['أعلى فولت ألواح (Voc)',i.maxVoc+' V'],['مجال الـMPPT',i.mppt[0]+'–'+i.mppt[1]+' V'],['عدد الـMPPT',i.nMppt+(i.perMppt?' (كل واحد '+i.perMppt+'W)':'')],['أعلى قدرة ألواح',i.maxPv+' W'],['أعلى تيار شحن',i.maxCh+' A'],['منفذ الـBMS',i.ports]];}
 function specBat(b,n){return [['الفولت / السعة',`51.2V · ${b.ah}Ah (${(b.ah*0.0512).toFixed(2)} kWh)`],['العدد',n+(n>1?` بالتوازي = ${b.ah*n}Ah (${(b.ah*n*0.0512).toFixed(1)} kWh)`:'')],['تيار الشحن/التفريغ',`مستحسن ${b.rec}A · أقصى ${b.maxCh}/${b.maxDis}A`],['الاتصال',b.comm.length?b.comm.join(' · '):'ما في'],['عمق التفريغ (DoD)',b.dod+'%'],['التوسعة',b.par]];}
 const tbl=r=>`<table class="pjt">${r.map(x=>`<tr><td>${x[0]}</td><td dir="auto">${x[1]}</td></tr>`).join('')}</table>`;
 function compatBox(i,b,n){const cp=CAT.compat(i,b),L=LV[cp.lvl];
  return `<div class="pjc" style="border-color:${L[1]}"><b style="color:${L[1]}">${L[0]}</b><p>${cp.txt}</p><div class="pjs">${cp.set.map(x=>`<span dir="auto">${x}</span>`).join('')}</div>
  <p class="muted" style="font-size:13px;margin-top:6px">حدّ الشحن للمنظومة: ${CAT.chA(i,b,n)}A · حدّ التفريغ: ${CAT.disA(i,b,n)}A · قاطع البطارية: ${CAT.brkBat(i)} · قاطع AC: ${CAT.brkAC(i)}</p></div>`;}
-function pickerHTML(){const i=CAT.inv(PK.inv),b=CAT.bat(PK.bat);
+function pickerHTML(){const i=CAT.inv(PK.inv),b=CAT.bat(PK.bat),step=PK.step||1;
  const brands=a=>[...new Set(a.map(x=>x.brand))];
- const grp=(arr,key)=>brands(arr).map(br=>`<div class="pjg"><h4>${br}</h4><div class="pjo">${arr.filter(x=>x.brand===br).map(x=>`<button type="button" class="${PK[key]===x.id?'on':''}" data-pk="${key}" data-v="${x.id}"><b dir="ltr">${x.model}</b><span>${key==='inv'?x.kw+'kW · '+(x.type==='hybrid'?'هايبرد':'أوف غريد'):x.ah+'Ah · '+(x.comm.length?x.comm[0]:'بلا اتصال')}</span></button>`).join('')}</div></div>`).join('');
- return `<div class="pjh"><h2>حدّد المشروع</h2><button type="button" class="ib" data-pk="close" aria-label="سكّر">✕</button></div>
- <p class="muted" style="font-size:14px">اختار الإنفرتر والبطارية يلّي بدّك تركّبهن. على أساسهن بيتغيّر التوصيل، الشاشة، الـBMS والحدود.</p>
- <div class="pjq"><span class="muted">جاهزين:</span>${CAT.PRESETS.map(p=>`<button type="button" data-pk="pre" data-v="${p.join(',')}">${CAT.inv(p[0]).brand} ${CAT.inv(p[0]).kw}kW + ${CAT.bat(p[1]).brand}${p[2]>1?' ×'+p[2]:''}</button>`).join('')}</div>
- <h3>1. الإنفرتر</h3>${grp(CAT.INV,'inv')}
- <h3>2. البطارية</h3>${grp(CAT.BAT,'bat')}
- <h3>3. كم بطارية؟</h3><div class="pjo">${[1,2,3,4].map(n=>`<button type="button" class="${PK.n===n?'on':''}" data-pk="n" data-v="${n}"><b>${n}</b><span>${(b.ah*n*0.0512).toFixed(1)} kWh</span></button>`).join('')}</div>
- <h3>الكتالوج والتوافق</h3><div class="pjcols"><div><h4 dir="ltr">${i.brand} ${i.model}</h4>${tbl(specInv(i))}<p class="muted" style="font-size:13px">${i.note}</p></div><div><h4 dir="ltr">${b.brand} ${b.model}</h4>${tbl(specBat(b,PK.n))}<p class="muted" style="font-size:13px">${b.note}</p></div></div>
- ${compatBox(i,b,PK.n)}
- <button type="button" class="pjgo" data-pk="go">ابدأ المشروع ←</button>`;}
-function openPicker(){PK=PROJ?Object.assign({},PROJ):PK;$('pjin').innerHTML=pickerHTML();$('pjm').hidden=false;document.body.style.overflow='hidden';}
+ const cards=(arr,key)=>brands(arr).map(br=>`<div class="pjg"><h4>${br}</h4><div class="pjo">${arr.filter(x=>x.brand===br).map(x=>`<button type="button" class="${PK[key]===x.id?'on':''}" data-pk="${key}" data-v="${x.id}"><b dir="ltr">${x.model.replace(/-EU.*$/,'')}</b><span>${key==='inv'?x.kw+'kW · '+(x.type==='hybrid'?'هايبرد':'أوف غريد'):x.ah+'Ah · '+(x.comm.length?'فيها اتصال':'بلا اتصال')}</span></button>`).join('')}</div></div>`).join('');
+ const cp=CAT.compat(i,b),L=LV[cp.lvl];
+ const dots=`<div class="pjdots"><i class="${step===1?'on':''}"></i><i class="${step===2?'on':''}"></i></div>`;
+ if(step===1)return `<div class="pjh"><h2>شو الإنفرتر؟</h2><button type="button" class="ib" data-pk="close" aria-label="سكّر">✕</button></div>${dots}
+  <div class="pjstep">${cards(CAT.INV,'inv')}</div>`;
+ return `<div class="pjh"><button type="button" class="pjback" data-pk="back">→ رجوع</button><h2>شو البطارية؟</h2><button type="button" class="ib" data-pk="close" aria-label="سكّر">✕</button></div>${dots}
+  <div class="pjstep"><p class="pjsel">الإنفرتر: <b dir="ltr">${i.brand} ${i.model.replace(/-EU.*$/,'')}</b></p>${cards(CAT.BAT,'bat')}
+  <div class="pjn"><span>كم بطارية؟</span><button type="button" data-pk="n" data-v="${Math.max(1,PK.n-1)}">−</button><b>${PK.n}</b><button type="button" data-pk="n" data-v="${Math.min(4,PK.n+1)}">+</button><span class="muted">${(b.ah*PK.n*0.0512).toFixed(1)} kWh</span></div>
+  <div class="pjok" style="border-color:${L[1]};color:${L[1]}">${L[0]}</div>
+  <details class="pjdet"><summary>الكتالوج والتوافق</summary><div class="pjcols"><div><h4 dir="ltr">${i.brand} ${i.model}</h4>${tbl(specInv(i))}</div><div><h4 dir="ltr">${b.brand} ${b.model}</h4>${tbl(specBat(b,PK.n))}</div></div>${compatBox(i,b,PK.n)}</details></div>
+  <button type="button" class="pjgo" data-pk="go">ابدأ المشروع ←</button>`;}
+function openPicker(){PK=PROJ?Object.assign({},PROJ):PK;PK.step=1;$('pjin').innerHTML=pickerHTML();$('pjm').hidden=false;document.body.style.overflow='hidden';}
 function closePicker(){$('pjm').hidden=true;document.body.style.overflow='';}
 $('pjm').addEventListener('click',e=>{if(e.target.id==='pjm'&&PROJ){closePicker();return;}const b=e.target.closest('[data-pk]');if(!b)return;const k=b.dataset.pk,v=b.dataset.v;
  if(k==='close'){if(PROJ)closePicker();else startProject();return;}
  if(k==='go'){startProject();return;}
- if(k==='pre'){const p=v.split(',');PK={inv:p[0],bat:p[1],n:+p[2]};}
+ let dir=0;if(k==='back'){PK.step=1;dir=-1;}
+ else if(k==='inv'){PK.inv=v;PK.step=2;dir=1;}
  else if(k==='n')PK.n=+v;else PK[k]=v;
- const sc=$('pjin').parentElement.scrollTop;$('pjin').innerHTML=pickerHTML();$('pjin').parentElement.scrollTop=sc;});
+ const box=$('pjin');box.innerHTML=pickerHTML();if(dir){box.classList.remove('sl','sr');void box.offsetWidth;box.classList.add(dir>0?'sl':'sr');box.parentElement.scrollTop=0;}});
 function startProject(){PROJ={inv:PK.inv,bat:PK.bat,n:PK.n};ls.set('simProj',JSON.stringify(PROJ));closePicker();applyProject(true);
  const i=CAT.inv(PROJ.inv),b=CAT.bat(PROJ.bat);ev('o',`مشروع جديد: ${i.brand} ${i.model} مع ${PROJ.n>1?PROJ.n+' × ':''}${b.brand} ${b.model}. وصّل وشغّل.`,'',0);
  $('wireSec').scrollIntoView({behavior:'smooth',block:'start'});}
@@ -1099,13 +1130,28 @@ function applyProject(fresh){if(!PROJ)return;const i=CAT.inv(PROJ.inv),b=CAT.bat
  $('pjchg').onclick=openPicker;
  $('pjcat').innerHTML=`<h2>كتالوج المشروع</h2><div class="pjcols"><div><h4 dir="ltr">${i.brand} ${i.model}</h4>${tbl(specInv(i))}</div><div><h4 dir="ltr">${b.brand} ${b.model}</h4>${tbl(specBat(b,n))}</div></div><h4 style="margin-top:10px">الـBMS والإعدادات</h4>${compatBox(i,b,n)}<p class="muted" style="font-size:12.5px;margin-top:8px">الأرقام من الـDatasheet الرسمية. الموديلات بتتغيّر، فشيك الـManual والسوفتوير تبع الجهاز قبل التركيب.</p>`;
  WIRE.render();draw();}
+
+/* ============ الإعدادات المهمّة لمشروعك ============ */
+let ksSig='';
+function keySet(){const el=$('keyset');if(!el)return;if(MODE!=='wire'||!PROJ){if(ksSig!=='x'){el.hidden=true;ksSig='x';}return;}el.hidden=false;
+ const i=INVx(),b=BATx(),n=PROJ.n||1,cp=CAT.compat(i,b),lim=CAT.chA(i,b,n),deye=i.screen==='deye',li=cp.lvl!=='none';
+ const rows=[];
+ if(deye){rows.push(['Batt Mode',S.battMode,li?'Lithium':'Use Batt V',S.battMode===(li?'Lithium':'Use Batt V'),'⚙ ← Battery Setting']);
+  if(li)rows.push(['Lithium Mode',protoTxt(S.liMode),protoTxt(cp.code),protoTxt(S.liMode)===protoTxt(cp.code),'⚙ ← Battery Setting ← Set3']);}
+ else{const P=CAT.PROG[i.screen];const want=li?(i.screen==='growatt'?'LI':cp.code):'USE';
+  rows.push(['Battery type ('+P.bat+')',S.pBat,want,S.pBat===want,'SETUP ← '+P.bat]);
+  if(li&&i.screen==='growatt')rows.push(['Li protocol (36)',S.pProto,cp.code,S.pProto===cp.code,'SETUP ← 36']);}
+ rows.push([deye?'Max A Charge':'Max charging current',S.maxCh+'A','≤ '+lim+'A',S.maxCh<=lim,deye?'⚙ ← Battery Setting':'SETUP ← 02']);
+ const ok=rows.every(r=>r[3]);const sig=JSON.stringify(rows)+ok;if(sig===ksSig)return;ksSig=sig;
+ el.innerHTML=`<h2>الإعدادات المهمّة لمشروعك ${ok?'<span class="ksok">✓ كلّها مضبوطة</span>':''}</h2><div class="ks">${rows.map(r=>`<div class="ksr ${r[3]?'ok':'no'}"><b>${r[3]?'✓':'✗'}</b><span class="ksn" dir="ltr">${r[0]}</span><span class="ksv" dir="ltr">${r[1]}</span><span class="ksw">${r[3]?'':'لازم: <b dir="ltr">'+r[2]+'</b> · <span dir="ltr">'+r[4]+'</span>'}</span></div>`).join('')}</div>`;}
+{const _d=draw;let lastPg='';draw=function(){_d.apply(this,arguments);keySet();const pg=UI.pg+'|'+(UI.tab||0)+'|'+(UI.ov?1:0)+'|'+(UI.pov?UI.pov.k:'');if(pg!==lastPg){const l=$('lcd');if(lastPg&&l&&l.animate&&!matchMedia('(prefers-reduced-motion: reduce)').matches)l.firstElementChild&&l.firstElementChild.animate([{opacity:.4,transform:'translateX(10px)'},{opacity:1,transform:'none'}],{duration:170,easing:'cubic-bezier(.2,.8,.2,1)'});lastPg=pg;}};}
 function setMode(m){MODE=m;ls.set('simMode',m);UI.pov=null;UI.pg='main';$('devH').textContent=m==='wire'&&PROJ?$('devH').textContent:'HYBRID INVERTER · 5kW · 48V';document.querySelectorAll('.mode').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
  $('wireSec').hidden=m!=='wire';$('envPV').hidden=m==='wire';$('envBT').hidden=m==='wire';
  if(m==='wire'){if(curCh){curCh=null;ls.set('simCh','');chUI();$('chRes').innerHTML='';}WIRE.compute();WIRE.setZoom();running=true;$('play').textContent='⏸ وقّف';if(PROJ)applyProject(false);else openPicker();}
  draw();}
 $('modes').addEventListener('click',e=>{const b=e.target.closest('.mode');if(b&&b.dataset.m!==MODE)setMode(b.dataset.m);});
 WIRE.init();setMode(MODE);
-document.querySelector('.ttabs').addEventListener('click',e=>{const b=e.target.closest('[data-tt]');if(!b)return;document.querySelectorAll('.ttabs button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tbody').forEach(x=>x.hidden=x.dataset.tb!==b.dataset.tt);});
+document.querySelector('.ttabs').addEventListener('click',e=>{const b=e.target.closest('[data-tt]');if(!b)return;document.querySelectorAll('.ttabs button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tbody').forEach(x=>{const on=x.dataset.tb===b.dataset.tt;x.hidden=!on;if(on){x.classList.remove('tin');void x.offsetWidth;x.classList.add('tin');}});});
 document.querySelector('.qbar').addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b)return;({in:'wzin',out:'wzout',fit:'wfit',undo:'wundo',edit:'wmove'})[b.dataset.q]&&$(({in:'wzin',out:'wzout',fit:'wfit',undo:'wundo',edit:'wmove'})[b.dataset.q]).click();});
 (function(){const card=$('board').closest('.card'),btn=$('wfs');let on=false;
  const set=v=>{on=v;card.classList.toggle('wfs',v);document.body.classList.toggle('nofs',v);btn.textContent=v?'✕':'⛶';btn.setAttribute('aria-label',v?'اطلع من الشاشة الكاملة':'شاشة كاملة');setTimeout(()=>WIRE.setZoom(),60);};

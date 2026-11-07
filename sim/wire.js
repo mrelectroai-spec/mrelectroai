@@ -288,13 +288,13 @@ function compSVG(c){const s=c.s||1;let g=`<g data-c="${c.id}" transform="matrix(
  g+='</g>';
  if(editMode&&selC===c.id){const X=c.x+(c.w+6)*s,Y=c.y+(c.h+(c.type==='inv'||c.type==='panel'?28:6))*s;g+=`<g class="rz"><circle cx="${X}" cy="${Y}" r="22" fill="transparent"/><rect x="${X-11}" y="${Y-11}" width="22" height="22" rx="5" fill="#ffb400" stroke="#fff" stroke-width="3"/><path d="M${X-5} ${Y+5}L${X+5} ${Y-5}M${X+1} ${Y-5}h4v4M${X-5} ${Y+1}v4h4" stroke="#fff" stroke-width="2" fill="none"/></g>`;}
  for(const k in c.t){const key=keyOf(c.id,k);const t=term(key);const sl=sel===key;
-  g+=`<g class="tm${sl?' on':''}" data-t="${key}"><circle cx="${t.x}" cy="${t.y}" r="15" fill="transparent"/><circle cx="${t.x}" cy="${t.y}" r="${sl?9:7}" fill="${KCOL[t.k]}" stroke="${sl?'#ffb400':'#fff'}" stroke-width="${sl?4:2}"/></g>`;
+  g+=`<g class="tm${sl?' on':''}" data-t="${key}"><circle cx="${t.x}" cy="${t.y}" r="${(15*KZ).toFixed(1)}" fill="transparent"/><circle cx="${t.x}" cy="${t.y}" r="${sl?9:7}" fill="${KCOL[t.k]}" stroke="${sl?'#ffb400':'#fff'}" stroke-width="${sl?4:2}"/></g>`;
   if(c.type!=='inv')g+=`<text x="${t.x}" y="${t.y+(t.d>0?24:-14)}" class="tl2">${t.l}</text>`;}
  return g;}
 const brd=()=>document.getElementById('board');
 function vb(){const b=brd();const ar=(b.clientHeight||600)/(b.clientWidth||1000);return [cam.x,cam.y,cam.w,cam.w*ar];}
 function applyView(){const s=document.getElementById('bsvg');if(s)s.setAttribute('viewBox',vb().map(v=>v.toFixed(1)).join(' '));}
-function render(){const b=brd();if(!b)return;const {de}=compute();
+function render(){const b=brd();if(!b)return;const {de}=compute();KZ=Math.min(2.4,Math.max(1,pxToW()));
  let g=`<svg id="bsvg" viewBox="${vb().join(' ')}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" class="${editMode?'mv':''}">
  <defs><pattern id="g1" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#d3dbdf" stroke-width="0.6"/></pattern><pattern id="g5" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#g1)"/><path d="M100 0H0V100" fill="none" stroke="#bfcad0" stroke-width="1.2"/></pattern></defs>
  <rect x="-5000" y="-5000" width="10000" height="10000" fill="#e8edf0"/><rect x="-5000" y="-5000" width="10000" height="10000" fill="url(#g5)"/>`;
@@ -306,17 +306,25 @@ function render(){const b=brd();if(!b)return;const {de}=compute();
   if(!editMode)g+=`<path class="wh" data-w="${i}" d="${d}" stroke="transparent" stroke-width="18" fill="none"/>`;});
  for(const id in C){const c=C[id];for(const k in c.t){const key=keyOf(id,k);if(sel===key||st.wires.some(w=>w.a===key||w.b===key)){const t=term(key);g+=`<circle cx="${t.x}" cy="${t.y}" r="4" fill="#fff" pointer-events="none"/>`;}}}
  if(selW>=0&&st.wires[selW]&&!editMode){const w=st.wires[selW];
-  const P=corners(w);
-  for(let j=0;j<P.length-1;j++){const a=P[j],b=P[j+1];const len=Math.hypot(b[0]-a[0],b[1]-a[1]);if(len<18)continue;const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;const hz=Math.abs(a[1]-b[1])<0.5;
-   g+=`<g class="hd" data-hw="${selW}" data-seg="${j}"><rect x="${mx-(hz?20:16)}" y="${my-(hz?16:20)}" width="${hz?40:32}" height="${hz?32:40}" fill="transparent"/><rect x="${mx-(hz?11:4)}" y="${my-(hz?4:11)}" width="${hz?22:8}" height="${hz?8:22}" rx="3" fill="#fff" stroke="#ffb400" stroke-width="2.5"/></g>`;}
-  for(let j=1;j<P.length-1;j++){const q=P[j];g+=`<g class="hd" data-hw="${selW}" data-cor="${j}"><circle cx="${q[0]}" cy="${q[1]}" r="20" fill="transparent"/><circle cx="${q[0]}" cy="${q[1]}" r="9" fill="#ffb400" stroke="#fff" stroke-width="3"/></g>`;}}
+  const P=corners(w);const K=KZ;
+  for(let j=0;j<P.length-1;j++){const a=P[j],b=P[j+1];const len=Math.hypot(b[0]-a[0],b[1]-a[1]);if(len<22*K)continue;const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;const hz=Math.abs(a[1]-b[1])<0.5;
+   const L=13*K,T=5*K;g+=`<g class="hd" data-hw="${selW}" data-seg="${j}"><rect x="${mx-(hz?24:18)*K}" y="${my-(hz?18:24)*K}" width="${(hz?48:36)*K}" height="${(hz?36:48)*K}" fill="transparent"/><rect x="${mx-(hz?L:T)}" y="${my-(hz?T:L)}" width="${2*(hz?L:T)}" height="${2*(hz?T:L)}" rx="${3*K}" fill="#fff" stroke="#ffb400" stroke-width="${2.5*K}"/></g>`;}
+  // كرت صغير حدّ الشريط: احذف / رجّعو
+  let best=1,bl=-1;for(let j=0;j<P.length-1;j++){const l=Math.hypot(P[j+1][0]-P[j][0],P[j+1][1]-P[j][1]);if(l>bl){bl=l;best=j;}}
+  const cx=(P[best][0]+P[best+1][0])/2,cy=(P[best][1]+P[best+1][1])/2-42*K;
+  g+=chip(cx,cy,[['wdel','🗑 احذف'],...(w.c?[['wstraight','↺ رجّعو']]:[])],K);}
+ if(editMode&&selC&&C[selC]){const c=C[selC],s=c.s||1;g+=chip(c.x+c.w*s/2,c.y-34*KZ,[['wsmall','－'],['wbig','＋'],['wdelc','🗑 شيلها']],KZ);}
+ if(st.dmg&&C.inv){const c=C.inv,s=c.s||1;g+=chip(c.x+c.w*s/2,c.y+c.h*s*0.45,[['wnew','🔧 ركّب إنفرتر جديد']],KZ*1.2);}
  g+='</svg>';b.innerHTML=g;
  const en=(id,v)=>{const e=document.getElementById(id);if(e)e.disabled=!v;};
  en('wdel',selW>=0);en('wstraight',selW>=0&&st.wires[selW]&&!!st.wires[selW].c);en('wbig',!!selC);en('wsmall',!!selC);en('wdelc',!!selC);
  const mv=document.getElementById('wmove');if(mv){mv.classList.toggle('on',editMode);mv.textContent=editMode?'✓ خلصت تعديل':'✋ عدّل القطع';}
  const ed=document.getElementById('wedit');if(ed)ed.hidden=!editMode;
  libUI();checklist(de);}
-let liveSig='',busy=false,drag=null;
+let liveSig='',busy=false,drag=null,KZ=1;
+function chip(cx,cy,acts,K){const h=30*K,pad=8*K,fs=13*K;const ws=acts.map(a=>Math.max(30*K,(a[1].length*7.2+16)*K));const tot=ws.reduce((x,y)=>x+y,0)+(acts.length-1)*4*K;let x=cx-tot/2;
+ let g=`<g class="chip">`;acts.forEach((a,i)=>{g+=`<g data-act="${a[0]}"><rect x="${x}" y="${cy-h/2}" width="${ws[i]}" height="${h}" rx="${h/2}" fill="#10221d" stroke="#22c79b" stroke-width="${1.5*K}"/><text x="${x+ws[i]/2}" y="${cy+fs*0.36}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="#e9fff7" style="font-family:'IBM Plex Sans Arabic',sans-serif">${a[1]}</text></g>`;x+=ws[i]+4*K;});
+ return g+'</g>';}
 function updateLive(){const b=document.getElementById('bsvg');if(!b||busy||drag)return;const r=R_();
  const sig=[r.houseOn,WS&&WS.powered,Math.round((r.soc||0)*100),r.faults?[...r.faults].join():'',Math.round((r.load||0)/50),Math.round((r.pv||0)/100),r.gridPresent,typeof gridSched==='function'&&r.min!=null?gridSched(r.min/60):0].join('|');
  if(sig!==liveSig){liveSig=sig;render();}}
@@ -386,10 +394,12 @@ function checklist(de){const L=[];const add=(lvl,t)=>L.push({lvl,t});const I=PI(
 /* ---------- الكاميرا: زوم ونقل متل الأوتوكاد ---------- */
 function bbox(){const cs=Object.values(C);if(!cs.length)return [0,0,1100,900];let a=1e9,b=1e9,c=-1e9,d=-1e9;
  for(const o of cs){const s=o.s||1;a=Math.min(a,o.x);b=Math.min(b,o.y-20);c=Math.max(c,o.x+o.w*s);d=Math.max(d,o.y+(o.h+40)*s);}return [a,b,c,d];}
-function fit(){const b=brd();const [a,bb,c,d]=bbox();const m=30;const ar=(b.clientHeight||600)/(b.clientWidth||1000);
- const W=Math.max(c-a+2*m,(d-bb+2*m)/ar);cam={x:(a+c)/2-W/2,y:(bb+d)/2-W*ar/2,w:W};render();}
+let camAnim=0;function animCam(t,ms){cancelAnimationFrame(camAnim);const f={...cam},t0=performance.now();const ease=x=>1-Math.pow(1-x,3);
+ const st_=now=>{const k=Math.min(1,(now-t0)/ms),e=ease(k);cam={x:f.x+(t.x-f.x)*e,y:f.y+(t.y-f.y)*e,w:f.w+(t.w-f.w)*e};applyView();if(k<1)camAnim=requestAnimationFrame(st_);else render();};camAnim=requestAnimationFrame(st_);}
+function fit(anim){const b=brd();const [a,bb,c,d]=bbox();const m=30;const ar=(b.clientHeight||600)/(b.clientWidth||1000);
+ const W=Math.max(c-a+2*m,(d-bb+2*m)/ar);const t={x:(a+c)/2-W/2,y:(bb+d)/2-W*ar/2,w:W};if(anim===true&&document.getElementById('bsvg'))animCam(t,240);else{cam=t;render();}}
 function zoomAt(f,wx,wy){const nw=Math.max(120,Math.min(6000,cam.w/f));f=cam.w/nw;cam.x=wx-(wx-cam.x)/f;cam.y=wy-(wy-cam.y)/f;cam.w=nw;applyView();}
-function zoomBtn(f){const v=vb();zoomAt(f,v[0]+v[2]/2,v[1]+v[3]/2);}
+function zoomBtn(f){const v=vb();const wx=v[0]+v[2]/2,wy=v[1]+v[3]/2;const nw=Math.max(120,Math.min(6000,cam.w/f));const k=cam.w/nw;animCam({x:wx-(wx-cam.x)/k,y:wy-(wy-cam.y)/k,w:nw},200);}
 
 /* ---------- السحب واللمس ---------- */
 let justDragged=0,raf=0;const ptrs=new Map();let pinch=null,pan=null;
@@ -404,14 +414,17 @@ function onDown(e){const b=brd();ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY})
  if(hd){e.preventDefault();const wi=+hd.dataset.hw,w=st.wires[wi];hist.push(snapH());
   if(!w.c)w.c=defC(w).slice();const P=corners(w);const p0=svgPt(e);
   drag={t:'pt',wi,seg:hd.dataset.seg!=null?+hd.dataset.seg:null,cor:hd.dataset.cor!=null?+hd.dataset.cor:null,P,p0,c0:w.c.slice(),moved:false,sx:e.clientX,sy:e.clientY};busy=true;return;}
+ if(e.target.closest('[data-act]'))return;
+ const tt=e.target.closest('[data-t]');if(tt&&!editMode){drag={t:'link',from:tt.dataset.t,moved:false,sx:e.clientX,sy:e.clientY};busy=true;return;}
  if(editMode&&e.target.closest('.rz')&&selC){e.preventDefault();hist.push(snapH());drag={t:'rz',id:selC,moved:false};busy=true;return;}
  if(editMode){const g=e.target.closest('[data-c]');if(g&&!e.target.closest('[data-sw]')){e.preventDefault();const c=C[g.dataset.c],p=svgPt(e);hist.push(snapH());drag={t:'c',id:c.id,ox:p[0]-c.x,oy:p[1]-c.y,moved:false,sx:e.clientX,sy:e.clientY};busy=true;return;}}
- if(!e.target.closest('[data-t],[data-sw],[data-w]')){pan={sx:e.clientX,sy:e.clientY,cx:cam.x,cy:cam.y,moved:false};busy=true;}}
+ if(!e.target.closest('[data-t],[data-sw],[data-w],[data-act]')){pan={sx:e.clientX,sy:e.clientY,cx:cam.x,cy:cam.y,moved:false};busy=true;}}
 function onMove(e){if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(pinch&&ptrs.size>=2){e.preventDefault();cap(e);const [p1,p2]=[...ptrs.values()];const d=Math.hypot(p1.x-p2.x,p1.y-p2.y),mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2;
   const k=pxToW();cam.x-=(mx-pinch.mx)*k;cam.y-=(my-pinch.my)*k;const wp=svgPt({clientX:mx,clientY:my});zoomAt(d/pinch.d,wp[0],wp[1]);pinch={d,mx,my};justDragged=Date.now();return;}
  if(pan){const dx=e.clientX-pan.sx,dy=e.clientY-pan.sy;if(!pan.moved&&Math.hypot(dx,dy)<5)return;if(!pan.moved)cap(e);pan.moved=true;const k=pxToW();cam.x=pan.cx-dx*k;cam.y=pan.cy-dy*k;applyView();return;}
  if(!drag)return;e.preventDefault();const p=svgPt(e);
+ if(drag.t==='link'){if(!drag.moved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<7)return;if(!drag.moved){cap(e);sel=null;}drag.moved=true;drag.to=nearT(p,drag.from);rubber(drag.from,p,drag.to);return;}
  if((drag.t==='c'||drag.t==='pt')&&!drag.moved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<4)return;if(!drag.moved)cap(e);drag.moved=true;
  if(drag.t==='pt'){const w=st.wires[drag.wi];const P=drag.P;w.c=drag.c0.slice();
   if(drag.seg!=null){let j=drag.seg;
@@ -430,6 +443,8 @@ function onMove(e){if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.cl
 function onUp(e){ptrs.delete(e.pointerId);if(ptrs.size<2&&pinch){pinch=null;if(!ptrs.size)busy=false;return;}
  if(pan){if(pan.moved)justDragged=Date.now();pan=null;busy=false;return;}
  if(!drag)return;const d=drag;drag=null;busy=false;
+ if(d.t==='link'){if(!d.moved)return;justDragged=Date.now();const r=document.getElementById('rub');if(r)r.remove();
+  if(d.to)connect(d.from,d.to);else{flash('فلتّ الشريط بمحل فاضي. اسحب لحدّ ما توصل عالطرف التاني.','w');render();}return;}
  if(d.t==='pt'){justDragged=Date.now();const w=st.wires[d.wi];
   if(!d.moved&&d.seg!=null){// كبسة عقطعة بلا سحب: زيد زاويتين بنصّها
    const P=d.P,j=d.seg,k=segParam(P,j);const a=P[j],b=P[j+1];const hz=Math.abs(a[1]-b[1])<0.5;const m=snap(hz?(a[0]+b[0])/2:(a[1]+b[1])/2,5);
@@ -442,22 +457,28 @@ function onUp(e){ptrs.delete(e.pointerId);if(ptrs.size<2&&pinch){pinch=null;if(!
  justDragged=Date.now();if(!d.moved)hist.pop();if(d.t==='c')selC=d.id;saveW();render();}
 
 /* ---------- التفاعل ---------- */
-function onBoard(e){if(Date.now()-justDragged<300)return;if(e.target.closest('.hd,.rz'))return;
+function onBoard(e){const act=e.target.closest('[data-act]');if(act){const b=document.getElementById(act.dataset.act);if(b){b.disabled=false;b.click();}return;}
+ if(Date.now()-justDragged<300)return;if(e.target.closest('.hd,.rz'))return;
  const sw=e.target.closest('[data-sw]');if(sw){onSwitch(sw.dataset.sw);return;}
  if(editMode){if(!e.target.closest('[data-c]')){selC=null;render();}return;}
  const t=e.target.closest('[data-t]');
  if(t){const k=t.dataset.t;selW=-1;
   if(!sel){sel=k;tip(k);}
   else if(sel===k){sel=null;}
-  else{const exists=st.wires.some(w=>(w.a===sel&&w.b===k)||(w.a===k&&w.b===sel));
-   if(!exists){hist.push(snapH());const A=term(sel),B=term(k);
-    st.wires.push({a:sel,b:k});selW=st.wires.length-1;
-    if(A.k!==B.k)flash(`⚠ وصلت ${KNAME[A.k]} (${A.l}) على ${KNAME[B.k]} (${B.l}). متأكّد؟`,'w');else flash('وصلت ✓ اسحب الزوايا (الدواير الصفر) أو القطع (المستطيلات البيض) لتحدّد مشي الشريط. كبسة عقطعة بتزيد زاوية.','');}
-   sel=null;afterChange();return;}
+  else{connect(sel,k);return;}
   render();return;}
- const w=e.target.closest('[data-w]');if(w){selW=+w.dataset.w;sel=null;flash('نقّيت الشريط: الدواير الصفر زوايا بتتحرّك بكل الاتجاهات، والمستطيلات البيض قطع بتطلّعها وبتنزّلها أو بتجيبها يمين وشمال. كبسة عقطعة بتزيد زاويتين.','');render();return;}
+ const w=e.target.closest('[data-w]');if(w){selW=+w.dataset.w;sel=null;flash('اسحب المستطيلات البيض لتحرّك الشريط. كبسة عليها بتزيد زاوية.','');render();return;}
  if(sel||selW>=0){sel=null;selW=-1;render();}}
-function tip(k){const [c,t]=k.split('.');const T=C[c].t[t];flash(`نقّيت: ${C[c].name} ← ${T.l} (${KNAME[T.k]}). هلّق اكبس عالطرف التاني.`,'');}
+function connect(a,b){const exists=st.wires.some(w=>(w.a===a&&w.b===b)||(w.a===b&&w.b===a));sel=null;
+ if(!exists&&a!==b){hist.push(snapH());const A=term(a),B=term(b);st.wires.push({a,b});selW=-1;
+  if(A.k!==B.k)flash(`⚠ وصلت ${KNAME[A.k]} (${A.l}) على ${KNAME[B.k]} (${B.l}). متأكّد؟`,'w');else flash(`وصلت ${A.l} ← ${B.l} ✓`,'');}
+ afterChange();}
+function nearT(p,except){let best=null,bd=Math.max(26,22*pxToW());for(const id in C)for(const k in C[id].t){const key=keyOf(id,k);if(key===except)continue;const t=term(key);const d=Math.hypot(t.x-p[0],t.y-p[1]);if(d<bd){bd=d;best=key;}}return best;}
+function rubber(from,p,to){const s=document.getElementById('bsvg');if(!s)return;let r=document.getElementById('rub');
+ if(!r){r=document.createElementNS('http://www.w3.org/2000/svg','g');r.id='rub';r.setAttribute('pointer-events','none');s.appendChild(r);}
+ const A=term(from),col=KCOL[A.k];const T=to?term(to):null;const ex=T?T.x:p[0],ey=T?T.y:p[1];const K=KZ;
+ r.innerHTML=`<path d="M${A.x} ${A.y}L${A.x} ${(A.y+ey)/2}L${ex} ${(A.y+ey)/2}L${ex} ${ey}" stroke="${col}" stroke-width="${5*K}" fill="none" stroke-dasharray="${10*K} ${6*K}" opacity=".85"/>`+(T?`<circle cx="${T.x}" cy="${T.y}" r="${14*K}" fill="none" stroke="#ffb400" stroke-width="${4*K}"/>`:`<circle cx="${ex}" cy="${ey}" r="${7*K}" fill="${col}"/>`);}
+function tip(k){const [c,t]=k.split('.');const T=C[c].t[t];flash(`${T.l}: هلّق اكبس عالطرف التاني (أو اسحب إصبعك لعندو).`,'');}
 function setZoom(){fit();}
 
 window.WIRE={render,setZoom,compute,updateLive,applyView,
@@ -466,7 +487,7 @@ window.WIRE={render,setZoom,compute,updateLive,applyView,
   b.addEventListener('pointerdown',onDown);b.addEventListener('pointermove',onMove);b.addEventListener('pointerup',onUp);b.addEventListener('pointercancel',onUp);
   b.addEventListener('wheel',e=>{e.preventDefault();const p=svgPt(e);zoomAt(Math.exp(-e.deltaY*0.0015),p[0],p[1]);},{passive:false});
   const on=(id,f)=>{const e=document.getElementById(id);if(e)e.onclick=f;};
-  on('wzin',()=>zoomBtn(1.3));on('wzout',()=>zoomBtn(1/1.3));on('wfit',fit);
+  on('wzin',()=>zoomBtn(1.4));on('wzout',()=>zoomBtn(1/1.4));on('wfit',()=>fit(true));
   on('wundo',()=>{if(!hist.length)return;restore(hist.pop());selW=-1;selC=null;afterChange();});
   on('wdel',()=>{if(selW<0)return;hist.push(snapH());st.wires.splice(selW,1);selW=-1;afterChange();});
   on('wstraight',()=>{if(selW<0)return;hist.push(snapH());delete st.wires[selW].c;saveW();render();});
