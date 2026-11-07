@@ -3,11 +3,13 @@
 'use strict';
 (function(){
 const INV=[
- {id:'deye5',brand:'Deye',model:'SUN-5K-SG03LP1-EU',kw:5,type:'hybrid',screen:'deye',maxVoc:500,startV:125,mppt:[150,425],nMppt:2,imp:13,maxPv:6500,maxCh:120,maxDis:120,acCh:120,sell:true,
+ {id:'deye66',brand:'Deye',model:'SUN-6.6K-OG03LP1-EU-AM2',kw:6.6,type:'offgrid',screen:'deye',lay:'og03',maxVoc:500,startV:125,mppt:[150,425],nMppt:2,imp:18,maxPv:10560,maxCh:140,maxDis:140,acCh:140,sell:false,brk:'DC 200A',
+  ports:'BMS 485/CAN (RJ45)',note:'أوف غريد من Deye، شاشة لمس وIP65. الأطراف تحت بالترتيب: Parallel، PV، BMS، Function، البطارية، كبسة ON/OFF، Grid، GEN، Load. بدّو قاطع DC برّاني 200A للبطارية.'},
+ {id:'deye5',lay:'sg',dcsw:true,brand:'Deye',model:'SUN-5K-SG03LP1-EU',kw:5,type:'hybrid',screen:'deye',maxVoc:500,startV:125,mppt:[150,425],nMppt:2,imp:13,maxPv:6500,maxCh:120,maxDis:120,acCh:120,sell:true,
   ports:'CAN · RS485',note:'هايبرد: بيبيع للشبكة، Time Of Use، وزيرو إكسبورت بالـCT.'},
- {id:'deye6',brand:'Deye',model:'SUN-6K-SG05LP1-EU',kw:6,type:'hybrid',screen:'deye',maxVoc:500,startV:125,mppt:[150,425],nMppt:2,imp:13,maxPv:7800,maxCh:135,maxDis:135,acCh:135,sell:true,
+ {id:'deye6',lay:'sg',dcsw:true,brand:'Deye',model:'SUN-6K-SG05LP1-EU',kw:6,type:'hybrid',screen:'deye',maxVoc:500,startV:125,mppt:[150,425],nMppt:2,imp:13,maxPv:7800,maxCh:135,maxDis:135,acCh:135,sell:true,
   ports:'CAN · RS485',note:'نفس شاشة وإعدادات الـ5K، تيار البطارية لحدّ 135A.'},
- {id:'deye8',brand:'Deye',model:'SUN-8K-SG05LP1-EU',kw:8,type:'hybrid',screen:'deye',maxVoc:500,startV:125,mppt:[150,425],nMppt:2,imp:13,maxPv:10400,maxCh:190,maxDis:190,acCh:190,sell:true,
+ {id:'deye8',lay:'sg',dcsw:true,brand:'Deye',model:'SUN-8K-SG05LP1-EU',kw:8,type:'hybrid',screen:'deye',maxVoc:500,startV:125,mppt:[150,425],nMppt:2,imp:13,maxPv:10400,maxCh:190,maxDis:190,acCh:190,sell:true,
   ports:'CAN · RS485',note:'تيار البطارية لحدّ 190A: بدّو كابلات وقاطع أكبر.'},
  {id:'fel5',brand:'Felicity',model:'IVEM5048',kw:5,type:'offgrid',screen:'felicity',maxVoc:500,startV:125,mppt:[120,450],nMppt:1,imp:20,maxPv:6000,maxCh:100,maxDis:115,acCh:100,sell:false,
   ports:'RS485 · CAN',note:'أوف غريد: MPPT واحد، ما بيبيع للشبكة. الدولة بتمرق Bypass.'},
@@ -21,13 +23,13 @@ const INV=[
   ports:'BMS (RS485/CAN)',note:'كل MPPT لحدّ 5500W، وشحن من الدولة لحدّ 150A.'},
 ];
 const BAT=[
- {id:'deyeg5',brand:'Deye',model:'SE-G5.1 Pro-B',ah:100,rec:50,maxCh:100,maxDis:100,comm:['CAN','RS485'],dod:90,par:'لحدّ 64 بالتوازي',note:'بطارية Deye الأصلية، فيها قاطع داخلي.'},
- {id:'dynbx',brand:'Dyness',model:'BX51100',ah:100,rec:50,maxCh:75,maxDis:75,comm:['CAN','RS485','RS232'],dod:90,par:'لحدّ 30 بالتوازي',note:'تصميم اقتصادي عالأرض أو عالحيط.'},
- {id:'dynb',brand:'Dyness',model:'B51100',ah:100,rec:50,maxCh:75,maxDis:75,comm:['CAN','RS485'],dod:90,par:'لحدّ 40 بالتوازي',note:'رف 19 إنش، الاتصال الافتراضي CAN.'},
- {id:'fel100',brand:'Felicity',model:'LPBF48100',ah:100,rec:50,maxCh:100,maxDis:100,comm:['CAN','RS485'],dod:95,par:'لحدّ 6 بالتوازي',note:'عالحيط، بتحدّد رقم كل بطارية بالـDIP.'},
- {id:'fel200',brand:'Felicity',model:'LPBF48200',ah:200,rec:80,maxCh:120,maxDis:120,comm:['CAN','RS485'],dod:95,par:'لحدّ 6 بالتوازي',note:'10kWh بقطعة وحدة.'},
- {id:'bcuu',brand:'Blue Carbon',model:'BCT-UU48-200',ah:200,rec:100,maxCh:100,maxDis:100,comm:[],dod:80,par:'—',note:'النسخة العادية: ما فيها منفذ اتصال، بتشتغل عالفولت.'},
- {id:'bcsm',brand:'Blue Carbon',model:'SMART-BCT-V-48-200P',ah:200,rec:100,maxCh:100,maxDis:100,comm:['CAN','RS485'],dod:80,par:'Stackable',note:'النسخة الذكية فيها CAN وRS485.'},
+ {id:'deyeg5',look:'rack',sw:'BREAKER',brand:'Deye',model:'SE-G5.1 Pro-B',ah:100,rec:50,maxCh:100,maxDis:100,comm:['CAN','RS485'],dod:90,par:'لحدّ 64 بالتوازي',note:'بطارية Deye الأصلية، فيها قاطع داخلي.'},
+ {id:'dynbx',look:'box',sw:'POWER',brand:'Dyness',model:'BX51100',ah:100,rec:50,maxCh:75,maxDis:75,comm:['CAN','RS485','RS232'],dod:90,par:'لحدّ 30 بالتوازي',note:'تصميم اقتصادي عالأرض أو عالحيط.'},
+ {id:'dynb',look:'rack',sw:'POWER',brand:'Dyness',model:'B51100',ah:100,rec:50,maxCh:75,maxDis:75,comm:['CAN','RS485'],dod:90,par:'لحدّ 40 بالتوازي',note:'رف 19 إنش، الاتصال الافتراضي CAN.'},
+ {id:'fel100',look:'wall',sw:'ON/OFF',brand:'Felicity',model:'LPBF48100',ah:100,rec:50,maxCh:100,maxDis:100,comm:['CAN','RS485'],dod:95,par:'لحدّ 6 بالتوازي',note:'عالحيط، بتحدّد رقم كل بطارية بالـDIP.'},
+ {id:'fel200',look:'wall',sw:'ON/OFF',brand:'Felicity',model:'LPBF48200',ah:200,rec:80,maxCh:120,maxDis:120,comm:['CAN','RS485'],dod:95,par:'لحدّ 6 بالتوازي',note:'10kWh بقطعة وحدة.'},
+ {id:'bcuu',look:'bc',sw:'ON/OFF',brand:'Blue Carbon',model:'BCT-UU48-200',ah:200,rec:100,maxCh:100,maxDis:100,comm:[],dod:80,par:'—',note:'النسخة العادية: ما فيها منفذ اتصال، بتشتغل عالفولت.'},
+ {id:'bcsm',look:'bc',sw:'ON/OFF',brand:'Blue Carbon',model:'SMART-BCT-V-48-200P',ah:200,rec:100,maxCh:100,maxDis:100,comm:['CAN','RS485'],dod:80,par:'Stackable',note:'النسخة الذكية فيها CAN وRS485.'},
 ];
 // إعدادات البطارية لكل نوع شاشة
 const PROG={
@@ -60,9 +62,9 @@ function compat(inv,bat){
 }
 function chA(inv,bat,n){return Math.min(bat.maxCh*n,inv.maxCh);}
 function disA(inv,bat,n){return Math.min(bat.maxDis*n,inv.maxDis);}
-function brkBat(inv){const a=inv.maxDis;return a<=125?'DC 125A':(a<=160?'DC 160A':(a<=200?'DC 200A':'DC 250A'));}
+function brkBat(inv){if(inv.brk)return inv.brk;const a=inv.maxDis;return a<=125?'DC 125A':(a<=160?'DC 160A':(a<=200?'DC 200A':'DC 250A'));}
 function brkAC(inv){return inv.kw<=6?'2P 32A':(inv.kw<=8?'2P 40A':'2P 63A');}
-const PRESETS=[['deye5','deyeg5',1],['deye5','bcuu',1],['deye6','dynbx',2],['fel5','fel100',1],['fel5','deyeg5',1],['grw6','dynb',2],['vol8','dynbx',2],['vol11','bcsm',1]];
+const PRESETS=[['deye66','deyeg5',1],['deye66','bcuu',1],['deye5','deyeg5',1],['deye5','bcuu',1],['deye6','dynbx',2],['fel5','fel100',1],['fel5','deyeg5',1],['grw6','dynb',2],['vol8','dynbx',2],['vol11','bcsm',1]];
 window.CAT={INV,BAT,PROG,compat,chA,disA,brkBat,brkAC,PRESETS,
- inv:id=>INV.find(x=>x.id===id)||INV[0],bat:id=>BAT.find(x=>x.id===id)||BAT[0]};
+ inv:id=>INV.find(x=>x.id===id)||INV[1],bat:id=>BAT.find(x=>x.id===id)||BAT[0]};
 })();

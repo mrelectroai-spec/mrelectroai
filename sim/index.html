@@ -159,6 +159,9 @@ input[type=range]{width:100%;accent-color:var(--volt)}
 .wtools button{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:6px 11px;font:600 14px 'IBM Plex Sans Arabic';cursor:pointer;min-width:38px}
 .wtools button:disabled{opacity:.4}
 .wtools #wsol{border-color:var(--volt);color:var(--volt)}
+.wtools #wmove.on{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
+.board.lock{touch-action:none}
+#bsvg .hd{cursor:grab}#bsvg.mv [data-c]{cursor:move}
 .board{overflow:auto;border-radius:14px;border:1px solid var(--line);max-height:78vh;direction:ltr;-webkit-overflow-scrolling:touch}
 .board svg{display:block}
 .board text{font-family:'Roboto Condensed',Arial,sans-serif}
@@ -215,9 +218,9 @@ input[type=range]{width:100%;accent-color:var(--volt)}
   <section id="wireSec">
     <div class="card">
       <h2>وصّل المنظومة بإيدك</h2>
-      <p class="muted" style="font-size:14px">اكبس على طرف، وبعدين عالطرف التاني ليمتدّ شريط. اكبس على أي شريط لتنقّيه وتحذفو. القواطع والعازل وكبسة POWER عالإنفرتر بينكبسوا. بس تخلّص، شغّل بالترتيب، وشاشة الإنفرتر تحت بتضوّي.</p>
+      <p class="muted" style="font-size:14px">اكبس على طرف، وبعدين عالطرف التاني ليمتدّ شريط. اكبس على أي شريط لتنقّيه: اسحب الدوائر الصفر لتحدّد مشيو. «✋ حرّك القطع» بيخلّيك تنقل الإنفرتر والبطارية والقواطع لمحل ما بدّك. القواطع مش إجبارية: فيك توصّل مباشرة، والفحص بيقلّك شو الخطر.</p>
       <div class="pjbar" id="pjbar"></div>
-      <div class="wtools"><button id="wzout" type="button">−</button><button id="wzin" type="button">+</button><button id="wundo" type="button">↶ تراجع</button><button id="wdel" type="button" disabled>🗑 احذف الشريط</button><button id="wclear" type="button">امسح الكل</button><button id="wnew" type="button">🔧 جهاز جديد</button><button id="wsol" type="button">ورجيني الحل</button></div>
+      <div class="wtools"><button id="wzout" type="button">−</button><button id="wzin" type="button">+</button><button id="wundo" type="button">↶ تراجع</button><button id="wdel" type="button" disabled>🗑 احذف الشريط</button><button id="wstraight" type="button" disabled>〰 سوّي الشريط</button><button id="wmove" type="button">✋ حرّك القطع</button><button id="wlay" type="button">رجّع الترتيب</button><button id="wclear" type="button">امسح الكل</button><button id="wnew" type="button">🔧 جهاز جديد</button><button id="wsol" type="button">ورجيني الحل</button></div>
       <div class="wmsg" id="wmsg" hidden></div>
       <div class="board" id="board"></div>
       <div class="wlg"><span><i style="background:#d32f2f"></i>موجب DC</span><span><i style="background:#1b1b1b"></i>سالب DC</span><span><i style="background:#8a4b14"></i>فاز L</span><span><i style="background:#1f6fd1"></i>نوترال N</span><span><i style="background:linear-gradient(90deg,#2e9d3a 50%,#f2d03b 50%)"></i>أرض PE</span><span><i style="background:#8a96a0"></i>اتصال CAN</span></div>
@@ -225,7 +228,7 @@ input[type=range]{width:100%;accent-color:var(--volt)}
     <div class="card" id="pjcat"></div>
     <div class="wgrid">
       <div class="card"><h2>فحص التوصيل</h2><div id="wcheck"></div></div>
-      <div class="card"><h2>ترتيب التشغيل</h2><ol class="steps"><li>قاطع البطارية ON</li><li>كبسة POWER عالإنفرتر ON</li><li>عازل الـDC ON (الألواح)</li><li>قاطع الدولة ON</li><li>قاطع البيت ON</li></ol><p class="muted" style="font-size:13.5px;margin-top:6px">وللإطفاء بالعكس: البيت، الدولة، العازل، الإنفرتر، وآخر شي البطارية.</p></div>
+      <div class="card"><h2>ترتيب التشغيل</h2><ol class="steps"><li>كبسة البطارية نفسها ON (Breaker أو Power عالبطارية)</li><li>قاطع البطارية ON (إذا ركّبت)</li><li>كبسة ON/OFF عالإنفرتر</li><li>عازل الـDC أو DC SW تبع الإنفرتر (الألواح)</li><li>قاطع الدولة ON</li><li>قاطع البيت ON</li></ol><p class="muted" style="font-size:13.5px;margin-top:6px">وللإطفاء بالعكس: البيت، الدولة، العازل، الإنفرتر، وآخر شي البطارية.</p></div>
     </div>
   </section>
 
@@ -468,7 +471,7 @@ function step(){
   if(R.soc<=(b.chem==='li'?0.02:0.05)){ if(battOk){faults.add('F56');R.day.f56++; ev('e',b.chem==='li'?'الـBMS فصل البطارية لأنها فضيت عالآخر (F56).':'F56: فولت البطارية وقع كتير. البطارية فضيت لآخرها مع إنو الشاشة كانت عم تقول '+Math.round(R.est*100)+'%.','f56',300);} disHead=0; }
   // --- allocation
   let pvLoad=0,pvBatt=0,pvGrid=0,dis=0,gch=0,imp=0;
-  const sellOK=gridPresent&&S.workMode==='Selling First'&&S.solarSell;
+  const sellOK=gridPresent&&IV.sell&&S.workMode==='Selling First'&&S.solarSell;
   if(S.pattern==='LoadFirst'){pvLoad=Math.min(pv,load);pvBatt=Math.min(pv-pvLoad,chHead);}
   else{pvBatt=Math.min(pv,chHead);pvLoad=Math.min(pv-pvBatt,load);}
   let rem=pv-pvLoad-pvBatt;
