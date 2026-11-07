@@ -55,7 +55,7 @@ function term(k){const [c,t]=k.split('.');const o=C[c],T=o.t[t],s=o.s||1;return 
 const hasT=k=>{const [c,t]=k.split('.');return !!(C[c]&&C[c].t[t]);};
 
 /* ---------- المشاريع الجاهزة ---------- */
-function readyProject(id){const I=PI(),n=PN(),B=PB();const comps=[],W=[];const a=(x,y)=>W.push({a:x,b:y,pts:[]});
+function readyProject(id){const I=PI(),n=PN(),B=PB();const comps=[],W=[];const a=(x,y)=>W.push({a:x,b:y});
  const look=B.look||'box';const stack=look==='rack'||look==='box';const mh=look==='rack'?(n>2?58:72):(n>2?70:96);
  const add=(type,id,x,y)=>comps.push({id,type,x,y,s:1});
  const two=id==='two',one=I.nMppt<2,dy=two&&!one?160:0;
@@ -87,7 +87,7 @@ function loadReady(id,keepSay){const r=readyProject(id);st.comps=r.comps;st.wire
 let hist=[];let sel=null,selW=-1,selC=null,editMode=false,cam={x:0,y:0,w:1100};
 if(st.proj!==projKey()||!st.comps.length&&!st.empty){const r=readyProject('home');st.comps=r.comps;st.wires=r.wires;st.sw=freshSw();st.dmg=0;st.proj=projKey();}
 rebuildC();
-st.wires=st.wires.filter(w=>hasT(w.a)&&hasT(w.b));st.wires.forEach(w=>{if(!w.pts)w.pts=[];});
+st.wires=st.wires.filter(w=>hasT(w.a)&&hasT(w.b));st.wires.forEach(w=>{delete w.pts;if(w.c&&!(w.c.length%2))delete w.c;});
 const snapH=()=>JSON.stringify({c:st.comps,w:st.wires});
 function restore(h){const o=JSON.parse(h);st.comps=o.c;st.wires=o.w;rebuildC();}
 function saveW(){ls.set('simBoard',JSON.stringify(st));}
@@ -187,27 +187,19 @@ let flashT;function flash(t,cls){const m=document.getElementById('wmsg');m.class
 
 /* ---------- مسار الشرايط ---------- */
 const P2=(x,y)=>x.toFixed(1)+' '+y.toFixed(1);
-function wPts(w){const A=term(w.a),B=term(w.b),s=24;return [[A.x,A.y],[A.x,A.y+A.d*s],...w.pts,[B.x,B.y+B.d*s],[B.x,B.y]];}
-// الشرايط: خطوط مستقيمة بزوايا قائمة بس
-function defRoute(w){const A=term(w.a),B=term(w.b),s=24;const i=st.wires.indexOf(w);const off=((i<0?0:i)%5)*7;
+// الشريط = خطوط أفقية وعمودية. w.c = [y1, x2, y3, …, yn]: أوّل وآخر قطعة عموديّة عالأطراف
+function defC(w){const A=term(w.a),B=term(w.b),s=24;const i=st.wires.indexOf(w);const off=((i<0?0:i)%5)*7;
  const a1=A.y+A.d*s,b1=B.y+B.d*s;let yc;
  if(A.d>0&&B.d>0)yc=Math.max(a1,b1)+off;else if(A.d<0&&B.d<0)yc=Math.min(a1,b1)-off;else yc=(a1+b1)/2+off-14;
- return [[A.x,A.y],[A.x,yc],[B.x,yc],[B.x,B.y]];}
-function orth(p){const out=[p[0]];let lastV=true;
- for(let i=1;i<p.length;i++){const a=out[out.length-1],b=p[i];
-  if(Math.abs(a[0]-b[0])<0.5&&Math.abs(a[1]-b[1])<0.5)continue;
-  if(Math.abs(a[0]-b[0])<0.5){out.push(b);lastV=true;continue;}
-  if(Math.abs(a[1]-b[1])<0.5){out.push(b);lastV=false;continue;}
-  out.push(lastV?[b[0],a[1]]:[a[0],b[1]],b);}
- return out;}
-function routePts(w){if(!w.pts.length)return defRoute(w);const A=term(w.a),B=term(w.b),s=24;
- const p=orth([[A.x,A.y],[A.x,A.y+A.d*s],...w.pts]);const last=p[p.length-1];
- // آخر شي لازم يوصل عموديّاً عالطرف
- const b1=[B.x,B.y+B.d*s];p.push(Math.abs(last[1]-b1[1])<0.5?b1:[b1[0],last[1]]);if(Math.abs(p[p.length-1][1]-b1[1])>0.5)p.push(b1);p.push([B.x,B.y]);
- return orth(p);}
-function wPts(w){const A=term(w.a),B=term(w.b),s=24;return [[A.x,A.y],[A.x,A.y+A.d*s],...w.pts,[B.x,B.y+B.d*s],[B.x,B.y]];}
-function wirePath(w){const p=routePts(w);return 'M'+p.map(q=>P2(q[0],q[1])).join(' L');}
-function midCubic(w){const p=defRoute(w);return [(p[1][0]+p[2][0])/2,p[1][1]];}
+ return [Math.round(yc)];}
+function corners(w){const A=term(w.a),B=term(w.b);const c=w.c||defC(w);const P=[[A.x,A.y]];let x=A.x;
+ for(let i=0;i<c.length;i++){if(i%2===0)P.push([x,c[i]]);else{x=c[i];P.push([x,c[i-1]]);}}
+ P.push([B.x,c[c.length-1]]);P.push([B.x,B.y]);return P;}
+// القطعة j (بين P[j] وP[j+1]) ← رقمها بـc، أو -1 للقطعتين يلّي عالأطراف
+const segParam=(P,j)=>(j>=1&&j<=P.length-3)?j-1:-1;
+const segHoriz=(P,j)=>Math.abs(P[j][1]-P[j+1][1])<0.5&&Math.abs(P[j][0]-P[j+1][0])>=0.5;
+function simplify(w){const c=w.c;if(!c)return;let ch=true;while(ch){ch=false;for(let i=0;i+2<c.length;i++){if(Math.abs(c[i]-c[i+2])<1){c.splice(i+1,2);ch=true;break;}}}}
+function wirePath(w){const p=corners(w);return 'M'+p.map(q=>P2(q[0],q[1])).join(' L');}
 
 /* ---------- الرسم ---------- */
 const R_=()=>(typeof R!=='undefined'&&R)||{};
@@ -314,12 +306,13 @@ function render(){const b=brd();if(!b)return;const {de}=compute();
   if(!editMode)g+=`<path class="wh" data-w="${i}" d="${d}" stroke="transparent" stroke-width="18" fill="none"/>`;});
  for(const id in C){const c=C[id];for(const k in c.t){const key=keyOf(id,k);if(sel===key||st.wires.some(w=>w.a===key||w.b===key)){const t=term(key);g+=`<circle cx="${t.x}" cy="${t.y}" r="4" fill="#fff" pointer-events="none"/>`;}}}
  if(selW>=0&&st.wires[selW]&&!editMode){const w=st.wires[selW];
-  if(!w.pts.length){const m=midCubic(w);g+=`<g class="hd" data-hw="${selW}" data-ins="0"><circle cx="${m[0]}" cy="${m[1]}" r="22" fill="transparent"/><circle cx="${m[0]}" cy="${m[1]}" r="11" fill="#ffb400" stroke="#fff" stroke-width="3"/><path d="M${m[0]-5} ${m[1]}h10M${m[0]} ${m[1]-5}v10" stroke="#fff" stroke-width="2.5"/></g>`;}
-  else{const p=wPts(w);for(let i=1;i<p.length-2;i++){const a=p[i],c=p[i+1];const mx=(a[0]+c[0])/2,my=(a[1]+c[1])/2;g+=`<g class="hd" data-hw="${selW}" data-ins="${i-1}"><circle cx="${mx}" cy="${my}" r="16" fill="transparent"/><circle cx="${mx}" cy="${my}" r="7" fill="#fff" stroke="#ffb400" stroke-width="3"/><path d="M${mx-3.5} ${my}h7M${mx} ${my-3.5}v7" stroke="#ffb400" stroke-width="2"/></g>`;}
-   w.pts.forEach((q,i)=>{g+=`<g class="hd" data-hw="${selW}" data-hp="${i}"><circle cx="${q[0]}" cy="${q[1]}" r="22" fill="transparent"/><circle cx="${q[0]}" cy="${q[1]}" r="11" fill="#ffb400" stroke="#fff" stroke-width="3"/></g>`;});}}
+  const P=corners(w);
+  for(let j=0;j<P.length-1;j++){const a=P[j],b=P[j+1];const len=Math.hypot(b[0]-a[0],b[1]-a[1]);if(len<18)continue;const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;const hz=Math.abs(a[1]-b[1])<0.5;
+   g+=`<g class="hd" data-hw="${selW}" data-seg="${j}"><rect x="${mx-(hz?20:16)}" y="${my-(hz?16:20)}" width="${hz?40:32}" height="${hz?32:40}" fill="transparent"/><rect x="${mx-(hz?11:4)}" y="${my-(hz?4:11)}" width="${hz?22:8}" height="${hz?8:22}" rx="3" fill="#fff" stroke="#ffb400" stroke-width="2.5"/></g>`;}
+  for(let j=1;j<P.length-1;j++){const q=P[j];g+=`<g class="hd" data-hw="${selW}" data-cor="${j}"><circle cx="${q[0]}" cy="${q[1]}" r="20" fill="transparent"/><circle cx="${q[0]}" cy="${q[1]}" r="9" fill="#ffb400" stroke="#fff" stroke-width="3"/></g>`;}}
  g+='</svg>';b.innerHTML=g;
  const en=(id,v)=>{const e=document.getElementById(id);if(e)e.disabled=!v;};
- en('wdel',selW>=0);en('wstraight',selW>=0&&st.wires[selW]&&st.wires[selW].pts.length);en('wbig',!!selC);en('wsmall',!!selC);en('wdelc',!!selC);
+ en('wdel',selW>=0);en('wstraight',selW>=0&&st.wires[selW]&&!!st.wires[selW].c);en('wbig',!!selC);en('wsmall',!!selC);en('wdelc',!!selC);
  const mv=document.getElementById('wmove');if(mv){mv.classList.toggle('on',editMode);mv.textContent=editMode?'✓ خلصت تعديل':'✋ عدّل القطع';}
  const ed=document.getElementById('wedit');if(ed)ed.hidden=!editMode;
  libUI();checklist(de);}
@@ -329,10 +322,20 @@ function updateLive(){const b=document.getElementById('bsvg');if(!b||busy||drag)
  if(sig!==liveSig){liveSig=sig;render();}}
 
 /* ---------- المكتبة والمشاريع الجاهزة ---------- */
+const ICON={panel:'<rect x="4" y="3" width="38" height="26" rx="2" fill="#163763" stroke="#9fb3c8"/><path d="M4 12h38M4 20h38M17 3v26M30 3v26" stroke="#4a6a93"/>',
+ iso:'<rect x="6" y="3" width="34" height="28" rx="4" fill="#f2f2ee" stroke="#b9bfb5"/><rect x="9" y="7" width="28" height="20" rx="3" fill="#ffd21f"/><circle cx="23" cy="17" r="7" fill="#d62b2b"/><rect x="21" y="8" width="4" height="18" rx="2" fill="#b51f1f"/>',
+ bdc:'<rect x="13" y="2" width="20" height="30" rx="3" fill="#fafafa" stroke="#9aa5ab"/><rect x="18" y="8" width="10" height="12" rx="2" fill="#25b36e"/><text x="23" y="29" font-size="6" text-anchor="middle" fill="#33414a" font-weight="700">DC</text>',
+ bac:'<rect x="13" y="2" width="20" height="30" rx="3" fill="#fafafa" stroke="#9aa5ab"/><rect x="18" y="8" width="10" height="12" rx="2" fill="#25b36e"/><text x="23" y="29" font-size="6" text-anchor="middle" fill="#33414a" font-weight="700">AC</text>',
+ inv:'<rect x="9" y="1" width="28" height="32" rx="5" fill="#f7f8f8" stroke="#c4cacd"/><rect x="16" y="6" width="14" height="9" rx="1" fill="#0d1419"/><path d="M9 22Q23 26 37 22V29Q37 33 33 33H13Q9 33 9 29Z" fill="#d7dcdf"/>',
+ bat:'<rect x="3" y="9" width="40" height="18" rx="3" fill="#3a4046" stroke="#1f2428"/><rect x="7" y="13" width="14" height="3" fill="#25d366"/><circle cx="30" cy="18" r="3" fill="#c62828"/><circle cx="37" cy="18" r="3" fill="#202326"/>',
+ sup:'<rect x="9" y="2" width="28" height="30" rx="3" fill="#e9ecef" stroke="#b9bfc4"/><rect x="13" y="6" width="20" height="9" rx="1" fill="#cfe3d4"/>',
+ house:'<path d="M6 16L23 3L40 16V32H6Z" fill="#f0e6d6" stroke="#b9a88a"/><circle cx="23" cy="20" r="5" fill="#ffd84d"/>',
+ eb:'<rect x="3" y="12" width="40" height="7" rx="2" fill="#c58b2a"/><path d="M23 19v6M15 26h16M18 29h10M21 32h4" stroke="#2e9d3a" stroke-width="2"/>'};
+const LIBG=[['الطاقة الشمسية',[['panel','لوح 550W'],['iso','عازل DC']]],['الأجهزة',[['inv','الإنفرتر'],['bat','البطارية']]],['الحماية والأرضي',[['bdc','قاطع DC'],['bac','قاطع AC'],['eb','بار أرض']]],['الدولة والبيت',[['sup','عدّاد الدولة'],['house','تابلو البيت']]]];
 function libUI(){const L=document.getElementById('wlib');if(!L)return;
- L.innerHTML=LIB.map(([t,l])=>`<button type="button" data-add="${t}" ${SINGLE[t]&&C[t]?'disabled':''}>${l}</button>`).join('');
- const Rd=document.getElementById('wready');if(Rd&&!Rd.dataset.k){Rd.dataset.k=1;}
- if(Rd)Rd.innerHTML=READY().map(([id,l])=>`<button type="button" data-ready="${id}">${l}</button>`).join('');}
+ L.className='tlib';L.innerHTML=LIBG.map(([g,items])=>`<div class="tgrp"><h5>${g}</h5><div class="tbtns">${items.map(([t,l])=>`<button type="button" class="lcard" data-add="${t}" ${SINGLE[t]&&C[t]?'disabled title="موجود عاللوحة"':''}><svg viewBox="0 0 46 34">${ICON[t]}</svg><span>${l}${SINGLE[t]&&C[t]?' ✓':''}</span></button>`).join('')}</div></div>`).join('');
+ const Rd=document.getElementById('wready');if(Rd)Rd.innerHTML=READY().map(([id,l])=>`<button type="button" data-ready="${id}">${l}</button>`).join('');
+ document.querySelectorAll('.qbar [data-q="edit"]').forEach(b=>b.classList.toggle('on',editMode));}
 function addPart(type){if(SINGLE[type]&&C[type])return;hist.push(snapH());const v=vb();
  let id=type;if(!SINGLE[type]){let i=1;while(C[PFX[type]+i])i++;id=PFX[type]+i;}
  const tmp=mk({type,id,x:0,y:0});const x=Math.round((v[0]+v[2]/2-tmp.w/2)/5)*5,y=Math.round((v[1]+v[3]/2-tmp.h/2)/5)*5;
@@ -399,8 +402,8 @@ function onDown(e){const b=brd();ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY})
  if(ptrs.size>2)return;
  const hd=e.target.closest('.hd');
  if(hd){e.preventDefault();const wi=+hd.dataset.hw,w=st.wires[wi];hist.push(snapH());
-  let pi;if(hd.dataset.hp!=null)pi=+hd.dataset.hp;else{const p=svgPt(e);pi=+hd.dataset.ins;w.pts.splice(pi,0,[snap(p[0],5),snap(p[1],5)]);}
-  drag={t:'pt',wi,pi,moved:false,ins:hd.dataset.hp==null};busy=true;return;}
+  if(!w.c)w.c=defC(w).slice();const P=corners(w);const p0=svgPt(e);
+  drag={t:'pt',wi,seg:hd.dataset.seg!=null?+hd.dataset.seg:null,cor:hd.dataset.cor!=null?+hd.dataset.cor:null,P,p0,c0:w.c.slice(),moved:false,sx:e.clientX,sy:e.clientY};busy=true;return;}
  if(editMode&&e.target.closest('.rz')&&selC){e.preventDefault();hist.push(snapH());drag={t:'rz',id:selC,moved:false};busy=true;return;}
  if(editMode){const g=e.target.closest('[data-c]');if(g&&!e.target.closest('[data-sw]')){e.preventDefault();const c=C[g.dataset.c],p=svgPt(e);hist.push(snapH());drag={t:'c',id:c.id,ox:p[0]-c.x,oy:p[1]-c.y,moved:false,sx:e.clientX,sy:e.clientY};busy=true;return;}}
  if(!e.target.closest('[data-t],[data-sw],[data-w]')){pan={sx:e.clientX,sy:e.clientY,cx:cam.x,cy:cam.y,moved:false};busy=true;}}
@@ -409,15 +412,32 @@ function onMove(e){if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.cl
   const k=pxToW();cam.x-=(mx-pinch.mx)*k;cam.y-=(my-pinch.my)*k;const wp=svgPt({clientX:mx,clientY:my});zoomAt(d/pinch.d,wp[0],wp[1]);pinch={d,mx,my};justDragged=Date.now();return;}
  if(pan){const dx=e.clientX-pan.sx,dy=e.clientY-pan.sy;if(!pan.moved&&Math.hypot(dx,dy)<5)return;if(!pan.moved)cap(e);pan.moved=true;const k=pxToW();cam.x=pan.cx-dx*k;cam.y=pan.cy-dy*k;applyView();return;}
  if(!drag)return;e.preventDefault();const p=svgPt(e);
- if(drag.t==='c'&&!drag.moved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<4)return;if(!drag.moved)cap(e);drag.moved=true;
- if(drag.t==='pt')st.wires[drag.wi].pts[drag.pi]=[snap(p[0],5),snap(p[1],5)];
+ if((drag.t==='c'||drag.t==='pt')&&!drag.moved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<4)return;if(!drag.moved)cap(e);drag.moved=true;
+ if(drag.t==='pt'){const w=st.wires[drag.wi];const P=drag.P;w.c=drag.c0.slice();
+  if(drag.seg!=null){let j=drag.seg;
+   if(segParam(P,j)<0){// قطعة عالطرف: منزيد زاوية تلقائياً ومنسحبها
+    const end=j===0;const m=Math.round(((P[j][1]+P[j+1][1])/2)/5)*5;const xx=P[j][0];
+    let k;if(end){w.c.unshift(m,xx);k=1;}else{w.c.push(xx,m);k=w.c.length-2;}
+    w.c[k]=snap(p[0],5);}
+   else{const k=segParam(P,j);w.c[k]=snap(k%2===0?p[1]:p[0],5);}}
+  else if(drag.cor!=null){const j=drag.cor;const kb=segParam(P,j-1),ka=segParam(P,j);
+   for(const k of [kb,ka])if(k>=0)w.c[k]=snap(k%2===0?p[1]:p[0],5);
+   if(kb<0&&ka>=0&&ka%2===0){/* زاوية حدّ الطرف الأول: الطرف ثابت */}}
+  drag.moved=true;}
  else if(drag.t==='rz'){const c=C[drag.id];const s=Math.max(0.4,Math.min(3,((p[0]-c.x)/(c.w+6)+(p[1]-c.y)/(c.h+(c.type==='inv'||c.type==='panel'?28:6)))/2));c.s=Math.round(s*100)/100;syncComp(c);}
  else{const c=C[drag.id];c.x=snap(p[0]-drag.ox,5);c.y=snap(p[1]-drag.oy,5);syncComp(c);}
  if(!raf)raf=requestAnimationFrame(()=>{raf=0;render();});}
 function onUp(e){ptrs.delete(e.pointerId);if(ptrs.size<2&&pinch){pinch=null;if(!ptrs.size)busy=false;return;}
  if(pan){if(pan.moved)justDragged=Date.now();pan=null;busy=false;return;}
  if(!drag)return;const d=drag;drag=null;busy=false;
- if(d.t==='pt'){justDragged=Date.now();if(!d.moved){if(d.ins)st.wires[d.wi].pts.splice(d.pi,1);hist.pop();}saveW();render();return;}
+ if(d.t==='pt'){justDragged=Date.now();const w=st.wires[d.wi];
+  if(!d.moved&&d.seg!=null){// كبسة عقطعة بلا سحب: زيد زاويتين بنصّها
+   const P=d.P,j=d.seg,k=segParam(P,j);const a=P[j],b=P[j+1];const hz=Math.abs(a[1]-b[1])<0.5;const m=snap(hz?(a[0]+b[0])/2:(a[1]+b[1])/2,5);
+   if(k>=0)w.c.splice(k+1,0,m,w.c[k]);else if(j===0)w.c.unshift(m,a[0]);else w.c.push(a[0],m);
+   flash('زدت زاويتين ✓ اسحب القطعة الجديدة لتطلّعها أو تنزّلها.','');}
+  else if(!d.moved){hist.pop();}
+  else simplify(w);
+  saveW();render();return;}
  if(d.t==='c'&&!d.moved){hist.pop();selC=d.id;render();return;}
  justDragged=Date.now();if(!d.moved)hist.pop();if(d.t==='c')selC=d.id;saveW();render();}
 
@@ -431,11 +451,11 @@ function onBoard(e){if(Date.now()-justDragged<300)return;if(e.target.closest('.h
   else if(sel===k){sel=null;}
   else{const exists=st.wires.some(w=>(w.a===sel&&w.b===k)||(w.a===k&&w.b===sel));
    if(!exists){hist.push(snapH());const A=term(sel),B=term(k);
-    st.wires.push({a:sel,b:k,pts:[]});selW=st.wires.length-1;
-    if(A.k!==B.k)flash(`⚠ وصلت ${KNAME[A.k]} (${A.l}) على ${KNAME[B.k]} (${B.l}). متأكّد؟`,'w');else flash('وصلت ✓ اسحب الدائرة الصفرا لتحدّد مشي الشريط، أو اكبس بمحل فاضي لتكمّل.','');}
+    st.wires.push({a:sel,b:k});selW=st.wires.length-1;
+    if(A.k!==B.k)flash(`⚠ وصلت ${KNAME[A.k]} (${A.l}) على ${KNAME[B.k]} (${B.l}). متأكّد؟`,'w');else flash('وصلت ✓ اسحب الزوايا (الدواير الصفر) أو القطع (المستطيلات البيض) لتحدّد مشي الشريط. كبسة عقطعة بتزيد زاوية.','');}
    sel=null;afterChange();return;}
   render();return;}
- const w=e.target.closest('[data-w]');if(w){selW=+w.dataset.w;sel=null;flash('نقّيت الشريط: اسحب الدوائر الصفر لتغيّر مشيو، و«+» بتزيد نقطة.','');render();return;}
+ const w=e.target.closest('[data-w]');if(w){selW=+w.dataset.w;sel=null;flash('نقّيت الشريط: الدواير الصفر زوايا بتتحرّك بكل الاتجاهات، والمستطيلات البيض قطع بتطلّعها وبتنزّلها أو بتجيبها يمين وشمال. كبسة عقطعة بتزيد زاويتين.','');render();return;}
  if(sel||selW>=0){sel=null;selW=-1;render();}}
 function tip(k){const [c,t]=k.split('.');const T=C[c].t[t];flash(`نقّيت: ${C[c].name} ← ${T.l} (${KNAME[T.k]}). هلّق اكبس عالطرف التاني.`,'');}
 function setZoom(){fit();}
@@ -449,7 +469,7 @@ window.WIRE={render,setZoom,compute,updateLive,applyView,
   on('wzin',()=>zoomBtn(1.3));on('wzout',()=>zoomBtn(1/1.3));on('wfit',fit);
   on('wundo',()=>{if(!hist.length)return;restore(hist.pop());selW=-1;selC=null;afterChange();});
   on('wdel',()=>{if(selW<0)return;hist.push(snapH());st.wires.splice(selW,1);selW=-1;afterChange();});
-  on('wstraight',()=>{if(selW<0)return;hist.push(snapH());st.wires[selW].pts=[];saveW();render();});
+  on('wstraight',()=>{if(selW<0)return;hist.push(snapH());delete st.wires[selW].c;saveW();render();});
   on('wmove',()=>{editMode=!editMode;sel=null;selW=-1;selC=null;render();flash(editMode?'وضع التعديل: اسحب أي قطعة، كبس عليها لتنقّيها، وكبّرها أو صغّرها بالمربّع الأصفر أو بالأزرار. وزيد قطع من المكتبة.':'خلصت تعديل ✓','');});
   on('wbig',()=>selC&&scalePart(selC,1.15));on('wsmall',()=>selC&&scalePart(selC,1/1.15));on('wdelc',()=>selC&&delPart(selC));
   on('wclear',()=>{if(!st.wires.length)return;hist.push(snapH());st.wires=[];for(const k in st.sw)st.sw[k]=0;selW=-1;afterChange();flash('مسحت كل الشرايط ونزّلت كل القواطع. القطع بقيت.','');});

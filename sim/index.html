@@ -160,6 +160,24 @@ input[type=range]{width:100%;accent-color:var(--volt)}
 .wtools button:disabled{opacity:.4}
 .wtools[hidden]{display:none}
 .bwrap{position:relative}
+.tpanel{border:1px solid var(--line);border-radius:14px;background:var(--panel-2);margin:8px 0;overflow:hidden}
+.ttabs{display:flex;border-bottom:1px solid var(--line)}
+.ttabs button{flex:1;background:none;border:0;color:var(--muted);font:700 14px 'IBM Plex Sans Arabic';padding:10px 6px;cursor:pointer;border-bottom:3px solid transparent}
+.ttabs button.on{color:var(--volt);border-bottom-color:var(--volt)}
+.tbody{padding:10px;display:flex;flex-wrap:wrap;gap:12px 18px}.tbody[hidden]{display:none}
+.tlib{display:flex;flex-wrap:wrap;gap:12px 18px}.card.wfs .tlib{flex-wrap:nowrap}
+.tgrp{display:flex;flex-direction:column;gap:6px;min-width:0}.tgrp h5{font-size:12.5px;color:var(--muted);font-weight:700;letter-spacing:.02em}
+.tbtns{display:flex;flex-wrap:wrap;gap:6px}
+.tbtns button{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:7px 11px;font:600 13.5px 'IBM Plex Sans Arabic';cursor:pointer}
+.tbtns button:disabled{opacity:.4;cursor:default}
+#wmove.on{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
+.lcard{display:flex;flex-direction:column;align-items:center;gap:4px;width:84px;padding:8px 4px!important}
+.lcard svg{width:46px;height:34px}.lcard span{font-size:12px;line-height:1.2;text-align:center}
+.qbar{position:absolute;top:8px;right:8px;z-index:3;display:flex;flex-direction:column;gap:6px}
+.qbar button{width:40px;height:40px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:18px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.22)}
+.qbar button.on{background:var(--volt);color:var(--volt-ink)}
+.card.wfs .tpanel{margin:0;flex:0 0 auto}.card.wfs .tbody{flex-wrap:nowrap;overflow-x:auto;padding:6px 8px;gap:14px}.card.wfs .tbtns{flex-wrap:nowrap}.card.wfs .tbtns button{flex:0 0 auto}.card.wfs .ttabs button{padding:7px 4px;font-size:13px}
+
 .fsb{position:absolute;top:8px;left:8px;z-index:3;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:20px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 .card.wfs{position:fixed;inset:0;z-index:90;margin:0;border-radius:0;display:flex;flex-direction:column;gap:4px;padding:8px;overflow:hidden}
 .card.wfs>h2,.card.wfs>p.muted,.card.wfs .wlg,.card.wfs .pjbar{display:none}
@@ -231,12 +249,19 @@ body.nofs{overflow:hidden}
       <h2>وصّل المنظومة بإيدك</h2>
       <p class="muted" style="font-size:14px">متل الأوتوكاد: كبّر وصغّر الرسمة بإصبعين أو بعجلة الماوس، واسحب بمحل فاضي لتمشي فيها. اختار مشروع جاهز أو ابدأ من الصفر وزيد القطع من المكتبة. اكبس على طرف وبعدين عالطرف التاني ليمتدّ شريط، ونقّي الشريط لتحدّد مشيو. «✋ عدّل القطع» بيخلّيك تنقل كل قطعة وتكبّرها أو تصغّرها لحالها. القواطع مش إجبارية: الفحص بيقلّك شو الخطر.</p>
       <div class="pjbar" id="pjbar"></div>
-      <div class="wsec"><b>مشاريع جاهزة</b><div class="wtools" id="wready"></div></div>
-      <div class="wsec"><b>مكتبة القطع</b><div class="wtools" id="wlib"></div></div>
-      <div class="wtools"><button id="wzout" type="button" aria-label="صغّر">−</button><button id="wzin" type="button" aria-label="كبّر">+</button><button id="wfit" type="button">⤢ كل الرسمة</button><button id="wundo" type="button">↶ تراجع</button><button id="wdel" type="button" disabled>🗑 احذف الشريط</button><button id="wstraight" type="button" disabled>〰 سوّي الشريط</button><button id="wmove" type="button">✋ عدّل القطع</button><button id="wclear" type="button">امسح الشرايط</button><button id="wnew" type="button">🔧 جهاز جديد</button></div>
-      <div class="wtools" id="wedit" hidden><span class="muted" style="font-size:13px;align-self:center">القطعة المنقّاية:</span><button id="wbig" type="button" disabled>➕ كبّرها</button><button id="wsmall" type="button" disabled>➖ صغّرها</button><button id="wdelc" type="button" disabled>🗑 شيلها</button></div>
+      <div class="tpanel">
+        <div class="ttabs" role="tablist"><button type="button" role="tab" data-tt="proj" class="on">📂 مشاريع جاهزة</button><button type="button" role="tab" data-tt="lib">🧩 مكتبة القطع</button><button type="button" role="tab" data-tt="tools">🛠 الأدوات</button></div>
+        <div class="tbody" data-tb="proj"><div class="tgrp"><div class="tbtns" id="wready"></div></div></div>
+        <div class="tbody" data-tb="lib" hidden><div id="wlib"></div></div>
+        <div class="tbody" data-tb="tools" hidden>
+          <div class="tgrp"><h5>العرض</h5><div class="tbtns"><button id="wzin" type="button">＋ قرّب</button><button id="wzout" type="button">－ بعّد</button><button id="wfit" type="button">⤢ كل الرسمة</button></div></div>
+          <div class="tgrp"><h5>الشرايط</h5><div class="tbtns"><button id="wundo" type="button">↶ تراجع</button><button id="wdel" type="button" disabled>🗑 احذف الشريط</button><button id="wstraight" type="button" disabled>〰 رجّع الشريط متل الأول</button><button id="wclear" type="button">امسح كل الشرايط</button></div></div>
+          <div class="tgrp"><h5>القطع</h5><div class="tbtns"><button id="wmove" type="button">✋ عدّل القطع</button><button id="wbig" type="button" disabled>➕ كبّر القطعة</button><button id="wsmall" type="button" disabled>➖ صغّر القطعة</button><button id="wdelc" type="button" disabled>🗑 شيل القطعة</button></div></div>
+          <div class="tgrp"><h5>الجهاز</h5><div class="tbtns"><button id="wnew" type="button">🔧 إنفرتر جديد (بعد ما ينضرب)</button></div></div>
+        </div>
+      </div>
       <div class="wmsg" id="wmsg" hidden></div>
-      <div class="bwrap"><div class="board" id="board"></div><button type="button" class="fsb" id="wfs" aria-label="شاشة كاملة">⛶</button></div>
+      <div class="bwrap"><div class="board" id="board"></div><button type="button" class="fsb" id="wfs" aria-label="شاشة كاملة">⛶</button><div class="qbar"><button type="button" data-q="in" aria-label="قرّب">＋</button><button type="button" data-q="out" aria-label="بعّد">－</button><button type="button" data-q="fit" aria-label="كل الرسمة">⤢</button><button type="button" data-q="undo" aria-label="تراجع">↶</button><button type="button" data-q="edit" aria-label="عدّل القطع">✋</button></div></div>
       <div class="wlg"><span><i style="background:#d32f2f"></i>موجب DC</span><span><i style="background:#1b1b1b"></i>سالب DC</span><span><i style="background:#8a4b14"></i>فاز L</span><span><i style="background:#1f6fd1"></i>نوترال N</span><span><i style="background:linear-gradient(90deg,#2e9d3a 50%,#f2d03b 50%)"></i>أرض PE</span><span><i style="background:#8a96a0"></i>اتصال CAN</span></div>
     </div>
     <div class="card" id="pjcat"></div>
@@ -1077,6 +1102,8 @@ function setMode(m){MODE=m;ls.set('simMode',m);UI.pov=null;UI.pg='main';$('devH'
  draw();}
 $('modes').addEventListener('click',e=>{const b=e.target.closest('.mode');if(b&&b.dataset.m!==MODE)setMode(b.dataset.m);});
 WIRE.init();setMode(MODE);
+document.querySelector('.ttabs').addEventListener('click',e=>{const b=e.target.closest('[data-tt]');if(!b)return;document.querySelectorAll('.ttabs button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tbody').forEach(x=>x.hidden=x.dataset.tb!==b.dataset.tt);});
+document.querySelector('.qbar').addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b)return;({in:'wzin',out:'wzout',fit:'wfit',undo:'wundo',edit:'wmove'})[b.dataset.q]&&$(({in:'wzin',out:'wzout',fit:'wfit',undo:'wundo',edit:'wmove'})[b.dataset.q]).click();});
 (function(){const card=$('board').closest('.card'),btn=$('wfs');let on=false;
  const set=v=>{on=v;card.classList.toggle('wfs',v);document.body.classList.toggle('nofs',v);btn.textContent=v?'✕':'⛶';btn.setAttribute('aria-label',v?'اطلع من الشاشة الكاملة':'شاشة كاملة');setTimeout(()=>WIRE.setZoom(),60);};
  btn.onclick=()=>{if(!on){set(true);try{card.requestFullscreen&&card.requestFullscreen().catch(()=>{});}catch(e){}}else{set(false);try{document.fullscreenElement&&document.exitFullscreen();}catch(e){}}};
