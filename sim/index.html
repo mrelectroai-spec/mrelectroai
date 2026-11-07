@@ -183,24 +183,46 @@ input[type=range]{width:100%;accent-color:var(--volt)}
 .wsum.ok{color:var(--volt)}.wsum.bad{color:var(--fault)}.wsum.warn{color:var(--warn)}
 .steps{padding-right:20px;font-size:14.5px}.steps li{margin:3px 0}
 .foot{font-size:12.5px;color:var(--muted);margin-top:18px;text-align:center}
+.pjbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:14px}
+.pjch,.pjq button,.pjo button{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:6px 11px;font:600 13.5px 'IBM Plex Sans Arabic';cursor:pointer}
+.pjch{border-color:var(--volt);color:var(--volt)}
+.pjm{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55);display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow:auto}
+.pjm[hidden]{display:none}
+.pjbox{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:18px;padding:16px;width:min(760px,100%);margin:auto}
+.pjh{display:flex;justify-content:space-between;align-items:center}
+.pjbox h3{font-size:15px;margin:14px 0 6px;color:var(--volt)}
+.pjg h4,.pjcols h4,#pjcat h4{font-size:13.5px;margin:6px 0 4px}
+.pjo,.pjq{display:flex;flex-wrap:wrap;gap:6px}
+.pjq{margin-top:8px;align-items:center;font-size:13px}
+.pjo button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:132px;text-align:start}
+.pjo button span{font-weight:400;font-size:12px;color:var(--muted)}
+.pjo button.on{border-color:var(--volt);background:color-mix(in srgb,var(--volt) 14%,var(--panel));box-shadow:0 0 0 1px var(--volt) inset}
+.pjcols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:620px){.pjcols{grid-template-columns:1fr}}
+.pjt{width:100%;border-collapse:collapse;font-size:13px}.pjt td{padding:4px 2px;border-bottom:1px solid var(--line);vertical-align:top}.pjt td:first-child{color:var(--muted);width:46%}
+.pjc{border:1px solid;border-radius:12px;padding:10px;margin-top:10px;font-size:14px}.pjc p{margin-top:4px}
+.pjs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.pjs span{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:13px;font-weight:600}
+.pjgo{display:block;width:100%;margin-top:14px;background:var(--volt);color:var(--volt-ink);border:0;border-radius:12px;padding:12px;font:700 16px 'IBM Plex Sans Arabic';cursor:pointer}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top"><a href="../">← MrElectroAI</a><button class="ib" id="theme" type="button">🌓</button></div>
   <h1>مختبر الطاقة الشمسية: <b>وصّل، شغّل، وبرمج</b></h1>
-  <p class="lede">نفس قوائم وإعدادات <span dir="ltr">Deye SUN-5K-SG03LP1</span> حسب الـManual. اضغط عالشاشة متل الإنفرتر الحقيقي، غيّر الإعدادات واحفظ بـ✓، وشوف شو بيصير بالبيت والبطارية والدولة. كل ما تكبس على إعداد، بيطلعلك شرحو تحت.</p>
+  <p class="lede">حدّد مشروعك: إنفرتر Deye أو Felicity أو Growatt أو Voltronic، مع بطارية Deye أو Dyness أو Felicity أو Blue Carbon. وصّل الشرايط، شغّل، وبرمج الشاشة. كل ما تكبس على إعداد، بيطلعلك شرحو تحت.</p>
 
   <div class="modes" id="modes"><button class="mode" data-m="wire" type="button">🔧 المشروع: وصّل وشغّل</button><button class="mode" data-m="free" type="button">🧪 المحاكي الحرّ والتحديات</button></div>
   <section id="wireSec">
     <div class="card">
       <h2>وصّل المنظومة بإيدك</h2>
       <p class="muted" style="font-size:14px">اكبس على طرف، وبعدين عالطرف التاني ليمتدّ شريط. اكبس على أي شريط لتنقّيه وتحذفو. القواطع والعازل وكبسة POWER عالإنفرتر بينكبسوا. بس تخلّص، شغّل بالترتيب، وشاشة الإنفرتر تحت بتضوّي.</p>
+      <div class="pjbar" id="pjbar"></div>
       <div class="wtools"><button id="wzout" type="button">−</button><button id="wzin" type="button">+</button><button id="wundo" type="button">↶ تراجع</button><button id="wdel" type="button" disabled>🗑 احذف الشريط</button><button id="wclear" type="button">امسح الكل</button><button id="wnew" type="button">🔧 جهاز جديد</button><button id="wsol" type="button">ورجيني الحل</button></div>
       <div class="wmsg" id="wmsg" hidden></div>
       <div class="board" id="board"></div>
       <div class="wlg"><span><i style="background:#d32f2f"></i>موجب DC</span><span><i style="background:#1b1b1b"></i>سالب DC</span><span><i style="background:#8a4b14"></i>فاز L</span><span><i style="background:#1f6fd1"></i>نوترال N</span><span><i style="background:linear-gradient(90deg,#2e9d3a 50%,#f2d03b 50%)"></i>أرض PE</span><span><i style="background:#8a96a0"></i>اتصال CAN</span></div>
     </div>
+    <div class="card" id="pjcat"></div>
     <div class="wgrid">
       <div class="card"><h2>فحص التوصيل</h2><div id="wcheck"></div></div>
       <div class="card"><h2>ترتيب التشغيل</h2><ol class="steps"><li>قاطع البطارية ON</li><li>كبسة POWER عالإنفرتر ON</li><li>عازل الـDC ON (الألواح)</li><li>قاطع الدولة ON</li><li>قاطع البيت ON</li></ol><p class="muted" style="font-size:13.5px;margin-top:6px">وللإطفاء بالعكس: البيت، الدولة، العازل، الإنفرتر، وآخر شي البطارية.</p></div>
@@ -210,7 +232,7 @@ input[type=range]{width:100%;accent-color:var(--volt)}
   <div class="grid">
     <div>
       <div class="dev" id="dev">
-        <div class="dev-h"><span>HYBRID INVERTER · 5kW · 48V</span><i>SIMULATOR</i></div>
+        <div class="dev-h"><span id="devH">HYBRID INVERTER · 5kW · 48V</span><i>SIMULATOR</i></div>
         <div class="bezel"><div class="lw" id="lw"><div class="lcd" id="lcd"></div></div></div>
         <div class="dev-b">
           <div class="leds"><div class="led" id="ledDC"><span></span>DC</div><div class="led" id="ledAC"><span></span>AC</div><div class="led" id="ledN"><span></span>NORMAL</div><div class="led red" id="ledA"><span></span>ALARM</div></div>
@@ -273,10 +295,11 @@ input[type=range]{width:100%;accent-color:var(--volt)}
       </div>
     </div>
   </div>
-  <p class="foot">محاكي تعليمي من MrElectroAI، مش تابع لشركة Deye ولا معتمد منها. الأسامي والقيم من الـManual الرسمي للموديل SUN-3.6/5/6K-SG03LP1-EU. الأرقام بالمحاكاة تقريبية للتعليم، وعالشغل الحقيقي ارجع دايماً لكتيّب الإنفرتر والبطارية.</p>
+  <p class="foot">محاكي تعليمي من MrElectroAI، مش تابع لأي شركة (Deye، Felicity، Growatt، Voltronic، Dyness، Blue Carbon) ولا معتمد منها. مواصفات الكتالوج من الـDatasheet الرسمية لكل موديل. الأسامي والقيم من الـManual الرسمي للموديل SUN-3.6/5/6K-SG03LP1-EU. الأرقام بالمحاكاة تقريبية للتعليم، وعالشغل الحقيقي ارجع دايماً لكتيّب الإنفرتر والبطارية.</p>
 </div>
 <div class="zmwrap" id="zmwrap"></div><button class="zmclose" id="zmclose" type="button">✕ سكّر</button>
 
+<script src="catalog.js"></script>
 <script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -293,6 +316,7 @@ function defaults(){return {
   liMode:0,liShut:10,liLow:20,liRestart:40,
   floatV:53.6,absV:57.6,eqV:57.6,eqDays:30,eqHours:3.0,tempco:-5,battR:25,
   shutV:46.0,lowV:47.5,restartV:52.0,shutP:20,lowP:35,restartP:50,
+  outPri:'SBU',chgSrc:'SNU',pBat:'AGM',pProto:'L01',cso:0,
   workMode:'Zero Export To Load',solarSell:0,maxSell:5000,zeroExp:20,pattern:'LoadFirst',maxSolar:6500,peak:0,peakW:5000,
   tou:0,slots:SLOT_T.map(t=>({t,p:5000,b:80,v:49.0,g:0,gen:0})),days:[1,1,1,1,1,1,1],
   gridMode:'General Standard',gridHz:50,invV:230,gridType:'Single Phase',
@@ -332,8 +356,13 @@ function loadW(h){let w=0;for(const a of APPS)if(E.apps[a.k])w+=appW(a.k,h);retu
 function gridSched(h){switch(E.sched){case '24':return true;case 'sub':return h>=6;case 'edl':return (h>=6&&h<8)||(h>=20&&h<22);case 'cut':return !(h>=20);case 'none':return false;}return false;}
 function gridVolt(h){return (E.gv===270&&(h>=22||h<6))?270:(E.gv===270?238:229);}
 let MODE=ls.get('simMode')||'wire';
+let PROJ=null;try{PROJ=JSON.parse(ls.get('simProj')||'null');if(PROJ&&!CAT.INV.some(x=>x.id===PROJ.inv))PROJ=null;}catch(e){}
+function INVx(){return (MODE==='wire'&&PROJ)?CAT.inv(PROJ.inv):CAT.inv('deye5');}
+function BATx(){return (MODE==='wire'&&PROJ)?CAT.bat(PROJ.bat):CAT.bat('deyeg5');}
+const isDeye=()=>INVx().screen==='deye';
+const protoTxt=c=>typeof c==='number'?String(c).padStart(2,'0'):c;
 const PJ=()=>(MODE==='wire'&&window.WS)?window.WS:{free:true};
-function battSpec(){if(MODE==='wire')return{chem:'li',ah:100,comm:!!PJ().comm,proto:0,chA:50,disA:100};switch(E.bt){case 'li':return{chem:'li',ah:100,comm:true,proto:0,chA:50,disA:100};case 'li2':return{chem:'li',ah:200,comm:true,proto:0,chA:100,disA:200};case 'linc':return{chem:'li',ah:100,comm:false,chA:50,disA:100};case 'pb':return{chem:'pb',ah:200,comm:false,chA:40,disA:100};}}
+function battSpec(){if(MODE==='wire'){const i=INVx(),bt=BATx(),n=(PROJ&&PROJ.n)||1,cp=CAT.compat(i,bt);return{chem:'li',ah:bt.ah*n,comm:!!PJ().comm&&cp.lvl!=='none',proto:cp.code,chA:CAT.chA(i,bt,n),disA:CAT.disA(i,bt,n)};}switch(E.bt){case 'li':return{chem:'li',ah:100,comm:true,proto:0,chA:50,disA:100};case 'li2':return{chem:'li',ah:200,comm:true,proto:0,chA:100,disA:200};case 'linc':return{chem:'li',ah:100,comm:false,chA:50,disA:100};case 'pb':return{chem:'pb',ah:200,comm:false,chA:40,disA:100};}}
 // PV
 const PANEL={w:550,voc:49.6,vmp:41.9,imp:13.1,kv:-0.0027,kp:-0.0035};
 function sunTimes(){return E.season==='summer'?{sr:5.6,ss:19.6,psh:7,tmin:20,tmax:33}:{sr:6.7,ss:16.9,psh:3,tmin:4,tmax:15};}
@@ -373,7 +402,7 @@ function deadStep(h,P){
   R.min++; if(R.min%1440===0){R.prevDay=R.day;R.day=newDay();}
 }
 function step(){
-  const h=R.min/60, b=battSpec(), cap=b.ah*(b.chem==='li'?51.2:48)/1000; // kWh
+  const IV=INVx(), h=R.min/60, b=battSpec(), cap=b.ah*(b.chem==='li'?51.2:48)/1000; // kWh
   R.absMin=(R.absMin||0)+1;
   const P=PJ();
   if(!P.free&&!P.powered){deadStep(h,P);return;}
@@ -386,7 +415,7 @@ function step(){
   let commFault=false;
   if(mode==='li'&&battOk){ if(!b.comm||b.chem!=='li'||S.liMode!==b.proto){commFault=true;battOk=false;}}
   if(commFault){faults.add('F58');R.day.f58++;
-    ev('e',b.chem==='pb'?'F58: Batt Mode على Lithium وبطارية الرصاص ما فيها BMS. الإنفرتر مش شايف البطارية. حطّ Use Batt V أو Use Batt %.':(!b.comm?'F58: Batt Mode على Lithium بس ما في كابل اتصال مع الـBMS. يا بتركّب الكابل، يا بتشتغل Use Batt V.':'F58: رقم Lithium Mode (البروتوكول) مش مطابق للبطارية. البطارية بدها 00.'),'f58',600);}
+    ev('e',b.chem==='pb'?'F58: Batt Mode على Lithium وبطارية الرصاص ما فيها BMS. الإنفرتر مش شايف البطارية. حطّ Use Batt V أو Use Batt %.':(!b.comm?(isDeye()?'F58: Batt Mode على Lithium بس ما في كابل اتصال مع الـBMS. يا بتركّب الكابل، يا بتشتغل Use Batt V.':`عطل اتصال BMS: Battery type على ${S.pBat} بس ما في كابل اتصال مع البطارية. يا بتركّب الكابل، يا بتحطّ USE.`):(isDeye()?`F58: رقم Lithium Mode (البروتوكول) مش مطابق للبطارية. البطارية بدها ${protoTxt(b.proto)}.`:`عطل اتصال BMS: البروتوكول المختار (${protoTxt(S.liMode)}) مش مطابق للبطارية. البطارية بدها ${protoTxt(b.proto)}.`)),'f58',600);}
   if(R.bmsTrip>0){R.bmsTrip--;battOk=false;}
   // --- grid
   const gv=gridVolt(h); const sched=gridSched(h)&&(P.free||P.grid);
@@ -406,11 +435,11 @@ function step(){
   let pv=0; R.pvS=[];
   strs.forEach((n,k)=>{let ps=0,vm=0;
     if(n>0&&ir>0.002){const vocT=n*PANEL.voc*(1+PANEL.kv*(Math.min(T,25)-25)), vmpT=n*PANEL.vmp*(1+PANEL.kv*(T-25));const nm='PV'+(k+1);
-      if(vocT>500){ev('e',`خطر: فولت ${nm} ${vocT.toFixed(0)}V بالبرد (${n} ألواح عالتسلسل) فوق حدّ الإنفرتر 500V. المدخل ممكن ينحرق! نقّص ألواح أو قسّمهن على PV1 وPV2.`,'pvov'+k,720);faults.add('PV');}
-      else if(vmpT<125){ev('w',`فولت ${nm} ${vmpT.toFixed(0)}V أقل من فولت الإقلاع 125V. ${n} ألواح عالتسلسل قليلين، الإنفرتر ما عم يقلع عليهن.`,'pvlow'+k,720);}
-      else{ps=n*PANEL.w*ir*(1+PANEL.kp*(T-25))*0.92; if(vmpT<150){ps*=0.8;ev('w',`فولت ${nm} ${vmpT.toFixed(0)}V تحت مجال الـMPPT (150–425V). عم يشتغل بس مش على أحسن نقطة.`,'mppt'+k,720);} ps=Math.min(ps,13*vmpT);vm=vmpT;}}
+      if(vocT>IV.maxVoc){ev('e',`خطر: فولت ${nm} ${vocT.toFixed(0)}V بالبرد (${n} ألواح عالتسلسل) فوق حدّ الإنفرتر ${IV.maxVoc}V. المدخل ممكن ينحرق! نقّص ألواح أو قسّمهن على PV1 وPV2.`,'pvov'+k,720);faults.add('PV');}
+      else if(vmpT<IV.startV){ev('w',`فولت ${nm} ${vmpT.toFixed(0)}V أقل من فولت الإقلاع ${IV.startV}V. ${n} ألواح عالتسلسل قليلين، الإنفرتر ما عم يقلع عليهن.`,'pvlow'+k,720);}
+      else{ps=n*PANEL.w*ir*(1+PANEL.kp*(T-25))*0.92; if(vmpT<IV.mppt[0]){ps*=0.8;ev('w',`فولت ${nm} ${vmpT.toFixed(0)}V تحت مجال الـMPPT (${IV.mppt[0]}–${IV.mppt[1]}V). عم يشتغل بس مش على أحسن نقطة.`,'mppt'+k,720);} ps=Math.min(ps,IV.imp*vmpT,IV.perMppt||1e9);vm=vmpT;}}
     R.pvS[k]={v:vm,p:ps};pv+=ps;});
-  pv=Math.min(pv,S.maxSolar,6500);
+  pv=Math.min(pv,isDeye()?S.maxSolar:1e9,IV.maxPv);
   pv=Math.max(0,pv);
   // --- load
   const houseW=loadW(h); let load=(P.free||P.load==='inv')?houseW:0;
@@ -447,12 +476,14 @@ function step(){
   let deficit=load-pvLoad;
   let outOn=true;
   if(gridPresent){
-    const canDis=battOk&&meas>gridFloor;
+    let canDis=battOk&&meas>gridFloor;
+    if(!isDeye()){ if(S.outPri==='SBU'&&battOk){ if(meas<=th.lo&&!R.onUtil){R.onUtil=true;ev('w',`البطارية وصلت لـBack to utility (${th.lo}${th.u}): الإنفرتر حوّل البيت عالدولة.`,'onutil',120);} if(R.onUtil&&meas>=th.re){R.onUtil=false;ev('o',`البطارية وصلت لـBack to battery (${th.re}${th.u}): البيت رجع عالشمس والبطارية.`,'',0);} canDis=!R.onUtil; } else canDis=false; }
     if(canDis)dis=Math.min(deficit,disHead);
     // grid charging
     let want=false; const startV=mode==='v'?S.gridStartV:S.gridStart;
     if(S.gridCharge&&battOk){ if(meas<startV)R.gcLatch=true; if(R.gcLatch&&meas>=startV+(mode==='v'?2:15))R.gcLatch=false; want=R.gcLatch;
       if(S.tou){const sl=slotAt(h);if(sl.g&&meas<(mode==='v'?sl.v:sl.b))want=true;} }
+    if(!isDeye())want=!!S.gridCharge&&battOk&&!full&&(S.outPri!=='SBU'||R.onUtil)&&!(S.cso&&pv>100);
     if(want){gch=Math.min(S.gridA*Vb,Math.max(0,chHead-pvBatt));}
     imp=deficit-dis+gch-pvGrid;
     if(!P.free&&P.load==='grid')imp+=houseW;
@@ -465,10 +496,10 @@ function step(){
     if(!battOk||empty){ outOn=pv>=load; if(!outOn&&load>0&&!empty)ev('e',mode==='n'?'ما في بطارية بالإعدادات (No Batt) وما في دولة. الشمس لحالها ما كفّت.':'ما في دولة والبطارية مش شغّالة، فالبيت عتم.','nobat',120); }
     else if(R.offLatch){outOn=false;}
     else { dis=Math.min(deficit,disHead); if(deficit>disHead+1){outOn=false; R.day.ol++; ev('e',`الأحمال ${Math.round(load)}W أكبر من الشمس ${Math.round(pv)}W + أعلى تفريغ للبطارية (Max A Discharge ${disA}A ≈ ${Math.round(disHead)}W). الإنفرتر طفى (Overload).`,'olbat',60); addAlarm('—','Overload / Batt discharge limit');} }
-    if(load>5000*1.1&&outOn){outOn=false;R.day.ol++;ev('e',`Overload: الأحمال ${Math.round(load)}W فوق قدرة الإنفرتر 5000W.`,'ol5',60);addAlarm('—','Overload');}
+    if(load>IV.kw*1100&&outOn){outOn=false;R.day.ol++;ev('e',`Overload: الأحمال ${Math.round(load)}W فوق قدرة الإنفرتر ${IV.kw*1000}W.`,'ol5',60);addAlarm('—','Overload');}
     if(!outOn){pvBatt=Math.min(pv,chHead);pvLoad=0;dis=0;}
   }
-  if(gridPresent&&load>5000*1.1){ev('w',`الأحمال ${Math.round(load)}W فوق 5kW. عالدولة بيمرقها bypass، بس بالانقطاع بيطفي.`,'olg',240);}
+  if(gridPresent&&load>IV.kw*1100){ev('w',`الأحمال ${Math.round(load)}W فوق ${IV.kw}kW. عالدولة بيمرقها bypass، بس بالانقطاع بيطفي.`,'olg',240);}
   // breaker
   if(gridPresent){
     const A=imp/gv;
@@ -642,6 +673,7 @@ function statusText(){const f=R.faults||new Set();
  return{t:'Normal',c:'#25b36e'};}
 function detail(title,rows,extra=''){return `<div class="L-top"><span class="tt">${title}</span><span>${fmtT(R.min)}</span></div><div style="padding:12px 16px"><div class="dt">${rows.map(r=>`<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>${extra}</div><div class="back" data-a="go" data-p="main">Esc</div>`;}
 function renderPage(){
+ if(!isDeye())return renderProg();
  const pg=UI.pg;
  if(pg==='main')return renderMain();
  const b=battSpec(), T=R.T||25;
@@ -682,6 +714,7 @@ function toast(t){UI.toast=t;draw();clearTimeout(toast.h);toast.h=setTimeout(()=
 
 /* ============ LCD interaction ============ */
 function onLcd(e){
+ if(!isDeye()){onProg(e);return;}
  const el=e.target.closest('[data-a]');if(!el)return;
  const a=el.dataset.a,k=el.dataset.k;
  if(a==='go'){UI.pg=el.dataset.p;UI.tab=0;help(el.dataset.p);draw();return;}
@@ -726,6 +759,7 @@ function commit(){const before=clone(S);S=clone(UI.draft);save();
 function save(){ls.set('simS',JSON.stringify(S));}
 // physical keys
 document.querySelector('.keys').addEventListener('click',e=>{const k=e.target.closest('[data-k]');if(!k)return;const v=k.dataset.k;
+ if(!isDeye()){if(UI.pov){UI.pov=null;}else if(v==='esc')UI.pg='main';else if(v==='enter')UI.pg=UI.pg==='main'?'setup':'main';draw();return;}
  if(UI.ov){UI.ov=null;draw();return;}
  if(v==='esc'){if(PAGES[UI.pg]){UI.draft=null;UI.gridUnlocked=false;UI.pg='setup';}else if(UI.pg==='bms')UI.pg='battery';else UI.pg='main';draw();}
  else if(v==='enter'){if(UI.pg==='main'){UI.pg='setup';draw();}else if(PAGES[UI.pg])commit();}
@@ -807,6 +841,68 @@ const H={
  reset:['Factory Reset','باسوورد 9999. بيرجّع كل الإعدادات متل المصنع.'],lock:['Lock out all changes','باسوورد 7777. بيقفل الإعدادات لحتى ما حدا يغيّر.'],
  timeSync:['Time Syncs','بيضبط الساعة من الإنترنت.'],beep:['Beep','صوت الكبسات.'],autoDim:['Auto Dim','بيخفّف ضو الشاشة.'],h24:['24-Hour','ساعة 24.'],
 };
+/* ============ شاشة الإنفرترات بأرقام البرامج (Growatt · Voltronic · Felicity) ============ */
+const PNUM={outPri:{growatt:'01',voltronic:'01'},maxCh:{growatt:'02',voltronic:'02'},pBat:{growatt:'05',voltronic:'05',felicity:'08'},pProto:{growatt:'36'},
+ gridA:{growatt:'11',voltronic:'11'},backGrid:{growatt:'12',voltronic:'12'},backBatt:{growatt:'13',voltronic:'13'},chgSrc:{voltronic:'16'},cutoff:{voltronic:'29'}};
+const PLBL={outPri:'Output source priority',maxCh:'Max charging current',pBat:'Battery type',pProto:'Li protocol',gridA:'Max utility charging current',backGrid:'Back to utility',backBatt:'Back to battery',chgSrc:'Charger source priority',cutoff:'Low DC cut-off'};
+const stepsA=(a,b,s)=>{const r=[];for(let v=a;v<=b+1e-9;v+=s)r.push(Math.round(v*10)/10);return r;};
+const pLi=()=>S.battMode==='Lithium';
+const PKEY={backGrid:()=>pLi()?'liLow':'lowV',backBatt:()=>pLi()?'liRestart':'restartV',cutoff:()=>pLi()?'liShut':'shutV'};
+function progKeys(){const sc=INVx().screen;const k=['outPri','maxCh','pBat'];if(sc==='growatt'&&S.pBat==='LI')k.push('pProto');return k.concat(['gridA','backGrid','backBatt','chgSrc','cutoff']);}
+function getPF(k){if(PKEY[k]){const v=S[PKEY[k]()];return pLi()?v+'%':Number(v).toFixed(1)+'V';}if(k==='maxCh'||k==='gridA')return S[k]+'A';return S[k];}
+function optsPF(k){const I=INVx(),sc=I.screen;
+ if(k==='outPri')return['SBU','SOL','UTI'];if(k==='chgSrc')return['CSO','SNU','OSO'];
+ if(k==='pBat')return CAT.PROG[sc].bopts;if(k==='pProto')return CAT.PROG.growatt.popts;
+ if(k==='maxCh')return stepsA(10,I.maxCh,10);if(k==='gridA')return stepsA(10,I.acCh,10);
+ if(PKEY[k])return pLi()?stepsA(5,60,5):stepsA(44,54,0.5);return[];}
+function applyProg(){const sc=INVx().screen;if(sc==='deye')return;const P=CAT.PROG[sc];const li=P.li(S.pBat);
+ S.battMode=li?'Lithium':'Use Batt V';if(li)S.liMode=sc==='growatt'?S.pProto:S.pBat;
+ if(!li){S.absV=S.pBat==='FLd'?58.4:(S.pBat==='AGM'?56.4:56.8);S.floatV=S.pBat==='FLd'?54.4:54.0;}
+ S.gridCharge=S.chgSrc==='OSO'?0:1;S.cso=S.chgSrc==='CSO'?1:0;S.tou=0;S.workMode='Zero Export To Load';S.pattern='LoadFirst';S.locked=0;save();}
+function setPF(k,v){const before=getPF(k);const key=PKEY[k]?PKEY[k]():k;S[key]=isNaN(+v)?v:+v;applyProg();
+ const n=(PNUM[k]||{})[INVx().screen];if(before!==getPF(k))ev('o',`حفظت: ${PLBL[k]}${n?' ('+n+')':''}: ${before} → ${getPF(k)}.`,'',0);}
+function renderProg(){const I=INVx(),sc=I.screen,f=R.faults||new Set();
+ const cs='font-family:"IBM Plex Mono",ui-monospace,monospace';
+ let h=`<div style="position:absolute;inset:0;background:#08141c;color:#bfefff;${cs}">`;
+ h+=`<div style="display:flex;justify-content:space-between;align-items:center;height:42px;padding:0 16px;background:#0e2230;font-size:16px;font-weight:700"><span>${I.brand.toUpperCase()} · ${I.model}</span><span>${fmtT(R.min)}</span></div>`;
+ if(UI.pg!=='setup'){
+  const err=f.has('F58')?(sc==='voltronic'?'ERROR 61 · BMS COMM':'BMS COMM ERROR'):(f.has('F56')?'BATTERY LOW / NOT FOUND':(f.has('PV')?'PV OVER VOLTAGE':(f.has('OFF')?'OUTPUT OFF':'')));
+  const line=R.gridPresent&&(S.outPri!=='SBU'||R.onUtil);
+  const bt=(pLi()&&!f.has('F58'))?Math.round(R.soc*100)+'%':R.bv.toFixed(1)+'V';
+  const tile=(k,t,v,s2)=>`<div data-a="ph" data-k="${k}" style="background:#0f2635;border:1px solid #1f4558;border-radius:10px;padding:10px 12px;cursor:pointer"><div style="font-size:13px;color:#6fb6cf">${t}</div><div style="font-size:26px;font-weight:700;margin-top:4px">${v}</div><div style="font-size:13px;color:#8fc9dc">${s2}</div></div>`;
+  h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px">`+
+   tile('solar','PV INPUT',Math.round(R.pv||0)+'W',(R.pvS||[]).filter(x=>x&&x.v).map(x=>Math.round(x.v)+'V').join(' · ')||'—')+
+   tile('grid','AC INPUT',R.gridPresent?Math.round(R.Vg||230)+'V':'NO AC',R.gridPresent?Math.round(Math.max(0,R.grid||0))+'W':'')+
+   tile('battery','BATTERY',bt,(R.bi>0?'CHG ':'DIS ')+Math.abs(R.bi||0).toFixed(0)+'A · '+S.pBat)+
+   tile('load','AC OUTPUT',R.out?Math.round(R.load||0)+'W':'OFF',R.out?Math.round((R.load||0)/(I.kw*10))+'%':'')+`</div>`;
+  h+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:0 16px;font-size:15px"><span style="color:${err?'#ff7a6a':'#5fe0a0'};font-weight:700">${err||(line?'LINE MODE':'BATTERY MODE')}</span><span>${S.outPri} · ${S.chgSrc}</span>`+
+   `<span data-a="pgo" data-p="setup" style="background:#1d6f8f;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font-weight:700">SETUP ⚙</span></div>`;}
+ else{
+  h+=`<div style="height:252px;overflow:auto;padding:2px 12px">`+progKeys().map(k=>{const n=(PNUM[k]||{})[sc];return `<div data-a="pk" data-k="${k}" style="display:flex;align-items:center;gap:10px;padding:4px 8px;border-bottom:1px solid #16384a;cursor:pointer;font-size:14.5px;line-height:19px"><b style="width:30px;color:#ffd166">${n||'··'}</b><span style="flex:1">${PLBL[k]}</span><b style="color:#7ff0ff">${getPF(k)}</b></div>`;}).join('')+`</div>`;
+  h+=`<div style="display:flex;justify-content:flex-end;padding:6px 14px"><span data-a="pgo" data-p="main" style="background:#33505f;color:#fff;border-radius:8px;padding:6px 16px;cursor:pointer;font-weight:700">ESC</span></div>`;}
+ if(UI.pov){const k=UI.pov.k,cur=String(getPF(k)).replace(/[AV%]$/,'');h+=`<div data-a="pvx" style="position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center"><div style="background:#0e2230;border:1px solid #2a6a84;border-radius:12px;padding:12px;width:470px;max-height:300px;overflow:auto"><div style="font-weight:700;margin-bottom:8px">${PLBL[k]}</div><div style="display:flex;flex-wrap:wrap;gap:6px">`+
+  UI.pov.opts.map(v=>{const on=String(v)===cur||Number(v)===Number(cur);return `<span data-a="pv" data-v="${v}" style="min-width:62px;text-align:center;padding:8px 6px;border-radius:8px;cursor:pointer;background:${on?'#22c79b':'#16384a'};color:${on?'#05231a':'#cfefff'};font-weight:700">${v}</span>`;}).join('')+`</div></div></div>`;}
+ return h+'</div>';}
+function onProg(e){const el=e.target.closest('[data-a]');if(!el)return;const a=el.dataset.a,k=el.dataset.k;
+ if(a==='pgo'){UI.pg=el.dataset.p;UI.pov=null;help(UI.pg==='setup'?'p:setup':'p:main');draw();return;}
+ if(a==='ph'){help(k);return;}
+ if(a==='pk'){help('p:'+k);UI.pov={k,opts:optsPF(k)};draw();return;}
+ if(a==='pv'){setPF(UI.pov.k,el.dataset.v);UI.pov=null;draw();return;}
+ if(a==='pvx'){if(e.target===el){UI.pov=null;draw();}return;}}
+const HP={
+ 'p:main':['الشاشة الرئيسية','أربع مربّعات: الألواح، مدخل الدولة (AC INPUT)، البطارية، ومخرج البيت (AC OUTPUT). تحت: LINE MODE يعني البيت عالدولة، وBATTERY MODE يعني عالشمس والبطارية. اكبس SETUP للبرامج.'],
+ 'p:setup':['البرامج','هالإنفرترات بتتبرمج بأرقام برامج. اكبس على أي برنامج واختار القيمة، بيتحفظ فوراً. الأرقام يلّي ما منعرفها أكيد لهالموديل حطّينالها ·· : شيك الـManual تبع موديلك.'],
+ 'p:outPri':['Output source priority','مين بيغذّي البيت أوّلاً. SBU: شمس، بعدين بطارية، والدولة آخر شي (لما البطارية توصل Back to utility). SOL: شمس، والدولة بدل البطارية. UTI: الدولة أوّلاً. بلبنان الأشهر SBU.','بـSOL وUTI البطارية ما بتفضى طول ما في دولة: بتضلّ احتياط للانقطاع بس.'],
+ 'p:maxCh':['Max charging current','أعلى تيار شحن (شمس + دولة). ما لازم يتعدّى حدّ البطارية.','بلا كابل اتصال، الإنفرتر ما بيعرف حدّ البطارية: إذا زاد عن المسموح، الـBMS تبع البطارية بيفصل.'],
+ 'p:pBat':['Battery type','AGM وFLd للرصاص. USE: إنت بتحطّ الفولتات (ليثيوم بلا اتصال). LI / PYL / LIb / LIC: ليثيوم مع كابل اتصال، والإنفرتر بياخد النسبة والحدود من الـBMS.','إذا اخترت ليثيوم وما في كابل، أو البروتوكول غلط، بيطلع عطل اتصال BMS والبطارية ما بتشتغل.'],
+ 'p:pProto':['Li protocol (Growatt)','رقم البروتوكول حسب البطارية: L01 وL02 على RS485، وL51 وL52 على CAN. الرقم من جدول Growatt أو شركة البطارية.'],
+ 'p:gridA':['Max utility charging current','قديش بتشحن من الدولة. بلبنان انتبه للاشتراك: الشحن + البيت لازم يضلّوا تحت قاطع الاشتراك.'],
+ 'p:backGrid':['Back to utility','بوضع SBU: لما البطارية تنزل لهون، الإنفرتر بيحوّل البيت عالدولة (إذا موجودة). بالفولت لليثيوم بلا اتصال، وبالنسبة مع الاتصال.'],
+ 'p:backBatt':['Back to battery','بوضع SBU: لما البطارية تتعبّى لهون، البيت بيرجع عالبطارية والشمس.'],
+ 'p:chgSrc':['Charger source priority','CSO: الشمس أوّلاً، والدولة بس إذا ما في شمس. SNU: الشمس والدولة سوا. OSO: الشمس بس، الدولة ما بتشحن أبداً.'],
+ 'p:cutoff':['Low DC cut-off','بلا دولة: لما البطارية توصل لهون، الإنفرتر بيطفي البيت ليحمي البطارية.'],
+};
+Object.assign(H,HP);
 function help(k){const h=H[k]||H[(k||'').split(':')[0]];if(!h)return;$('hT').textContent=h[0];$('hP').textContent=h[1];const w=$('hW');if(h[2]){w.hidden=false;w.textContent='⚠ '+h[2];}else w.hidden=true;}
 
 /* ============ ENV UI ============ */
@@ -912,11 +1008,55 @@ for(let i=0;i<1;i++)step();
 ev('o','الإنفرتر اشتغل. اكبس على أي شي عالشاشة لتعرف شو هوّي.','',0);
 draw();help('main');
 </script>
+<div class="pjm" id="pjm" hidden><div class="pjbox" role="dialog" aria-modal="true" aria-label="حدّد المشروع"><div id="pjin"></div></div></div>
 <script src="wire.js"></script>
 <script>
-function setMode(m){MODE=m;ls.set('simMode',m);document.querySelectorAll('.mode').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+/* ============ حدّد المشروع: الإنفرتر + البطارية ============ */
+const LV={ok:['✓ متوافقين رسمياً','#22c79b'],chk:['⚠ بيشتغلوا، تأكّد من الوكيل','#e0a12c'],none:['○ بلا اتصال: عالفولت','#8fa3ad']};
+let PK=PROJ?Object.assign({},PROJ):{inv:'deye5',bat:'deyeg5',n:1};
+function specInv(i){return [['النوع',i.type==='hybrid'?'هايبرد (بيبيع للشبكة)':'أوف غريد'],['القدرة',i.kw+' kW'],['أعلى فولت ألواح (Voc)',i.maxVoc+' V'],['مجال الـMPPT',i.mppt[0]+'–'+i.mppt[1]+' V'],['عدد الـMPPT',i.nMppt+(i.perMppt?' (كل واحد '+i.perMppt+'W)':'')],['أعلى قدرة ألواح',i.maxPv+' W'],['أعلى تيار شحن',i.maxCh+' A'],['منفذ الـBMS',i.ports]];}
+function specBat(b,n){return [['الفولت / السعة',`51.2V · ${b.ah}Ah (${(b.ah*0.0512).toFixed(2)} kWh)`],['العدد',n+(n>1?` بالتوازي = ${b.ah*n}Ah (${(b.ah*n*0.0512).toFixed(1)} kWh)`:'')],['تيار الشحن/التفريغ',`مستحسن ${b.rec}A · أقصى ${b.maxCh}/${b.maxDis}A`],['الاتصال',b.comm.length?b.comm.join(' · '):'ما في'],['عمق التفريغ (DoD)',b.dod+'%'],['التوسعة',b.par]];}
+const tbl=r=>`<table class="pjt">${r.map(x=>`<tr><td>${x[0]}</td><td dir="auto">${x[1]}</td></tr>`).join('')}</table>`;
+function compatBox(i,b,n){const cp=CAT.compat(i,b),L=LV[cp.lvl];
+ return `<div class="pjc" style="border-color:${L[1]}"><b style="color:${L[1]}">${L[0]}</b><p>${cp.txt}</p><div class="pjs">${cp.set.map(x=>`<span dir="auto">${x}</span>`).join('')}</div>
+ <p class="muted" style="font-size:13px;margin-top:6px">حدّ الشحن للمنظومة: ${CAT.chA(i,b,n)}A · حدّ التفريغ: ${CAT.disA(i,b,n)}A · قاطع البطارية: ${CAT.brkBat(i)} · قاطع AC: ${CAT.brkAC(i)}</p></div>`;}
+function pickerHTML(){const i=CAT.inv(PK.inv),b=CAT.bat(PK.bat);
+ const brands=a=>[...new Set(a.map(x=>x.brand))];
+ const grp=(arr,key)=>brands(arr).map(br=>`<div class="pjg"><h4>${br}</h4><div class="pjo">${arr.filter(x=>x.brand===br).map(x=>`<button type="button" class="${PK[key]===x.id?'on':''}" data-pk="${key}" data-v="${x.id}"><b dir="ltr">${x.model}</b><span>${key==='inv'?x.kw+'kW · '+(x.type==='hybrid'?'هايبرد':'أوف غريد'):x.ah+'Ah · '+(x.comm.length?x.comm[0]:'بلا اتصال')}</span></button>`).join('')}</div></div>`).join('');
+ return `<div class="pjh"><h2>حدّد المشروع</h2><button type="button" class="ib" data-pk="close" aria-label="سكّر">✕</button></div>
+ <p class="muted" style="font-size:14px">اختار الإنفرتر والبطارية يلّي بدّك تركّبهن. على أساسهن بيتغيّر التوصيل، الشاشة، الـBMS والحدود.</p>
+ <div class="pjq"><span class="muted">جاهزين:</span>${CAT.PRESETS.map(p=>`<button type="button" data-pk="pre" data-v="${p.join(',')}">${CAT.inv(p[0]).brand} ${CAT.inv(p[0]).kw}kW + ${CAT.bat(p[1]).brand}${p[2]>1?' ×'+p[2]:''}</button>`).join('')}</div>
+ <h3>1. الإنفرتر</h3>${grp(CAT.INV,'inv')}
+ <h3>2. البطارية</h3>${grp(CAT.BAT,'bat')}
+ <h3>3. كم بطارية؟</h3><div class="pjo">${[1,2,3,4].map(n=>`<button type="button" class="${PK.n===n?'on':''}" data-pk="n" data-v="${n}"><b>${n}</b><span>${(b.ah*n*0.0512).toFixed(1)} kWh</span></button>`).join('')}</div>
+ <h3>الكتالوج والتوافق</h3><div class="pjcols"><div><h4 dir="ltr">${i.brand} ${i.model}</h4>${tbl(specInv(i))}<p class="muted" style="font-size:13px">${i.note}</p></div><div><h4 dir="ltr">${b.brand} ${b.model}</h4>${tbl(specBat(b,PK.n))}<p class="muted" style="font-size:13px">${b.note}</p></div></div>
+ ${compatBox(i,b,PK.n)}
+ <button type="button" class="pjgo" data-pk="go">ابدأ المشروع ←</button>`;}
+function openPicker(){PK=PROJ?Object.assign({},PROJ):PK;$('pjin').innerHTML=pickerHTML();$('pjm').hidden=false;document.body.style.overflow='hidden';}
+function closePicker(){$('pjm').hidden=true;document.body.style.overflow='';}
+$('pjm').addEventListener('click',e=>{if(e.target.id==='pjm'&&PROJ){closePicker();return;}const b=e.target.closest('[data-pk]');if(!b)return;const k=b.dataset.pk,v=b.dataset.v;
+ if(k==='close'){if(PROJ)closePicker();else startProject();return;}
+ if(k==='go'){startProject();return;}
+ if(k==='pre'){const p=v.split(',');PK={inv:p[0],bat:p[1],n:+p[2]};}
+ else if(k==='n')PK.n=+v;else PK[k]=v;
+ const sc=$('pjin').parentElement.scrollTop;$('pjin').innerHTML=pickerHTML();$('pjin').parentElement.scrollTop=sc;});
+function startProject(){PROJ={inv:PK.inv,bat:PK.bat,n:PK.n};ls.set('simProj',JSON.stringify(PROJ));closePicker();applyProject(true);
+ const i=CAT.inv(PROJ.inv),b=CAT.bat(PROJ.bat);ev('o',`مشروع جديد: ${i.brand} ${i.model} مع ${PROJ.n>1?PROJ.n+' × ':''}${b.brand} ${b.model}. وصّل وشغّل.`,'',0);
+ $('wireSec').scrollIntoView({behavior:'smooth',block:'start'});}
+function applyProject(fresh){if(!PROJ)return;const i=CAT.inv(PROJ.inv),b=CAT.bat(PROJ.bat),n=PROJ.n||1;
+ if(fresh){const keep={y:S.y,mo:S.mo,d:S.d};S=Object.assign(defaults(),keep);S.maxSolar=i.maxPv;S.maxSell=i.kw*1000;S.peakW=i.kw*1000;
+  if(i.screen!=='deye'){S.pBat='AGM';S.maxCh=Math.min(60,i.maxCh);S.gridA=30;applyProg();}
+  save();UI={pg:'main',tab:0,draft:null,ov:null,toast:null,gridUnlocked:false};WIRE.rebuild();resetRuntime(0.6);}
+ F.maxSolar.max=i.maxPv;F.maxCh.max=i.maxCh;F.maxDis.max=i.maxDis;F.gridA.max=i.acCh;F.genA.max=i.acCh;F.maxSell.max=i.kw*1000;
+ if(i.screen!=='deye')applyProg();
+ $('devH').textContent=`${i.brand.toUpperCase()} · ${i.model} · ${i.kw}kW · 48V`;
+ $('pjbar').innerHTML=`<div><b dir="ltr">${i.brand} ${i.model}</b> + <b dir="ltr">${n>1?n+' × ':''}${b.brand} ${b.model}</b></div><button type="button" class="pjch" id="pjchg">غيّر المشروع</button>`;
+ $('pjchg').onclick=openPicker;
+ $('pjcat').innerHTML=`<h2>كتالوج المشروع</h2><div class="pjcols"><div><h4 dir="ltr">${i.brand} ${i.model}</h4>${tbl(specInv(i))}</div><div><h4 dir="ltr">${b.brand} ${b.model}</h4>${tbl(specBat(b,n))}</div></div><h4 style="margin-top:10px">الـBMS والإعدادات</h4>${compatBox(i,b,n)}<p class="muted" style="font-size:12.5px;margin-top:8px">الأرقام من الـDatasheet الرسمية. الموديلات بتتغيّر، فشيك الـManual والسوفتوير تبع الجهاز قبل التركيب.</p>`;
+ WIRE.render();draw();}
+function setMode(m){MODE=m;ls.set('simMode',m);UI.pov=null;UI.pg='main';$('devH').textContent=m==='wire'&&PROJ?$('devH').textContent:'HYBRID INVERTER · 5kW · 48V';document.querySelectorAll('.mode').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
  $('wireSec').hidden=m!=='wire';$('envPV').hidden=m==='wire';$('envBT').hidden=m==='wire';
- if(m==='wire'){if(curCh){curCh=null;ls.set('simCh','');chUI();$('chRes').innerHTML='';}WIRE.compute();WIRE.setZoom();running=true;$('play').textContent='⏸ وقّف';}
+ if(m==='wire'){if(curCh){curCh=null;ls.set('simCh','');chUI();$('chRes').innerHTML='';}WIRE.compute();WIRE.setZoom();running=true;$('play').textContent='⏸ وقّف';if(PROJ)applyProject(false);else openPicker();}
  draw();}
 $('modes').addEventListener('click',e=>{const b=e.target.closest('.mode');if(b&&b.dataset.m!==MODE)setMode(b.dataset.m);});
 WIRE.init();setMode(MODE);
