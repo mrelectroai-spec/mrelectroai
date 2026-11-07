@@ -188,15 +188,26 @@ let flashT;function flash(t,cls){const m=document.getElementById('wmsg');m.class
 /* ---------- مسار الشرايط ---------- */
 const P2=(x,y)=>x.toFixed(1)+' '+y.toFixed(1);
 function wPts(w){const A=term(w.a),B=term(w.b),s=24;return [[A.x,A.y],[A.x,A.y+A.d*s],...w.pts,[B.x,B.y+B.d*s],[B.x,B.y]];}
-function wirePath(w){const A=term(w.a),B=term(w.b);
- if(!w.pts.length){const s=Math.min(110,Math.max(40,Math.abs(A.y-B.y)*0.5+30));return `M${P2(A.x,A.y)} C${P2(A.x,A.y+A.d*s)} ${P2(B.x,B.y+B.d*s)} ${P2(B.x,B.y)}`;}
- const p=wPts(w);let d=`M${P2(p[0][0],p[0][1])}`;
- for(let i=1;i<p.length-1;i++){const a=p[i-1],b=p[i],c=p[i+1];const l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]);const r=Math.min(16,l1/2,l2/2);
-  if(r<1){d+=` L${P2(b[0],b[1])}`;continue;}
-  const s1=[b[0]+(a[0]-b[0])*r/l1,b[1]+(a[1]-b[1])*r/l1],s2=[b[0]+(c[0]-b[0])*r/l2,b[1]+(c[1]-b[1])*r/l2];d+=` L${P2(s1[0],s1[1])} Q${P2(b[0],b[1])} ${P2(s2[0],s2[1])}`;}
- const z=p[p.length-1];return d+` L${P2(z[0],z[1])}`;}
-function midCubic(w){const A=term(w.a),B=term(w.b);const s=Math.min(110,Math.max(40,Math.abs(A.y-B.y)*0.5+30));
- const p0=[A.x,A.y],p1=[A.x,A.y+A.d*s],p2=[B.x,B.y+B.d*s],p3=[B.x,B.y];return [0,1].map(i=>0.125*p0[i]+0.375*p1[i]+0.375*p2[i]+0.125*p3[i]);}
+// الشرايط: خطوط مستقيمة بزوايا قائمة بس
+function defRoute(w){const A=term(w.a),B=term(w.b),s=24;const i=st.wires.indexOf(w);const off=((i<0?0:i)%5)*7;
+ const a1=A.y+A.d*s,b1=B.y+B.d*s;let yc;
+ if(A.d>0&&B.d>0)yc=Math.max(a1,b1)+off;else if(A.d<0&&B.d<0)yc=Math.min(a1,b1)-off;else yc=(a1+b1)/2+off-14;
+ return [[A.x,A.y],[A.x,yc],[B.x,yc],[B.x,B.y]];}
+function orth(p){const out=[p[0]];let lastV=true;
+ for(let i=1;i<p.length;i++){const a=out[out.length-1],b=p[i];
+  if(Math.abs(a[0]-b[0])<0.5&&Math.abs(a[1]-b[1])<0.5)continue;
+  if(Math.abs(a[0]-b[0])<0.5){out.push(b);lastV=true;continue;}
+  if(Math.abs(a[1]-b[1])<0.5){out.push(b);lastV=false;continue;}
+  out.push(lastV?[b[0],a[1]]:[a[0],b[1]],b);}
+ return out;}
+function routePts(w){if(!w.pts.length)return defRoute(w);const A=term(w.a),B=term(w.b),s=24;
+ const p=orth([[A.x,A.y],[A.x,A.y+A.d*s],...w.pts]);const last=p[p.length-1];
+ // آخر شي لازم يوصل عموديّاً عالطرف
+ const b1=[B.x,B.y+B.d*s];p.push(Math.abs(last[1]-b1[1])<0.5?b1:[b1[0],last[1]]);if(Math.abs(p[p.length-1][1]-b1[1])>0.5)p.push(b1);p.push([B.x,B.y]);
+ return orth(p);}
+function wPts(w){const A=term(w.a),B=term(w.b),s=24;return [[A.x,A.y],[A.x,A.y+A.d*s],...w.pts,[B.x,B.y+B.d*s],[B.x,B.y]];}
+function wirePath(w){const p=routePts(w);return 'M'+p.map(q=>P2(q[0],q[1])).join(' L');}
+function midCubic(w){const p=defRoute(w);return [(p[1][0]+p[2][0])/2,p[1][1]];}
 
 /* ---------- الرسم ---------- */
 const R_=()=>(typeof R!=='undefined'&&R)||{};
@@ -297,8 +308,8 @@ function render(){const b=brd();if(!b)return;const {de}=compute();
  <rect x="-5000" y="-5000" width="10000" height="10000" fill="#e8edf0"/><rect x="-5000" y="-5000" width="10000" height="10000" fill="url(#g5)"/>`;
  for(const id in C)g+=compSVG(C[id]);
  st.wires.forEach((w,i)=>{const A=term(w.a);const col=KCOL[A.k];const d=wirePath(w);const s=i===selW;
-  g+=`<path d="${d}" stroke="${s?'#ffb400':'rgba(0,0,0,.25)'}" stroke-width="${s?11:8}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-  g+=`<path d="${d}" stroke="${col}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  g+=`<path d="${d}" stroke="${s?'#ffb400':'rgba(0,0,0,.25)'}" stroke-width="${s?11:8}" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>`;
+  g+=`<path d="${d}" stroke="${col}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>`;
   if(A.k==='PE')g+=`<path d="${d}" stroke="#f2d03b" stroke-width="5" stroke-dasharray="8 8" fill="none"/>`;
   if(!editMode)g+=`<path class="wh" data-w="${i}" d="${d}" stroke="transparent" stroke-width="18" fill="none"/>`;});
  for(const id in C){const c=C[id];for(const k in c.t){const key=keyOf(id,k);if(sel===key||st.wires.some(w=>w.a===key||w.b===key)){const t=term(key);g+=`<circle cx="${t.x}" cy="${t.y}" r="4" fill="#fff" pointer-events="none"/>`;}}}

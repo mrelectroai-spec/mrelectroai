@@ -159,6 +159,14 @@ input[type=range]{width:100%;accent-color:var(--volt)}
 .wtools button{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:6px 11px;font:600 14px 'IBM Plex Sans Arabic';cursor:pointer;min-width:38px}
 .wtools button:disabled{opacity:.4}
 .wtools[hidden]{display:none}
+.bwrap{position:relative}
+.fsb{position:absolute;top:8px;left:8px;z-index:3;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:20px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.card.wfs{position:fixed;inset:0;z-index:90;margin:0;border-radius:0;display:flex;flex-direction:column;gap:4px;padding:8px;overflow:hidden}
+.card.wfs>h2,.card.wfs>p.muted,.card.wfs .wlg,.card.wfs .pjbar{display:none}
+.card.wfs .bwrap{flex:1;min-height:0}.card.wfs .board{height:100%}
+.card.wfs .wsec,.card.wfs .wtools{flex-wrap:nowrap;overflow-x:auto;margin:0;padding-bottom:2px}.card.wfs .wtools button{flex:0 0 auto;padding:5px 9px;font-size:13px}
+.card.wfs .wmsg{position:absolute;top:auto;bottom:12px;left:60px;right:12px;margin:0;z-index:4}
+body.nofs{overflow:hidden}
 .wtools #wsol{border-color:var(--volt);color:var(--volt)}
 .wtools #wmove.on{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
 .board.lock{touch-action:none}
@@ -228,7 +236,7 @@ input[type=range]{width:100%;accent-color:var(--volt)}
       <div class="wtools"><button id="wzout" type="button" aria-label="صغّر">−</button><button id="wzin" type="button" aria-label="كبّر">+</button><button id="wfit" type="button">⤢ كل الرسمة</button><button id="wundo" type="button">↶ تراجع</button><button id="wdel" type="button" disabled>🗑 احذف الشريط</button><button id="wstraight" type="button" disabled>〰 سوّي الشريط</button><button id="wmove" type="button">✋ عدّل القطع</button><button id="wclear" type="button">امسح الشرايط</button><button id="wnew" type="button">🔧 جهاز جديد</button></div>
       <div class="wtools" id="wedit" hidden><span class="muted" style="font-size:13px;align-self:center">القطعة المنقّاية:</span><button id="wbig" type="button" disabled>➕ كبّرها</button><button id="wsmall" type="button" disabled>➖ صغّرها</button><button id="wdelc" type="button" disabled>🗑 شيلها</button></div>
       <div class="wmsg" id="wmsg" hidden></div>
-      <div class="board" id="board"></div>
+      <div class="bwrap"><div class="board" id="board"></div><button type="button" class="fsb" id="wfs" aria-label="شاشة كاملة">⛶</button></div>
       <div class="wlg"><span><i style="background:#d32f2f"></i>موجب DC</span><span><i style="background:#1b1b1b"></i>سالب DC</span><span><i style="background:#8a4b14"></i>فاز L</span><span><i style="background:#1f6fd1"></i>نوترال N</span><span><i style="background:linear-gradient(90deg,#2e9d3a 50%,#f2d03b 50%)"></i>أرض PE</span><span><i style="background:#8a96a0"></i>اتصال CAN</span></div>
     </div>
     <div class="card" id="pjcat"></div>
@@ -1069,6 +1077,11 @@ function setMode(m){MODE=m;ls.set('simMode',m);UI.pov=null;UI.pg='main';$('devH'
  draw();}
 $('modes').addEventListener('click',e=>{const b=e.target.closest('.mode');if(b&&b.dataset.m!==MODE)setMode(b.dataset.m);});
 WIRE.init();setMode(MODE);
+(function(){const card=$('board').closest('.card'),btn=$('wfs');let on=false;
+ const set=v=>{on=v;card.classList.toggle('wfs',v);document.body.classList.toggle('nofs',v);btn.textContent=v?'✕':'⛶';btn.setAttribute('aria-label',v?'اطلع من الشاشة الكاملة':'شاشة كاملة');setTimeout(()=>WIRE.setZoom(),60);};
+ btn.onclick=()=>{if(!on){set(true);try{card.requestFullscreen&&card.requestFullscreen().catch(()=>{});}catch(e){}}else{set(false);try{document.fullscreenElement&&document.exitFullscreen();}catch(e){}}};
+ document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&on)set(false);});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&on&&!document.fullscreenElement)set(false);});})();
 // روابط مباشرة: #wire (التوصيل) · #screen (واجهة الإنفرتر) · #battery (إعدادات البطارية)
 function route(){const h=location.hash.slice(1).toLowerCase();if(!h)return;
  if(h==='wire'){setMode('wire');}
