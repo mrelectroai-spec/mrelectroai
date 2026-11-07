@@ -158,11 +158,14 @@ input[type=range]{width:100%;accent-color:var(--volt)}
 .wtools{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .wtools button{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:6px 11px;font:600 14px 'IBM Plex Sans Arabic';cursor:pointer;min-width:38px}
 .wtools button:disabled{opacity:.4}
+.wtools[hidden]{display:none}
 .wtools #wsol{border-color:var(--volt);color:var(--volt)}
 .wtools #wmove.on{background:var(--volt);color:var(--volt-ink);border-color:var(--volt)}
 .board.lock{touch-action:none}
 #bsvg .hd{cursor:grab}#bsvg.mv [data-c]{cursor:move}
-.board{overflow:auto;border-radius:14px;border:1px solid var(--line);max-height:78vh;direction:ltr;-webkit-overflow-scrolling:touch}
+.board{overflow:hidden;border-radius:14px;border:1px solid var(--line);height:min(72vh,700px);direction:ltr;touch-action:none;user-select:none;-webkit-user-select:none;background:#e8edf0}
+.wsec{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}.wsec>b{font-size:13px;color:var(--muted);min-width:76px}.wsec .wtools{margin:2px 0}
+.wtools button:disabled{opacity:.4}
 .board svg{display:block}
 .board text{font-family:'Roboto Condensed',Arial,sans-serif}
 .board .bt{text-anchor:middle;font-weight:700;font-size:12px}
@@ -218,9 +221,12 @@ input[type=range]{width:100%;accent-color:var(--volt)}
   <section id="wireSec">
     <div class="card">
       <h2>وصّل المنظومة بإيدك</h2>
-      <p class="muted" style="font-size:14px">اكبس على طرف، وبعدين عالطرف التاني ليمتدّ شريط. اكبس على أي شريط لتنقّيه: اسحب الدوائر الصفر لتحدّد مشيو. «✋ حرّك القطع» بيخلّيك تنقل الإنفرتر والبطارية والقواطع لمحل ما بدّك. القواطع مش إجبارية: فيك توصّل مباشرة، والفحص بيقلّك شو الخطر.</p>
+      <p class="muted" style="font-size:14px">متل الأوتوكاد: كبّر وصغّر الرسمة بإصبعين أو بعجلة الماوس، واسحب بمحل فاضي لتمشي فيها. اختار مشروع جاهز أو ابدأ من الصفر وزيد القطع من المكتبة. اكبس على طرف وبعدين عالطرف التاني ليمتدّ شريط، ونقّي الشريط لتحدّد مشيو. «✋ عدّل القطع» بيخلّيك تنقل كل قطعة وتكبّرها أو تصغّرها لحالها. القواطع مش إجبارية: الفحص بيقلّك شو الخطر.</p>
       <div class="pjbar" id="pjbar"></div>
-      <div class="wtools"><button id="wzout" type="button">−</button><button id="wzin" type="button">+</button><button id="wundo" type="button">↶ تراجع</button><button id="wdel" type="button" disabled>🗑 احذف الشريط</button><button id="wstraight" type="button" disabled>〰 سوّي الشريط</button><button id="wmove" type="button">✋ حرّك القطع</button><button id="wlay" type="button">رجّع الترتيب</button><button id="wclear" type="button">امسح الكل</button><button id="wnew" type="button">🔧 جهاز جديد</button><button id="wsol" type="button">ورجيني الحل</button></div>
+      <div class="wsec"><b>مشاريع جاهزة</b><div class="wtools" id="wready"></div></div>
+      <div class="wsec"><b>مكتبة القطع</b><div class="wtools" id="wlib"></div></div>
+      <div class="wtools"><button id="wzout" type="button" aria-label="صغّر">−</button><button id="wzin" type="button" aria-label="كبّر">+</button><button id="wfit" type="button">⤢ كل الرسمة</button><button id="wundo" type="button">↶ تراجع</button><button id="wdel" type="button" disabled>🗑 احذف الشريط</button><button id="wstraight" type="button" disabled>〰 سوّي الشريط</button><button id="wmove" type="button">✋ عدّل القطع</button><button id="wclear" type="button">امسح الشرايط</button><button id="wnew" type="button">🔧 جهاز جديد</button></div>
+      <div class="wtools" id="wedit" hidden><span class="muted" style="font-size:13px;align-self:center">القطعة المنقّاية:</span><button id="wbig" type="button" disabled>➕ كبّرها</button><button id="wsmall" type="button" disabled>➖ صغّرها</button><button id="wdelc" type="button" disabled>🗑 شيلها</button></div>
       <div class="wmsg" id="wmsg" hidden></div>
       <div class="board" id="board"></div>
       <div class="wlg"><span><i style="background:#d32f2f"></i>موجب DC</span><span><i style="background:#1b1b1b"></i>سالب DC</span><span><i style="background:#8a4b14"></i>فاز L</span><span><i style="background:#1f6fd1"></i>نوترال N</span><span><i style="background:linear-gradient(90deg,#2e9d3a 50%,#f2d03b 50%)"></i>أرض PE</span><span><i style="background:#8a96a0"></i>اتصال CAN</span></div>
