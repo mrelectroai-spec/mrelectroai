@@ -26,6 +26,7 @@
         body: JSON.stringify({ vid: v, page: page, part: part || null, src: src || null, ref: ref || null, dev: dev }) }).catch(function () {});
     }
     var hashPart = function () { return me && me.hasAttribute('data-hash') ? (location.hash.slice(1, 40) || null) : null; };
+    window.meaTrack = send;   // صفحات تانية فيها تعدّ كبسة (متل links/)
     send(hashPart());
 
     // ---------- أوّل ما يفوت: اسمو ورقمو (مرّة وحدة عهالتلفون) ----------
