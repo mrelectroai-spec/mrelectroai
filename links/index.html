@@ -86,6 +86,37 @@ svg{display:block}
   <p class="ft">MrElectroAI · لبنان</p>
 </div>
 <script>
+// لغة التلفون: إذا مش عربي، منبيّن الصفحة بالإنجليزي
+(function () {
+  var L = (navigator.languages && navigator.languages[0]) || navigator.language || 'ar';
+  if (/^ar/i.test(L)) return;
+  var EN = {
+    title: 'Contact Anwar · MrElectroAI',
+    name: 'Anwar',
+    sub: 'Electrician & trainer · 13 years in the field<br>Electrical books, short and practical: Electricity, Classic Control, and Solar Energy',
+    order: ['Order the books on WhatsApp', 'A ready message opens, just tap send'],
+    offer: '🎁 All 3 printed books for $65 with free delivery across Lebanon · Cash on delivery',
+    wa: ['Chat on WhatsApp', null],
+    channel: ['WhatsApp channel', 'Tips and offers'],
+    tiktok: ['TikTok', null], insta: ['Instagram', null], telegram: ['Telegram', null],
+    site: ['Free book sample', 'Have a look before you buy'],
+    courses: ['Website & free courses', 'Quizzes and a 3D parts lab'],
+    ft: 'MrElectroAI · Lebanon'
+  };
+  var h = document.documentElement; h.lang = 'en'; h.dir = 'ltr'; document.title = EN.title;
+  document.querySelector('h1').textContent = EN.name;
+  document.querySelector('.sub').innerHTML = EN.sub;
+  document.querySelector('.offer').textContent = EN.offer;
+  document.querySelector('.ft').textContent = EN.ft;
+  document.querySelectorAll('a.b').forEach(function (a) {
+    var t = EN[a.dataset.k]; if (!t) return;
+    var el = a.querySelector('.t'), sm = el.querySelector('small');
+    el.firstChild.textContent = t[0];
+    if (t[1] && sm) sm.textContent = t[1];
+    el.style.textAlign = 'left'; if (sm) sm.style.textAlign = 'left';
+    a.querySelector('.ar').textContent = '›';
+  });
+})();
 document.querySelectorAll('a.b').forEach(function (a) {
   a.addEventListener('click', function () { try { if (window.meaTrack) window.meaTrack('btn-' + a.dataset.k); } catch (e) {} });
 });
