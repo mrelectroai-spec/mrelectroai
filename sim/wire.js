@@ -199,7 +199,17 @@ function corners(w){const A=term(w.a),B=term(w.b);const c=w.c||defC(w);const P=[
 const segParam=(P,j)=>(j>=1&&j<=P.length-3)?j-1:-1;
 const segHoriz=(P,j)=>Math.abs(P[j][1]-P[j+1][1])<0.5&&Math.abs(P[j][0]-P[j+1][0])>=0.5;
 function simplify(w){const c=w.c;if(!c)return;let ch=true;while(ch){ch=false;for(let i=0;i+2<c.length;i++){if(Math.abs(c[i]-c[i+2])<1){c.splice(i+1,2);ch=true;break;}}}}
-function wirePath(w){const p=corners(w);return 'M'+p.map(q=>P2(q[0],q[1])).join(' L');}
+function wirePath(w){const p=corners(w);let d=`M${P2(p[0][0],p[0][1])}`;
+ for(let i=1;i<p.length-1;i++){const a=p[i-1],b=p[i],c=p[i+1];const l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]);const r=Math.min(14,l1/2,l2/2);
+  if(r<1){d+=` L${P2(b[0],b[1])}`;continue;}
+  const s1=[b[0]+(a[0]-b[0])*r/l1,b[1]+(a[1]-b[1])*r/l1],s2=[b[0]+(c[0]-b[0])*r/l2,b[1]+(c[1]-b[1])*r/l2];d+=` L${P2(s1[0],s1[1])} Q${P2(b[0],b[1])} ${P2(s2[0],s2[1])}`;}
+ const z=p[p.length-1];return d+` L${P2(z[0],z[1])}`;}
+// الشريط متل الحقيقي: لمعة، وجلبة (ماركر) فيها اسم الطرف حدّ كل راس
+const HI={'+':'#ff8a80','-':'#6b6b6b','L':'#d08a4e','N':'#7fb3ff','PE':'#7fd88a','CAN':'#cfd6db'};
+function sleeve(w,end){const p=corners(w);const a=end?p[p.length-1]:p[0],b=end?p[p.length-2]:p[1];const L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(L<34)return '';
+ const T=term(end?w.b:w.a);const ux=(b[0]-a[0])/L,uy=(b[1]-a[1])/L;const cx=a[0]+ux*24,cy=a[1]+uy*24;const vert=Math.abs(uy)>0.5;
+ let txt=(T.l.length>7?T.l.slice(0,7):T.l).replace('−','–');if(txt==='+'||txt==='–')txt=txt==='+'?'+ DC':'– DC';const len=Math.max(22,txt.length*6.4+8);
+ return `<g pointer-events="none" transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)})${vert?' rotate(-90)':''}"><rect x="${-len/2}" y="-6.5" width="${len}" height="13" rx="3" fill="#f7f7f2" stroke="#9aa3a8" stroke-width="1"/><text x="0" y="3.6" text-anchor="middle" font-size="9.5" font-weight="700" fill="#222" style="font-family:'IBM Plex Mono',ui-monospace,monospace">${txt}</text></g>`;}
 
 /* ---------- الرسم ---------- */
 const R_=()=>(typeof R!=='undefined'&&R)||{};
@@ -300,9 +310,12 @@ function render(){const b=brd();if(!b)return;const {de}=compute();KZ=Math.min(2.
  <rect x="-5000" y="-5000" width="10000" height="10000" fill="#e8edf0"/><rect x="-5000" y="-5000" width="10000" height="10000" fill="url(#g5)"/>`;
  for(const id in C)g+=compSVG(C[id]);
  st.wires.forEach((w,i)=>{const A=term(w.a);const col=KCOL[A.k];const d=wirePath(w);const s=i===selW;
-  g+=`<path d="${d}" stroke="${s?'#ffb400':'rgba(0,0,0,.25)'}" stroke-width="${s?11:8}" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>`;
-  g+=`<path d="${d}" stroke="${col}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>`;
-  if(A.k==='PE')g+=`<path d="${d}" stroke="#f2d03b" stroke-width="5" stroke-dasharray="8 8" fill="none"/>`;
+  g+=`<path d="${d}" transform="translate(1.5 2.5)" stroke="rgba(0,0,0,.22)" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  if(s)g+=`<path d="${d}" stroke="#ffb400" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  g+=`<path d="${d}" stroke="${col}" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  if(A.k==='PE')g+=`<path d="${d}" stroke="#f2d03b" stroke-width="7" stroke-dasharray="10 10" fill="none" stroke-linejoin="round"/>`;
+  g+=`<path d="${d}" transform="translate(-1.2 -1.2)" stroke="${A.k==='PE'?'#fff6c4':HI[A.k]}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>`;
+  g+=sleeve(w,0)+sleeve(w,1);
   if(!editMode)g+=`<path class="wh" data-w="${i}" d="${d}" stroke="transparent" stroke-width="18" fill="none"/>`;});
  for(const id in C){const c=C[id];for(const k in c.t){const key=keyOf(id,k);if(sel===key||st.wires.some(w=>w.a===key||w.b===key)){const t=term(key);g+=`<circle cx="${t.x}" cy="${t.y}" r="4" fill="#fff" pointer-events="none"/>`;}}}
  if(selW>=0&&st.wires[selW]&&!editMode){const w=st.wires[selW];
