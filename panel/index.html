@@ -117,7 +117,6 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-
  <div class="wrap">
   <div class="hb"><a class="glass" href="../app/" aria-label="رجوع">→</a><div><h1>مختبر التابلو ⚡</h1><p>ركّب، وصّل، شغّل، وشوف إذا مشروعك زابط.</p></div><div id="langSlot" style="margin-inline-start:auto"></div></div>
   <button class="pc glass" type="button" data-open="free"><div class="i">🧪</div><div><b>مختبر حرّ</b><span>كل القطع قدّامك: جرّب أي دارة بدّك ياها.</span></div><div class="go">افتح ←</div></button>
-  <div class="sec">مشاريع كورس الكلاسيك كنترول</div>
   <div id="plist"></div>
  </div>
 </section>
@@ -160,7 +159,10 @@ let B={comps:[],wires:[],on:false,blown:false},E=window.PENGINE(B),PJ=null,KEY='
 
 /* ---------- الصفحات ---------- */
 function done(id){return ls('panelDone_'+id)==='1';}
-function homeList(){$('plist').innerHTML=window.PROJECTS.map(p=>`<button class="pc glass${p.soon?' soon':''}${done(p.id)?' done':''}" type="button" ${p.soon?'disabled':''} data-open="${p.id}"><div class="i">${p.icon}</div><div><b>مشروع ${p.n}: ${p.title}</b><span>${p.soon?'قريباً':done(p.id)?'خلّصتو ✓ فيك تعيدو':'ركّب الدارة كاملة، وبفحصلك ياها لحالي.'}</span></div><div class="go">${p.soon?'قريباً':done(p.id)?'✓ خلص':'ابدا ←'}</div></button>`).join('');}
+function homeList(){const card=p=>`<button class="pc glass${p.soon?' soon':''}${done(p.id)?' done':''}" type="button" ${p.soon?'disabled':''} data-open="${p.id}"><div class="i">${p.icon}</div><div><b>مشروع ${p.n}: ${p.title}</b><span>${p.soon?'قريباً':done(p.id)?'خلّصتو ✓ فيك تعيدو':'ركّب الدارة كاملة، وبفحصلك ياها لحالي.'}</span></div><div class="go">${p.soon?'قريباً':done(p.id)?'✓ خلص':'ابدا ←'}</div></button>`;
+ const C=[['electro','مشاريع كورس الكهربا'],['classic','مشاريع كورس الكلاسيك كنترول']];
+ $('plist').innerHTML=C.map(([k,t])=>{const L=window.PROJECTS.filter(p=>p.course===k);const d=L.filter(p=>done(p.id)).length;return `<div class="sec">${t} · ${d}/${L.length} ✓</div>`+L.map(card).join('');}).join('')+
+ `<div class="sec">مشاريع كورس الطاقة الشمسية</div><a class="pc glass" href="../sim/#projects" style="text-decoration:none;color:inherit"><div class="i">☀️</div><div><b>مشاريع الطاقة الشمسية</b><span>6 مشاريع بمختبر الطاقة: إنفرتر، بطاريات، ألواح، وإعدادات.</span></div><div class="go">افتح ←</div></a>`;}
 document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o&&!o.disabled)location.hash=o.dataset.open;});
 function route(){const h=location.hash.slice(1);if(!h){$('lab').hidden=true;$('home').hidden=false;homeList();stop();return;}
  const p=window.PROJECTS.find(x=>x.id===h&&!x.soon);if(h!=='free'&&!p){location.hash='';return;}
@@ -170,7 +172,7 @@ window.addEventListener('hashchange',route);
 function open(p){PJ=p;KEY='panel_'+(p?p.id:'free');$('home').hidden=true;$('lab').hidden=false;$('ttl').textContent=p?`مشروع ${p.n}: ${p.title}`:'مختبر حرّ';
  B.on=false;B.blown=false;runUI();
  let saved=null;try{saved=JSON.parse(ls(KEY)||'null');}catch(e){}
- if(saved&&saved.comps){B.comps=saved.comps;B.wires=saved.wires;for(const c of B.comps){c.st={};if(c.type.startsWith('mcb'))c.st.on=true;}}
+ if(saved&&saved.comps){B.comps=saved.comps;B.wires=saved.wires;for(const c of B.comps){c.st={};if(c.type.startsWith('mcb')||c.type==='rcd')c.st.on=true;}}
  else{B.comps=[];B.wires=[];if(p)p.setup((t,x,y)=>add(t,x,y,true));}
  undo=[];sel=null;selW=null;pend=null;$('task').hidden=!p;if(p)taskCard();setTool('move');fit(false);draw();}
 $('bBack').onclick=()=>{location.hash='';};
@@ -179,9 +181,10 @@ $('bBack').onclick=()=>{location.hash='';};
 function nid(t){let i=1;while(B.comps.some(c=>c.id===t+i))i++;return t+i;}
 function nlabel(t){const pre=P[t].pre;if(!pre)return '';let i=1;while(B.comps.some(c=>c.label===pre+i))i++;return pre+i;}
 function add(t,x,y,quiet){const d=P[t];const c=Object.assign({id:nid(t),type:t,x:snap(x),y:y,label:nlabel(t),st:{}},JSON.parse(JSON.stringify(d.def||{})));
- if(t.startsWith('mcb'))c.st.on=true;c.y=railY(c,y);B.comps.push(c);if(!quiet){sel=c.id;selW=null;}return c;}
+ if(t.startsWith('mcb')||t==='rcd')c.st.on=true;c.y=railY(c,y);B.comps.push(c);if(!quiet){sel=c.id;selW=null;}return c;}
 const snap=v=>Math.round(v/10)*10;
-function railY(c,y){const h=P[c.type].h;if(c.type==='src'||c.type==='motor')return snap(y);
+const DIN={mcb1:1,mcb3:1,rcd:1,kc:1,ol:1,relay:1,tmr:1,tb:1};
+function railY(c,y){const h=P[c.type].h;if(!DIN[c.type])return snap(y);
  for(const r of RAILS)if(Math.abs(y+h/2-r)<70)return r-h/2;return snap(y);}
 function tpos(k){const [id,n]=k.split('.');const c=B.comps.find(x=>x.id===id);if(!c)return null;const t=P[c.type].terms.find(x=>x.n===n);return t?{x:c.x+t.x,y:c.y+t.y,d:t.d}:null;}
 
@@ -242,7 +245,7 @@ function snapState(){return JSON.stringify({comps:B.comps.map(c=>{const o={...c}
 function save(){ls(KEY,snapState());}
 function push(){undo.push(snapState());if(undo.length>50)undo.shift();}
 $('bUndo').onclick=()=>{const s=undo.pop();if(!s){toast('ما في شي لترجعو');return;}const o=JSON.parse(s);
- const st={};for(const c of B.comps)st[c.id]=c.st;B.comps=o.comps.map(c=>(c.st=st[c.id]||(c.type.startsWith('mcb')?{on:true}:{}),c));B.wires=o.wires;sel=null;selW=null;save();sim();draw();};
+ const st={};for(const c of B.comps)st[c.id]=c.st;B.comps=o.comps.map(c=>(c.st=st[c.id]||(c.type.startsWith('mcb')||c.type==='rcd'?{on:true}:{}),c));B.wires=o.wires;sel=null;selW=null;save();sim();draw();};
 $('bFit').onclick=()=>fit(true);
 
 /* ---------- الأدوات ---------- */
@@ -256,16 +259,19 @@ function closeSheets(except){document.querySelectorAll('.sheet').forEach(s=>{if(
 document.addEventListener('click',e=>{if(e.target.closest('[data-close]'))closeSheets();});
 
 /* ---------- مكتبة القطع ---------- */
+const VAR={lamp:[['g','لمبة خضرا',{color:'g'}],['r','لمبة حمرا',{color:'r'}],['y','لمبة صفرا',{color:'y'}]],
+ src1:[['grid','الدولة',{kind:'grid'}],['gen','الموتير',{kind:'gen'}],['inv','الإنفرتر',{kind:'inv'}]],
+ load:[['heater','سخّان',{kind:'heater',watt:3000}],['ac','مكيّف',{kind:'ac',watt:2600}],['fan','مروحة شفط',{kind:'fan',watt:750}],['house','البيت',{kind:'house',watt:5000}]]};
 (function lib(){const cats={};for(const t in P){const d=P[t];(cats[d.cat]=cats[d.cat]||[]).push(t);}
  const names={'حماية':'الحماية','تحكم':'التحكم','كبسات':'الكبسات واللمبات','حمل':'الأحمال','وصل':'التغذية والوصل'};
  let h='';for(const k of ['حماية','تحكم','كبسات','حمل','وصل'])if(cats[k]){h+=`<div class="cat">${names[k]}</div><div class="tiles">`;
   for(const t of cats[k]){const d=P[t];const c=Object.assign({id:'p',type:t,label:'',st:{on:true}},JSON.parse(JSON.stringify(d.def||{})));
-   const variants=t==='lamp'?[['g','لمبة خضرا'],['r','لمبة حمرا'],['y','لمبة صفرا']]:[[null,d.name]];
-   for(const [v,nm] of variants){if(v)c.color=v;h+=`<button class="tile" type="button" data-add="${t}" ${v?`data-v="${v}"`:''}><svg viewBox="-12 -30 ${d.w+24} ${d.h+44}">${DEFS}${d.draw(c,{on:true})}</svg><span>${nm}</span></button>`;}}
+   const variants=VAR[t]||[[null,d.name]];
+   for(const [v,nm,ex] of variants){if(v&&ex)Object.assign(c,ex);h+=`<button class="tile" type="button" data-add="${t}" ${v?`data-v="${v}"`:''}><svg viewBox="-12 -30 ${d.w+24} ${d.h+44}">${DEFS}${d.draw(c,{on:true})}</svg><span>${nm}</span></button>`;}}
   h+='</div>';}
  $('libBody').innerHTML=h;
  $('libBody').onclick=e=>{const b=e.target.closest('[data-add]');if(!b)return;push();const t=b.dataset.add,d=P[t];
-  const cx=cam.x+cam.w/2-d.w/2,cy=cam.y+cam.h/2-d.h/2;const c=add(t,Math.max(60,Math.min(W-d.w-60,cx)),Math.max(60,Math.min(H-d.h-60,cy)));if(b.dataset.v)c.color=b.dataset.v;
+  const cx=cam.x+cam.w/2-d.w/2,cy=cam.y+cam.h/2-d.h/2;const c=add(t,Math.max(60,Math.min(W-d.w-60,cx)),Math.max(60,Math.min(H-d.h-60,cy)));if(b.dataset.v){const vv=(VAR[t]||[]).find(x=>x[0]===b.dataset.v);if(vv)Object.assign(c,vv[2]);}
   closeSheets();save();sim();draw();chipFor(c);};})();
 
 /* ---------- خصائص القطعة والشريط ---------- */
@@ -275,6 +281,10 @@ function chipFor(c){const d=P[c.type];let h=`<h3>${d.name} <span style="color:va
  if(c.type==='ol')h+=`<div class="lbl">ضبط الأوفرلود (A)</div><div class="step"><button data-step="setA" data-d="-0.5">−</button><b>${c.setA}A</b><button data-step="setA" data-d="0.5">+</button></div>`;
  if(c.type==='tmr')h+=`<div class="lbl">وقت التايمر (ثواني)</div><div class="step"><button data-step="sec" data-d="-1">−</button><b>${c.sec}s</b><button data-step="sec" data-d="1">+</button></div>`;
  if(c.type==='motor')h+=`<div class="lbl">قدرة الموتور</div><div class="row">${[2.2,4,5.5,7.5,11,15].map(k=>`<button class="chip${c.kw===k?' on':''}" data-p="kw" data-v="${k}">${k}kW · ${motorI(k).toFixed(1)}A</button>`).join('')}</div>`;
+ if(c.type==='motor6')h+=`<div class="lbl">قدرة الموتور</div><div class="row">${[7.5,11,15,18.5,22].map(k=>`<button class="chip${c.kw===k?' on':''}" data-p="kw" data-v="${k}">${k}kW · ${motorI(k).toFixed(1)}A</button>`).join('')}</div>`;
+ if(c.type==='rcd')h+=`<div class="lbl">قيمة الديفرنسيال (A)</div><div class="row">${window.PARTS.RATR.map(r=>`<button class="chip${c.rating===r?' on':''}" data-p="rating" data-v="${r}">${r}A</button>`).join('')}</div>`;
+ if(c.type==='src1')h+=`<div class="lbl">نوع المصدر</div><div class="row">${[['grid','الدولة'],['gen','الموتير'],['inv','الإنفرتر']].map(([v,n])=>`<button class="chip${c.kind===v?' on':''}" data-p="kind" data-v="${v}" data-s="1">${n}</button>`).join('')}</div>`;
+ if(c.type==='load')h+=`<div class="lbl">قدرة الحمل</div><div class="row">${[500,750,1000,2000,2600,3000,5000,7000].map(w=>`<button class="chip${c.watt===w?' on':''}" data-p="watt" data-v="${w}">${w>=1000?(w/1000)+'kW':w+'W'} · ${(w/230).toFixed(1)}A</button>`).join('')}</div>`;
  if(c.type==='lamp')h+=`<div class="lbl">اللون</div><div class="row">${[['g','خضرا'],['r','حمرا'],['y','صفرا'],['w','بيضا']].map(([v,n])=>`<button class="chip${c.color===v?' on':''}" data-p="color" data-v="${v}" data-s="1">${n}</button>`).join('')}</div>`;
  if(c.type!=='src')h+=`<div class="lbl">الاسم عالمخطط</div><input class="inp" id="pLabel" value="${esc(c.label||'')}" maxlength="8">`;
  h+=`<button class="big bad" type="button" data-del="${c.id}">🗑️ احذف القطعة وشرايطها</button>`;
@@ -344,7 +354,7 @@ function connect(a,b){if(a===b)return;if(a.split('.')[0]===b.split('.')[0]&&P[B.
  {}
  if(B.wires.some(w=>(w.a===a&&w.b===b)||(w.a===b&&w.b===a))){toast('هالشريط موجود');draw();return;}
  push();const pa=E.termInfo(a),pb=E.termInfo(b);const pw=pa&&pb&&pa.pw&&pb.pw;const isPE=/\.PE$/.test(a)||/\.PE$/.test(b);const isN=/\.N$/.test(a)||/\.N$/.test(b);
- const ph=(/\.(L1|U1)$/.test(a+' ')||/\.(L1|U1)$/.test(b))?'br':(/\.(L2|V1)$/.test(a)||/\.(L2|V1)$/.test(b))?'bk':(/\.(L3|W1)$/.test(a)||/\.(L3|W1)$/.test(b))?'gr':null;
+ const ph=(/\.(L1|U1|L)$/.test(a)||/\.L$/.test(b)||/\.(L1|U1)$/.test(b))?'br':(/\.(L2|V1)$/.test(a)||/\.(L2|V1)$/.test(b))?'bk':(/\.(L3|W1)$/.test(a)||/\.(L3|W1)$/.test(b))?'gr':null;
  let i=1;while(B.wires.some(w=>w.id==='w'+i))i++;
  const w={id:'w'+i,a,b,color:isPE?'gy':isN?'bl':pw?(ph||'bk'):'rd',mm2:isPE?2.5:pw?1.5:1,num:''};
  B.wires.push(w);pend=null;save();sim();draw();toast(pw?'شريط باور: شيك المقطع على تيار الموتور':'شريط تحكم');}
@@ -357,6 +367,10 @@ function control(id,a,down){const c=B.comps.find(x=>x.id===id);if(!c)return;
  else if(down&&a==='test'){c.st.trip=true;}
  else if(down&&a==='reset'){c.st.trip=false;c.st.heat=0;}
  else if(down&&a==='dial'){sel=c.id;chipFor(c);}
+ else if(down&&a==='avail'){c.st.off=!c.st.off;toast(c.st.off?'المصدر انقطع':'رجع المصدر');}
+ else if(down&&a==='smoke'){c.st.smoke=!c.st.smoke;}
+ else if(down&&a==='toggle'){c.st.on=!c.st.on;}
+ else if(down&&a==='leak'){c.st.leak=!c.st.leak;if(c.st.leak)toast('عملت تسريب عالأرض بهالجهاز: الديفرنسيال لازم يفصل',true);}
  else return;sim();draw();}
 
 /* ---------- الملتيميتر ---------- */
@@ -368,12 +382,13 @@ function probe(k){if(!B.on){toast('شغّل الكهربا أوّل (زر ▶ ف
 
 /* ---------- التشغيل ---------- */
 let raf=0,last=0;
-function sim(){if(!B.on){for(const c of B.comps){if(c.type==='kc'||c.type==='tmr'){c.st.e=false;c.st.t=0;c.st.done=false;}if(c.type==='lamp')c.st.on=false;if(c.type==='motor'){c.st.m='off';c.st.I=0;}}B._N=null;for(const w of B.wires){w.I=0;w.heat=0;}return;}
+function sim(){if(!B.on){for(const c of B.comps){if(c.type==='kc'||c.type==='tmr'){c.st.e=false;c.st.t=0;c.st.done=false;}if(c.type==='lamp'||c.type==='load'||c.type==='bulb'||c.type==='siren')c.st.on=false;if(c.type==='relay')c.st.e=false;if(c.type==='socket')c.st.v=false;if(c.type==='motor'||c.type==='motor6'){c.st.m='off';c.st.I=0;}}B._N=null;for(const w of B.wires){w.I=0;w.heat=0;}return;}
  const ev=[];E.solve(ev);report(ev);}
 function loop(t){if(!B.on)return;const dt=Math.min(.1,(t-last)/1000||0);last=t;const ev=[];E.tick(dt,ev);report(ev);
  if(!loop.n||t-loop.n>120){loop.n=t;draw();}raf=requestAnimationFrame(loop);}
 function report(ev){for(const x of ev){
- if(x.k==='trip')toast(x.why==='short'?`⚡ قصر! فصل القاطع ${x.c.label}`:`القاطع ${x.c.label} فصل: الحمل أكبر منو`,true);
+ if(x.k==='trip')toast(x.why==='short'?`⚡ قصر! فصل القاطع ${x.c.label}`:x.why==='cross'?`⚡ ربطت مصدرين ببعض! فصل ${x.c.label}`:`القاطع ${x.c.label} فصل: الحمل أكبر منو`,true);
+ if(x.k==='rcd')toast(`الديفرنسيال ${x.c.label} فصل: في تيار راجع من برّا الـN (تسريب أو N غلط)`,true);
  if(x.k==='blown')toast('💥 قصر مباشر بلا قاطع: الفيوز الرئيسي ضرب! شيك الشرايط وطفّي وشغّل.',true);
  if(x.k==='burn')toast(`🔥 ${x.c.label} انحطّ على 400V واحترق. الكويل بدّو فاز ونوترال.`,true);
  if(x.k==='oltrip')toast(x.why==='phase'?`الأوفرلود ${x.c.label} فصل: فاز ناقص عالموتور`:`الأوفرلود ${x.c.label} فصل: ضبطو أقل من تيار الموتور`,true);
