@@ -42,6 +42,10 @@ h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
 .nav button{flex:1;background:none;border:0;color:var(--muted);font:600 12px 'IBM Plex Sans Arabic',sans-serif;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;touch-action:manipulation;transition:color .2s}
 .nav button i{font-style:normal;font-size:22px;transition:transform .2s cubic-bezier(.2,.8,.2,1)}
 .nav button.on{color:var(--volt)}.nav button.on i{transform:translateY(-2px) scale(1.08)}
+.news{margin:0 -16px 18px;padding:0 16px;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.news::-webkit-scrollbar{display:none}
+.news:empty{display:none}
+.nw{flex:0 0 82%;scroll-snap-align:start;background:linear-gradient(135deg,#0f2a22,#0a1a15);border:1px solid #22c79b55;border-radius:18px;padding:14px;transition:transform .14s}
+.nw:active{transform:scale(.97)}.nw small{color:var(--volt);font-weight:700;font-size:12px}.nw b{display:block;font-size:15.5px;margin:4px 0 3px}.nw span{display:block;font-size:13px;color:var(--muted);line-height:1.6}
 .foot{margin-top:22px;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.8}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -54,6 +58,7 @@ h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
   <div><h1>MrElectro<b>AI</b></h1><p>كهرباء · كلاسيك كنترول · طاقة شمسية</p></div>
   <div id="langSlot" style="margin-inline-start:auto"></div>
 </header>
+<div class="news" id="news" aria-label="الجديد"></div>
 
 <section class="tab on" id="t-lab">
   <h2>المختبر</h2><p class="sub">وصّل بإيدك، شغّل، وشوف شو بيصير.</p>
@@ -106,6 +111,9 @@ h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
 (function(){var K='appTab';function show(t){document.querySelectorAll('.tab').forEach(function(s){s.classList.toggle('on',s.id==='t-'+t);});
  document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});try{localStorage.setItem(K,t);}catch(e){}scrollTo(0,0);}
  document.querySelector('.nav').addEventListener('click',function(e){var b=e.target.closest('[data-t]');if(b)show(b.dataset.t);});
+ fetch('news.json?t='+Date.now()).then(function(r){return r.json();}).then(function(d){var box=document.getElementById('news');
+  (d.items||[]).slice(0,6).forEach(function(n){var a=document.createElement('a');a.className='nw';a.href=n.url||'#';
+   a.innerHTML='<small>🔔 جديد</small><b></b><span></span>';a.querySelector('b').textContent=n.title||'';a.querySelector('span').textContent=n.body||'';box.appendChild(a);});}).catch(function(){});
  var h=location.hash.slice(1),s=null;try{s=localStorage.getItem(K);}catch(e){}if(h&&document.getElementById('t-'+h))show(h);else if(s&&document.getElementById('t-'+s))show(s);})();
 </script>
 </body>

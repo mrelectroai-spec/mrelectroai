@@ -1,0 +1,116 @@
+name: Build MrElectroAI APK
+
+# التطبيق بيفتح الموقع (app/)، فكل تعديل عالموقع بيوصل لحالو بلا ما تعيد البناء.
+# لتبني نسخة APK جديدة: غيّر الرقم بملف mrelectroai-android/BUILD (أو Actions ← Run workflow)
+# الإشعارات: زيد خبر بملف app/news.json، والتطبيق بيطلّعو إشعار.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'mrelectroai-android/**'
+      - '.github/workflows/build-mrelectroai-apk.yml'
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: mrelectroai-apk
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-24.04
+    env:
+      KS_PASS: 'c85a50b4e8a4f17ab2d47b6c'
+      PKG_DIR: app/src/main/java/com/mrelectroai/app
+    steps:
+      - name: 1. Checkout
+        uses: actions/checkout@v5
+
+      - name: 2. Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: 3. Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: 4. Create Capacitor app
+        run: |
+          mkdir -p cap/www cap/assets
+          cp mrelectroai-android/www/offline.html cap/www/
+          cp mrelectroai-android/www/offline.html cap/www/index.html
+          cp app/icon-192.png cap/www/icon.png
+          cp mrelectroai-android/assets/*.png cap/assets/
+          cd cap
+          npm init -y > /dev/null
+          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7 @capacitor/app@7
+          cat > capacitor.config.json << 'JSON'
+          {
+            "appId": "com.mrelectroai.app",
+            "appName": "MrElectroAI",
+            "webDir": "www",
+            "backgroundColor": "#070F0D",
+            "server": {
+              "url": "https://mrelectroai-spec.github.io/mrelectroai/app/",
+              "errorPath": "offline.html"
+            },
+            "android": { "adjustMarginsForEdgeToEdge": "force" }
+          }
+          JSON
+          npx cap add android
+          npx --yes @capacitor/assets@3 generate --android --iconBackgroundColor '#0A1814' --iconBackgroundColorDark '#0A1814' --splashBackgroundColor '#070F0D' --splashBackgroundColorDark '#070F0D' || echo "icon generation skipped"
+          npx cap sync android
+
+      - name: 5. Notifications code + permissions + version
+        run: |
+          cd cap/android
+          cp $GITHUB_WORKSPACE/mrelectroai-android/java/*.java $PKG_DIR/
+          mkdir -p app/src/main/res/drawable
+          cp $GITHUB_WORKSPACE/mrelectroai-android/ic_stat_bolt.xml app/src/main/res/drawable/
+          sed -i '0,/^dependencies {/s//dependencies {\n    implementation "androidx.work:work-runtime:2.9.1"/' app/build.gradle
+          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n</manifest>#' app/src/main/AndroidManifest.xml
+          sed -i 's/versionCode [0-9]*/versionCode ${{ github.run_number }}/; s/versionName "[^"]*"/versionName "1.${{ github.run_number }}"/' app/build.gradle
+          grep -n "versionCode\|versionName\|work-runtime" app/build.gradle
+          grep -n "permission\|launchMode" app/src/main/AndroidManifest.xml
+          ls $PKG_DIR
+
+      - name: 6. Build & sign
+        run: |
+          cd cap/android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+          $BT/zipalign -f -p 4 app/build/outputs/apk/release/app-release-unsigned.apk aligned.apk
+          $BT/apksigner sign --ks $GITHUB_WORKSPACE/mrelectroai-android/mrelectroai.keystore --ks-key-alias mrelectroai --ks-pass env:KS_PASS --key-pass env:KS_PASS --out $GITHUB_WORKSPACE/MrElectroAI.apk aligned.apk
+          $BT/apksigner verify $GITHUB_WORKSPACE/MrElectroAI.apk
+
+      - name: 7. Publish download link
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete app-latest -y --cleanup-tag || true
+          gh release create app-latest MrElectroAI.apk --title "MrElectroAI (APK)" --notes "نسخة 1.${{ github.run_number }}. التحديث بينزل فوق القديم." --latest=false
+
+      - name: 8. Put APK on the site + redeploy Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+          cp MrElectroAI.apk app/MrElectroAI.apk
+          git add app/MrElectroAI.apk
+          git commit -m "app: update APK 1.${{ github.run_number }}" && git push || echo "no change"
+          gh api -X POST repos/${{ github.repository }}/pages/builds || echo "pages rebuild request failed"
+
+      - name: 9. Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MrElectroAI-APK
+          path: MrElectroAI.apk
