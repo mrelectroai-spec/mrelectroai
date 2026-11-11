@@ -4,24 +4,35 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MrElectroAI</title>
-<meta name="description" content="تطبيق MrElectroAI: المختبر، الكتب، الكورسات، وأدوات الفنيين.">
+<meta name="description" content="تطبيق MrElectroAI: المختبر، الكتب، الكورسات، أدوات الفنيين، ومساعد AI.">
 <meta name="theme-color" content="#070F0D">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script>
+(function(){var t='auto';try{t=localStorage.getItem('siteTheme')||'auto';}catch(e){}
+ var d=t==='auto'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;document.documentElement.setAttribute('data-theme',d);})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#070F0D;--panel:#0e1b17;--panel2:#13241f;--line:#1f3a32;--text:#e8f2ef;--muted:#8fa9a1;--volt:#22C79B;--ink:#04231a}
+:root{--bg:#070F0D;--panel:#0e1b17;--panel2:#13241f;--line:#1f3a32;--text:#e8f2ef;--muted:#8fa9a1;--volt:#22C79B;--ink:#04231a;--hero1:#0f2a22;--hero2:#0a1a15;--navbg:rgba(10,20,17,.94);--me:#123a2f;--bot:#0e1b17}
+[data-theme=light]{--bg:#F3F7F5;--panel:#FFFFFF;--panel2:#E8F1ED;--line:#D3E2DC;--text:#0B1A16;--muted:#56706A;--volt:#14A37C;--ink:#FFFFFF;--hero1:#E2F6EE;--hero2:#F5FBF8;--navbg:rgba(255,255,255,.95);--me:#D7F2E7;--bot:#FFFFFF}
 *{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+#langSlot #langBtn{background:var(--panel)!important;border-color:var(--line)!important;height:40px}
+html{-webkit-tap-highlight-color:transparent;background:var(--bg)}
 body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Arabic','Readex Pro',system-ui,sans-serif;min-height:100vh;
- padding:max(14px,env(safe-area-inset-top)) 16px calc(86px + env(safe-area-inset-bottom))}
+ padding:max(14px,env(safe-area-inset-top)) 16px calc(86px + env(safe-area-inset-bottom));transition:background .25s,color .25s}
 a{color:inherit;text-decoration:none}
-.top{display:flex;align-items:center;gap:12px;margin:6px 0 18px}
-.top img{width:52px;height:52px;border-radius:50%}
-.top h1{font:700 22px 'Readex Pro',sans-serif;letter-spacing:-.01em}.top h1 b{color:var(--volt)}
-.top p{font-size:13px;color:var(--muted)}
+button{font-family:inherit;color:inherit}
+.top{display:flex;align-items:center;gap:12px;margin:6px 0 16px}
+.top img{width:50px;height:50px;border-radius:14px}
+.top h1{font:700 21px 'Readex Pro',sans-serif;letter-spacing:-.01em}.top h1 b{color:var(--volt)}
+.top p{font-size:12.5px;color:var(--muted)}
+.tops{margin-inline-start:auto;display:flex;align-items:center;gap:8px}
+.gear{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center;font-size:19px;cursor:pointer;transition:transform .14s}
+.gear:active{transform:scale(.92)}
 .tab{display:none;animation:in .24s cubic-bezier(.2,.8,.2,1)}.tab.on{display:block}
 @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
@@ -33,20 +44,56 @@ h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
 .card img.cv{flex:0 0 52px;width:52px;height:70px;object-fit:cover;border-radius:8px}
 .card b{display:block;font-size:15.5px}.card span{display:block;font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5}
 .card .go{margin-inline-start:auto;color:var(--volt);font-size:20px}
-.hero{background:linear-gradient(135deg,#0f2a22,#0a1a15);border:1px solid #22c79b55}
+.hero{background:linear-gradient(135deg,var(--hero1),var(--hero2));border:1px solid #22c79b55}
 .hero .ic{background:var(--volt);color:var(--ink)}
 .row{display:flex;gap:8px;margin-top:12px}
-.btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:46px;border-radius:14px;background:var(--volt);color:var(--ink);font-weight:700;font-size:15px;transition:transform .14s}
+.btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:46px;border-radius:14px;background:var(--volt);color:var(--ink);font-weight:700;font-size:15px;transition:transform .14s;border:0;cursor:pointer}
 .btn.alt{background:var(--panel2);color:var(--text);border:1px solid var(--line)}.btn:active{transform:scale(.96)}
-.nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(10,20,17,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:6px 6px max(8px,env(safe-area-inset-bottom));z-index:10}
-.nav button{flex:1;background:none;border:0;color:var(--muted);font:600 12px 'IBM Plex Sans Arabic',sans-serif;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;touch-action:manipulation;transition:color .2s}
-.nav button i{font-style:normal;font-size:22px;transition:transform .2s cubic-bezier(.2,.8,.2,1)}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--navbg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:6px 4px max(8px,env(safe-area-inset-bottom));z-index:10}
+.nav button{flex:1;background:none;border:0;color:var(--muted);font:600 11.5px 'IBM Plex Sans Arabic',sans-serif;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;touch-action:manipulation;transition:color .2s}
+.nav button i{font-style:normal;font-size:21px;transition:transform .2s cubic-bezier(.2,.8,.2,1)}
 .nav button.on{color:var(--volt)}.nav button.on i{transform:translateY(-2px) scale(1.08)}
+.foot{margin-top:22px;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.8}
 .news{margin:0 -16px 18px;padding:0 16px;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.news::-webkit-scrollbar{display:none}
 .news:empty{display:none}
-.nw{flex:0 0 82%;scroll-snap-align:start;background:linear-gradient(135deg,#0f2a22,#0a1a15);border:1px solid #22c79b55;border-radius:18px;padding:14px;transition:transform .14s}
+.nw{flex:0 0 82%;scroll-snap-align:start;background:linear-gradient(135deg,var(--hero1),var(--hero2));border:1px solid #22c79b55;border-radius:18px;padding:14px;transition:transform .14s}
 .nw:active{transform:scale(.97)}.nw small{color:var(--volt);font-weight:700;font-size:12px}.nw b{display:block;font-size:15.5px;margin:4px 0 3px}.nw span{display:block;font-size:13px;color:var(--muted);line-height:1.6}
-.foot{margin-top:22px;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.8}
+/* الإعدادات */
+.set{background:var(--panel);border:1px solid var(--line);border-radius:18px;margin-bottom:12px;overflow:hidden}
+.si{display:flex;align-items:center;gap:12px;padding:14px;border-top:1px solid var(--line);min-height:60px;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:start;font-size:15px;cursor:pointer}
+.si:first-child{border-top:0}
+.si i{font-style:normal;font-size:20px;width:28px;text-align:center}
+.si .t{flex:1}.si .t small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px;line-height:1.5}
+.si .go{color:var(--muted)}
+.sw{position:relative;width:50px;height:30px;border-radius:99px;background:var(--line);border:0;flex:0 0 50px;cursor:pointer;transition:background .2s}
+.sw::after{content:'';position:absolute;top:3px;inset-inline-start:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25);transition:inset-inline-start .2s cubic-bezier(.2,.8,.2,1)}
+.sw[aria-checked=true]{background:var(--volt)}.sw[aria-checked=true]::after{inset-inline-start:23px}
+.sw:disabled{opacity:.45}
+.seg{display:flex;background:var(--panel2);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:none;border-radius:9px;padding:8px 10px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.seg button.on{background:var(--panel);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.blk{display:block;padding:14px;border-top:1px solid var(--line)}.blk:first-child{border-top:0}
+.blk .lb{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:15px}.blk .lb i{font-style:normal;font-size:20px;width:28px;text-align:center}
+.warn{font-size:12.5px;color:#E8A33D;margin-top:6px;line-height:1.6}
+.ver{text-align:center;color:var(--muted);font-size:12px;margin-top:6px}
+/* المساعد */
+#t-ai.on{display:flex;flex-direction:column;min-height:calc(100vh - 190px)}
+.chat{flex:1;display:flex;flex-direction:column;gap:10px;padding-bottom:10px}
+.msg{max-width:88%;padding:11px 14px;border-radius:18px;font-size:15px;line-height:1.75;white-space:pre-wrap;word-wrap:break-word;animation:in .2s}
+.msg.bot{background:var(--bot);border:1px solid var(--line);align-self:flex-start;border-start-start-radius:6px}
+.msg.me{background:var(--me);align-self:flex-end;border-start-end-radius:6px}
+.msg a{color:var(--volt);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.msg.typing{color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 10px}
+.chips button{border:1px solid #22c79b66;background:var(--panel);color:var(--text);border-radius:99px;padding:8px 13px;font-size:13.5px;cursor:pointer;transition:transform .14s}
+.chips button:active{transform:scale(.95)}
+.comp{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom));display:flex;gap:8px;background:var(--bg);padding:8px 0 4px}
+.comp textarea{flex:1;resize:none;height:48px;max-height:120px;border-radius:16px;border:1px solid var(--line);background:var(--panel);color:var(--text);padding:12px 14px;font:inherit;font-size:16px;line-height:1.4}
+.comp textarea:focus{outline:2px solid var(--volt);border-color:transparent}
+.comp button{width:48px;height:48px;border-radius:16px;border:0;background:var(--volt);color:var(--ink);font-size:20px;cursor:pointer;flex:0 0 48px}
+.comp button:disabled{opacity:.5}
+.aihd{display:flex;align-items:center;gap:10px;margin-bottom:6px}.aihd h2{margin:0}
+.aihd button{margin-inline-start:auto;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:6px 10px;font-size:12.5px;color:var(--muted);cursor:pointer}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script src="../t.js" data-page="app" defer></script>
@@ -56,7 +103,7 @@ h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
 <header class="top">
   <img src="icon-192.png" alt="MrElectroAI">
   <div><h1>MrElectro<b>AI</b></h1><p>كهرباء · كلاسيك كنترول · طاقة شمسية</p></div>
-  <div id="langSlot" style="margin-inline-start:auto"></div>
+  <div class="tops"><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
 </header>
 <div class="news" id="news" aria-label="الجديد"></div>
 
@@ -101,20 +148,129 @@ h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
   <div class="foot">عندك مشروع أو سؤال؟<br><a href="https://wa.me/96179434479" style="color:var(--volt);font-weight:700">احكيني عالواتساب</a> · <span dir="ltr">+961 79 434 479</span></div>
 </section>
 
+<section class="tab" id="t-ai">
+  <div class="aihd"><h2>🤖 المساعد</h2><button type="button" id="aiClear">محادثة جديدة</button></div>
+  <p class="sub">اسألني شو بدّك، وبدلّك عالأداة أو الكورس المناسب.</p>
+  <div class="chat" id="chat" aria-live="polite" translate="no"></div>
+  <div class="chips" id="chips">
+    <button type="button">بدي اتعلّم كهربا من الصفر</button>
+    <button type="button">بدي احسب منظومة طاقة شمسية لبيت</button>
+    <button type="button">بدي اعمل عرض سعر لزبون</button>
+    <button type="button">كيف بركّب كونتاكتور مع أوفرلود؟</button>
+    <button type="button">بدي اشتري كتاب</button>
+  </div>
+  <form class="comp" id="comp"><textarea id="q" rows="1" placeholder="اكتب سؤالك هون…" aria-label="سؤالك"></textarea><button type="submit" id="send" aria-label="ابعت">➤</button></form>
+</section>
+
+<section class="tab" id="t-settings">
+  <h2>الإعدادات</h2>
+  <div class="set">
+    <div class="si"><i>🔔</i><div class="t">الإشعارات<small id="nfTxt">أخبار، كورسات وأدوات جديدة.</small></div><button type="button" class="sw" id="nfSw" role="switch" aria-checked="true" aria-label="الإشعارات"></button></div>
+    <button type="button" class="si" id="nfSys" hidden><i>📱</i><div class="t">الإشعارات مسكّرة من التلفون<small>اكبس هون وشغّلها من إعدادات التلفون.</small></div><span class="go">←</span></button>
+  </div>
+  <div class="set">
+    <div class="blk"><div class="lb"><i>🌐</i>اللغة</div><div class="seg" id="segLang"><button type="button" data-v="ar" class="notranslate" translate="no">عربي</button><button type="button" data-v="en" class="notranslate" translate="no">English</button></div></div>
+    <div class="blk"><div class="lb"><i>🌓</i>المظهر</div><div class="seg" id="segTheme"><button type="button" data-v="auto">تلقائي</button><button type="button" data-v="dark">غامق</button><button type="button" data-v="light">فاتح</button></div></div>
+  </div>
+  <div class="set">
+    <a class="si" href="privacy.html"><i>🔒</i><div class="t">سياسة الخصوصية</div><span class="go">←</span></a>
+    <a class="si" href="https://wa.me/96179434479"><i>💬</i><div class="t">تواصل مع أنور<small>واتساب: <span dir="ltr">+961 79 434 479</span></small></div><span class="go">←</span></a>
+    <button type="button" class="si" id="share"><i>📤</i><div class="t">شارك التطبيق مع رفقاتك</div><span class="go">←</span></button>
+    <a class="si" id="getApk" href="MrElectroAI.apk" hidden><i>⬇️</i><div class="t">نزّل التطبيق عأندرويد<small>ملف APK</small></div><span class="go">←</span></a>
+  </div>
+  <p class="ver" id="ver">MrElectroAI</p>
+</section>
+
 <nav class="nav" aria-label="الأقسام">
   <button type="button" data-t="lab" class="on"><i>🔌</i>المختبر</button>
   <button type="button" data-t="books"><i>📘</i>الكتب</button>
   <button type="button" data-t="courses"><i>🎓</i>الكورسات</button>
   <button type="button" data-t="tools"><i>🛠️</i>الأدوات</button>
+  <button type="button" data-t="ai"><i>🤖</i>المساعد</button>
 </nav>
 <script>
-(function(){var K='appTab';function show(t){document.querySelectorAll('.tab').forEach(function(s){s.classList.toggle('on',s.id==='t-'+t);});
- document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});try{localStorage.setItem(K,t);}catch(e){}scrollTo(0,0);}
- document.querySelector('.nav').addEventListener('click',function(e){var b=e.target.closest('[data-t]');if(b)show(b.dataset.t);});
- fetch('news.json?t='+Date.now()).then(function(r){return r.json();}).then(function(d){var box=document.getElementById('news');
-  (d.items||[]).slice(0,6).forEach(function(n){var a=document.createElement('a');a.className='nw';a.href=n.url||'#';
-   a.innerHTML='<small>🔔 جديد</small><b></b><span></span>';a.querySelector('b').textContent=n.title||'';a.querySelector('span').textContent=n.body||'';box.appendChild(a);});}).catch(function(){});
- var h=location.hash.slice(1),s=null;try{s=localStorage.getItem(K);}catch(e){}if(h&&document.getElementById('t-'+h))show(h);else if(s&&document.getElementById('t-'+s))show(s);})();
+(function(){
+var K='appTab',$=function(i){return document.getElementById(i);};
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){return null;}}
+var EN=ls('siteLang')==='en';
+var T=EN?{noNet:'No internet. Try again.',notIn:'Notifications work in the Android app only.',thinking:'Thinking…',hi:'Hi 👋 I\'m the MrElectroAI assistant. Tell me what you need and I\'ll point you to the right tool or course.',appOnly:'Website',ver:'Version '}
+ :{noNet:'ما في إنترنت، جرّب كمان مرّة.',notIn:'الإشعارات بتشتغل بتطبيق الأندرويد بس.',thinking:'عم فكّر…',hi:'أهلا 👋 أنا مساعد MrElectroAI. قلّي شو بدّك، وبدلّك عالأداة أو الكورس اللي بيناسبك.',appOnly:'الموقع',ver:'نسخة '};
+
+/* ---------- التبويبات ---------- */
+function show(t){if(!$('t-'+t))t='lab';document.querySelectorAll('.tab').forEach(function(s){s.classList.toggle('on',s.id==='t-'+t);});
+ document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});if(t!=='settings')ls(K,t);$('news').hidden=t!=='lab';scrollTo(0,0);
+ if(t==='ai')openAI();if(t==='settings')loadSet();}
+document.querySelector('.nav').addEventListener('click',function(e){var b=e.target.closest('[data-t]');if(b)show(b.dataset.t);});
+$('gear').onclick=function(){show('settings');};
+function fromHash(){var h=location.hash.slice(1);if(h==='news')h='lab';if(h&&$('t-'+h)){show(h);return true;}return false;}
+window.addEventListener('hashchange',fromHash);
+
+/* ---------- الأخبار ---------- */
+fetch('news.json?t='+Date.now()).then(function(r){return r.json();}).then(function(d){var box=$('news');
+ (d.items||[]).slice(0,6).forEach(function(n){var a=document.createElement('a');a.className='nw';a.href=n.url||'#';
+  a.innerHTML='<small>🔔 جديد</small><b></b><span></span>';a.querySelector('b').textContent=n.title||'';a.querySelector('span').textContent=n.body||'';box.appendChild(a);});}).catch(function(){});
+
+/* ---------- جوّا التطبيق؟ ---------- */
+var CAP=window.Capacitor&&typeof window.Capacitor.nativePromise==='function';
+var INAPP=CAP||/MrElectroAIApp/.test(navigator.userAgent);
+function nat(m,o){return CAP?window.Capacitor.nativePromise('AppPrefs',m,o||{}):Promise.reject('web');}
+
+/* ---------- الإعدادات ---------- */
+function paintNotif(r){$('nfSw').setAttribute('aria-checked',r.notif?'true':'false');$('nfSys').hidden=!(r.notif&&r.system===false);}
+function loadSet(){
+ if(CAP){$('nfSw').disabled=false;nat('get').then(function(r){paintNotif(r);$('ver').textContent='MrElectroAI · '+T.ver+(r.version||'');}).catch(function(){});}
+ else{$('nfSw').disabled=true;$('nfSw').setAttribute('aria-checked','false');$('nfTxt').textContent=T.notIn;$('ver').textContent='MrElectroAI · '+T.appOnly;$('getApk').hidden=INAPP;}
+ var th=ls('siteTheme')||'auto';document.querySelectorAll('#segTheme button').forEach(function(b){b.classList.toggle('on',b.dataset.v===th);});
+ document.querySelectorAll('#segLang button').forEach(function(b){b.classList.toggle('on',b.dataset.v===(EN?'en':'ar'));});}
+$('nfSw').onclick=function(){if(!CAP)return;var on=$('nfSw').getAttribute('aria-checked')!=='true';nat('setNotif',{on:on}).then(paintNotif).catch(function(){});};
+$('nfSys').onclick=function(){nat('openSettings').catch(function(){});};
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&$('t-settings').classList.contains('on'))loadSet();});
+function applyTheme(t){var d=t==='auto'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;document.documentElement.setAttribute('data-theme',d);
+ var m=document.querySelector('meta[name=theme-color]');if(m)m.content=d==='light'?'#F3F7F5':'#070F0D';}
+applyTheme(ls('siteTheme')||'auto');
+matchMedia('(prefers-color-scheme: light)').addEventListener('change',function(){if((ls('siteTheme')||'auto')==='auto')applyTheme('auto');});
+$('segTheme').onclick=function(e){var b=e.target.closest('button');if(!b)return;ls('siteTheme',b.dataset.v);applyTheme(b.dataset.v);loadSet();};
+$('segLang').onclick=function(e){var b=e.target.closest('button');if(!b)return;if((b.dataset.v==='en')!==EN){ls(K,'settings');var lb=$('langBtn');if(lb)lb.click();else{ls('siteLang',b.dataset.v);location.reload();}}};
+$('share').onclick=function(){var u='https://mrelectroai-spec.github.io/mrelectroai/app/',t=EN?'MrElectroAI: labs, courses and tools for electricians':'MrElectroAI: مختبر، كورسات مجانية، وأدوات للكهربجية';
+ if(navigator.share)navigator.share({title:'MrElectroAI',text:t,url:u}).catch(function(){});else location.href='https://wa.me/?text='+encodeURIComponent(t+'\n'+u);};
+
+/* ---------- المساعد ---------- */
+var FN='https://utjpvjnhffapbwpbkkuc.supabase.co/functions/v1/mea-ai',HK='aiChat1',H=[];
+try{H=JSON.parse(ls(HK)||'[]')||[];}catch(e){H=[];}
+var B='https://mrelectroai-spec.github.io/mrelectroai/';
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function fmt(s){var h=esc(s);
+ h=h.replace(/\[([^\]]{1,80})\]\((https:\/\/(?:mrelectroai-spec\.github\.io\/mrelectroai\/|wa\.me\/96179434479)[^\s)]*)\)/g,function(_,t,u){return '<a href="'+u+'">'+t+'</a>';});
+ h=h.replace(/\*\*([^*]{1,120})\*\*/g,'<b>$1</b>');return h;}
+function bubble(role,text,cls){var d=document.createElement('div');d.className='msg '+(role==='user'?'me':'bot')+(cls?' '+cls:'');d.innerHTML=role==='user'?esc(text):fmt(text);$('chat').appendChild(d);
+ d.scrollIntoView({block:'end',behavior:'smooth'});return d;}
+var opened=false;function openAI(){if(opened)return;opened=true;bubble('model',T.hi);H.forEach(function(m){bubble(m.role,m.text);});$('chips').hidden=H.length>0;}
+$('aiClear').onclick=function(){H=[];ls(HK,'[]');$('chat').innerHTML='';opened=false;openAI();};
+/* بديل بلا AI: كلمات مفتاحية */
+var R=[
+ [/صفر|مبتد|اتعلم|اتعلّم|تعلم|learn|begin|basic/i,'إذا بادئ من الصفر، بلّش بامتحان تحديد المستوى، وبعدين كورس الكهربا المجاني.\n[امتحان تحديد المستوى]('+B+'quiz.html)\n[كورس الكهربا]('+B+'course/)','If you\'re starting from zero, take the placement quiz, then the free electricity course.\n[Placement quiz]('+B+'quiz.html)\n[Electricity course]('+B+'course/)'],
+ [/منظوم|شمسي|ألواح|الواح|بطاري|solar|panel|batter|system/i,'لتحسب منظومة لبيت: حط الأحمال وبيطلعلك الإنفرتر والبطاريات والألواح والكابلات.\n[حساب المنظومة]('+B+'tools/load/)\n[قياس السطح]('+B+'tools/roof/)','To size a home solar system, enter your loads and get the inverter, batteries, panels and cables.\n[System sizing]('+B+'tools/load/)\n[Roof measuring]('+B+'tools/roof/)'],
+ [/عرض سعر|تسعير|زبون|quote|price/i,'اعمل عرض سعر PDF للزبون بدقيقتين.\n[عرض السعر]('+B+'tools/quote/)','Make a PDF price quote for your customer in two minutes.\n[Price quote]('+B+'tools/quote/)'],
+ [/إنفرتر|انفرتر|دايه|داي|deye|growatt|felicity|voltronic|inverter|إعدادات|اعدادات/i,'إعدادات الإنفرترات خطوة بخطوة، وجرّب التوصيل بالمختبر.\n[إعدادات الإنفرترات]('+B+'tools/inverters/)\n[إعدادات Deye]('+B+'tools/deye/)\n[مختبر الطاقة]('+B+'sim/)','Inverter settings step by step, and try the wiring in the lab.\n[Inverter settings]('+B+'tools/inverters/)\n[Deye settings]('+B+'tools/deye/)\n[Solar lab]('+B+'sim/)'],
+ [/كونتاكت|كنتاكت|أوفرلود|اوفرلود|ريليه|كلاسيك|موتور|contactor|relay|overload|motor|classic/i,'الكلاسيك كنترول: شوف القطع بالـ3D، وخود الكورس المجاني قاعدة قاعدة. وقبل أي شغل، قطّع الكهربا.\n[مختبر القطع]('+B+'lab/)\n[كورس الكلاسيك]('+B+'classic/)','Classic control: see the parts in 3D and take the free course rule by rule. Always switch the power off before working.\n[Parts lab]('+B+'lab/)\n[Classic course]('+B+'classic/)'],
+ [/كتاب|كتب|شراء|اشتري|سعر الكتاب|book|buy/i,'الكتب PDF، بتطلبها من أنور عالواتساب. وفيك تنزّل عيّنة مجانية قبل.\n[اطلب عالواتساب](https://wa.me/96179434479)\n[العيّنات المجانية]('+B+'sample/)','The books are PDFs; order them from Anwar on WhatsApp. You can download a free sample first.\n[Order on WhatsApp](https://wa.me/96179434479)\n[Free samples]('+B+'sample/)']];
+function local(q){for(var i=0;i<R.length;i++)if(R[i][0].test(q))return R[i][EN?2:1];
+ return EN?'I couldn\'t get that. Try the tools or ask Anwar directly.\n[All tools]('+B+'tools/)\n[WhatsApp Anwar](https://wa.me/96179434479)':'ما فهمت عليك منيح. شوف الأدوات، أو اسأل أنور مباشرة.\n[كل الأدوات]('+B+'tools/)\n[احكي أنور عالواتساب](https://wa.me/96179434479)';}
+var busy=false;
+function ask(q){q=q.trim();if(!q||busy)return;busy=true;$('send').disabled=true;$('chips').hidden=true;
+ H.push({role:'user',text:q});bubble('user',q);var t=bubble('model',T.thinking,'typing');
+ fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'chat',lang:EN?'en':'ar',vid:ls('mea_vid')||'',messages:H.slice(-10)})})
+ .then(function(r){return r.json();}).then(function(d){return d&&d.text?d.text:local(q);})
+ .catch(function(){return navigator.onLine===false?T.noNet:local(q);})
+ .then(function(a){t.classList.remove('typing');t.innerHTML=fmt(a);t.scrollIntoView({block:'end',behavior:'smooth'});H.push({role:'model',text:a});H=H.slice(-20);ls(HK,JSON.stringify(H));busy=false;$('send').disabled=false;});}
+$('comp').onsubmit=function(e){e.preventDefault();var v=$('q').value;$('q').value='';$('q').style.height='';ask(v);};
+$('q').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('comp').requestSubmit();}});
+$('q').addEventListener('input',function(){this.style.height='';this.style.height=Math.min(this.scrollHeight,120)+'px';});
+$('chips').onclick=function(e){var b=e.target.closest('button');if(b)ask(b.textContent);};
+
+/* ---------- أوّل فتحة ---------- */
+if(!fromHash()){var s=ls(K);show(s&&$('t-'+s)?s:'lab');}
+})();
 </script>
 </body>
 </html>

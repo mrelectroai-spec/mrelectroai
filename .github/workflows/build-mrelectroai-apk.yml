@@ -56,6 +56,7 @@ jobs:
             "appName": "MrElectroAI",
             "webDir": "www",
             "backgroundColor": "#070F0D",
+            "appendUserAgent": "MrElectroAIApp",
             "server": {
               "url": "https://mrelectroai-spec.github.io/mrelectroai/app/",
               "errorPath": "offline.html"

@@ -93,6 +93,7 @@ public class NewsWorker extends Worker {
 
     private void show(JSONObject it, String id) {
         Context c = getApplicationContext();
+        if (!AppPrefs.notifOn(c)) return;
         if (Build.VERSION.SDK_INT >= 33 &&
                 ContextCompat.checkSelfPermission(c, "android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) return;
         NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);

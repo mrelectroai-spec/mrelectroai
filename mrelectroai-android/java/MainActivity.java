@@ -14,6 +14,7 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        registerPlugin(AppPrefs.class);
         super.onCreate(savedInstanceState);
         try {
             getWindow().getDecorView().setBackgroundColor(0xFF070F0D);
@@ -22,7 +23,7 @@ public class MainActivity extends BridgeActivity {
         } catch (Exception ignored) { }
 
         // إذن الإشعارات (أندرويد 13 وطالع)
-        if (Build.VERSION.SDK_INT >= 33 &&
+        if (AppPrefs.notifOn(this) && Build.VERSION.SDK_INT >= 33 &&
                 checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 71);
         }
