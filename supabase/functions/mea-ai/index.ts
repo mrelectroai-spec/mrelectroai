@@ -1,6 +1,6 @@
 // MrElectroAI: مساعد AI + ترجمة الموقع للإنجليزي (مع كاش بالداتابيز)
 const KEY = Deno.env.get("GEMINI_API_KEY") || "";
-const MODELS = (Deno.env.get("GEMINI_MODEL") || "gemini-3.8-flash,gemini-flash-latest").split(",").map((s) => s.trim()).filter(Boolean);
+const MODELS = (Deno.env.get("GEMINI_MODEL") || "gemini-flash-lite-latest,gemini-3.5-flash-lite,gemini-flash-latest").split(",").map((s) => s.trim()).filter(Boolean);
 const SB = Deno.env.get("SUPABASE_URL")!;
 const SR = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const CORS = {
@@ -47,7 +47,7 @@ async function gemini(system: string, contents: unknown[], opts: { json?: boolea
       try {
         r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${KEY}`, {
           method: "POST",
-          signal: AbortSignal.timeout(opts.json ? 50000 : 40000),
+          signal: AbortSignal.timeout(opts.json ? 40000 : 20000),
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: system }] },
