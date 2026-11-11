@@ -85,6 +85,7 @@
         d.remove(); document.documentElement.style.overflow = '';
       });
     }
+    window.meaLead = function (l) { try { ls.setItem('mea_lead', JSON.stringify(l)); ls.removeItem('mea_lead_sent'); } catch (x) {} record(l); fill(l); };
     var pages = (+(ls.getItem('mea_pages') || 0)) + 1; ls.setItem('mea_pages', String(pages));
     var kl = known();
     if (kl) record(kl);

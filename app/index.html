@@ -120,6 +120,25 @@ html,body{background:transparent}
 .rep{font-size:14px;line-height:1.85;white-space:pre-wrap;margin-top:8px;padding:12px;border-radius:14px;background:var(--panel2);border:1px solid var(--line)}
 .rep a{color:var(--volt);font-weight:700}
 .qd{margin-top:8px}.qd summary{cursor:pointer;font-size:13.5px;font-weight:700;color:var(--volt);padding:4px 0}.ql{display:grid;gap:6px;margin-top:6px}.ql div{font-size:13px;line-height:1.7;padding:8px 10px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}.ql small{color:var(--muted);font-size:12px}
+
+/* الترحيب بأوّل فتحة */
+#onb{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;padding:16px;background:rgba(3,10,8,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:fin .25s}
+@keyframes fin{from{opacity:0}}
+#onb .box{width:min(440px,100%);border-radius:28px;padding:22px 18px calc(18px + env(safe-area-inset-bottom));background:var(--panel2);border:1px solid var(--line);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 20px 60px rgba(0,0,0,.35);animation:up .35s cubic-bezier(.2,.9,.2,1)}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+#onb .dots{display:flex;gap:6px;justify-content:center;margin-bottom:14px}#onb .dots i{width:7px;height:7px;border-radius:9px;background:var(--line);transition:all .3s}#onb .dots i.on{width:22px;background:var(--volt)}
+#onb h3{font:700 21px 'Readex Pro',sans-serif;margin-bottom:4px}#onb p{color:var(--muted);font-size:14.5px;line-height:1.7;margin-bottom:14px}
+#onb label{display:block;font-size:13.5px;font-weight:600;margin:10px 0 5px}
+#onb input{width:100%;height:48px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--text);padding:0 14px;font:inherit;font-size:16px}
+#onb input:focus{outline:2px solid var(--volt);border-color:transparent}
+#onb .opt{display:grid;gap:8px}#onb .opt button{display:flex;align-items:center;gap:12px;text-align:start;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--panel);font-size:15px;font-weight:600;cursor:pointer;transition:transform .14s,background .2s}
+#onb .opt button:active{transform:scale(.97)}#onb .opt button span{font-size:22px}#onb .opt button small{display:block;font-weight:500;color:var(--muted);font-size:12.5px}
+#onb .go{width:100%;height:52px;border:0;border-radius:16px;background:var(--volt);color:#04231a;font-weight:700;font-size:16px;margin-top:14px;cursor:pointer}
+#onb .skip{display:block;margin:10px auto 0;background:none;border:0;color:var(--muted);font-size:13.5px;cursor:pointer}
+#onb .er{color:#ff6b6b;font-size:13px;min-height:18px;margin-top:6px}
+#onb .rec{display:flex;gap:14px;align-items:center;padding:14px;border-radius:18px;background:linear-gradient(135deg,var(--hero1),var(--hero2));border:1px solid rgba(34,199,155,.45);margin-bottom:6px}
+#onb .rec img{width:56px;height:76px;object-fit:cover;border-radius:8px}#onb .rec b{display:block;font-size:16px}#onb .rec span{font-size:13px;color:var(--muted);line-height:1.6}
+.pth.mine{border-color:rgba(34,199,155,.7);box-shadow:inset 0 0 0 1px rgba(34,199,155,.5),0 8px 30px rgba(0,0,0,.18)}.mineb{display:inline-block;font-size:11.5px;font-weight:700;color:#04231a;background:var(--volt);border-radius:9px;padding:2px 8px;margin-inline-start:6px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script src="../t.js" data-page="app" defer></script>
@@ -128,6 +147,7 @@ html,body{background:transparent}
 </head>
 <body>
 <div class="bg" aria-hidden="true"></div>
+<div id="onb" hidden role="dialog" aria-modal="true" aria-label="أهلا فيك"><div class="box" id="onbBox"></div></div>
 <header class="top">
   <img src="icon-192.png" alt="MrElectroAI">
   <div><h1>MrElectro<b>AI</b></h1><p>كهرباء · كلاسيك كنترول · طاقة شمسية</p></div>
@@ -198,6 +218,7 @@ html,body{background:transparent}
     <div class="blk"><div class="lb"><i>🌓</i>المظهر</div><div class="seg" id="segTheme"><button type="button" data-v="auto">تلقائي</button><button type="button" data-v="dark">غامق</button><button type="button" data-v="light">فاتح</button></div></div>
   </div>
   <div class="set">
+    <button type="button" class="si" id="reOnb"><i>🧭</i><div class="t">من وين بلّش؟<small>جاوب 2 أسئلة وبقلّك شو بيناسبك</small></div><span class="go">←</span></button>
     <a class="si" href="privacy.html"><i>🔒</i><div class="t">سياسة الخصوصية</div><span class="go">←</span></a>
     <a class="si" href="https://wa.me/96179434479"><i>💬</i><div class="t">تواصل مع أنور<small>واتساب: <span dir="ltr">+961 79 434 479</span></small></div><span class="go">←</span></a>
     <button type="button" class="si" id="share"><i>📤</i><div class="t">شارك التطبيق مع رفقاتك</div><span class="go">←</span></button>
@@ -256,6 +277,7 @@ applyTheme(ls('siteTheme')||'auto');
 matchMedia('(prefers-color-scheme: light)').addEventListener('change',function(){if((ls('siteTheme')||'auto')==='auto')applyTheme('auto');});
 $('segTheme').onclick=function(e){var b=e.target.closest('button');if(!b)return;ls('siteTheme',b.dataset.v);applyTheme(b.dataset.v);loadSet();};
 $('segLang').onclick=function(e){var b=e.target.closest('button');if(!b)return;if((b.dataset.v==='en')!==EN){ls(K,'settings');var lb=$('langBtn');if(lb)lb.click();else{ls('siteLang',b.dataset.v);location.reload();}}};
+$('reOnb').onclick=function(){onb();};
 $('share').onclick=function(){var u='https://mrelectroai-spec.github.io/mrelectroai/app/',t=EN?'MrElectroAI: labs, courses and tools for electricians':'MrElectroAI: مختبر، كورسات مجانية، وأدوات للكهربجية';
  if(navigator.share)navigator.share({title:'MrElectroAI',text:t,url:u}).catch(function(){});else location.href='https://wa.me/?text='+encodeURIComponent(t+'\n'+u);};
 
@@ -296,10 +318,11 @@ $('chips').onclick=function(e){var b=e.target.closest('button');if(b)ask(b.textC
 
 /* ---------- مساري ---------- */
 function paths(){const M=window.MEAPATH;if(!M)return;M.rules().then(RJ=>{const box=$('paths');let h='';
- for(const id of ['course','classic','solar']){const s=M.status(id),c=s.c,R=(RJ[id]||{}).rules||[];const T=n=>{const r=R.find(x=>x.n===n);return r?r.t:'';};
+ const pr=prof(),ORD=['course','classic','solar'];if(pr&&pr.rec){ORD.splice(ORD.indexOf(pr.rec),1);ORD.unshift(pr.rec);}
+ for(const id of ORD){const s=M.status(id),c=s.c,R=(RJ[id]||{}).rules||[];const T=n=>{const r=R.find(x=>x.n===n);return r?r.t:'';};
   const pct=Math.round(100*((s.read?1:0)+s.passed/s.total*2+(s.finished?1:0)+(s.unlocked?1:0))/5);
   const s1=s.read,s2=s.finished,s3=s.finished&&s.excellent,s4=s.unlocked;
-  h+=`<div class="pth" data-c="${id}"><div class="hd"><div class="ic">${c.icon}</div><div><b>${c.title}</b><span>كتاب «${c.book}»</span></div></div><div class="bar"><i style="width:${pct}%"></i></div>`;
+  const mine=pr&&pr.rec===id;h+=`<div class="pth${mine?' mine':''}" data-c="${id}"><div class="hd"><div class="ic">${c.icon}</div><div><b>${c.title}${mine?'<span class="mineb">مقترح إلك</span>':''}</b><span>كتاب «${c.book}»</span></div></div><div class="bar"><i style="width:${pct}%"></i></div>`;
   h+=`<div class="stp${s1?' ok':''}"><div class="n">${s1?'✓':'1'}</div><div class="t">قراية الكتاب<small>${s1?'خلّصتو 👏':'اقرا الكتاب للآخر، وبعدين علّم هون.'}</small></div><button type="button" class="go" data-read="${id}">${s1?'رجّع':'✓ خلّصتو'}</button></div>`;
   h+=`<div class="stp${s2?' ok':''}${!s1?' lock':''}"><div class="n">${s2?'✓':'2'}</div><div class="t">كورس الأسئلة<small>${s.finished?`خلّصت كل القواعد بـ${s.mistakes} غلطة`:s.started?`${s.passed} من ${s.total} قاعدة · ${s.mistakes} غلطة لهلّق`:`${s.total} قاعدة، 10 أسئلة بكل وحدة`}</small></div><a class="go" href="../${c.url}">${s.finished?'افتح':s.started?'كمّل ←':'ابدا ←'}</a></div>`;
   let rep='';if(s.started){const w=s.weak.slice(0,4);
@@ -323,8 +346,33 @@ function report(id,btn){const M=window.MEAPATH,s=M.status(id);const out=$('rep_'
   .then(r=>r.json()).then(d=>d&&d.text?d.text:local()).catch(local).then(t=>{out.innerHTML=fmt(t);btn.disabled=false;});});}
 paths();document.addEventListener('visibilitychange',()=>{if(!document.hidden)paths();});
 
+
+/* ---------- الترحيب بأوّل فتحة: 20 ثانية ---------- */
+var BK={course:['الكهرباء بالمختصر المفيد','../course/cover.jpg','18 قاعدة من الصفر: الشرايط، التابلو، الديجنتير، وكيف تلاقي العطل.'],classic:['الكلاسيك كنترول بالمختصر المفيد','../classic/cover.jpg','25 قاعدة: كونتاكتور، أوفرلود، تايمر، ستار دلتا، وATS.'],solar:['الطاقة الشمسية بالمختصر المفيد','../solar/cover.jpg','32 قاعدة: ألواح، إنفرترات، بطاريات، وتركيب كامل.']};
+function prof(){try{return JSON.parse(ls('meaProfile')||'null');}catch(e){return null;}}
+function onb(){var P={},step=0,lead=null;try{lead=JSON.parse(ls('mea_lead')||'null');}catch(e){}
+ var box=$('onbBox'),pre=!!(lead&&lead.name&&lead.phone),N=pre?3:4;
+ function dots(){var h='<div class="dots">';for(var i=0;i<N;i++)h+='<i class="'+(i===step?'on':'')+'"></i>';return h+'</div>';}
+ function close(){$('onb').hidden=true;document.documentElement.style.overflow='';}
+ function rec(){if(P.exp==='zero'||P.want==='house'||P.want==='all')return 'course';return P.want;}
+ function render(){var k=pre?step+1:step;var h=dots();
+  if(k===0)h+='<h3>أهلا فيك 👋</h3><p>20 ثانية بس، لنعرف من وين تبلّش.</p><label for="oN">اسمك</label><input id="oN" autocomplete="name" placeholder="مثلاً: محمد علي"><label for="oP">رقمك (واتساب)</label><input id="oP" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" placeholder="70 123 456"><div class="er" id="oE"></div><button class="go" id="oNext">يلّا ←</button><button class="skip" id="oSkip">بعدين</button>';
+  if(k===1)h+='<h3>قديش خبرتك بالكهربا؟</h3><p>بلا تكلّف، ما في جواب غلط.</p><div class="opt" data-k="exp"><button data-v="zero"><span>🌱</span><div>من الصفر<small>ما بعرف شي، أو بعرف شوي كتير</small></div></button><button data-v="some"><span>🔧</span><div>عندي شوي خبرة<small>أقل من سنتين، أو هاوي</small></div></button><button data-v="pro"><span>⚡</span><div>فني شغّال<small>سنتين وطالع بالشغل</small></div></button></div><button class="skip" id="oSkip">بعدين</button>';
+  if(k===2)h+='<h3>شو بدّك تتعلّم؟</h3><p>نقّي الأقرب لإلك.</p><div class="opt" data-k="want"><button data-v="house"><span>🏠</span><div>كهربا بيوت<small>شرايط، تابلو، قواطع، أعطال</small></div></button><button data-v="classic"><span>🎛️</span><div>كلاسيك كنترول ولوحات<small>كونتاكتورات، موتورات، ATS</small></div></button><button data-v="solar"><span>☀️</span><div>طاقة شمسية<small>ألواح، إنفرترات، بطاريات</small></div></button><button data-v="all"><span>🎓</span><div>كل شي، خطوة خطوة<small>من الأساس للاحتراف</small></div></button></div><button class="skip" id="oSkip">بعدين</button>';
+  if(k===3){var r=rec(),b=BK[r],why=P.exp==='zero'&&P.want!=='house'&&P.want!=='all'?'بما إنك من الصفر، بلّش بالأساس، وبعدها بتوصل لـ'+(P.want==='solar'?'الطاقة الشمسية':'الكلاسيك')+'.':P.exp==='pro'&&r!=='course'?'إنت فني، فبلّش دغري بالشي اللي بدّك ياه.':'هيدا الأنسب لإلك هلّق.';
+   h+='<h3>'+(lead&&lead.name?esc(lead.name.split(' ')[0])+'، ':'')+'هيدا بيناسبك 👇</h3><p>'+why+'</p><div class="rec"><img src="'+b[1]+'" alt=""><div><b>'+b[0]+'</b><span>'+b[2]+'</span></div></div><p style="margin:10px 0 0;font-size:13.5px">مسارك: الكتاب ← كورس الأسئلة ← التقرير ← المشاريع العملية.</p><button class="go" id="oDone">ابدا مساري ←</button>';}
+  box.innerHTML=h;
+  var sk=$('oSkip');if(sk)sk.onclick=function(){ls('meaOnb','skip');close();};
+  var nx=$('oNext');if(nx){var nm=$('oN');setTimeout(function(){nm.focus();},250);nx.onclick=function(){var n=$('oN').value.trim().replace(/\s+/g,' '),ph=$('oP').value.trim();
+   if(n.length<2){$('oE').textContent='اكتب اسمك.';return;}if(ph.replace(/\D/g,'').length<7){$('oE').textContent='اكتب رقمك كامل.';return;}
+   lead={name:n,phone:ph};ls('mea_lead',JSON.stringify(lead));try{window.meaLead&&window.meaLead(lead);}catch(e){}step++;render();};}
+  var op=box.querySelector('.opt');if(op)op.onclick=function(e){var b=e.target.closest('[data-v]');if(!b)return;P[op.dataset.k]=b.dataset.v;b.style.background='rgba(34,199,155,.25)';setTimeout(function(){step++;render();},160);};
+  var dn=$('oDone');if(dn)dn.onclick=function(){P.rec=rec();P.at=Date.now();ls('meaProfile',JSON.stringify(P));ls('meaOnb','1');close();show('courses');paths();};}
+ $('onb').hidden=false;document.documentElement.style.overflow='hidden';render();}
+
 /* ---------- أوّل فتحة ---------- */
 if(!fromHash()){var s=ls(K);show(s&&$('t-'+s)?s:'lab');}
+if(!ls('meaOnb'))setTimeout(onb,450);
 })();
 </script>
 </body>
