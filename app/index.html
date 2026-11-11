@@ -94,12 +94,39 @@ h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
 .comp button:disabled{opacity:.5}
 .aihd{display:flex;align-items:center;gap:10px;margin-bottom:6px}.aihd h2{margin:0}
 .aihd button{margin-inline-start:auto;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:6px 10px;font-size:12.5px;color:var(--muted);cursor:pointer}
+
+/* ===== الزجاج متل الآيفون ===== */
+:root{--panel:rgba(255,255,255,.075);--panel2:rgba(255,255,255,.13);--line:rgba(255,255,255,.16);--bot:rgba(255,255,255,.08);--navbg:rgba(12,24,20,.55);--glow1:rgba(34,199,155,.42);--glow2:rgba(60,120,255,.30);--glow3:rgba(150,90,255,.24);--glow4:rgba(0,180,220,.22);--hero1:rgba(34,199,155,.20);--hero2:rgba(255,255,255,.05)}
+[data-theme=light]{--panel:rgba(255,255,255,.58);--panel2:rgba(255,255,255,.78);--line:rgba(255,255,255,.85);--bot:rgba(255,255,255,.7);--navbg:rgba(255,255,255,.6);--glow1:rgba(34,199,155,.30);--glow2:rgba(80,140,255,.22);--glow3:rgba(170,120,255,.20);--glow4:rgba(0,190,230,.18);--hero1:rgba(34,199,155,.18);--hero2:rgba(255,255,255,.55)}
+html,body{background:transparent}
+.bg{position:fixed;inset:-25%;z-index:-1;background:radial-gradient(40% 35% at 18% 22%,var(--glow1),transparent 70%),radial-gradient(35% 30% at 85% 18%,var(--glow2),transparent 70%),radial-gradient(45% 40% at 72% 88%,var(--glow3),transparent 70%),radial-gradient(40% 35% at 8% 92%,var(--glow4),transparent 70%),var(--bg);animation:drift 30s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate(4%,-3%) rotate(6deg) scale(1.06)}}
+.card,.set,.gear,.nw,.msg.bot,.comp textarea,.aihd button,.chips button,.pth,.seg{-webkit-backdrop-filter:blur(20px) saturate(170%);backdrop-filter:blur(20px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 8px 30px rgba(0,0,0,.18)}
+.nav{-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border-top:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.comp{background:transparent}
+.hero{border-color:rgba(34,199,155,.45)}
+/* مساري */
+.pth{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:14px}
+.pth .hd{display:flex;align-items:center;gap:12px;margin-bottom:12px}.pth .hd .ic{flex:0 0 48px;height:48px}
+.pth .hd b{font-size:16px;display:block}.pth .hd span{font-size:12.5px;color:var(--muted)}
+.bar{height:8px;border-radius:9px;background:var(--panel2);overflow:hidden;margin:2px 0 12px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#22C79B,#5be0b9);border-radius:9px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.stp{display:flex;gap:12px;padding:10px 2px;border-top:1px solid var(--line);align-items:flex-start}
+.stp:first-of-type{border-top:0}
+.stp .n{flex:0 0 30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700;background:var(--panel2);border:1px solid var(--line)}
+.stp.ok .n{background:var(--volt);color:#04231a;border-color:transparent}.stp.lock{opacity:.6}
+.stp .t{flex:1;font-size:14.5px;line-height:1.65}.stp .t small{display:block;color:var(--muted);font-size:12.5px}
+.stp .go{align-self:center;font-size:13px;font-weight:700;color:var(--volt);white-space:nowrap;padding:8px 12px;border-radius:12px;background:rgba(34,199,155,.12);border:1px solid rgba(34,199,155,.35);cursor:pointer}
+.weak{margin:8px 0 2px;display:grid;gap:6px}.weak div{font-size:13px;line-height:1.6;padding:8px 10px;border-radius:12px;background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.3)}
+.rep{font-size:14px;line-height:1.85;white-space:pre-wrap;margin-top:8px;padding:12px;border-radius:14px;background:var(--panel2);border:1px solid var(--line)}
+.rep a{color:var(--volt);font-weight:700}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script src="../t.js" data-page="app" defer></script>
 <script src="../lang.js" defer></script>
+<script src="path.js"></script>
 </head>
 <body>
+<div class="bg" aria-hidden="true"></div>
 <header class="top">
   <img src="icon-192.png" alt="MrElectroAI">
   <div><h1>MrElectro<b>AI</b></h1><p>كهرباء · كلاسيك كنترول · طاقة شمسية</p></div>
@@ -127,13 +154,9 @@ h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
 </section>
 
 <section class="tab" id="t-courses">
-  <h2>الكورسات المجانية</h2><p class="sub">قاعدة قاعدة لحد ما تبصمها، ومجانية.</p>
-  <div class="grid">
-    <a class="card hero" href="../quiz.html"><div class="ic">🎯</div><div><b>مش عارف من وين تبلّش؟</b><span>جاوب 6 أسئلة بدقيقة، وبقلّك شو بيناسب مستواك.</span></div><div class="go">←</div></a>
-    <a class="card" href="../course/"><div class="ic">⚡</div><div><b>كورس الكهرباء</b><span>180 سؤال على 18 قاعدة</span></div><div class="go">←</div></a>
-    <a class="card" href="../classic/"><div class="ic">🎛️</div><div><b>كورس الكلاسيك كنترول</b><span>250 سؤال على 25 قاعدة</span></div><div class="go">←</div></a>
-    <a class="card" href="../solar/"><div class="ic">☀️</div><div><b>كورس الطاقة الشمسية</b><span>320 سؤال على 32 قاعدة</span></div><div class="go">←</div></a>
-  </div>
+  <h2>مساري 🎓</h2><p class="sub">الكتاب ← كورس الأسئلة ← التقرير ← المشاريع. خطوة خطوة.</p>
+  <a class="card hero" href="../quiz.html" style="margin-bottom:14px"><div class="ic">🎯</div><div><b>مش عارف من وين تبلّش؟</b><span>جاوب 6 أسئلة بدقيقة، وبقلّك شو بيناسب مستواك.</span></div><div class="go">←</div></a>
+  <div id="paths"></div>
 </section>
 
 <section class="tab" id="t-tools">
@@ -185,7 +208,7 @@ h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
 <nav class="nav" aria-label="الأقسام">
   <button type="button" data-t="lab" class="on"><i>🔌</i>المختبر</button>
   <button type="button" data-t="books"><i>📘</i>الكتب</button>
-  <button type="button" data-t="courses"><i>🎓</i>الكورسات</button>
+  <button type="button" data-t="courses"><i>🎓</i>مساري</button>
   <button type="button" data-t="tools"><i>🛠️</i>الأدوات</button>
   <button type="button" data-t="ai"><i>🤖</i>المساعد</button>
 </nav>
@@ -203,7 +226,7 @@ function show(t){if(!$('t-'+t))t='lab';document.querySelectorAll('.tab').forEach
  if(t==='ai')openAI();if(t==='settings')loadSet();}
 document.querySelector('.nav').addEventListener('click',function(e){var b=e.target.closest('[data-t]');if(b)show(b.dataset.t);});
 $('gear').onclick=function(){show('settings');};
-function fromHash(){var h=location.hash.slice(1);if(h==='news')h='lab';if(h&&$('t-'+h)){show(h);return true;}return false;}
+function fromHash(){var h=location.hash.slice(1);if(h==='news')h='lab';if(h==='path')h='courses';if(h&&$('t-'+h)){show(h);return true;}return false;}
 window.addEventListener('hashchange',fromHash);
 
 /* ---------- الأخبار ---------- */
@@ -268,6 +291,31 @@ $('comp').onsubmit=function(e){e.preventDefault();var v=$('q').value;$('q').valu
 $('q').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('comp').requestSubmit();}});
 $('q').addEventListener('input',function(){this.style.height='';this.style.height=Math.min(this.scrollHeight,120)+'px';});
 $('chips').onclick=function(e){var b=e.target.closest('button');if(b)ask(b.textContent);};
+
+
+/* ---------- مساري ---------- */
+function paths(){const M=window.MEAPATH;if(!M)return;M.rules().then(RJ=>{const box=$('paths');let h='';
+ for(const id of ['course','classic','solar']){const s=M.status(id),c=s.c,R=(RJ[id]||{}).rules||[];const T=n=>{const r=R.find(x=>x.n===n);return r?r.t:'';};
+  const pct=Math.round(100*((s.read?1:0)+s.passed/s.total*2+(s.finished?1:0)+(s.unlocked?1:0))/5);
+  const s1=s.read,s2=s.finished,s3=s.finished&&s.excellent,s4=s.unlocked;
+  h+=`<div class="pth" data-c="${id}"><div class="hd"><div class="ic">${c.icon}</div><div><b>${c.title}</b><span>كتاب «${c.book}»</span></div></div><div class="bar"><i style="width:${pct}%"></i></div>`;
+  h+=`<div class="stp${s1?' ok':''}"><div class="n">${s1?'✓':'1'}</div><div class="t">قراية الكتاب<small>${s1?'خلّصتو 👏':'اقرا الكتاب للآخر، وبعدين علّم هون.'}</small></div><button type="button" class="go" data-read="${id}">${s1?'رجّع':'✓ خلّصتو'}</button></div>`;
+  h+=`<div class="stp${s2?' ok':''}${!s1?' lock':''}"><div class="n">${s2?'✓':'2'}</div><div class="t">كورس الأسئلة<small>${s.finished?`خلّصت كل القواعد بـ${s.mistakes} غلطة`:s.started?`${s.passed} من ${s.total} قاعدة · ${s.mistakes} غلطة لهلّق`:`${s.total} قاعدة، 10 أسئلة بكل وحدة`}</small></div><a class="go" href="../${c.url}">${s.finished?'افتح':s.started?'كمّل ←':'ابدا ←'}</a></div>`;
+  let rep='';if(s.started){const w=s.weak.slice(0,4);
+   rep=w.length?`<div class="weak">${w.map(r=>`<div>⚠️ <b>القاعدة ${r.n}: ${T(r.n)}</b> · ${r.m} غلطات. ارجع اقراها بالكتاب.</div>`).join('')}</div>`:(s.passed?'<div class="weak"><div style="background:rgba(34,199,155,.1);border-color:rgba(34,199,155,.35)">✅ ما في قاعدة ضعيفة لهلّق. كمّل هيك!</div></div>':'');}
+  h+=`<div class="stp${s3?' ok':''}${!s.started?' lock':''}"><div class="n">${s3?'✓':'3'}</div><div class="t">التقرير: وين لازم تقوّي<small>${!s.started?'بيطلع بس تبلّش الكورس.':s.excellent?'نتيجتك ممتازة 🎉':s.finished?`${s.mistakes} غلطات: لازم ${M.MAX_MISTAKES} أو أقل لتنفتح المشاريع. راجع القواعد تحت وعيد الكورس.`:'هول القواعد اللي غلطت فيها أكتر شي:'}</small>${rep}<div class="rep" id="rep_${id}" hidden></div></div>${s.started?`<button type="button" class="go" data-rep="${id}">🤖 حلّلي</button>`:''}</div>`;
+  h+=`<div class="stp${s4?' ok':' lock'}"><div class="n">${s4?'✓':'🔒'}</div><div class="t">المشاريع العملية (${c.projN})<small>${s4?'انفتحت! طبّق بإيدك بالمختبر.':`بتنفتح بس تخلّص الكورس بـ${M.MAX_MISTAKES} غلطات أو أقل.`}</small></div>${s4?`<a class="go" href="../${c.proj}">افتح ←</a>`:''}</div></div>`;}
+ box.innerHTML=h;});}
+$('paths').addEventListener('click',e=>{const r=e.target.closest('[data-read]');if(r){const id=r.dataset.read;window.MEAPATH.markRead(id,!window.MEAPATH.status(id).read);paths();return;}
+ const a=e.target.closest('[data-rep]');if(a)report(a.dataset.rep,a);});
+function report(id,btn){const M=window.MEAPATH,s=M.status(id);const out=$('rep_'+id);out.hidden=false;out.textContent=T.thinking;btn.disabled=true;
+ M.rules().then(RJ=>{const R=(RJ[id]||{}).rules||[];const T2=n=>{const r=R.find(x=>x.n===n);return r?r.t:'';};
+  const lines=s.per.sort((a,b)=>a.n-b.n).map(r=>`القاعدة ${r.n} (${T2(r.n)}): ${r.m} غلطات من ${r.a} جواب${r.p?' ✓':''}`).join('\n');
+  const q=`اكتبلي تقرير قصير بالعامية اللبنانية لطالب بـ«${s.c.title}» (كتاب ${s.c.book}). خلّص ${s.passed} من ${s.total} قاعدة، ومجموع غلطاتو ${s.mistakes}. هيدي نتايجو:\n${lines}\nقلّو بنقاط قصيرة: شو منيح فيه، وأي قواعد لازم يرجع يقراها بالكتاب بالإسم والرقم، وشو الخطوة الجاية. المشاريع العملية بتنفتح بس يخلّص بـ${M.MAX_MISTAKES} غلطات أو أقل. بلا روابط.`;
+  const local=()=>{const w=s.weak.slice(0,4);return (w.length?'ركّز على هول القواعد وارجع اقراها بالكتاب:\n'+w.map(r=>`• القاعدة ${r.n}: ${T2(r.n)} (${r.m} غلطات)`).join('\n'):'شغلك منيح لهلّق، ما في قاعدة ضعيفة.')+(s.finished?(s.excellent?'\n\n🎉 نتيجتك ممتازة، والمشاريع انفتحت.':`\n\nخلّصت بـ${s.mistakes} غلطات. راجع القواعد فوق وعيد الكورس لتنزل لـ${M.MAX_MISTAKES} أو أقل.`):'\n\nكمّل القواعد الباقية.');};
+  fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'chat',lang:EN?'en':'ar',vid:ls('mea_vid')||'',messages:[{role:'user',text:q}]})})
+  .then(r=>r.json()).then(d=>d&&d.text?d.text:local()).catch(local).then(t=>{out.innerHTML=fmt(t);btn.disabled=false;});});}
+paths();document.addEventListener('visibilitychange',()=>{if(!document.hidden)paths();});
 
 /* ---------- أوّل فتحة ---------- */
 if(!fromHash()){var s=ls(K);show(s&&$('t-'+s)?s:'lab');}

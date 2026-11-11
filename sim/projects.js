@@ -47,7 +47,9 @@ let cur=null;try{cur=localStorage.getItem('solarCur')||null;}catch(e){}
 
 function card(){let el=document.getElementById('spj');if(el)return el;
  el=document.createElement('div');el.className='card';el.id='spj';const ks=document.getElementById('keyset');ks.parentNode.insertBefore(el,ks);return el;}
-function render(){const el=card();const P=SP.find(p=>p.id===cur);
+function render(){const el=card();
+ const M=window.MEAPATH;if(M&&!M.status('solar').unlocked){el.innerHTML=`<h2>🎓 مشاريع كورس الطاقة الشمسية</h2><style>.lockc{text-align:center;padding:10px}.lockc b{display:block;font-size:17px;margin:6px 0}.lockc p{color:var(--muted);line-height:1.8}.lockc a{display:inline-block;margin-top:10px;padding:11px 16px;border-radius:12px;background:var(--volt);color:#04231a;font-weight:700;text-decoration:none}</style>`+M.lockHTML('solar');return;}
+ const P=SP.find(p=>p.id===cur);
  let h=`<h2>🎓 مشاريع كورس الطاقة الشمسية · ${SP.filter(p=>done(p.id)).length}/${SP.length} ✓</h2>`;
  h+=`<div class="spl">${SP.map(p=>`<button type="button" class="spb${p.id===cur?' on':''}${done(p.id)?' ok':''}" data-sp="${p.id}"><span>${p.icon}</span><b>${p.n}. ${p.title}</b>${done(p.id)?'<i>✓</i>':''}</button>`).join('')}</div>`;
  if(P){h+=`<div class="spd"><p>${P.brief}</p><ul>${P.goals.map(g=>`<li>${g}</li>`).join('')}</ul>`;

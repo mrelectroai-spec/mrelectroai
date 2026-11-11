@@ -9,7 +9,7 @@ function screw(x,y,lab,top){
   `<path d="M${f(x-3.6)} ${f(y+1.7)}L${f(x+3.6)} ${f(y-1.7)}" stroke="#50565c" stroke-width="1.4" stroke-linecap="round"/>`+
   (lab!==''?`<text x="${x}" y="${top?y+19:y-12}" class="tl">${lab}</text>`:'');}
 function terms(c){return P[c.type].terms.map(t=>screw(t.x,t.y,t.lab!=null?t.lab:t.n,t.d<0)).join('');}
-function tag(c,w){return `<text x="${w/2}" y="-8" class="tag">${c.label||''}</text>`;}
+function tag(c,w){return '';} // الاسم بينرسم فوق كل شي بطبقة لحالها
 const body=(x,y,w,h,r,fill)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${fill}"/>`;
 
 const P={
@@ -17,9 +17,9 @@ const P={
   terms:[T('L1',34,74,1,1),T('L2',86,74,1,1),T('L3',138,74,1,1),T('N',196,74,1),T('PE',252,74,1)],
   draw(c,S){const col={L1:'#8B5A2B',L2:'#2a2d31',L3:'#8d949b',N:'#2f6fd6',PE:'#3fae49'};
    return body(0,0,290,96,12,'url(#gDark)')+`<rect x="1" y="1" width="288" height="94" rx="11" fill="none" stroke="rgba(255,255,255,.12)"/>`+
-   `<text x="16" y="24" class="lt" text-anchor="start">شبكة 400V · 3 فاز</text><circle cx="270" cy="20" r="5" fill="${S.on?'#3dff8f':'#24452f'}" ${S.on?'filter="url(#fGlow)"':''}/>`+
+   `<text x="16" y="24" class="lt w b" style="text-anchor:start">شبكة 400V · 3 فاز</text><circle cx="270" cy="20" r="5" fill="${S.on?'#3dff8f':'#24452f'}" ${S.on?'filter="url(#fGlow)"':''}/>`+
    this.terms.map(t=>`<rect x="${t.x-13}" y="40" width="26" height="12" rx="3" fill="${col[t.n]}"/>${t.n==='PE'?`<rect x="${t.x-13}" y="44" width="26" height="4" fill="#f2d33b"/>`:''}`).join('')+
-   this.terms.map(t=>screw(t.x,t.y,'',false)+`<text x="${t.x}" y="36" class="lt">${t.n}</text>`).join('');},
+   this.terms.map(t=>screw(t.x,t.y,'',false)+`<text x="${t.x}" y="36" class="lt w b">${t.n}</text>`).join('');},
   links:()=>[]},
 
  mcb1:{name:'قاطع 1P',cat:'حماية',w:40,h:172,pre:'Q',props:['rating'],def:{rating:10},
@@ -197,6 +197,18 @@ const P={
    `<rect x="48" y="58" width="26" height="18" rx="4" fill="#ffd54a" data-act="test" class="act"/><text x="61" y="70" class="lt s" pointer-events="none">T</text>`+
    `<text x="42" y="118" class="lt s b">${c.rating}A · 30mA</text><text x="23" y="${on?106:66}" class="lt s" fill="#1d6b47">${on?'ON':'OFF'}</text>`+(c.st.trip?`<rect x="30" y="134" width="24" height="4" rx="2" fill="#ff3b30"/>`:'')+terms(c);},
   links:c=>c.st.on&&!c.st.trip?[['1','2'],['N1','N2']]:[]},
+
+ rail:{name:'سكّة DIN',cat:'تركيب',w:600,h:36,pre:'',props:['len'],def:{len:600},mount:1,
+  terms:[],
+  draw(c){const L=c.len||600;let s=`<rect x="0" y="4" width="${L}" height="28" rx="3" fill="url(#gRail)"/><rect x="0" y="4" width="${L}" height="5" fill="rgba(255,255,255,.45)"/>`;
+   for(let x=14;x<L-20;x+=40)s+=`<rect x="${x}" y="14" width="22" height="8" rx="3" fill="rgba(40,48,56,.6)"/>`;return s;},
+  links:()=>[]},
+ duct:{name:'مجرى شرايط',cat:'تركيب',w:600,h:60,pre:'',props:['len'],def:{len:600},mount:1,
+  terms:[],
+  draw(c){const L=c.len||600;let s=`<rect x="0" y="0" width="${L}" height="60" rx="4" fill="rgba(200,206,212,.55)" stroke="rgba(255,255,255,.4)"/>`;
+   for(let x=8;x<L-8;x+=16)s+=`<rect x="${x}" y="0" width="8" height="12" fill="rgba(60,70,80,.35)"/><rect x="${x}" y="48" width="8" height="12" fill="rgba(60,70,80,.35)"/>`;
+   return s+`<rect x="0" y="24" width="${L}" height="12" fill="rgba(255,255,255,.25)"/>`;},
+  links:()=>[]},
 
  tb:{name:'ترمينال',cat:'وصل',w:28,h:92,pre:'X',
   terms:[T('a',14,15,-1),T('b',14,77,1)],

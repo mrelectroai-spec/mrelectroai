@@ -41,6 +41,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-
 .sec{font-size:13px;color:var(--muted);margin:18px 4px 8px;font-weight:600}
 /* المختبر */
 #lab{position:fixed;inset:0;z-index:2}
+#lockBox{position:fixed;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%);width:min(380px,calc(100% - 32px));border-radius:26px;padding:26px 20px;text-align:center}
+.lockc b{display:block;font-size:18px;margin:8px 0}.lockc p{color:var(--muted);line-height:1.8;font-size:14.5px}.lockc a{display:inline-block;margin-top:14px;padding:12px 18px;border-radius:14px;background:var(--volt);color:var(--ink);font-weight:700;text-decoration:none}
 #svg{position:absolute;inset:0;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none}
 .top{position:fixed;z-index:6;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;display:flex;align-items:center;gap:8px;border-radius:20px;padding:6px}
 .tb{min-width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:18px;transition:transform .14s,background .2s;padding:0 10px}
@@ -86,7 +88,11 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-
 #toast{position:fixed;z-index:9;left:50%;top:calc(max(10px,env(safe-area-inset-top)) + 62px);transform:translate(-50%,-14px);opacity:0;padding:10px 16px;border-radius:16px;font-size:14px;font-weight:600;max-width:calc(100% - 30px);text-align:center;transition:all .25s;pointer-events:none}
 #toast.show{opacity:1;transform:translate(-50%,0)}#toast.bad{background:rgba(120,20,20,.55);border-color:rgba(255,120,110,.5)}
 /* SVG */
-.tl{font:600 10.5px 'IBM Plex Sans Arabic',sans-serif;text-anchor:middle;fill:#2a3036;pointer-events:none}
+.tl{font:700 10.5px 'IBM Plex Sans Arabic',sans-serif;text-anchor:middle;fill:#fff;paint-order:stroke;stroke:#0b1512;stroke-width:3px;stroke-linejoin:round;pointer-events:none}
+.pl rect{fill:rgba(6,17,14,.82);stroke:rgba(34,199,155,.7);stroke-width:1.5}.pl text{font:700 13px 'Readex Pro',sans-serif;fill:#fff;text-anchor:middle;pointer-events:none}.pl{pointer-events:none}
+.tp.cand{fill:rgba(34,199,155,.16);stroke:rgba(34,199,155,.75);stroke-width:2;animation:cand 1s ease-in-out infinite alternate}@keyframes cand{to{fill:rgba(34,199,155,.34)}}
+#wbar{position:fixed;z-index:7;left:50%;transform:translateX(-50%);top:calc(max(10px,env(safe-area-inset-top)) + 62px);display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;border-radius:18px;font-size:14px;font-weight:600;max-width:calc(100% - 20px)}
+#wbar button{padding:8px 12px;border-radius:12px;background:rgba(255,90,82,.25);font-size:13px}
 .lt{font:600 11px 'IBM Plex Sans Arabic',sans-serif;text-anchor:middle;fill:#38414a;pointer-events:none}
 .lt.b{font-weight:700}.lt.s{font-size:8.5px}.lt.w{fill:#fff}
 .tag{font:700 13px 'Readex Pro',sans-serif;text-anchor:middle;fill:#e8fff6;paint-order:stroke;stroke:rgba(0,0,0,.45);stroke-width:3px;pointer-events:none}
@@ -121,6 +127,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-
  </div>
 </section>
 
+<section id="lockBox" class="glass" hidden></section>
 <section id="lab" hidden>
  <svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg>
  <header class="top glass">
@@ -142,8 +149,10 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-
  <div class="sheet glass" id="sProp"><div class="grab"></div><div id="propBody"></div></div>
  <div class="sheet glass" id="sRes"><div class="grab"></div><div id="resBody"></div></div>
  <div id="toast" class="glass"></div>
+ <div id="wbar" class="glass" hidden><span id="wbarT"></span><button type="button" id="wbarX">✕ إلغاء</button></div>
 </section>
 
+<script src="../app/path.js"></script>
 <script src="parts.js"></script>
 <script src="engine.js"></script>
 <script src="projects.js"></script>
@@ -154,18 +163,20 @@ const {P,motorI,CAP,GAUGES,RAT1,RAT3,COLORS,DEFS}=window.PARTS;
 const $=i=>document.getElementById(i),NS='http://www.w3.org/2000/svg';
 const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){return null;}};
 const W=1700,H=1150; // ورقة التابلو
-const RAILS=[300,560,820];
+const pw=c=>c.len||P[c.type].w;
 let B={comps:[],wires:[],on:false,blown:false},E=window.PENGINE(B),PJ=null,KEY='',cam={x:0,y:0,w:W,h:H},tool='move',sel=null,selW=null,pend=null,undo=[],events=[];
 
 /* ---------- الصفحات ---------- */
 function done(id){return ls('panelDone_'+id)==='1';}
-function homeList(){const card=p=>`<button class="pc glass${p.soon?' soon':''}${done(p.id)?' done':''}" type="button" ${p.soon?'disabled':''} data-open="${p.id}"><div class="i">${p.icon}</div><div><b>مشروع ${p.n}: ${p.title}</b><span>${p.soon?'قريباً':done(p.id)?'خلّصتو ✓ فيك تعيدو':'ركّب الدارة كاملة، وبفحصلك ياها لحالي.'}</span></div><div class="go">${p.soon?'قريباً':done(p.id)?'✓ خلص':'ابدا ←'}</div></button>`;
+const PCID={electro:'course',classic:'classic'};const locked=p=>window.MEAPATH&&!window.MEAPATH.status(PCID[p.course]).unlocked;
+function homeList(){const card=p=>{const L=locked(p);return `<button class="pc glass${p.soon||L?' soon':''}${done(p.id)?' done':''}" type="button" ${p.soon?'disabled':''} data-open="${p.id}"><div class="i">${L?'🔒':p.icon}</div><div><b>مشروع ${p.n}: ${p.title}</b><span>${L?'بينفتح بس تخلّص الكورس بنتيجة ممتازة':done(p.id)?'خلّصتو ✓ فيك تعيدو':'ركّب الدارة كاملة، وبفحصلك ياها لحالي.'}</span></div><div class="go">${L?'🔒':done(p.id)?'✓ خلص':'ابدا ←'}</div></button>`;};
  const C=[['electro','مشاريع كورس الكهربا'],['classic','مشاريع كورس الكلاسيك كنترول']];
  $('plist').innerHTML=C.map(([k,t])=>{const L=window.PROJECTS.filter(p=>p.course===k);const d=L.filter(p=>done(p.id)).length;return `<div class="sec">${t} · ${d}/${L.length} ✓</div>`+L.map(card).join('');}).join('')+
  `<div class="sec">مشاريع كورس الطاقة الشمسية</div><a class="pc glass" href="../sim/#projects" style="text-decoration:none;color:inherit"><div class="i">☀️</div><div><b>مشاريع الطاقة الشمسية</b><span>6 مشاريع بمختبر الطاقة: إنفرتر، بطاريات، ألواح، وإعدادات.</span></div><div class="go">افتح ←</div></a>`;}
 document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o&&!o.disabled)location.hash=o.dataset.open;});
-function route(){const h=location.hash.slice(1);if(!h){$('lab').hidden=true;$('home').hidden=false;homeList();stop();return;}
+function route(){const h=location.hash.slice(1);if(!h){$('lockBox').hidden=true;$('lab').hidden=true;$('home').hidden=false;homeList();stop();return;}
  const p=window.PROJECTS.find(x=>x.id===h&&!x.soon);if(h!=='free'&&!p){location.hash='';return;}
+ if(p&&locked(p)){const lk=window.MEAPATH.lockHTML(PCID[p.course]);$('lockBox').innerHTML=lk+'<p style="margin-top:12px"><a href="#" style="background:none;color:var(--muted);padding:0">رجوع للمشاريع</a></p>';$('lockBox').hidden=false;$('home').hidden=true;$('lab').hidden=true;return;}$('lockBox').hidden=true;
  open(p||null);}
 window.addEventListener('hashchange',route);
 
@@ -174,7 +185,8 @@ function open(p){PJ=p;KEY='panel_'+(p?p.id:'free');$('home').hidden=true;$('lab'
  let saved=null;try{saved=JSON.parse(ls(KEY)||'null');}catch(e){}
  if(saved&&saved.comps){B.comps=saved.comps;B.wires=saved.wires;for(const c of B.comps){c.st={};if(c.type.startsWith('mcb')||c.type==='rcd')c.st.on=true;}}
  else{B.comps=[];B.wires=[];if(p)p.setup((t,x,y)=>add(t,x,y,true));}
- undo=[];sel=null;selW=null;pend=null;$('task').hidden=!p;if(p)taskCard();setTool('move');fit(false);draw();}
+ lib();undo=[];sel=null;selW=null;pend=null;$('task').hidden=!p;if(p)taskCard();setTool('move');fit(false);draw();}
+$('wbarX').onclick=()=>{pend=null;draw();};
 $('bBack').onclick=()=>{location.hash='';};
 
 /* ---------- القطع ---------- */
@@ -185,7 +197,7 @@ function add(t,x,y,quiet){const d=P[t];const c=Object.assign({id:nid(t),type:t,x
 const snap=v=>Math.round(v/10)*10;
 const DIN={mcb1:1,mcb3:1,rcd:1,kc:1,ol:1,relay:1,tmr:1,tb:1};
 function railY(c,y){const h=P[c.type].h;if(!DIN[c.type])return snap(y);
- for(const r of RAILS)if(Math.abs(y+h/2-r)<70)return r-h/2;return snap(y);}
+ for(const r of B.comps)if(r.type==='rail'){const cy=r.y+18;if(c.x+P[c.type].w>r.x&&c.x<r.x+pw(r)&&Math.abs(y+h/2-cy)<60)return cy-h/2;}return snap(y);}
 function tpos(k){const [id,n]=k.split('.');const c=B.comps.find(x=>x.id===id);if(!c)return null;const t=P[c.type].terms.find(x=>x.n===n);return t?{x:c.x+t.x,y:c.y+t.y,d:t.d}:null;}
 
 /* ---------- الرسم ---------- */
@@ -194,7 +206,6 @@ function frame(){let s=`<rect x="0" y="0" width="${W}" height="${H}" rx="28" fil
  s+=`<g class="frame">`;for(let i=0;i<8;i++){const x=40+i*(W-80)/8;s+=`<line x1="${x}" y1="18" x2="${x}" y2="34" stroke="rgba(255,255,255,.25)"/><text x="${x+(W-80)/16}" y="31">${i+1}</text>`;}
  'ABCDE'.split('').forEach((L,i)=>{const y=60+i*(H-120)/5;s+=`<text x="22" y="${y+(H-120)/10+5}">${L}</text>`;});s+=`</g>`;
  s+=`<rect x="40" y="40" width="${W-80}" height="${H-80}" rx="16" fill="none" stroke="rgba(255,255,255,.18)" stroke-dasharray="2 8"/>`;
- for(const r of RAILS)s+=`<rect x="70" y="${r-14}" width="${W-140}" height="28" rx="3" fill="url(#gRail)" opacity=".9"/>`+Array.from({length:Math.floor((W-160)/40)},(_,i)=>`<rect x="${86+i*40}" y="${r-4}" width="22" height="8" rx="3" fill="rgba(40,48,56,.55)"/>`).join('');
  s+=`<g transform="translate(${W-420} ${H-96})"><rect width="380" height="64" rx="12" fill="rgba(0,0,0,.25)" stroke="rgba(255,255,255,.2)"/><text x="190" y="27" style="font:700 15px 'Readex Pro';fill:#dffcf2;text-anchor:middle">MrElectroAI · مختبر التابلو</text><text x="190" y="49" style="font:500 12.5px 'IBM Plex Sans Arabic';fill:rgba(255,255,255,.6);text-anchor:middle">${PJ?'مشروع '+PJ.n+': '+PJ.title:'مختبر حرّ'}</text></g>`;
  return s;}
 function wpath(w){const a=tpos(w.a),b=tpos(w.b);if(!a||!b)return null;
@@ -211,8 +222,9 @@ const POTC={L1:'#ffb35c',L2:'#ff6b6b',L3:'#b9a6ff',N:'#6fb2ff',PE:'#7dff9a'};
 function draw(){
  let s=DEFS+`<g id="cam">`+frame();
  // القطع
- for(const c of B.comps){const d=P[c.type];
-  s+=`<g class="part${sel===c.id?' sel':''}" data-c="${c.id}" transform="translate(${c.x} ${c.y})" filter="url(#fShadow)"><rect class="ol" x="-8" y="-24" width="${d.w+16}" height="${d.h+32}" rx="12" fill="transparent" stroke="none"/>${d.draw(c,B)}</g>`;}
+ const ord=B.comps.filter(c=>P[c.type].mount).concat(B.comps.filter(c=>!P[c.type].mount));
+ for(const c of ord){const d=P[c.type];
+  s+=`<g class="part${sel===c.id?' sel':''}" data-c="${c.id}" transform="translate(${c.x} ${c.y})" filter="url(#fShadow)"><rect class="ol" x="-8" y="-24" width="${pw(c)+16}" height="${d.h+32}" rx="12" fill="transparent" stroke="none"/>${d.draw(c,B)}</g>`;}
  // الشرايط
  let wl='',fl='',sl='';
  for(const w of B.wires){const p=wpath(w);if(!p)continue;const col=w.color==='gy'?'url(#pGY)':(COLORS[w.color]||COLORS.bk)[0];const sw=3.2+w.mm2*1.1;
@@ -225,16 +237,21 @@ function draw(){
   if(w.num)for(const [t,e] of [[p.a,p.a1],[p.b,p.b1]]){const y=(t.y+e.y)/2;sl+=`<rect class="sleeve" x="${t.x-13}" y="${y-7}" width="26" height="14" rx="3"/><text class="sleevet" x="${t.x}" y="${y+3.5}">${esc(w.num)}</text>`;}
   if(selW===w.id)sl+=`<rect class="whd" data-wh="${w.id}" x="${(p.a1.x+p.b1.x)/2-16}" y="${p.my-9}" width="32" height="18" rx="9"/>`;}
  s+=`<g>${wl}</g><g>${fl}</g><g>${sl}</g>`;
+ // أسماء القطع: فوق كل شي، بخلفية غامقة لتنقرا
+ for(const c of B.comps){if(!c.label||P[c.type].mount)continue;const L=String(c.label),w=L.length*8.5+18,x=c.x+pw(c)/2;s+=`<g class="pl"><rect x="${x-w/2}" y="${c.y-34}" width="${w}" height="22" rx="11"/><text x="${x}" y="${c.y-18}">${esc(L)}</text></g>`;}
  // الأطراف (فوق كل شي لتنكبس)
- for(const c of B.comps)for(const t of P[c.type].terms){const k=c.id+'.'+t.n;s+=`<circle class="tp${pend===k?' pend':''}" data-t="${k}" cx="${c.x+t.x}" cy="${c.y+t.y}" r="13"/>`;}
+ const TR=Math.max(14,Math.min(30,22*cam.w/(svg.clientWidth||400)));
+ for(const c of B.comps)for(const t of P[c.type].terms){const k=c.id+'.'+t.n;s+=`<circle class="tp${pend===k?' pend':pend?' cand':''}" data-t="${k}" cx="${c.x+t.x}" cy="${c.y+t.y}" r="${TR}"/>`;}
  s+=`<path id="rub" class="rub" d="" /></g>`;
+ wbar();
  svg.innerHTML=s;applyCam();}
+function wbar(){const b=$('wbar');if(!pend){b.hidden=true;return;}const [id,t]=pend.split('.');const c=B.comps.find(x=>x.id===id);$('wbarT').textContent=`〰️ من ${(c&&(c.label||P[c.type].name))||''}·${t}: اكبس عالطرف التاني`;b.hidden=false;}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function applyCam(){svg.setAttribute('viewBox',`${cam.x} ${cam.y} ${cam.w} ${cam.h}`);}
 function fit(anim){const r=svg.getBoundingClientRect();const vw=r.width||innerWidth,vh=r.height||innerHeight;
  const top=(innerWidth<700?78:84)+ (PJ&&!$('task').classList.contains('min')&&!$('task').hidden?$('task').offsetHeight+8:0),bot=86;
  let x0=0,y0=0,x1=W,y1=H;
- if(B.comps.length){x0=1e9;y0=1e9;x1=-1e9;y1=-1e9;for(const c of B.comps){const d=P[c.type];x0=Math.min(x0,c.x-30);y0=Math.min(y0,c.y-40);x1=Math.max(x1,c.x+d.w+30);y1=Math.max(y1,c.y+d.h+40);}
+ if(B.comps.length){x0=1e9;y0=1e9;x1=-1e9;y1=-1e9;for(const c of B.comps){const d=P[c.type];x0=Math.min(x0,c.x-30);y0=Math.min(y0,c.y-40);x1=Math.max(x1,c.x+pw(c)+30);y1=Math.max(y1,c.y+d.h+40);}
   const mw=Math.max(x1-x0,500),mh=Math.max(y1-y0,400);const cx=(x0+x1)/2,cy=(y0+y1)/2;x0=cx-mw/2;x1=cx+mw/2;y0=cy-mh/2;y1=cy+mh/2;}
  const aw=vw,ah=Math.max(120,vh-top-bot);const k=Math.max((x1-x0)/aw,(y1-y0)/ah);
  const w=vw*k,h=vh*k;const t={x:(x0+x1)/2-w/2,y:(y0+y1)/2-(ah/2+top)*k,w,h};if(anim)animCam(t);else{cam=t;applyCam();}}
@@ -262,9 +279,10 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-close]'))closeS
 const VAR={lamp:[['g','لمبة خضرا',{color:'g'}],['r','لمبة حمرا',{color:'r'}],['y','لمبة صفرا',{color:'y'}]],
  src1:[['grid','الدولة',{kind:'grid'}],['gen','الموتير',{kind:'gen'}],['inv','الإنفرتر',{kind:'inv'}]],
  load:[['heater','سخّان',{kind:'heater',watt:3000}],['ac','مكيّف',{kind:'ac',watt:2600}],['fan','مروحة شفط',{kind:'fan',watt:750}],['house','البيت',{kind:'house',watt:5000}]]};
-(function lib(){const cats={};for(const t in P){const d=P[t];(cats[d.cat]=cats[d.cat]||[]).push(t);}
- const names={'حماية':'الحماية','تحكم':'التحكم','كبسات':'الكبسات واللمبات','حمل':'الأحمال','وصل':'التغذية والوصل'};
- let h='';for(const k of ['حماية','تحكم','كبسات','حمل','وصل'])if(cats[k]){h+=`<div class="cat">${names[k]}</div><div class="tiles">`;
+const KIT={electro:['src1','mcb1','rcd','bulb','sw1','sw2','socket','load','tb','rail','duct'],classic:['src','src1','mcb1','mcb3','kc','ol','relay','tmr','pbg','pbr','es','lamp','smoke','siren','motor','motor6','load','tb','rail','duct']};
+function lib(){const cats={};const allow=PJ&&KIT[PJ.course];for(const t in P){if(allow&&!allow.includes(t))continue;const d=P[t];(cats[d.cat]=cats[d.cat]||[]).push(t);}
+ const names={'حماية':'الحماية','تحكم':'التحكم','كبسات':'الكبسات واللمبات','حمل':'الأحمال','وصل':'التغذية والوصل','تركيب':'التركيب: سكك ومجاري'};
+ let h='';for(const k of ['تركيب','حماية','تحكم','كبسات','حمل','وصل'])if(cats[k]){h+=`<div class="cat">${names[k]}</div><div class="tiles">`;
   for(const t of cats[k]){const d=P[t];const c=Object.assign({id:'p',type:t,label:'',st:{on:true}},JSON.parse(JSON.stringify(d.def||{})));
    const variants=VAR[t]||[[null,d.name]];
    for(const [v,nm,ex] of variants){if(v&&ex)Object.assign(c,ex);h+=`<button class="tile" type="button" data-add="${t}" ${v?`data-v="${v}"`:''}><svg viewBox="-12 -30 ${d.w+24} ${d.h+44}">${DEFS}${d.draw(c,{on:true})}</svg><span>${nm}</span></button>`;}}
@@ -272,7 +290,7 @@ const VAR={lamp:[['g','لمبة خضرا',{color:'g'}],['r','لمبة حمرا',
  $('libBody').innerHTML=h;
  $('libBody').onclick=e=>{const b=e.target.closest('[data-add]');if(!b)return;push();const t=b.dataset.add,d=P[t];
   const cx=cam.x+cam.w/2-d.w/2,cy=cam.y+cam.h/2-d.h/2;const c=add(t,Math.max(60,Math.min(W-d.w-60,cx)),Math.max(60,Math.min(H-d.h-60,cy)));if(b.dataset.v){const vv=(VAR[t]||[]).find(x=>x[0]===b.dataset.v);if(vv)Object.assign(c,vv[2]);}
-  closeSheets();save();sim();draw();chipFor(c);};})();
+  closeSheets();save();sim();draw();chipFor(c);};}
 
 /* ---------- خصائص القطعة والشريط ---------- */
 function chipFor(c){const d=P[c.type];let h=`<h3>${d.name} <span style="color:var(--volt)">${esc(c.label||'')}</span><button type="button" data-close>سكّر</button></h3>`;
@@ -281,12 +299,13 @@ function chipFor(c){const d=P[c.type];let h=`<h3>${d.name} <span style="color:va
  if(c.type==='ol')h+=`<div class="lbl">ضبط الأوفرلود (A)</div><div class="step"><button data-step="setA" data-d="-0.5">−</button><b>${c.setA}A</b><button data-step="setA" data-d="0.5">+</button></div>`;
  if(c.type==='tmr')h+=`<div class="lbl">وقت التايمر (ثواني)</div><div class="step"><button data-step="sec" data-d="-1">−</button><b>${c.sec}s</b><button data-step="sec" data-d="1">+</button></div>`;
  if(c.type==='motor')h+=`<div class="lbl">قدرة الموتور</div><div class="row">${[2.2,4,5.5,7.5,11,15].map(k=>`<button class="chip${c.kw===k?' on':''}" data-p="kw" data-v="${k}">${k}kW · ${motorI(k).toFixed(1)}A</button>`).join('')}</div>`;
+ if(c.type==='rail'||c.type==='duct')h+=`<div class="lbl">الطول</div><div class="row">${[300,450,600,800,1000,1300].map(L=>`<button class="chip${c.len===L?' on':''}" data-p="len" data-v="${L}">${L/10} سم</button>`).join('')}</div>`;
  if(c.type==='motor6')h+=`<div class="lbl">قدرة الموتور</div><div class="row">${[7.5,11,15,18.5,22].map(k=>`<button class="chip${c.kw===k?' on':''}" data-p="kw" data-v="${k}">${k}kW · ${motorI(k).toFixed(1)}A</button>`).join('')}</div>`;
  if(c.type==='rcd')h+=`<div class="lbl">قيمة الديفرنسيال (A)</div><div class="row">${window.PARTS.RATR.map(r=>`<button class="chip${c.rating===r?' on':''}" data-p="rating" data-v="${r}">${r}A</button>`).join('')}</div>`;
  if(c.type==='src1')h+=`<div class="lbl">نوع المصدر</div><div class="row">${[['grid','الدولة'],['gen','الموتير'],['inv','الإنفرتر']].map(([v,n])=>`<button class="chip${c.kind===v?' on':''}" data-p="kind" data-v="${v}" data-s="1">${n}</button>`).join('')}</div>`;
  if(c.type==='load')h+=`<div class="lbl">قدرة الحمل</div><div class="row">${[500,750,1000,2000,2600,3000,5000,7000].map(w=>`<button class="chip${c.watt===w?' on':''}" data-p="watt" data-v="${w}">${w>=1000?(w/1000)+'kW':w+'W'} · ${(w/230).toFixed(1)}A</button>`).join('')}</div>`;
  if(c.type==='lamp')h+=`<div class="lbl">اللون</div><div class="row">${[['g','خضرا'],['r','حمرا'],['y','صفرا'],['w','بيضا']].map(([v,n])=>`<button class="chip${c.color===v?' on':''}" data-p="color" data-v="${v}" data-s="1">${n}</button>`).join('')}</div>`;
- if(c.type!=='src')h+=`<div class="lbl">الاسم عالمخطط</div><input class="inp" id="pLabel" value="${esc(c.label||'')}" maxlength="8">`;
+ if(!P[c.type].mount&&c.type!=='src')h+=`<div class="lbl">الاسم عالمخطط</div><input class="inp" id="pLabel" value="${esc(c.label||'')}" maxlength="8">`;
  h+=`<button class="big bad" type="button" data-del="${c.id}">🗑️ احذف القطعة وشرايطها</button>`;
  $('propBody').innerHTML=h;$('propBody').dataset.c=c.id;delete $('propBody').dataset.w;openSheet('sProp');
  const L=$('pLabel');if(L)L.onchange=()=>{push();c.label=L.value.trim();save();draw();};}
@@ -311,7 +330,7 @@ $('propBody').onclick=e=>{const pb=$('propBody');
 /* ---------- اللمس: تحريك، شرايط، زوم ---------- */
 const ptrs=new Map();let drag=null,pinch=null;
 function wpt(e){const r=svg.getBoundingClientRect();return {x:cam.x+(e.clientX-r.left)/r.width*cam.w,y:cam.y+(e.clientY-r.top)/r.height*cam.h};}
-function nearT(p,except){let best=null,bd=(26*cam.w/svg.getBoundingClientRect().width)+6;
+function nearT(p,except){let best=null,bd=(34*cam.w/svg.getBoundingClientRect().width)+8;
  for(const c of B.comps)for(const t of P[c.type].terms){const k=c.id+'.'+t.n;if(k===except)continue;const d=Math.hypot(c.x+t.x-p.x,c.y+t.y-p.y);if(d<bd){bd=d;best=k;}}return best;}
 svg.addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),cam:{...cam},mid:wpt({clientX:(a.x+b.x)/2,clientY:(a.y+b.y)/2})};drag=null;return;}
@@ -333,7 +352,7 @@ svg.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;ptrs.set
  if(!drag)return;const p=wpt(e);
  if(drag.t==='pan'){const r=svg.getBoundingClientRect();const dx=(e.clientX-drag.sx)/r.width*drag.cam.w,dy=(e.clientY-drag.sy)/r.height*drag.cam.h;if(Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy)>4)drag.moved=true;cam={...drag.cam,x:drag.cam.x-dx,y:drag.cam.y-dy};applyCam();}
  else if(drag.t==='part'){if(!drag.moved&&Math.hypot(p.x-drag.p0.x,p.y-drag.p0.y)>6){drag.moved=true;push();try{svg.setPointerCapture(e.pointerId);}catch(x){}}
-  if(drag.moved){const c=drag.c,d=P[c.type];c.x=Math.max(10,Math.min(W-d.w-10,snap(p.x-drag.dx)));c.y=Math.max(30,Math.min(H-d.h-10,p.y-drag.dy));
+  if(drag.moved){const c=drag.c,d=P[c.type];c.x=Math.max(10,Math.min(W-pw(c)-10,snap(p.x-drag.dx)));c.y=Math.max(30,Math.min(H-d.h-10,p.y-drag.dy));
    const g=svg.querySelector(`[data-c="${c.id}"]`);if(g)g.setAttribute('transform',`translate(${c.x} ${c.y})`);drawWiresOnly();}}
  else if(drag.t==='link'){if(Math.hypot(p.x-drag.p0.x,p.y-drag.p0.y)>8){drag.moved=true;const a=tpos(drag.from);const rub=$('rub');const n=nearT(p,drag.from);const b=n?tpos(n):p;rub.setAttribute('d',`M${a.x} ${a.y}L${a.x} ${b.y}L${b.x} ${b.y}`);
   svg.querySelectorAll('.tp.hot').forEach(x=>x.classList.remove('hot'));if(n){const el=svg.querySelector(`[data-t="${n}"]`);if(el)el.classList.add('hot');}}}
@@ -342,7 +361,7 @@ function endPtr(e){ptrs.delete(e.pointerId);if(pinch){if(ptrs.size<2)pinch=null;
  if(d.t==='act'){control(d.c,d.a,false);return;}
  if(d.t==='part'){if(d.moved){d.c.y=railY(d.c,d.c.y);save();draw();}else{sel=d.c.id;selW=null;draw();chipFor(d.c);}return;}
  if(d.t==='link'){$('rub').setAttribute('d','');if(d.moved){const n=nearT(p,d.from);if(n)connect(d.from,n);else draw();}
-  else{if(pend&&pend!==d.from){connect(pend,d.from);pend=null;}else{pend=pend===d.from?null:d.from;if(pend)toast('هلّق اكبس عالطرف التاني');draw();}}return;}
+  else{if(pend&&pend!==d.from){connect(pend,d.from);pend=null;}else{pend=pend===d.from?null:d.from;draw();}}return;}
  if(d.t==='wh'){save();draw();return;}
  if(d.t==='wtap'){selW=d.id;sel=null;draw();chipWire(B.wires.find(x=>x.id===d.id));return;}
  if(d.t==='pan'&&!d.moved){if(sel||selW||pend){sel=null;selW=null;pend=null;closeSheets();draw();}}}
