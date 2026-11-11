@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<title>مختبر التابلو · MrElectroAI</title>
+<meta name="description" content="مختبر التابلو من MrElectroAI: ركّب قواطع وكونتاكتورات وأوفرلود وكبسات وموتور، وصّل الشرايط بالمقطع الصح، شغّل وشوف إذا مشروعك زابط.">
+<meta name="theme-color" content="#06110e">
+<link rel="icon" href="../app/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--volt:#22C79B;--ink:#03140f;--text:#eef6f3;--muted:#a5bdb6;--glass:rgba(255,255,255,.09);--glass2:rgba(255,255,255,.14);--edge:rgba(255,255,255,.22);--edge2:rgba(255,255,255,.08);--warn:#ffb020;--bad:#ff5a52}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#06110e;color:var(--text);font-family:'IBM Plex Sans Arabic','Readex Pro',system-ui,sans-serif}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+[hidden]{display:none!important}
+/* الخلفية: ألوان ناعمة ورا الزجاج */
+.bg{position:fixed;inset:-20%;z-index:0;background:
+ radial-gradient(40% 35% at 20% 25%,rgba(34,199,155,.42),transparent 70%),
+ radial-gradient(35% 30% at 85% 20%,rgba(60,120,255,.32),transparent 70%),
+ radial-gradient(45% 40% at 70% 85%,rgba(150,90,255,.26),transparent 70%),
+ radial-gradient(40% 35% at 10% 90%,rgba(0,180,220,.25),transparent 70%),#06110e;
+ filter:saturate(120%);animation:drift 28s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate(4%,-3%) rotate(6deg) scale(1.06)}}
+.glass{background:linear-gradient(180deg,var(--glass2),var(--glass));-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);
+ border:1px solid var(--edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -1px 0 rgba(255,255,255,.05),0 10px 40px rgba(0,0,0,.35)}
+/* شاشة المشاريع */
+#home{position:fixed;inset:0;z-index:5;overflow:auto;padding:max(16px,env(safe-area-inset-top)) 16px 40px}
+#home .wrap{max-width:720px;margin:0 auto}
+.hb{display:flex;align-items:center;gap:10px;margin:4px 0 18px}
+.hb a{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:20px;text-decoration:none;color:var(--text)}
+.hb h1{font:700 22px 'Readex Pro',sans-serif}.hb p{font-size:13px;color:var(--muted)}
+.pc{display:flex;align-items:center;gap:14px;border-radius:22px;padding:16px;margin-bottom:12px;width:100%;text-align:start;transition:transform .16s cubic-bezier(.2,.8,.2,1)}
+.pc:active{transform:scale(.97)}
+.pc .i{flex:0 0 54px;height:54px;border-radius:16px;display:grid;place-items:center;font-size:27px;background:rgba(255,255,255,.12);border:1px solid var(--edge2)}
+.pc b{display:block;font-size:16px}.pc span{display:block;font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+.pc .go{margin-inline-start:auto;font-size:13px;color:var(--volt);font-weight:700;white-space:nowrap}
+.pc.soon{opacity:.55}.pc.soon .go{color:var(--muted)}
+.pc.done .go{color:#7dffc6}
+.sec{font-size:13px;color:var(--muted);margin:18px 4px 8px;font-weight:600}
+/* المختبر */
+#lab{position:fixed;inset:0;z-index:2}
+#svg{position:absolute;inset:0;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none}
+.top{position:fixed;z-index:6;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;display:flex;align-items:center;gap:8px;border-radius:20px;padding:6px}
+.tb{min-width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:18px;transition:transform .14s,background .2s;padding:0 10px}
+.tb:active{transform:scale(.9)}.tb.on{background:rgba(34,199,155,.28);box-shadow:inset 0 0 0 1px rgba(34,199,155,.6)}
+.top .ttl{flex:1;min-width:0;font:700 14.5px 'Readex Pro',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.run{background:var(--volt);color:var(--ink);font-weight:700;font-size:14px;gap:6px;display:flex;align-items:center;padding:0 14px}
+.run.on{background:#ff5a52;color:#fff}
+.dock{position:fixed;z-index:6;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));display:flex;gap:6px;border-radius:24px;padding:6px}
+.dock .tb{flex-direction:column;gap:1px;font-size:19px;height:52px;min-width:60px}
+.dock .tb small{font-size:10.5px;color:var(--muted);font-weight:600}
+.dock .tb.on small{color:#c9fff0}
+/* الشيتات */
+.sheet{position:fixed;z-index:8;left:0;right:0;bottom:0;max-height:72vh;border-radius:26px 26px 0 0;padding:10px 14px max(16px,env(safe-area-inset-bottom));overflow:auto;transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.9,.2,1)}
+.sheet.open{transform:none}
+.grab{width:42px;height:5px;border-radius:9px;background:rgba(255,255,255,.35);margin:2px auto 10px}
+.sheet h3{font:700 16px 'Readex Pro',sans-serif;margin:0 4px 10px;display:flex;align-items:center;gap:8px}
+.sheet h3 button{margin-inline-start:auto;font-size:13px;color:var(--muted);padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.08)}
+.cat{font-size:12.5px;color:var(--muted);margin:10px 4px 6px;font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.tile{border-radius:18px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05));border:1px solid var(--edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.3);transition:transform .14s}
+.tile:active{transform:scale(.93)}
+.tile svg{width:100%;height:64px}.tile span{font-size:12px;font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
+.chip{padding:9px 13px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid var(--edge2);font-size:14px;font-weight:600;transition:transform .12s}
+.chip:active{transform:scale(.94)}.chip.on{background:var(--volt);color:var(--ink);border-color:transparent}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.35)}.sw.on{outline:3px solid var(--volt);outline-offset:2px}
+.lbl{font-size:13px;color:var(--muted);margin:4px 4px 0}
+.inp{width:100%;height:44px;border-radius:12px;border:1px solid var(--edge);background:rgba(0,0,0,.25);color:var(--text);padding:0 12px;font:inherit;font-size:16px}
+.big{width:100%;height:50px;border-radius:16px;background:var(--volt);color:var(--ink);font-weight:700;font-size:16px;margin-top:8px}
+.big.alt{background:rgba(255,255,255,.12);color:var(--text)}.big.bad{background:rgba(255,90,82,.2);color:#ffb3ae}
+.step{display:flex;align-items:center;gap:10px}.step button{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.12);font-size:22px;font-weight:700}
+.step b{flex:1;text-align:center;font-size:20px}
+/* المهمّة */
+.task{position:fixed;z-index:5;top:calc(max(10px,env(safe-area-inset-top)) + 64px);right:10px;width:min(380px,calc(100% - 20px));border-radius:20px;padding:12px 14px;max-height:46vh;overflow:auto;transition:transform .3s cubic-bezier(.2,.9,.2,1),opacity .3s}
+.task.min{transform:translateY(-8px);opacity:0;pointer-events:none}
+.task b{font-size:14.5px}.task p{font-size:13.5px;line-height:1.7;margin:6px 0;color:#dceee8}
+.task ul{margin:4px 18px 8px 0;font-size:13px;line-height:1.75;color:var(--muted)}
+.task .row{margin:6px 0 0}
+.res{list-style:none}.res li{display:flex;gap:10px;padding:10px 4px;border-top:1px solid rgba(255,255,255,.08);font-size:14px;line-height:1.6}
+.res li:first-child{border-top:0}.res i{font-style:normal;font-size:17px}.res small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.score{font:700 30px 'Readex Pro',sans-serif;text-align:center;margin:4px 0}.score small{display:block;font-size:13px;color:var(--muted);font-weight:500}
+/* الإشعار */
+#toast{position:fixed;z-index:9;left:50%;top:calc(max(10px,env(safe-area-inset-top)) + 62px);transform:translate(-50%,-14px);opacity:0;padding:10px 16px;border-radius:16px;font-size:14px;font-weight:600;max-width:calc(100% - 30px);text-align:center;transition:all .25s;pointer-events:none}
+#toast.show{opacity:1;transform:translate(-50%,0)}#toast.bad{background:rgba(120,20,20,.55);border-color:rgba(255,120,110,.5)}
+/* SVG */
+.tl{font:600 10.5px 'IBM Plex Sans Arabic',sans-serif;text-anchor:middle;fill:#2a3036;pointer-events:none}
+.lt{font:600 11px 'IBM Plex Sans Arabic',sans-serif;text-anchor:middle;fill:#38414a;pointer-events:none}
+.lt.b{font-weight:700}.lt.s{font-size:8.5px}.lt.w{fill:#fff}
+.tag{font:700 13px 'Readex Pro',sans-serif;text-anchor:middle;fill:#e8fff6;paint-order:stroke;stroke:rgba(0,0,0,.45);stroke-width:3px;pointer-events:none}
+.part{cursor:grab}.part.sel>.ol{stroke:var(--volt);stroke-width:2.5;stroke-dasharray:6 5;fill:rgba(34,199,155,.06)}
+.act{cursor:pointer}
+.tp{fill:transparent;cursor:crosshair}.tp.hot{fill:rgba(34,199,155,.35);stroke:var(--volt);stroke-width:2}
+.tp.pend{fill:rgba(255,200,0,.4);stroke:#ffc400;stroke-width:2.5}
+.wire{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.wsel{fill:none;stroke:#fff;stroke-opacity:.55;stroke-linecap:round;stroke-linejoin:round}
+.flow{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:3 13;animation:flow .9s linear infinite;pointer-events:none}
+@keyframes flow{to{stroke-dashoffset:-16}}
+.hot{animation:hotw .6s ease-in-out infinite alternate}@keyframes hotw{to{stroke:#ff7a1a}}
+.spin{animation:spin .45s linear infinite}.spinr{animation:spin .45s linear infinite reverse}.hum{animation:hum .08s linear infinite alternate}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes hum{to{transform:translateX(1.5px)}}
+.whd{fill:#fff;stroke:var(--volt);stroke-width:2.5;cursor:ns-resize}
+.sleeve{fill:#f4f6f7;stroke:#9aa3ab;stroke-width:.8}.sleevet{font:700 9.5px 'IBM Plex Sans Arabic',sans-serif;text-anchor:middle;fill:#1d2328;pointer-events:none}
+.rub{stroke:var(--volt);stroke-width:4;stroke-dasharray:8 6;fill:none;pointer-events:none}
+.frame text{font:600 13px 'Readex Pro',sans-serif;fill:rgba(255,255,255,.45);text-anchor:middle}
+@media (prefers-reduced-motion:reduce){.bg,.flow,.spin,.spinr,.hum{animation:none}}
+</style>
+<script src="../t.js" data-page="panel" defer></script>
+<script src="../lang.js" defer></script>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<section id="home">
+ <div class="wrap">
+  <div class="hb"><a class="glass" href="../app/" aria-label="رجوع">→</a><div><h1>مختبر التابلو ⚡</h1><p>ركّب، وصّل، شغّل، وشوف إذا مشروعك زابط.</p></div><div id="langSlot" style="margin-inline-start:auto"></div></div>
+  <button class="pc glass" type="button" data-open="free"><div class="i">🧪</div><div><b>مختبر حرّ</b><span>كل القطع قدّامك: جرّب أي دارة بدّك ياها.</span></div><div class="go">افتح ←</div></button>
+  <div class="sec">مشاريع كورس الكلاسيك كنترول</div>
+  <div id="plist"></div>
+ </div>
+</section>
+
+<section id="lab" hidden>
+ <svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg>
+ <header class="top glass">
+  <button class="tb" id="bBack" type="button" aria-label="رجوع">→</button>
+  <div class="ttl" id="ttl">مختبر التابلو</div>
+  <button class="tb" id="bUndo" type="button" aria-label="تراجع">↶</button>
+  <button class="tb" id="bFit" type="button" aria-label="كل التابلو">⤢</button>
+  <button class="tb run" id="bRun" type="button"><span id="runI">▶</span><span id="runT">شغّل</span></button>
+ </header>
+ <aside class="task glass" id="task" hidden></aside>
+ <nav class="dock glass" aria-label="الأدوات">
+  <button class="tb" id="tLib" type="button"><span>🧩</span><small>القطع</small></button>
+  <button class="tb on" id="tMove" type="button"><span>✋</span><small>تحريك</small></button>
+  <button class="tb" id="tWire" type="button"><span>〰️</span><small>شريط</small></button>
+  <button class="tb" id="tProbe" type="button"><span>🔍</span><small>ملتيميتر</small></button>
+  <button class="tb" id="tTask" type="button"><span>📋</span><small>المهمّة</small></button>
+ </nav>
+ <div class="sheet glass" id="sLib"><div class="grab"></div><h3>🧩 القطع<button type="button" data-close>سكّر</button></h3><div id="libBody"></div></div>
+ <div class="sheet glass" id="sProp"><div class="grab"></div><div id="propBody"></div></div>
+ <div class="sheet glass" id="sRes"><div class="grab"></div><div id="resBody"></div></div>
+ <div id="toast" class="glass"></div>
+</section>
+
+<script src="parts.js"></script>
+<script src="engine.js"></script>
+<script src="projects.js"></script>
+<script>
+(function(){
+'use strict';
+const {P,motorI,CAP,GAUGES,RAT1,RAT3,COLORS,DEFS}=window.PARTS;
+const $=i=>document.getElementById(i),NS='http://www.w3.org/2000/svg';
+const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){return null;}};
+const W=1700,H=1150; // ورقة التابلو
+const RAILS=[300,560,820];
+let B={comps:[],wires:[],on:false,blown:false},E=window.PENGINE(B),PJ=null,KEY='',cam={x:0,y:0,w:W,h:H},tool='move',sel=null,selW=null,pend=null,undo=[],events=[];
+
+/* ---------- الصفحات ---------- */
+function done(id){return ls('panelDone_'+id)==='1';}
+function homeList(){$('plist').innerHTML=window.PROJECTS.map(p=>`<button class="pc glass${p.soon?' soon':''}${done(p.id)?' done':''}" type="button" ${p.soon?'disabled':''} data-open="${p.id}"><div class="i">${p.icon}</div><div><b>مشروع ${p.n}: ${p.title}</b><span>${p.soon?'قريباً':done(p.id)?'خلّصتو ✓ فيك تعيدو':'ركّب الدارة كاملة، وبفحصلك ياها لحالي.'}</span></div><div class="go">${p.soon?'قريباً':done(p.id)?'✓ خلص':'ابدا ←'}</div></button>`).join('');}
+document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o&&!o.disabled)location.hash=o.dataset.open;});
+function route(){const h=location.hash.slice(1);if(!h){$('lab').hidden=true;$('home').hidden=false;homeList();stop();return;}
+ const p=window.PROJECTS.find(x=>x.id===h&&!x.soon);if(h!=='free'&&!p){location.hash='';return;}
+ open(p||null);}
+window.addEventListener('hashchange',route);
+
+function open(p){PJ=p;KEY='panel_'+(p?p.id:'free');$('home').hidden=true;$('lab').hidden=false;$('ttl').textContent=p?`مشروع ${p.n}: ${p.title}`:'مختبر حرّ';
+ B.on=false;B.blown=false;runUI();
+ let saved=null;try{saved=JSON.parse(ls(KEY)||'null');}catch(e){}
+ if(saved&&saved.comps){B.comps=saved.comps;B.wires=saved.wires;for(const c of B.comps){c.st={};if(c.type.startsWith('mcb'))c.st.on=true;}}
+ else{B.comps=[];B.wires=[];if(p)p.setup((t,x,y)=>add(t,x,y,true));}
+ undo=[];sel=null;selW=null;pend=null;$('task').hidden=!p;if(p)taskCard();setTool('move');fit(false);draw();}
+$('bBack').onclick=()=>{location.hash='';};
+
+/* ---------- القطع ---------- */
+function nid(t){let i=1;while(B.comps.some(c=>c.id===t+i))i++;return t+i;}
+function nlabel(t){const pre=P[t].pre;if(!pre)return '';let i=1;while(B.comps.some(c=>c.label===pre+i))i++;return pre+i;}
+function add(t,x,y,quiet){const d=P[t];const c=Object.assign({id:nid(t),type:t,x:snap(x),y:y,label:nlabel(t),st:{}},JSON.parse(JSON.stringify(d.def||{})));
+ if(t.startsWith('mcb'))c.st.on=true;c.y=railY(c,y);B.comps.push(c);if(!quiet){sel=c.id;selW=null;}return c;}
+const snap=v=>Math.round(v/10)*10;
+function railY(c,y){const h=P[c.type].h;if(c.type==='src'||c.type==='motor')return snap(y);
+ for(const r of RAILS)if(Math.abs(y+h/2-r)<70)return r-h/2;return snap(y);}
+function tpos(k){const [id,n]=k.split('.');const c=B.comps.find(x=>x.id===id);if(!c)return null;const t=P[c.type].terms.find(x=>x.n===n);return t?{x:c.x+t.x,y:c.y+t.y,d:t.d}:null;}
+
+/* ---------- الرسم ---------- */
+const svg=$('svg');
+function frame(){let s=`<rect x="0" y="0" width="${W}" height="${H}" rx="28" fill="url(#gPlate)" stroke="rgba(255,255,255,.28)" stroke-width="2"/><rect x="0" y="0" width="${W}" height="${H}" rx="28" fill="url(#gSheen)" pointer-events="none"/>`;
+ s+=`<g class="frame">`;for(let i=0;i<8;i++){const x=40+i*(W-80)/8;s+=`<line x1="${x}" y1="18" x2="${x}" y2="34" stroke="rgba(255,255,255,.25)"/><text x="${x+(W-80)/16}" y="31">${i+1}</text>`;}
+ 'ABCDE'.split('').forEach((L,i)=>{const y=60+i*(H-120)/5;s+=`<text x="22" y="${y+(H-120)/10+5}">${L}</text>`;});s+=`</g>`;
+ s+=`<rect x="40" y="40" width="${W-80}" height="${H-80}" rx="16" fill="none" stroke="rgba(255,255,255,.18)" stroke-dasharray="2 8"/>`;
+ for(const r of RAILS)s+=`<rect x="70" y="${r-14}" width="${W-140}" height="28" rx="3" fill="url(#gRail)" opacity=".9"/>`+Array.from({length:Math.floor((W-160)/40)},(_,i)=>`<rect x="${86+i*40}" y="${r-4}" width="22" height="8" rx="3" fill="rgba(40,48,56,.55)"/>`).join('');
+ s+=`<g transform="translate(${W-420} ${H-96})"><rect width="380" height="64" rx="12" fill="rgba(0,0,0,.25)" stroke="rgba(255,255,255,.2)"/><text x="190" y="27" style="font:700 15px 'Readex Pro';fill:#dffcf2;text-anchor:middle">MrElectroAI · مختبر التابلو</text><text x="190" y="49" style="font:500 12.5px 'IBM Plex Sans Arabic';fill:rgba(255,255,255,.6);text-anchor:middle">${PJ?'مشروع '+PJ.n+': '+PJ.title:'مختبر حرّ'}</text></g>`;
+ return s;}
+function wpath(w){const a=tpos(w.a),b=tpos(w.b);if(!a||!b)return null;
+ const a1={x:a.x,y:a.y+a.d*22},b1={x:b.x,y:b.y+b.d*22};
+ let my=w.my;if(my==null){if(a.d>0&&b.d>0)my=Math.max(a1.y,b1.y)+16;else if(a.d<0&&b.d<0)my=Math.min(a1.y,b1.y)-16;else my=(a1.y+b1.y)/2;}
+ const pts=[[a.x,a.y],[a1.x,a1.y],[a1.x,my],[b1.x,my],[b1.x,b1.y],[b.x,b.y]].filter((p,i,arr)=>!i||p[0]!==arr[i-1][0]||p[1]!==arr[i-1][1]);
+ // زوايا مدوّرة
+ let d=`M${pts[0][0]} ${pts[0][1]}`;for(let i=1;i<pts.length-1;i++){const p=pts[i],q=pts[i-1],n=pts[i+1];
+  const r=Math.min(10,Math.hypot(p[0]-q[0],p[1]-q[1])/2,Math.hypot(n[0]-p[0],n[1]-p[1])/2);
+  const ux=Math.sign(p[0]-q[0]),uy=Math.sign(p[1]-q[1]),vx=Math.sign(n[0]-p[0]),vy=Math.sign(n[1]-p[1]);
+  d+=`L${p[0]-ux*r} ${p[1]-uy*r}Q${p[0]} ${p[1]} ${p[0]+vx*r} ${p[1]+vy*r}`;}
+ d+=`L${pts[pts.length-1][0]} ${pts[pts.length-1][1]}`;return {d,my,a,b,a1,b1};}
+const POTC={L1:'#ffb35c',L2:'#ff6b6b',L3:'#b9a6ff',N:'#6fb2ff',PE:'#7dff9a'};
+function draw(){
+ let s=DEFS+`<g id="cam">`+frame();
+ // القطع
+ for(const c of B.comps){const d=P[c.type];
+  s+=`<g class="part${sel===c.id?' sel':''}" data-c="${c.id}" transform="translate(${c.x} ${c.y})" filter="url(#fShadow)"><rect class="ol" x="-8" y="-24" width="${d.w+16}" height="${d.h+32}" rx="12" fill="transparent" stroke="none"/>${d.draw(c,B)}</g>`;}
+ // الشرايط
+ let wl='',fl='',sl='';
+ for(const w of B.wires){const p=wpath(w);if(!p)continue;const col=w.color==='gy'?'url(#pGY)':(COLORS[w.color]||COLORS.bk)[0];const sw=3.2+w.mm2*1.1;
+  if(selW===w.id)wl+=`<path class="wsel" d="${p.d}" stroke-width="${sw+7}"/>`;
+  wl+=`<path class="wire" d="${p.d}" stroke="rgba(0,0,0,.35)" stroke-width="${sw+2.4}" transform="translate(0 2)"/>`;
+  wl+=`<path class="wire${w.heat>0.3?' hot':''}" d="${p.d}" stroke="${col}" stroke-width="${sw}"/>`;
+  wl+=`<path class="wire" d="${p.d}" stroke="rgba(255,255,255,.28)" stroke-width="${Math.max(1,sw/3.5)}" transform="translate(-${sw/5} -${sw/5})"/>`;
+  wl+=`<path d="${p.d}" stroke="transparent" stroke-width="${sw+16}" fill="none" data-w="${w.id}" style="cursor:pointer"/>`;
+  if(B.on){const lv=E.live(w.a);if(lv)fl+=`<path class="flow" d="${p.d}" stroke="${POTC[lv]}" stroke-width="${Math.max(2,sw/2.2)}" style="animation-duration:${w.I>0?'.45s':'1.2s'}"/>`;}
+  if(w.num)for(const [t,e] of [[p.a,p.a1],[p.b,p.b1]]){const y=(t.y+e.y)/2;sl+=`<rect class="sleeve" x="${t.x-13}" y="${y-7}" width="26" height="14" rx="3"/><text class="sleevet" x="${t.x}" y="${y+3.5}">${esc(w.num)}</text>`;}
+  if(selW===w.id)sl+=`<rect class="whd" data-wh="${w.id}" x="${(p.a1.x+p.b1.x)/2-16}" y="${p.my-9}" width="32" height="18" rx="9"/>`;}
+ s+=`<g>${wl}</g><g>${fl}</g><g>${sl}</g>`;
+ // الأطراف (فوق كل شي لتنكبس)
+ for(const c of B.comps)for(const t of P[c.type].terms){const k=c.id+'.'+t.n;s+=`<circle class="tp${pend===k?' pend':''}" data-t="${k}" cx="${c.x+t.x}" cy="${c.y+t.y}" r="13"/>`;}
+ s+=`<path id="rub" class="rub" d="" /></g>`;
+ svg.innerHTML=s;applyCam();}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function applyCam(){svg.setAttribute('viewBox',`${cam.x} ${cam.y} ${cam.w} ${cam.h}`);}
+function fit(anim){const r=svg.getBoundingClientRect();const vw=r.width||innerWidth,vh=r.height||innerHeight;
+ const top=(innerWidth<700?78:84)+ (PJ&&!$('task').classList.contains('min')&&!$('task').hidden?$('task').offsetHeight+8:0),bot=86;
+ let x0=0,y0=0,x1=W,y1=H;
+ if(B.comps.length){x0=1e9;y0=1e9;x1=-1e9;y1=-1e9;for(const c of B.comps){const d=P[c.type];x0=Math.min(x0,c.x-30);y0=Math.min(y0,c.y-40);x1=Math.max(x1,c.x+d.w+30);y1=Math.max(y1,c.y+d.h+40);}
+  const mw=Math.max(x1-x0,500),mh=Math.max(y1-y0,400);const cx=(x0+x1)/2,cy=(y0+y1)/2;x0=cx-mw/2;x1=cx+mw/2;y0=cy-mh/2;y1=cy+mh/2;}
+ const aw=vw,ah=Math.max(120,vh-top-bot);const k=Math.max((x1-x0)/aw,(y1-y0)/ah);
+ const w=vw*k,h=vh*k;const t={x:(x0+x1)/2-w/2,y:(y0+y1)/2-(ah/2+top)*k,w,h};if(anim)animCam(t);else{cam=t;applyCam();}}
+function animCam(t){const f={...cam},t0=performance.now();(function st(n){const k=Math.min(1,(n-t0)/280),e=1-Math.pow(1-k,3);cam={x:f.x+(t.x-f.x)*e,y:f.y+(t.y-f.y)*e,w:f.w+(t.w-f.w)*e,h:f.h+(t.h-f.h)*e};applyCam();if(k<1)requestAnimationFrame(st);})(t0);}
+
+/* ---------- الحفظ والتراجع ---------- */
+function snapState(){return JSON.stringify({comps:B.comps.map(c=>{const o={...c};delete o.st;return o;}),wires:B.wires.map(w=>({id:w.id,a:w.a,b:w.b,color:w.color,mm2:w.mm2,num:w.num||'',my:w.my}))});}
+function save(){ls(KEY,snapState());}
+function push(){undo.push(snapState());if(undo.length>50)undo.shift();}
+$('bUndo').onclick=()=>{const s=undo.pop();if(!s){toast('ما في شي لترجعو');return;}const o=JSON.parse(s);
+ const st={};for(const c of B.comps)st[c.id]=c.st;B.comps=o.comps.map(c=>(c.st=st[c.id]||(c.type.startsWith('mcb')?{on:true}:{}),c));B.wires=o.wires;sel=null;selW=null;save();sim();draw();};
+$('bFit').onclick=()=>fit(true);
+
+/* ---------- الأدوات ---------- */
+function setTool(t){tool=t;pend=null;['tMove','tWire','tProbe'].forEach(i=>$(i).classList.toggle('on',i==='t'+t[0].toUpperCase()+t.slice(1)));draw();
+ if(t==='wire')toast('اكبس على طرف، بعدين عالطرف التاني. أو اسحب من طرف لطرف.');if(t==='probe')toast('اكبس على أي طرف لتقيس الفولت.');}
+$('tMove').onclick=()=>setTool('move');$('tWire').onclick=()=>setTool('wire');$('tProbe').onclick=()=>setTool('probe');
+$('tTask').onclick=()=>{if(!PJ){toast('بالمختبر الحرّ ما في مهمّة. جرّب أي دارة.');return;}$('task').hidden=false;$('task').classList.toggle('min');};
+$('tLib').onclick=()=>openSheet('sLib');
+function openSheet(id){closeSheets(id);$(id).classList.add('open');}
+function closeSheets(except){document.querySelectorAll('.sheet').forEach(s=>{if(s.id!==except)s.classList.remove('open');});}
+document.addEventListener('click',e=>{if(e.target.closest('[data-close]'))closeSheets();});
+
+/* ---------- مكتبة القطع ---------- */
+(function lib(){const cats={};for(const t in P){const d=P[t];(cats[d.cat]=cats[d.cat]||[]).push(t);}
+ const names={'حماية':'الحماية','تحكم':'التحكم','كبسات':'الكبسات واللمبات','حمل':'الأحمال','وصل':'التغذية والوصل'};
+ let h='';for(const k of ['حماية','تحكم','كبسات','حمل','وصل'])if(cats[k]){h+=`<div class="cat">${names[k]}</div><div class="tiles">`;
+  for(const t of cats[k]){const d=P[t];const c=Object.assign({id:'p',type:t,label:'',st:{on:true}},JSON.parse(JSON.stringify(d.def||{})));
+   const variants=t==='lamp'?[['g','لمبة خضرا'],['r','لمبة حمرا'],['y','لمبة صفرا']]:[[null,d.name]];
+   for(const [v,nm] of variants){if(v)c.color=v;h+=`<button class="tile" type="button" data-add="${t}" ${v?`data-v="${v}"`:''}><svg viewBox="-12 -30 ${d.w+24} ${d.h+44}">${DEFS}${d.draw(c,{on:true})}</svg><span>${nm}</span></button>`;}}
+  h+='</div>';}
+ $('libBody').innerHTML=h;
+ $('libBody').onclick=e=>{const b=e.target.closest('[data-add]');if(!b)return;push();const t=b.dataset.add,d=P[t];
+  const cx=cam.x+cam.w/2-d.w/2,cy=cam.y+cam.h/2-d.h/2;const c=add(t,Math.max(60,Math.min(W-d.w-60,cx)),Math.max(60,Math.min(H-d.h-60,cy)));if(b.dataset.v)c.color=b.dataset.v;
+  closeSheets();save();sim();draw();chipFor(c);};})();
+
+/* ---------- خصائص القطعة والشريط ---------- */
+function chipFor(c){const d=P[c.type];let h=`<h3>${d.name} <span style="color:var(--volt)">${esc(c.label||'')}</span><button type="button" data-close>سكّر</button></h3>`;
+ if(c.type==='mcb1')h+=`<div class="lbl">قيمة القاطع (A)</div><div class="row">${RAT1.map(r=>`<button class="chip${c.rating===r?' on':''}" data-p="rating" data-v="${r}">${r}A</button>`).join('')}</div>`;
+ if(c.type==='mcb3')h+=`<div class="lbl">قيمة القاطع (A)</div><div class="row">${RAT3.map(r=>`<button class="chip${c.rating===r?' on':''}" data-p="rating" data-v="${r}">${r}A</button>`).join('')}</div>`;
+ if(c.type==='ol')h+=`<div class="lbl">ضبط الأوفرلود (A)</div><div class="step"><button data-step="setA" data-d="-0.5">−</button><b>${c.setA}A</b><button data-step="setA" data-d="0.5">+</button></div>`;
+ if(c.type==='tmr')h+=`<div class="lbl">وقت التايمر (ثواني)</div><div class="step"><button data-step="sec" data-d="-1">−</button><b>${c.sec}s</b><button data-step="sec" data-d="1">+</button></div>`;
+ if(c.type==='motor')h+=`<div class="lbl">قدرة الموتور</div><div class="row">${[2.2,4,5.5,7.5,11,15].map(k=>`<button class="chip${c.kw===k?' on':''}" data-p="kw" data-v="${k}">${k}kW · ${motorI(k).toFixed(1)}A</button>`).join('')}</div>`;
+ if(c.type==='lamp')h+=`<div class="lbl">اللون</div><div class="row">${[['g','خضرا'],['r','حمرا'],['y','صفرا'],['w','بيضا']].map(([v,n])=>`<button class="chip${c.color===v?' on':''}" data-p="color" data-v="${v}" data-s="1">${n}</button>`).join('')}</div>`;
+ if(c.type!=='src')h+=`<div class="lbl">الاسم عالمخطط</div><input class="inp" id="pLabel" value="${esc(c.label||'')}" maxlength="8">`;
+ h+=`<button class="big bad" type="button" data-del="${c.id}">🗑️ احذف القطعة وشرايطها</button>`;
+ $('propBody').innerHTML=h;$('propBody').dataset.c=c.id;delete $('propBody').dataset.w;openSheet('sProp');
+ const L=$('pLabel');if(L)L.onchange=()=>{push();c.label=L.value.trim();save();draw();};}
+function chipWire(w){const pw=E.isPower(w);let h=`<h3>〰️ شريط ${pw?'باور':'تحكم'}<button type="button" data-close>سكّر</button></h3>`;
+ h+=`<div class="lbl">اللون</div><div class="row">${Object.entries(COLORS).map(([k,[c,n]])=>`<button class="sw${w.color===k?' on':''}" data-wp="color" data-v="${k}" data-s="1" title="${n}" style="background:${k==='gy'?'repeating-linear-gradient(45deg,#3fae49 0 6px,#f2d33b 6px 12px)':c}"></button>`).join('')}</div>`;
+ h+=`<div class="lbl">المقطع (mm²)</div><div class="row">${GAUGES.map(g=>`<button class="chip${w.mm2===g?' on':''}" data-wp="mm2" data-v="${g}">${g} · ${CAP[g]}A</button>`).join('')}</div>`;
+ h+=`<div class="lbl">رقم الشريط</div><input class="inp" id="wNum" value="${esc(w.num||'')}" maxlength="5" placeholder="مثلاً 1، 2، L1…">`;
+ if(w.I)h+=`<p class="lbl" style="margin-top:8px">التيار فيه هلّق: <b style="color:${w.I>(CAP[w.mm2]||0)?'var(--bad)':'var(--volt)'}">${w.I.toFixed(1)}A</b> · بيحمل ${CAP[w.mm2]}A</p>`;
+ h+=`<button class="big bad" type="button" data-delw="${w.id}">🗑️ احذف الشريط</button>`;
+ $('propBody').innerHTML=h;$('propBody').dataset.w=w.id;delete $('propBody').dataset.c;openSheet('sProp');
+ const N=$('wNum');N.onchange=()=>{push();w.num=N.value.trim();save();draw();};}
+$('propBody').onclick=e=>{const pb=$('propBody');
+ const c=B.comps.find(x=>x.id===pb.dataset.c),w=B.wires.find(x=>x.id===pb.dataset.w);
+ const b=e.target.closest('[data-p],[data-step],[data-wp],[data-del],[data-delw]');if(!b)return;push();
+ if(b.dataset.del){B.wires=B.wires.filter(x=>!x.a.startsWith(b.dataset.del+'.')&&!x.b.startsWith(b.dataset.del+'.'));B.comps=B.comps.filter(x=>x.id!==b.dataset.del);sel=null;closeSheets();}
+ else if(b.dataset.delw){B.wires=B.wires.filter(x=>x.id!==b.dataset.delw);selW=null;closeSheets();}
+ else if(c&&b.dataset.p){c[b.dataset.p]=b.dataset.s?b.dataset.v:+b.dataset.v;chipFor(c);}
+ else if(c&&b.dataset.step){const k=b.dataset.step;c[k]=Math.round((c[k]+ +b.dataset.d)*10)/10;if(k==='setA')c[k]=Math.max(1,Math.min(32,c[k]));if(k==='sec')c[k]=Math.max(1,Math.min(60,c[k]));chipFor(c);}
+ else if(w&&b.dataset.wp){w[b.dataset.wp]=b.dataset.s?b.dataset.v:+b.dataset.v;chipWire(w);}
+ save();sim();draw();};
+
+/* ---------- اللمس: تحريك، شرايط، زوم ---------- */
+const ptrs=new Map();let drag=null,pinch=null;
+function wpt(e){const r=svg.getBoundingClientRect();return {x:cam.x+(e.clientX-r.left)/r.width*cam.w,y:cam.y+(e.clientY-r.top)/r.height*cam.h};}
+function nearT(p,except){let best=null,bd=(26*cam.w/svg.getBoundingClientRect().width)+6;
+ for(const c of B.comps)for(const t of P[c.type].terms){const k=c.id+'.'+t.n;if(k===except)continue;const d=Math.hypot(c.x+t.x-p.x,c.y+t.y-p.y);if(d<bd){bd=d;best=k;}}return best;}
+svg.addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),cam:{...cam},mid:wpt({clientX:(a.x+b.x)/2,clientY:(a.y+b.y)/2})};drag=null;return;}
+ const p=wpt(e),tg=e.target;
+ // الكبسات والقواطع أهم من الشريط اللي مارق فوقها
+ const stack=document.elementsFromPoint(e.clientX,e.clientY);const pick=sel=>{for(const el of stack){const m=el.closest&&el.closest(sel);if(m&&svg.contains(m))return m;}return null;};
+ const tp=tg.closest('[data-t]'),wh=tg.closest('[data-wh]'),act=tp||wh?null:pick('[data-act]'),wr=act?null:tg.closest('[data-w]'),pt=act?act.closest('[data-c]'):tg.closest('[data-c]');
+ if(tp&&tool!=='probe'){drag={t:'link',from:tp.dataset.t,p0:p,moved:false};return;}
+ if(tp&&tool==='probe'){probe(tp.dataset.t);return;}
+ if(act&&pt){control(pt.dataset.c,act.dataset.act,true);drag={t:'act',c:pt.dataset.c,a:act.dataset.act};return;}
+ if(wh){const w=B.wires.find(x=>x.id===wh.dataset.wh);push();drag={t:'wh',w,y0:p.y,my0:wpath(w).my};return;}
+ if(pt&&tool!=='probe'){const c=B.comps.find(x=>x.id===pt.dataset.c);drag={t:'part',c,dx:p.x-c.x,dy:p.y-c.y,p0:p,moved:false};return;}
+ if(wr){drag={t:'wtap',id:wr.dataset.w,p0:p};return;}
+ drag={t:'pan',sx:e.clientX,sy:e.clientY,cam:{...cam},moved:false};});
+svg.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pinch&&ptrs.size===2){const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);const k=Math.max(.25,Math.min(4,pinch.d/d));
+  const nw=Math.max(300,Math.min(W*2.6,pinch.cam.w*k)),nh=nw*pinch.cam.h/pinch.cam.w;const r=svg.getBoundingClientRect();
+  const mx=((a.x+b.x)/2-r.left)/r.width,my=((a.y+b.y)/2-r.top)/r.height;cam={x:pinch.mid.x-mx*nw,y:pinch.mid.y-my*nh,w:nw,h:nh};applyCam();return;}
+ if(!drag)return;const p=wpt(e);
+ if(drag.t==='pan'){const r=svg.getBoundingClientRect();const dx=(e.clientX-drag.sx)/r.width*drag.cam.w,dy=(e.clientY-drag.sy)/r.height*drag.cam.h;if(Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy)>4)drag.moved=true;cam={...drag.cam,x:drag.cam.x-dx,y:drag.cam.y-dy};applyCam();}
+ else if(drag.t==='part'){if(!drag.moved&&Math.hypot(p.x-drag.p0.x,p.y-drag.p0.y)>6){drag.moved=true;push();try{svg.setPointerCapture(e.pointerId);}catch(x){}}
+  if(drag.moved){const c=drag.c,d=P[c.type];c.x=Math.max(10,Math.min(W-d.w-10,snap(p.x-drag.dx)));c.y=Math.max(30,Math.min(H-d.h-10,p.y-drag.dy));
+   const g=svg.querySelector(`[data-c="${c.id}"]`);if(g)g.setAttribute('transform',`translate(${c.x} ${c.y})`);drawWiresOnly();}}
+ else if(drag.t==='link'){if(Math.hypot(p.x-drag.p0.x,p.y-drag.p0.y)>8){drag.moved=true;const a=tpos(drag.from);const rub=$('rub');const n=nearT(p,drag.from);const b=n?tpos(n):p;rub.setAttribute('d',`M${a.x} ${a.y}L${a.x} ${b.y}L${b.x} ${b.y}`);
+  svg.querySelectorAll('.tp.hot').forEach(x=>x.classList.remove('hot'));if(n){const el=svg.querySelector(`[data-t="${n}"]`);if(el)el.classList.add('hot');}}}
+ else if(drag.t==='wh'){drag.w.my=snap(drag.my0+(p.y-drag.y0));drawWiresOnly();}});
+function endPtr(e){ptrs.delete(e.pointerId);if(pinch){if(ptrs.size<2)pinch=null;drag=null;return;}if(!drag)return;const d=drag;drag=null;const p=wpt(e);
+ if(d.t==='act'){control(d.c,d.a,false);return;}
+ if(d.t==='part'){if(d.moved){d.c.y=railY(d.c,d.c.y);save();draw();}else{sel=d.c.id;selW=null;draw();chipFor(d.c);}return;}
+ if(d.t==='link'){$('rub').setAttribute('d','');if(d.moved){const n=nearT(p,d.from);if(n)connect(d.from,n);else draw();}
+  else{if(pend&&pend!==d.from){connect(pend,d.from);pend=null;}else{pend=pend===d.from?null:d.from;if(pend)toast('هلّق اكبس عالطرف التاني');draw();}}return;}
+ if(d.t==='wh'){save();draw();return;}
+ if(d.t==='wtap'){selW=d.id;sel=null;draw();chipWire(B.wires.find(x=>x.id===d.id));return;}
+ if(d.t==='pan'&&!d.moved){if(sel||selW||pend){sel=null;selW=null;pend=null;closeSheets();draw();}}}
+svg.addEventListener('pointerup',endPtr);svg.addEventListener('pointercancel',endPtr);
+svg.addEventListener('wheel',e=>{e.preventDefault();const p=wpt(e);const k=Math.exp(e.deltaY*0.0015);const nw=Math.max(300,Math.min(W*2.6,cam.w*k)),nh=nw*cam.h/cam.w;
+ cam={x:p.x-(p.x-cam.x)*nw/cam.w,y:p.y-(p.y-cam.y)*nh/cam.h,w:nw,h:nh};applyCam();},{passive:false});
+function drawWiresOnly(){draw();}
+function connect(a,b){if(a===b)return;if(a.split('.')[0]===b.split('.')[0]&&P[B.comps.find(c=>c.id===a.split('.')[0]).type].links)
+ {}
+ if(B.wires.some(w=>(w.a===a&&w.b===b)||(w.a===b&&w.b===a))){toast('هالشريط موجود');draw();return;}
+ push();const pa=E.termInfo(a),pb=E.termInfo(b);const pw=pa&&pb&&pa.pw&&pb.pw;const isPE=/\.PE$/.test(a)||/\.PE$/.test(b);const isN=/\.N$/.test(a)||/\.N$/.test(b);
+ const ph=(/\.(L1|U1)$/.test(a+' ')||/\.(L1|U1)$/.test(b))?'br':(/\.(L2|V1)$/.test(a)||/\.(L2|V1)$/.test(b))?'bk':(/\.(L3|W1)$/.test(a)||/\.(L3|W1)$/.test(b))?'gr':null;
+ let i=1;while(B.wires.some(w=>w.id==='w'+i))i++;
+ const w={id:'w'+i,a,b,color:isPE?'gy':isN?'bl':pw?(ph||'bk'):'rd',mm2:isPE?2.5:pw?1.5:1,num:''};
+ B.wires.push(w);pend=null;save();sim();draw();toast(pw?'شريط باور: شيك المقطع على تيار الموتور':'شريط تحكم');}
+
+/* ---------- الكبسات والقواطع ---------- */
+function control(id,a,down){const c=B.comps.find(x=>x.id===id);if(!c)return;
+ if(a==='press'){c.st.p=down;}
+ else if(down&&a==='latch'){c.st.p=!c.st.p;}
+ else if(down&&a==='lever'){if(c.st.trip){c.st.trip=false;c.st.on=false;c.st.heat=0;}else c.st.on=!c.st.on;if(B.blown&&c.st.on)B.blown=false;}
+ else if(down&&a==='test'){c.st.trip=true;}
+ else if(down&&a==='reset'){c.st.trip=false;c.st.heat=0;}
+ else if(down&&a==='dial'){sel=c.id;chipFor(c);}
+ else return;sim();draw();}
+
+/* ---------- الملتيميتر ---------- */
+function probe(k){if(!B.on){toast('شغّل الكهربا أوّل (زر ▶ فوق)');return;}const lv=E.live(k);const c=B.comps.find(x=>x.id===k.split('.')[0]);
+ const nm=(c.label||P[c.type].name)+' · '+k.split('.')[1];
+ if(!lv){toast(`${nm}: 0V، ما في كهربا`);return;}
+ if(lv==='N'||lv==='PE'){toast(`${nm}: ${lv==='N'?'نوترال':'أرضي'} (0V)`);return;}
+ toast(`${nm}: ${lv} · 230V مع النوترال · 400V مع الفاز التاني`);}
+
+/* ---------- التشغيل ---------- */
+let raf=0,last=0;
+function sim(){if(!B.on){for(const c of B.comps){if(c.type==='kc'||c.type==='tmr'){c.st.e=false;c.st.t=0;c.st.done=false;}if(c.type==='lamp')c.st.on=false;if(c.type==='motor'){c.st.m='off';c.st.I=0;}}B._N=null;for(const w of B.wires){w.I=0;w.heat=0;}return;}
+ const ev=[];E.solve(ev);report(ev);}
+function loop(t){if(!B.on)return;const dt=Math.min(.1,(t-last)/1000||0);last=t;const ev=[];E.tick(dt,ev);report(ev);
+ if(!loop.n||t-loop.n>120){loop.n=t;draw();}raf=requestAnimationFrame(loop);}
+function report(ev){for(const x of ev){
+ if(x.k==='trip')toast(x.why==='short'?`⚡ قصر! فصل القاطع ${x.c.label}`:`القاطع ${x.c.label} فصل: الحمل أكبر منو`,true);
+ if(x.k==='blown')toast('💥 قصر مباشر بلا قاطع: الفيوز الرئيسي ضرب! شيك الشرايط وطفّي وشغّل.',true);
+ if(x.k==='burn')toast(`🔥 ${x.c.label} انحطّ على 400V واحترق. الكويل بدّو فاز ونوترال.`,true);
+ if(x.k==='oltrip')toast(x.why==='phase'?`الأوفرلود ${x.c.label} فصل: فاز ناقص عالموتور`:`الأوفرلود ${x.c.label} فصل: ضبطو أقل من تيار الموتور`,true);
+ if(x.k==='chatter')toast('الدارة عم ترجف (الكونتاكتور عم يفصل ويوصل). شيك التثبيت.',true);}}
+function runUI(){$('bRun').classList.toggle('on',B.on);$('runI').textContent=B.on?'■':'▶';$('runT').textContent=B.on?'طفّي':'شغّل';}
+$('bRun').onclick=()=>{B.on=!B.on;B.blown=false;if(B.on){for(const c of B.comps){if(c.st.burnt)c.st.burnt=false;}last=performance.now();sim();raf=requestAnimationFrame(loop);toast('⚡ الكهربا شغّالة: جرّب الكبسات');}else stop();runUI();draw();};
+function stop(){B.on=false;cancelAnimationFrame(raf);sim();runUI();}
+
+/* ---------- المهمّة والفحص ---------- */
+function taskCard(){const p=PJ;const seen=ls('panelSeen_'+p.id)==='1';ls('panelSeen_'+p.id,'1');$('task').classList.toggle('min',seen);
+ $('task').innerHTML=`<b>📋 ${p.title}</b><p>${p.brief}</p><details><summary style="font-size:13px;color:var(--volt);cursor:pointer;font-weight:600">شو المطلوب بالتفصيل</summary><ul>${p.goals.map(g=>`<li>${g}</li>`).join('')}</ul></details>
+ <div class="row"><button class="chip on" type="button" id="bCheck">✓ افحص مشروعي</button><button class="chip" type="button" id="bHint">💡 تلميح</button><button class="chip" type="button" id="bHide">إخفي ⌃</button></div>`;
+ $('bCheck').onclick=check;$('bHint').onclick=hint;$('bHide').onclick=()=>{$('task').classList.add('min');};}
+let hi=0;function hint(){const h=PJ.hints[hi%PJ.hints.length];hi++;$('resBody').innerHTML=`<h3>💡 تلميح ${((hi-1)%PJ.hints.length)+1} من ${PJ.hints.length}<button type="button" data-close>سكّر</button></h3><p style="font-size:15px;line-height:1.9;margin:0 4px 10px">${h}</p><button class="big alt" type="button" id="nh">التلميح الجاي</button>`;openSheet('sRes');$('nh').onclick=hint;}
+function check(){const r=PJ.check(B);const n=r.filter(x=>x.pass).length,all=n===r.length;
+ if(all){ls('panelDone_'+PJ.id,'1');try{window.meaTrack&&window.meaTrack('done_'+PJ.id);}catch(e){}}
+ $('resBody').innerHTML=`<h3>${all?'🎉 مشروعك زابط!':'نتيجة الفحص'}<button type="button" data-close>سكّر</button></h3>
+ <div class="score">${n} / ${r.length}<small>${all?'برافو! الدارة شغّالة متل التابلو الحقيقي.':'صلّح اللي عليه ✗ وافحص كمان مرّة.'}</small></div>
+ <ul class="res">${r.map(x=>`<li><i>${x.pass?'✅':'❌'}</i><div>${x.txt}${x.pass?'':`<small>${x.hint}</small>`}</div></li>`).join('')}</ul>
+ ${all?`<button class="big" type="button" onclick="location.hash=''">رجوع للمشاريع</button>`:''}`;openSheet('sRes');}
+
+/* ---------- إشعار ---------- */
+let tt=0;function toast(m,bad){const t=$('toast');t.textContent=m;t.classList.toggle('bad',!!bad);t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),bad?3800:2400);}
+window.addEventListener('resize',()=>{if(!$('lab').hidden)fit(false);});
+window.PANEL={B,add,connect,draw,check:()=>PJ&&PJ.check(B)};
+route();
+})();
+</script>
+</body>
+</html>
