@@ -6,7 +6,8 @@
   const WA_NUMBER = '96179434479';           // رقم أنور (واتساب)
   const WA_DISPLAY = '+961 79 434 479';
   const CFG = window.COURSE_CONFIG || {};
-  const STREAK_TARGET = CFG.streak || 5;                    // أسئلة صح ورا بعض بآخر كل قاعدة
+  const STREAK_TARGET = CFG.streak || 0;                    // اختبار «صح ورا بعض» انلغى (أنور): القاعدة بتخلص بس يجاوب أسئلتها كلها صح
+  const TEACHER = (() => { try { return localStorage.getItem('meaTeacher') === '1'; } catch (e) { return false; } })();
   const REQUEUE_GAP = 3;                      // السؤال الغلط بيرجع بعد كم سؤال
   const KEY = CFG.storageKey || 'classic-course-v1';
   const BOOK = CFG.book || 'الكلاسيك كنترول بالمختصر المفيد';
@@ -80,6 +81,7 @@
   }
   let reporting = false;
   async function report() {
+    if (TEACHER) return;
     progress(true);
     if (!S || !S.name || reporting) return;
     const x = snapshot();
@@ -108,7 +110,7 @@
   }
   let progT = 0, progTimer = null;
   function progress(now) {
-    if (!S || !S.name) return;
+    if (!S || !S.name || TEACHER) return;
     clearTimeout(progTimer);
     const wait = now ? 0 : Math.max(0, 15000 - (Date.now() - progT));
     progTimer = setTimeout(() => {
@@ -191,7 +193,7 @@
       <img class="cover" src="cover.jpg" alt="غلاف كتاب ${BOOK}">
       <h1>بصّم الكتاب قاعدة قاعدة</h1>
       ${CFG.banner ? `<p class="err">${CFG.banner}</p>` : ''}
-      <p>رح نسألك ${RULES[0].q.length} أسئلة على كل قاعدة من الـ ${TOTAL}. كل سؤال بتغلط فيه بيرجعلك لحتى تجاوبو صح، وبالآخر لازم تجاوب ${STREAK_TARGET} أسئلة صح ورا بعض. ما بتنفتحلك القاعدة يلي بعدها إلا بس تكون باصم يلي قبلها.</p>
+      <p>رح نسألك ${RULES[0].q.length} أسئلة على كل قاعدة من الـ ${TOTAL}. كل سؤال بتغلط فيه بيرجعلك لحتى تجاوبو صح${STREAK_TARGET ? `، وبالآخر لازم تجاوب ${STREAK_TARGET} أسئلة صح ورا بعض` : ''}. ما بتنفتحلك القاعدة يلي بعدها إلا بس تكون باصم يلي قبلها.</p>
       ${CHALLENGE ? `<div class="challenge"><b>🎁 التحدّي:</b> خلّص الـ ${RULES.length * RULES[0].q.length} سؤال بـ ${CHALLENGE_MAX} غلطات أو أقل، وخود الكتاب بخصم: <b>${CHALLENGE_PRICE}$</b> بدل ${BOOK_FULL}$.</div>` : `<div class="challenge"><b>${RULES.length * RULES[0].q.length} سؤال</b> من 6 أنواع: مفهوم، موقف، عطل، أرقام، مخطط، وسلامة. وبكل قاعدة فيك تفتح رسمتها من الكتاب، وتجرّب قطعتها بمختبر القطع.</div>`}
       <p class="muted">بآخر الكورس بتبعت ملخص شغلك لأنور عالواتساب، وإذا خلّصت بـ5 غلطات أو أقل، أنور بيبعتلك شهادة باسمك 🎓</p>
       ${!preStatus().done ? `<p class="muted">جديد بالكهربا؟ الأحسن تبلّش بـ<a href="${PRE_URL}">كورس الكتاب الأول</a> (الفولت والأمبير والتابلو)، بس فيك تبلّش هون إذا حابب.</p>` : ''}
@@ -320,6 +322,7 @@
   function quiz() {
     const n = S.current, r = rule(n), st = R(n);
     if (!st.start) { st.start = Date.now(); save(); progress(); }
+    if (st.phase === 'check' && !STREAK_TARGET && !st.passed) { st.passed = true; st.end = Date.now(); save(); return rulePassed(n); }
     const qi = nextIndex(st);
     const item = r.q[qi];
     const correct = item.a[0];
@@ -340,6 +343,7 @@
         ${mistakeChip()}
         <h2>${GL.h(r.title)}</h2>
         ${progHtml}
+        ${TEACHER ? '<button class="btn ghost" id="tskip" style="margin-top:8px">⏭ تخطّى القاعدة (وضع الأستاذ)</button>' : ''}
         <div class="tools">
           ${typeof FIGS !== 'undefined' && FIGS[n] ? '<button class="tool" id="figBtn" type="button">📐 شوف رسمة القاعدة</button>' : ''}
           ${r.lab ? `<a class="tool" href="${LAB}${r.lab}" target="_blank" rel="noopener">🧩 جرّب القطعة بالمختبر</a>` : ''}
@@ -357,6 +361,8 @@
     if (figBtn) figBtn.addEventListener('click', () => openFig(n));
     const btns = [...$app.querySelectorAll('.opt')];
     btns.forEach((b) => b.addEventListener('click', () => answer(b, opts[+b.dataset.i] === correct)));
+    const ts = document.getElementById('tskip');
+    if (ts) ts.addEventListener('click', () => { st.passed = true; st.end = Date.now(); save(); rulePassed(n); top(); });
 
     function answer(btn, ok) {
       btns.forEach((b) => { b.disabled = true; });
@@ -368,7 +374,7 @@
       if (st.phase === 'learn') {
         st.queue.shift();
         if (!ok) { st.mistakes++; st.missed[qi] = (st.missed[qi] || 0) + 1; st.queue.splice(Math.min(REQUEUE_GAP, st.queue.length), 0, qi); }
-        if (st.queue.length === 0) { st.phase = 'check'; st.streak = 0; }
+        if (st.queue.length === 0) { if (STREAK_TARGET) { st.phase = 'check'; st.streak = 0; } else { st.passed = true; st.end = Date.now(); passedNow = true; } }
       } else {
         st.last = qi; st.pending = null;
         if (ok) { st.streak++; if (st.streak >= STREAK_TARGET) { st.passed = true; st.end = Date.now(); passedNow = true; } }
