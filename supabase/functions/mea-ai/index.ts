@@ -1,7 +1,6 @@
 // MrElectroAI: مساعد AI + ترجمة الموقع للإنجليزي (مع كاش بالداتابيز)
-// المفتاح: GEMINI_API_KEY (سرّ بـSupabase). بلا مفتاح بيرجّع nokey والموقع بيشتغل بالبديل.
 const KEY = Deno.env.get("GEMINI_API_KEY") || "";
-const MODELS = (Deno.env.get("GEMINI_MODEL") || "gemini-flash-latest,gemini-2.5-flash,gemini-2.0-flash").split(",").map((s) => s.trim()).filter(Boolean);
+const MODELS = (Deno.env.get("GEMINI_MODEL") || "gemini-3.8-flash,gemini-flash-latest").split(",").map((s) => s.trim()).filter(Boolean);
 const SB = Deno.env.get("SUPABASE_URL")!;
 const SR = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const CORS = {
@@ -42,24 +41,40 @@ If you don't know, say so and suggest WhatsApp. Do not discuss topics unrelated 
 async function gemini(system: string, contents: unknown[], opts: { json?: boolean; max?: number; temp?: number } = {}) {
   let last = "";
   for (const m of MODELS) {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${KEY}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
-        contents,
-        generationConfig: { temperature: opts.temp ?? 0.4, maxOutputTokens: opts.max ?? 2048, ...(opts.json ? { responseMimeType: "application/json" } : {}) },
-      }),
-    });
-    if (r.ok) {
-      const d = await r.json();
-      const t = (d?.candidates?.[0]?.content?.parts || []).map((p: { text?: string }) => p.text || "").join("").trim();
-      if (t) return t;
-      last = "empty";
-      continue;
+    let think = true;
+    for (let att = 0; att < 4; att++) {
+      let r: Response;
+      try {
+        r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${KEY}`, {
+          method: "POST",
+          signal: AbortSignal.timeout(opts.json ? 50000 : 40000),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: system }] },
+            contents,
+            generationConfig: {
+              temperature: opts.temp ?? 0.4, maxOutputTokens: opts.max ?? 2048,
+              ...(opts.json ? { responseMimeType: "application/json" } : {}),
+              ...(think ? { thinkingConfig: { thinkingLevel: "low" } } : {}),
+            },
+          }),
+        });
+      } catch (e) { last = `${m} fetch ${String(e).slice(0, 120)}`; console.error(last); break; }
+      if (r.ok) {
+        const d = await r.json();
+        const t = (d?.candidates?.[0]?.content?.parts || []).filter((p: { thought?: boolean }) => !p.thought).map((p: { text?: string }) => p.text || "").join("").trim();
+        if (t) return t;
+        last = `${m} empty ${JSON.stringify(d).slice(0, 200)}`;
+        console.error(last);
+        break;
+      }
+      last = `${m} ${r.status} ${(await r.text()).slice(0, 300)}`;
+      console.error(last);
+      if (r.status === 400 && think) { think = false; continue; }
+      if ((r.status === 503 || r.status === 429 || r.status === 500) && att < 3) { await new Promise((ok) => setTimeout(ok, 1200 * (att + 1))); continue; }
+      break;
     }
-    last = `${r.status} ${(await r.text()).slice(0, 200)}`;
-    if (r.status === 400 || r.status === 401 || r.status === 403) { if (!/not found|not supported/i.test(last)) break; }
+    if (/ 40[13] /.test(last)) break;
   }
   throw new Error(last);
 }
@@ -86,11 +101,14 @@ async function translate(texts: string[]) {
     for (let i = 0; i < miss.length; i += 40) {
       const part = miss.slice(i, i + 40);
       const src = part.map((k) => texts[k]);
-      const out = await gemini(
+      let out = "";
+      try {
+        out = await gemini(
         "You translate Arabic (often Lebanese dialect) website/app UI text about electricity, solar energy, classic control (contactors, relays, motors), books and courses into natural, clear English for technicians. Keep numbers, units, emojis, symbols, punctuation, brand and model names, and English words as they are. Keep it short like UI text. Input is a JSON array of strings. Output ONLY a JSON array of English strings, same length and same order.",
         [{ role: "user", parts: [{ text: JSON.stringify(src) }] }],
         { json: true, temp: 0.1, max: 8192 },
       );
+      } catch (e) { console.error("tr", String(e).slice(0, 200)); break; }
       let arr: unknown;
       try { arr = JSON.parse(out); } catch { arr = null; }
       if (!Array.isArray(arr) || arr.length !== src.length) continue;
@@ -112,7 +130,7 @@ Deno.serve(async (req) => {
       const texts = (Array.isArray(b.texts) ? b.texts : []).slice(0, 200).map((t: unknown) => String(t).slice(0, 2000));
       if (!texts.length) return json({ en: [] });
       const en = await translate(texts);
-      if (!KEY && en.every((x) => x == null)) return json({ error: "nokey", en }, 503);
+      if (en.every((x) => x == null)) return json({ error: KEY ? "ai" : "nokey", en }, 503);
       return json({ en });
     }
     if (b.mode === "chat") {
@@ -128,6 +146,7 @@ Deno.serve(async (req) => {
     }
     return json({ error: "mode" }, 400);
   } catch (e) {
+    console.error("handler", String(e).slice(0, 300));
     return json({ error: "ai", detail: String(e).slice(0, 200) }, 502);
   }
 });
