@@ -469,6 +469,7 @@
       <div class="sendbox">
         <h2>آخر خطوة: ابعت ملخصك لأنور</h2>
         <p class="muted">بعد ما تبعت الملخص، أنور بيشوف نتيجتك. وإذا غلطاتك 5 أو أقل، بيبعتلك شهادة باسمك 🎓</p>
+        <a href="../sim/#projects" style="display:block;margin-top:14px;padding:14px;border-radius:16px;border:1px solid #22c79b88;background:rgba(34,199,155,.1);color:inherit;text-decoration:none;line-height:1.7"><b style="color:#22C79B">🛠️ الخطوة الجاية: طبّق بإيدك</b><br>6 مشاريع بمختبر الطاقة: أوف غريد، توزيع ألواح، BMS، هايبرد، حساب، وكشف عطل.</a>
         <button class="btn wa" id="s1">1. افتح محادثة أنور وابعت الرسالة</button>
         <button class="btn wa" id="s2" ${step2 ? '' : 'disabled'}>2. ابعت ملف الملخص PDF</button>
         <div class="status" id="st">${step2 ? '' : 'بلّش بالخطوة 1.'}</div>
