@@ -495,6 +495,9 @@ function tip(k){const [c,t]=k.split('.');const T=C[c].t[t];flash(`${T.l}: هلّ
 function setZoom(){fit();}
 
 window.WIRE={render,setZoom,compute,updateLive,applyView,
+ // للمشاريع: قراءة الحالة، وتحميل لوحة بداية (بلا شرايط أو مع أعطال)
+ peek(){return {st,C,analyze,allOn,pvV,PI,PB,PN,byType,offOne:id=>{const a=allOn();a[id]=0;return a;}};},
+ loadBoard(base,fn){const r=readyProject(base);if(fn)fn(r);st.comps=r.comps;st.wires=r.wires;st.sw=freshSw();st.dmg=0;st.proj=projKey();st.empty=0;rebuildC();hist=[];sel=null;selW=-1;selC=null;editMode=false;saveW();compute();fit();render();},
  rebuild(){loadReady('home');editMode=false;compute();fit();},
  init(){const b=brd();b.addEventListener('click',onBoard);
   b.addEventListener('pointerdown',onDown);b.addEventListener('pointermove',onMove);b.addEventListener('pointerup',onUp);b.addEventListener('pointercancel',onUp);

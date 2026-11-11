@@ -1134,7 +1134,7 @@ function applyProject(fresh){if(!PROJ)return;const i=CAT.inv(PROJ.inv),b=CAT.bat
 
 /* ============ الإعدادات المهمّة لمشروعك ============ */
 let ksSig='';
-function keySet(){const el=$('keyset');if(!el)return;if(MODE!=='wire'||!PROJ){if(ksSig!=='x'){el.hidden=true;ksSig='x';}return;}el.hidden=false;
+function ksRows(){
  const i=INVx(),b=BATx(),n=PROJ.n||1,cp=CAT.compat(i,b),lim=CAT.chA(i,b,n),deye=i.screen==='deye',li=cp.lvl!=='none';
  const rows=[];
  if(deye){rows.push(['Batt Mode',S.battMode,li?'Lithium':'Use Batt V',S.battMode===(li?'Lithium':'Use Batt V'),'⚙ ← Battery Setting']);
@@ -1143,6 +1143,9 @@ function keySet(){const el=$('keyset');if(!el)return;if(MODE!=='wire'||!PROJ){if
   rows.push(['Battery type ('+P.bat+')',S.pBat,want,S.pBat===want,'SETUP ← '+P.bat]);
   if(li&&i.screen==='growatt')rows.push(['Li protocol (36)',S.pProto,cp.code,S.pProto===cp.code,'SETUP ← 36']);}
  rows.push([deye?'Max A Charge':'Max charging current',S.maxCh+'A','≤ '+lim+'A',S.maxCh<=lim,deye?'⚙ ← Battery Setting':'SETUP ← 02']);
+ return rows;}
+function keySet(){const el=$('keyset');if(!el)return;if(MODE!=='wire'||!PROJ){if(ksSig!=='x'){el.hidden=true;ksSig='x';}return;}el.hidden=false;
+ const rows=ksRows();
  const ok=rows.every(r=>r[3]);const sig=JSON.stringify(rows)+ok;if(sig===ksSig)return;ksSig=sig;
  el.innerHTML=`<h2>الإعدادات المهمّة لمشروعك ${ok?'<span class="ksok">✓ كلّها مضبوطة</span>':''}</h2><div class="ks">${rows.map(r=>`<div class="ksr ${r[3]?'ok':'no'}"><b>${r[3]?'✓':'✗'}</b><span class="ksn" dir="ltr">${r[0]}</span><span class="ksv" dir="ltr">${r[1]}</span><span class="ksw">${r[3]?'':'لازم: <b dir="ltr">'+r[2]+'</b> · <span dir="ltr">'+r[4]+'</span>'}</span></div>`).join('')}</div>`;}
 {const _d=draw;let lastPg='';draw=function(){_d.apply(this,arguments);keySet();const pg=UI.pg+'|'+(UI.tab||0)+'|'+(UI.ov?1:0)+'|'+(UI.pov?UI.pov.k:'');if(pg!==lastPg){const l=$('lcd');if(lastPg&&l&&l.animate&&!matchMedia('(prefers-reduced-motion: reduce)').matches)l.firstElementChild&&l.firstElementChild.animate([{opacity:.4,transform:'translateX(10px)'},{opacity:1,transform:'none'}],{duration:170,easing:'cubic-bezier(.2,.8,.2,1)'});lastPg=pg;}};}
@@ -1169,5 +1172,6 @@ route();window.addEventListener('hashchange',route);
 let lastW=innerWidth;window.addEventListener('resize',()=>{if(MODE==='wire'&&Math.abs(innerWidth-lastW)>40){lastW=innerWidth;WIRE.setZoom();}});
 </script>
 <script src="../t.js" data-page="sim" data-hash defer></script>
+<script src="projects.js"></script>
 </body>
 </html>
