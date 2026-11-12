@@ -12,6 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../glass.css">
+<script src="../glass.js"></script>
 <style>
 :root{--void:#070F0D;--panel:#0E1A17;--line:#1E332D;--volt:#22C79B;--volt-ink:#031310;--text:#E8F2EE;--muted:#7B928C}
 [data-theme="light"]{--void:#F7F9F8;--panel:#FFF;--line:#E1EAE6;--volt:#0E8F6E;--volt-ink:#FFF;--text:#0B1613;--muted:#5A6D67}
@@ -52,6 +54,11 @@ li:before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background
 .lead .x{background:none;border:0;color:var(--muted);font:inherit;font-size:14px;margin-top:10px;width:100%;cursor:pointer}
 .lead .pv{font-size:12.5px;color:var(--muted);margin-top:8px;text-align:center}
 @media (max-width:700px){.grid{grid-template-columns:1fr}.cv{max-width:260px;margin:0 auto}.more{grid-template-columns:1fr}.btn{max-width:none}}
+/* زجاج المراية */
+:root,[data-theme="dark"],[data-theme="light"]{--void:var(--g-bg);--panel:var(--g-bot);--line:var(--g-edge2);--text:var(--g-text);--muted:var(--g-muted)}
+html,body{background:transparent!important}
+.ib,.more a,.lead .bx{background:linear-gradient(180deg,var(--g-top),var(--g-bot));border-color:var(--g-edge);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1px 0 var(--g-hi),var(--g-shadow)}
+.lead input{background:var(--g-chip)}
 </style>
 <script src="../lang.js" defer></script>
 </head>
@@ -113,8 +120,7 @@ li:before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background
 </div>
 <script>
 (() => {
-  try { const t = localStorage.getItem('mea_theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
-  document.getElementById('th').onclick = () => { const n = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = n; try { localStorage.setItem('mea_theme', n); } catch (e) {} };
+  document.getElementById('th').onclick = () => { const n = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; if (window.meaTheme) window.meaTheme(n); else document.documentElement.dataset.theme = n; };
   const K = 'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK';
   // ---- اسم ورقم قبل العيّنة ----
   const LU = 'https://utjpvjnhffapbwpbkkuc.supabase.co/rest/v1/sample_leads';

@@ -256,7 +256,12 @@
     document.body.appendChild(b);
   }
 
+  /* مجانية (أنور): قياس السطح وإعدادات الإنفرترات. وأدوات الكتب بتنفتح بمفتاح الكتاب من التطبيق */
+  const FREE = ['roof','inverters'];
+  const BOOK_OF = { wirephase:'course', transformer:'classic', load:'solar', quote:'solar' };
+  function openByBook(){ try{ return localStorage.getItem('meaTeacher')==='1' || (BOOK_OF[TOOL] && localStorage.getItem('meaBook_'+BOOK_OF[TOOL])==='1'); }catch(e){ return false; } }
   async function boot(){
+    if(FREE.includes(TOOL) || openByBook()) return;
     const d = trialLeft();
     if(d > 0){ trialBanner(d); return; }
     const saved = localStorage.getItem(KEY);

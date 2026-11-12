@@ -40,7 +40,9 @@
       ارجع راجع هول بالكورس الأول، وبعدين كمّل هون:<ul>${list}</ul>
       <a class="tool" href="${PRE_URL}" target="_blank" rel="noopener">افتح الكورس الأول</a></div>`;
   }
-  const NEED_KEY = CFG.requireKey === true;   // الكورس صار تحدّي مجاني؛ المفتاح بيرجع إذا انحط requireKey: true
+  const NEED_KEY = CFG.requireKey !== false;   // الكورس بينفتح بمفتاح الكتاب (أنور: كل شي مقفول إلا العيّنة)
+  const OWN_KEY = 'meaBook_classic';
+  const owned = () => { try { return localStorage.getItem(OWN_KEY) === '1' || localStorage.getItem('meaTeacher') === '1'; } catch (e) { return false; } };
 
   // تحدّي الكتاب: يلي بيخلّص بـ 5 غلطات أو أقل بياخد الكتاب بخصم 30%
   const CHALLENGE_MAX = 5;
@@ -50,7 +52,7 @@
   // نفس قاعدة مفاتيح أدوات MrElectroAI (tools/lock.js)
   const SB_URL = 'https://utjpvjnhffapbwpbkkuc.supabase.co';
   const SB_KEY = 'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK';
-  const BOOK_TOOL = 'book';
+  const BOOK_TOOL = 'book2';
   const TOTAL = RULES.length;
 
   const $app = document.getElementById('app');
@@ -58,6 +60,7 @@
 
   // ---------- storage ----------
   let S = load();
+  try { if (S && S.startedAt && S.startedAt < Date.parse('2026-11-13T00:00:00+02:00') && localStorage.getItem(OWN_KEY) !== '1') localStorage.setItem(OWN_KEY, '1'); } catch (e) {}
   function load() {
     try { const raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch (e) {}
     return null;
@@ -163,7 +166,7 @@
     if (GATE && !S && !preStatus().done) return gate();
     if (!S) return welcome();
     if (GATE && !S.pre && !preStatus().done) return gate();
-    if (NEED_KEY && !S.key) return keyOnly();
+    if (NEED_KEY && !S.key && !owned()) return keyOnly();
     if (S.finishedAt) return finalScreen();
     if (view === 'quiz') return quiz();
     return board();
@@ -203,12 +206,12 @@
         <label for="ph">رقم تلفونك (واتساب)</label>
         <input id="ph" type="tel" inputmode="tel" autocomplete="tel" placeholder="مثلاً: 70 123 456" dir="ltr" required value="${esc(preStatus().phone || LEAD.phone || '')}">
         <div class="hint">الاسم بينكتب عالشهادة متل ما بتكتبو هون.</div>
-        ${NEED_KEY ? keyField() : ''}
+        ${NEED_KEY && !owned() ? keyField() : ''}
         <div class="err" id="err" role="alert"></div>
         <p class="muted" style="font-size:14px;margin:6px 0 10px">اسمك ورقمك ونتيجتك بيوصلو لأنور لحالو، ليتابع معك. ما حدا غيرو بيشوفهن.</p>
         <button class="btn volt" type="submit">ابدأ الكورس</button>
       </form>
-      ${NEED_KEY ? buyHint() : ''}`;
+      ${NEED_KEY && !owned() ? buyHint() : ''}`;
     document.getElementById('f').addEventListener('submit', (e) => {
       e.preventDefault();
       const name = document.getElementById('nm').value.trim().replace(/\s+/g, ' ');
@@ -217,7 +220,7 @@
       const err = document.getElementById('err');
       if (name.length < 3) { err.textContent = 'اكتب اسمك الكامل (3 حروف عالأقل).'; return; }
       if (digits.length < 7) { err.textContent = 'اكتب رقم تلفونك كامل.'; return; }
-      if (!NEED_KEY) { S = fresh(name, phone); S.pre = true; save(); report(); view = 'board'; render(); top(); return; }
+      if (!NEED_KEY || owned()) { S = fresh(name, phone); S.pre = true; save(); report(); view = 'board'; render(); top(); return; }
       activate(e.submitter || document.querySelector('#f button[type=submit]'), (code) => {
         S = fresh(name, phone); S.key = code; save(); report(); view = 'board'; render(); top();
       });
@@ -231,7 +234,7 @@
         <div class="hint">المفتاح بيوصلك عالواتساب مع الكتاب.</div>`;
   }
   function buyHint() {
-    return `<p class="muted" style="text-align:center;margin-top:18px">ما عندك مفتاح؟ <a href="../#books" style="color:var(--volt);font-weight:600">اشتري الكتاب</a> وبيوصلك معو.</p>`;
+    return `<p class="muted" style="text-align:center;margin-top:18px">ما عندك مفتاح؟ <a href="https://wa.me/96179434479" style="color:var(--volt);font-weight:600">اشتري الكتاب عالواتساب</a> وبيوصلك معو.</p>`;
   }
   // طالب بلّش قبل ما ينحط المفتاح: منطلب المفتاح بس، وتقدّمو بيضل
   function keyOnly() {
@@ -257,6 +260,7 @@
     const r = await verifyKey(code);
     btn.disabled = false; btn.textContent = label;
     if (!r.ok) { err.textContent = r.msg; return; }
+    try { localStorage.setItem(OWN_KEY, '1'); } catch (e) {}
     onOk(code);
   }
   async function sb(path, opts) {
@@ -266,7 +270,8 @@
     return res.status === 204 ? null : res.json();
   }
   async function fingerprint() {
-    const s = [navigator.userAgent, navigator.language, screen.width + 'x' + screen.height,
+    // بلا userAgent: نفس التلفون بالتطبيق وبالمتصفّح بيعطي نفس البصمة (مفتاح الكتاب بيشتغل بالتنين)
+    const s = [navigator.language, screen.width + 'x' + screen.height,
       new Date().getTimezoneOffset(), navigator.hardwareConcurrency || 0].join('|');
     const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
     return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('').slice(0, 24);

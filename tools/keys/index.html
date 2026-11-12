@@ -138,7 +138,9 @@ input:focus,select:focus{border-color:var(--volt)}
         <option value="inverters">إعدادات الإنفرترات</option>
         <option value="transformer">حاسبة المحوّلات</option>
         <option value="wirephase">توزيع الفازات</option>
-        <option value="book">📘 كتاب الكهرباء + الكورس</option>
+        <option value="book">📘 كتاب 1: الكهرباء</option>
+        <option value="book2">📗 كتاب 2: الكلاسيك كنترول</option>
+        <option value="book3">📙 كتاب 3: الطاقة الشمسية</option>
       </select></div>
     <label class="lbl">الباقة</label>
     <div class="pkgs" id="pkgs"></div>
@@ -182,7 +184,8 @@ const SB_URL="https://utjpvjnhffapbwpbkkuc.supabase.co";
 const SB_KEY="sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
 const WA="96179434479";
 const TOOLS={all:'كل الأدوات',roof:'قياس السطح',transformer:'المحوّلات',
-  inverters:'الإنفرترات',load:'حساب المنظومة',wirephase:'توزيع الفازات',book:'📘 كتاب الكهرباء + الكورس'};
+  inverters:'الإنفرترات',load:'حساب المنظومة',wirephase:'توزيع الفازات',book:'📘 كتاب 1: الكهرباء',book2:'📗 كتاب 2: الكلاسيك كنترول',book3:'📙 كتاب 3: الطاقة الشمسية'};
+const BOOKS={book:['الكهرباء بالمختصر المفيد','📘'],book2:['الكلاسيك كنترول بالمختصر المفيد','📗'],book3:['الطاقة الشمسية بالمختصر المفيد','📙']};
 /* سعر الكتاب: 10$، وخصم الإطلاق 9$ لحد ليل 1 تشرين التاني 2026 */
 const BOOK_PRICE=(new Date()<new Date('2026-11-01T23:59:59+02:00'))?9:10;
 const COURSE_URL='https://mrelectroai-spec.github.io/mrelectroai/course/';
@@ -190,7 +193,8 @@ const PRICE={
   roof:{m:10,q:25,y:80,L:200}, load:{m:10,q:25,y:80,L:200},
   inverters:{m:8,q:20,y:60,L:150}, transformer:{m:8,q:20,y:60,L:150},
   wirephase:{m:5,q:12,y:35,L:90}, all:{m:25,q:60,y:180,L:450},
-  book:{m:BOOK_PRICE,q:BOOK_PRICE,y:BOOK_PRICE,L:BOOK_PRICE}
+  book:{m:BOOK_PRICE,q:BOOK_PRICE,y:BOOK_PRICE,L:BOOK_PRICE},
+  book2:{m:10,q:10,y:10,L:10}, book3:{m:10,q:10,y:10,L:10}
 };
 const PKG={m:['شهر',30],q:['3 شهور',90],y:['سنة',365],L:['مدى الحياة',0]};
 
@@ -235,9 +239,9 @@ if(TOKEN){$('lock').style.display='none';load();}
 let pkg='y';
 function drawPkgs(){
   const t=$('nTools').value, P=PRICE[t]||PRICE.all;
-  if(t==='book'){ /* الكتاب: دفعة وحدة، والمفتاح دائم */
+  if(BOOKS[t]){ /* الكتاب: دفعة وحدة، والمفتاح دائم */
     pkg='L';
-    $('pkgs').innerHTML='<button class="pk life on" data-k="L"><b>📘 الكتاب + الكورس (دائم)</b><span class="v">'+P.L+'$</span></button>';
+    $('pkgs').innerHTML='<button class="pk life on" data-k="L"><b>'+BOOKS[t][1]+' الكتاب + كل شي معو (دائم)</b><span class="v">'+P.L+'$</span></button>';
     $('nPaid').value=P.L; $('nDur').value=0; return;
   }
   if(pkg==='L'&&$('pkgs').querySelector('[data-k="L"]')&&$('pkgs').children.length===1) pkg='y';
@@ -287,7 +291,7 @@ function waLink(phone,msg){
   return 'https://api.whatsapp.com/send?'+(full?'phone='+full+'&':'')+'text='+encodeURIComponent(msg);
 }
 function waMsg(L){
-  if(L.tools==='book') return bookMsg(L);
+  if(BOOKS[L.tools]) return bookMsg(L);
   const t=TOOLS[L.tools]||L.tools;
   let m='🔑 *مفتاح تفعيل أدوات MrElectroAI*\n';
   m+='━━━━━━━━━━━━━━━\n';
@@ -308,13 +312,16 @@ function waMsg(L){
   return m;
 }
 function bookMsg(L){
-  let m='📘 *كتاب الكهرباء بالمختصر المفيد*\n';
+  const B=BOOKS[L.tools]||BOOKS.book;
+  let m=B[1]+' *كتاب '+B[0]+'*\n';
   m+='━━━━━━━━━━━━━━━\n';
   m+='أهلا '+L.name+' 👋 شكراً إنك اشتريت الكتاب.\n\n';
   m+='📎 الكتاب PDF مرفق بهالمحادثة.\n\n';
-  m+='*بعد ما تقراه، جرّب الكورس:*\n';
-  m+=COURSE_URL+'\n';
-  m+='180 سؤال قاعدة قاعدة، وإذا خلّصتو بـ5 غلطات أو أقل، ببعتلك شهادة باسمك 🎓\n\n';
+  m+='🔑 *مفتاحك:* '+L.code+'\n';
+  m+='بيفتحلك بتطبيق MrElectroAI كل شي معو: كورس الأسئلة، التقرير، المشاريع العملية، قطع الـ3D والأدوات.\n\n';
+  m+='*كيف تفعّل؟*\n1. افتح التطبيق: https://mrelectroai-spec.github.io/mrelectroai/app/\n2. روح على «مساري» أو «الكتب»\n3. اكبس «عندي مفتاح» وحط المفتاح\n\n';
+  m+='⚠️ المفتاح بينربط بتلفونك. إذا بدّلت تلفون احكيني وبفكّو.\n\n';
+  m+='وإذا خلّصت الكورس بـ5 غلطات أو أقل، ببعتلك شهادة باسمك 🎓\n\n';
   m+='أي سؤال أنا جاهز 👍\nأنور الحسن الجاسم — MrElectroAI\n+961 79 434 479';
   return m;
 }

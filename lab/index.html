@@ -193,6 +193,17 @@ button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
   </div>
 </div>
 
+<script src="../app/path.js"></script>
+<div id="plock" hidden><div class="pb"><div style="font-size:42px">🔒</div><b id="plT"></b><p id="plP"></p>
+<input id="plK" placeholder="MEA-XXXX-XXXX" dir="ltr" autocomplete="off" spellcheck="false"><div id="plE"></div>
+<button id="plGo">🔑 فعّل المفتاح</button><a id="plWa" href="https://wa.me/96179434479">اشتري الكتاب عالواتساب</a><a id="plFree" href="#">شوف القطعة المجانية ←</a></div></div>
+<style>#plock{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+#plock .pb{width:min(380px,100%);text-align:center;border-radius:26px;padding:24px 18px;color:#eef6f3;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 20px 60px rgba(0,0,0,.4);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif}
+#plock b{display:block;font-size:18px;margin:8px 0}#plock p{color:#a5bdb6;font-size:14px;line-height:1.8;margin:0 0 12px}
+#plock input{width:100%;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.25);color:#fff;text-align:center;font-size:17px;letter-spacing:2px;text-transform:uppercase}
+#plE{color:#ff8a80;font-size:13px;min-height:18px;margin:6px 0}
+#plock button,#plock a{display:block;width:100%;padding:12px;border-radius:14px;font:700 15px inherit;text-decoration:none;margin-top:8px;border:0;cursor:pointer}
+#plGo{background:#22C79B;color:#03140f}#plWa{background:rgba(255,255,255,.12);color:#eef6f3}#plFree{background:none;color:#22C79B;font-size:14px!important}</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function () {
@@ -1593,8 +1604,26 @@ function renderAct() {
   else { btn.textContent = st.on ? d.act[1] : d.act[0]; btn.setAttribute("aria-pressed", st.on ? "true" : "false"); }
 }
 
+/* كل كتاب إلو قطعو، وقطعة وحدة من كل كتاب مجانية (مثال) */
+const PBOOK = { course: ['mcb','rcd','stair','photo'], solar: ['pv','mc4','gpv','dciso','dcspd','lfp','hybrid'] };
+const PFREE = ['mcb','contactor','pv'];
+const PNAME = { course: 'الكهرباء بالمختصر المفيد', classic: 'الكلاسيك كنترول بالمختصر المفيد', solar: 'الطاقة الشمسية بالمختصر المفيد' };
+function bookOf(id) { for (const b in PBOOK) if (PBOOK[b].includes(id)) return b; return 'classic'; }
+function partLocked(d) {
+  const M = window.MEAPATH, b = bookOf(d.id);
+  if (!M || PFREE.includes(d.id) || M.owned(b)) { $("plock").hidden = true; return false; }
+  const free = PFREE.find(x => bookOf(x) === b);
+  $("plT").textContent = d.name + ': بتنفتح مع الكتاب';
+  $("plP").textContent = 'هالقطعة من كتاب «' + PNAME[b] + '». اشتري الكتاب وحط المفتاح، بتنفتحلك كل قطعو.';
+  $("plFree").href = '#' + free; $("plFree").onclick = () => { $("plock").hidden = true; };
+  $("plWa").href = 'https://wa.me/96179434479?text=' + encodeURIComponent('بدي كتاب «' + PNAME[b] + '»');
+  $("plE").textContent = ''; $("plGo").onclick = async () => { $("plGo").disabled = true; const r = await M.unlock(b, $("plK").value); $("plGo").disabled = false;
+    if (r.ok) { $("plock").hidden = true; load(d.id); } else $("plE").textContent = r.msg; };
+  $("plock").hidden = false; return true;
+}
 function load(id) {
   const d = PARTS.find(p => p.id === id) || PARTS[0];
+  if (partLocked(d)) return;
   cur = d; st.def = d; clearTimers(); hlKey = null; closePop(); $("banner").hidden = true;
   Object.assign(st, { k: 0, on: false, f: 0, fault: false, F: {}, kind: null, elapsed: 0, lit: false, pos: 0 });
   document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-current", c.dataset.id === d.id ? "true" : "false"));

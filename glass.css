@@ -1,0 +1,33 @@
+/* ===== زجاج المراية: نفس شكل مختبر التابلو، بالغامق وبالفاتح =====
+   بينحط بأي صفحة مع glass.js (هو بيزيد الخلفية الملوّنة وبيظبط الثيم من إعدادات التطبيق). */
+:root,[data-theme=dark]{
+ --g-bg:#06110e;
+ --g-c1:rgba(34,199,155,.42);--g-c2:rgba(60,120,255,.32);--g-c3:rgba(150,90,255,.26);--g-c4:rgba(0,180,220,.25);
+ --g-top:rgba(255,255,255,.14);--g-bot:rgba(255,255,255,.07);
+ --g-edge:rgba(255,255,255,.22);--g-edge2:rgba(255,255,255,.09);
+ --g-hi:rgba(255,255,255,.28);--g-sheen:rgba(255,255,255,.16);
+ --g-shadow:0 10px 40px rgba(0,0,0,.35);
+ --g-chip:rgba(255,255,255,.12);
+ --g-text:#eef6f3;--g-muted:#a5bdb6;--g-volt:#22C79B;--g-ink:#03140f;
+}
+[data-theme=light]{
+ --g-bg:#e9f2ef;
+ --g-c1:rgba(34,199,155,.62);--g-c2:rgba(80,140,255,.52);--g-c3:rgba(170,120,255,.46);--g-c4:rgba(0,190,230,.44);
+ --g-top:rgba(255,255,255,.78);--g-bot:rgba(255,255,255,.46);
+ --g-edge:rgba(255,255,255,.95);--g-edge2:rgba(255,255,255,.7);
+ --g-hi:rgba(255,255,255,1);--g-sheen:rgba(255,255,255,.55);
+ --g-shadow:0 10px 34px rgba(18,60,50,.16);
+ --g-chip:rgba(255,255,255,.6);
+ --g-text:#0b1a16;--g-muted:#4f6862;--g-volt:#0f9c75;--g-ink:#ffffff;
+}
+.mea-bg{position:fixed;inset:-20%;z-index:-1;pointer-events:none;background:
+ radial-gradient(40% 35% at 20% 25%,var(--g-c1),transparent 70%),
+ radial-gradient(35% 30% at 85% 20%,var(--g-c2),transparent 70%),
+ radial-gradient(45% 40% at 70% 85%,var(--g-c3),transparent 70%),
+ radial-gradient(40% 35% at 10% 90%,var(--g-c4),transparent 70%),var(--g-bg);
+ filter:saturate(120%);animation:meaDrift 28s ease-in-out infinite alternate}
+@keyframes meaDrift{to{transform:translate(4%,-3%) rotate(6deg) scale(1.06)}}
+.mea-glass{position:relative;background:linear-gradient(180deg,var(--g-top),var(--g-bot));
+ -webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);
+ border:1px solid var(--g-edge);box-shadow:inset 0 1px 0 var(--g-hi),inset 0 -1px 0 rgba(255,255,255,.05),var(--g-shadow)}
+@media (prefers-reduced-motion:reduce){.mea-bg{animation:none}}

@@ -199,3 +199,12 @@ sup.gn { font-size: 10px; font-weight: 700; color: var(--volt, #22C79B); margin-
 .gloss .en { font-weight: 700; }
 .gloss .rd { opacity: .75; }
 .opt sup.gn { color: inherit; opacity: .8; }
+
+/* ===== زجاج المراية (نفس التطبيق ومختبر التابلو) ===== */
+:root,[data-theme="dark"],[data-theme="light"]{--void:var(--g-bg);--panel:var(--g-bot);--panel-2:var(--g-chip);--line:var(--g-edge2);--text:var(--g-text);--muted:var(--g-muted)}
+html,body{background:transparent!important}
+.board,.qcard,.sendbox,.tool,.opt,.btn:not(.volt):not(.wa),.icon-btn,.challenge{background:linear-gradient(180deg,var(--g-top),var(--g-bot));border-color:var(--g-edge);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1px 0 var(--g-hi),var(--g-shadow)}
+.challenge{background:linear-gradient(135deg,rgba(34,199,155,.30),rgba(34,199,155,.08))}
+.opt.right{background:rgba(34,199,155,.28)}.opt.wrong{background:rgba(255,90,82,.22)}
+.nav{background:color-mix(in srgb,var(--g-bg) 45%,transparent)!important;-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--g-edge)}
+input{background:var(--g-chip)!important;border-color:var(--g-edge)!important;color:var(--g-text)!important}
