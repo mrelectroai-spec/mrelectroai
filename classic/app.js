@@ -42,7 +42,7 @@
   }
   const NEED_KEY = CFG.requireKey !== false;   // الكورس بينفتح بمفتاح الكتاب (أنور: كل شي مقفول إلا العيّنة)
   const OWN_KEY = 'meaBook_classic';
-  const owned = () => { try { return localStorage.getItem(OWN_KEY) === '1' || localStorage.getItem('meaTeacher') === '1'; } catch (e) { return false; } };
+  const owned = () => { try { const v = localStorage.getItem(OWN_KEY); return v === '1' || (!!v && v.slice(0, 6) === 'until:' && v.slice(6) >= new Date().toISOString().slice(0, 10)) || localStorage.getItem('meaTeacher') === '1'; } catch (e) { return false; } };
 
   // تحدّي الكتاب: يلي بيخلّص بـ 5 غلطات أو أقل بياخد الكتاب بخصم 30%
   const CHALLENGE_MAX = 5;
@@ -260,7 +260,7 @@
     const r = await verifyKey(code);
     btn.disabled = false; btn.textContent = label;
     if (!r.ok) { err.textContent = r.msg; return; }
-    try { localStorage.setItem(OWN_KEY, '1'); } catch (e) {}
+    try { localStorage.setItem(OWN_KEY, r.expires ? 'until:' + r.expires : '1'); } catch (e) {}
     onOk(code);
   }
   async function sb(path, opts) {
@@ -281,7 +281,7 @@
     let r;
     try { r = await sb('rpc/verify_license', { method: 'POST', body: JSON.stringify({ p_code: code, p_device: fp, p_tool: BOOK_TOOL }) }); }
     catch (e) { return { ok: false, msg: 'ما قدرنا نتحقق من المفتاح. تأكد إنك متصل بالإنترنت وجرّب مرة تانية.' }; }
-    if (r && r.ok) return { ok: true };
+    if (r && r.ok) return { ok: true, expires: r.expires || null };
     return { ok: false, msg: (r && r.msg) || 'المفتاح غلط. تأكد منو بالرسالة يلي وصلتك.' };
   }
 

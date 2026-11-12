@@ -24,7 +24,8 @@ function status(id){const c=C[id];let S=null;try{S=JSON.parse(get(c.key)||'null'
  const weak=per.filter(r=>r.m>=2||(r.a&&r.m/r.a>0.2)).sort((a,b)=>b.m-a.m);
  return {id,c,cert,read,started:!!S,passed,total,mistakes,answers,finished,excellent,unlocked:(excellent&&owned(id))||teacher,owned:owned(id),teacher,weak,per,current:S?S.current:1};}
 // الكتاب مشتري؟ (مفتاح الكتاب انحط عهالتلفون، أو وضع الأستاذ)
-function owned(id){if(get('meaBook_'+id)==='1'||get('meaTeacher')==='1')return true;
+function okVal(v){return v==='1'||(!!v&&v.slice(0,6)==='until:'&&v.slice(6)>=new Date().toISOString().slice(0,10));}
+function owned(id){if(okVal(get('meaBook_'+id))||get('meaTeacher')==='1')return true;
  // اللي بلّشوا الكورس قبل القفل بيضل مفتوحلن
  try{const S=JSON.parse(get(C[id].key)||'null');if(S&&S.startedAt&&S.startedAt<Date.parse('2026-11-13T00:00:00+02:00')){set('meaBook_'+id,'1');return true;}}catch(e){}return false;}
 const SB='https://utjpvjnhffapbwpbkkuc.supabase.co',SK='sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK';
@@ -34,7 +35,7 @@ async function fp(){const s=[navigator.language,screen.width+'x'+screen.height,n
 async function unlock(id,code){code=String(code||'').trim().toUpperCase().replace(/\s+/g,'');if(code.length<8)return{ok:false,msg:'اكتب المفتاح كامل.'};
  let r;try{const res=await fetch(SB+'/rest/v1/rpc/verify_license',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({p_code:code,p_device:await fp(),p_tool:C[id].tool})});r=await res.json();}
  catch(e){return{ok:false,msg:'ما قدرنا نتحقق. تأكد من الإنترنت وجرّب كمان مرة.'};}
- if(r&&r.ok){set('meaBook_'+id,'1');return{ok:true,name:r.name};}return{ok:false,msg:(r&&r.msg)||'المفتاح غلط.'};}
+ if(r&&r.ok){set('meaBook_'+id,r.expires?'until:'+r.expires:'1');return{ok:true,name:r.name,expires:r.expires};}return{ok:false,msg:(r&&r.msg)||'المفتاح غلط.'};}
 function markRead(id,v){set('meaRead_'+id,v?'1':'0');}
 let RULES=null;
 function rules(){if(RULES)return Promise.resolve(RULES);const base=(document.querySelector('script[src*="path.js"]')||{}).src||'';const u=base.replace(/path\.js.*$/,'rules.json');

@@ -259,7 +259,7 @@
   /* مجانية (أنور): قياس السطح وإعدادات الإنفرترات. وأدوات الكتب بتنفتح بمفتاح الكتاب من التطبيق */
   const FREE = ['roof','inverters'];
   const BOOK_OF = { wirephase:'course', transformer:'classic', load:'solar', quote:'solar' };
-  function openByBook(){ try{ return localStorage.getItem('meaTeacher')==='1' || (BOOK_OF[TOOL] && localStorage.getItem('meaBook_'+BOOK_OF[TOOL])==='1'); }catch(e){ return false; } }
+  function openByBook(){ try{ return localStorage.getItem('meaTeacher')==='1' || (BOOK_OF[TOOL] && (function(v){ return v==='1' || (!!v && v.slice(0,6)==='until:' && v.slice(6)>=new Date().toISOString().slice(0,10)); })(localStorage.getItem('meaBook_'+BOOK_OF[TOOL]))); }catch(e){ return false; } }
   async function boot(){
     if(FREE.includes(TOOL) || openByBook()) return;
     const d = trialLeft();

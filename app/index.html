@@ -137,6 +137,13 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 #nbl a.nw1{border-color:rgba(34,199,155,.6)}#nbl a.nw1 b::before{content:'● ';color:#ff4d4f;font-size:11px;vertical-align:2px}
 @keyframes pop{from{opacity:0;transform:translate(-20px,30px) scale(.4)}to{opacity:1;transform:none}}
 /* الكتب */
+#tchBar{display:flex;align-items:center;gap:6px;margin:-6px 0 14px;padding:6px 6px 6px 10px;border-radius:16px;background:rgba(34,199,155,.18);border:1px solid rgba(34,199,155,.5)}#tchBar span{flex:1;font-weight:700;font-size:13.5px;padding-inline-start:4px}#tchBar button{padding:8px 11px;border-radius:12px;background:var(--g-chip);border:1px solid var(--g-edge2);font-weight:700;font-size:13px;color:var(--text)}
+.mdl{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.mdb{width:min(380px,100%);padding:18px;margin:0;max-height:90vh;overflow:auto}.mdt{font:700 17px 'Readex Pro',sans-serif;margin-bottom:4px}.mds{font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.mde{font-size:13px;min-height:18px;margin:6px 0;color:#ff6b6b}.mdl2{font-size:13px;font-weight:700;color:var(--muted);margin:12px 2px 6px}
+.chp{display:flex;flex-wrap:wrap;gap:6px}.chp button{padding:9px 11px;border-radius:12px;background:var(--g-chip);border:1px solid var(--g-edge2);font-size:13.5px;font-weight:600;color:var(--text)}.chp button.on{background:var(--volt);color:#03140f;border-color:transparent}
+.kc{display:flex;align-items:center;gap:10px;margin:12px 0;padding:14px;border-radius:16px;background:rgba(34,199,155,.16);border:1px solid rgba(34,199,155,.5)}
+.kc b{flex:1;font:700 21px 'Readex Pro',monospace;letter-spacing:1px;direction:ltr;text-align:center}.kc button{width:46px;height:46px;border-radius:12px;background:var(--volt);color:#03140f;font-size:20px}
 .pin{width:100%;border-radius:14px;border:1px solid var(--g-edge);background:var(--g-chip);color:var(--text);padding:12px 14px;font:inherit;font-size:16px;margin-top:8px;resize:none}
 .sec2{font-size:13px;color:var(--muted);font-weight:700;margin:16px 4px 8px}
 .bk{align-items:stretch}.bk img.cv{width:62px;height:86px;flex:0 0 62px}
@@ -204,19 +211,29 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <body>
 <div class="bg" aria-hidden="true"></div>
 <div id="tchM" hidden style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)"><div class="set" style="width:min(340px,100%);padding:18px;margin:0"><div style="font:700 17px 'Readex Pro',sans-serif;margin-bottom:10px;text-align:center">🎓 وضع الأستاذ</div><div id="tchBox"><input id="tchPw" type="password" inputmode="numeric" placeholder="كلمة السر" autocomplete="off" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line,#ccc);background:transparent;color:inherit;font:inherit"><div id="tchErr" style="color:#e5484d;font-size:13px;min-height:18px;margin-top:4px"></div><button type="button" id="tchOk" style="width:100%;padding:11px;border:0;border-radius:12px;background:#16A37C;color:#fff;font:inherit;font-weight:700">ادخل</button></div></div></div>
+<div id="admM" hidden class="mdl" style="z-index:65"><div class="set mdb"><div class="mdt">🔐 دخول الأدمن</div><p class="mds">نفس الإيميل وكلمة السر تبع صفحة المفاتيح. بتحطّن مرة وحدة عهالتلفون.</p>
+<input id="aE" class="pin" type="email" dir="ltr" placeholder="الإيميل" autocomplete="username"><input id="aP" class="pin" type="password" dir="ltr" placeholder="كلمة السر" autocomplete="current-password"><div id="aErr" class="mde"></div>
+<div class="row"><button type="button" class="btn" id="aGo">ادخل</button><button type="button" class="btn alt" data-close>بطّل</button></div></div></div>
+<div id="keyM" hidden class="mdl"><div class="set mdb"><div class="mdt">🔑 مفتاح جديد</div>
+<div id="kForm"><input id="kN" class="pin" maxlength="60" placeholder="اسم الشخص"><input id="kP" class="pin" type="tel" inputmode="tel" dir="ltr" placeholder="رقمو (اختياري): 70123456">
+<div class="mdl2">شو بيفتح؟</div><div class="chp" id="kT"><button type="button" data-v="book" class="on">📘 كتاب 1</button><button type="button" data-v="book2">📗 كتاب 2</button><button type="button" data-v="book3">📙 كتاب 3</button><button type="button" data-v="all">🧰 كل الأدوات</button></div>
+<div class="mdl2">قدّيش؟</div><div class="chp" id="kD"><button type="button" data-v="3">🧪 تجربة 3 أيام</button><button type="button" data-v="30">📅 شهري</button><button type="button" data-v="365">🗓️ سنوي</button><button type="button" data-v="0" class="on">💎 مدى الحياة</button></div>
+<div id="kErr" class="mde"></div><div class="row"><button type="button" class="btn" id="kMake">اعمل المفتاح</button><button type="button" class="btn alt" data-close>بطّل</button></div></div>
+<div id="kOut" hidden></div></div></div>
 <div id="pushM" hidden style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)"><div class="set" style="width:min(380px,100%);padding:18px;margin:0">
 <div style="font:700 17px 'Readex Pro',sans-serif;margin-bottom:4px">📣 ابعت إشعار للكل</div><p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">بيوصل لكل يلي منزّلين التطبيق خلال دقايق، وبيطلع بدائرة الجديد.</p>
 <input id="pT" class="pin" maxlength="120" placeholder="العنوان: مثلاً كورس جديد 🔥"><textarea id="pB" class="pin" maxlength="600" rows="3" placeholder="الرسالة"></textarea>
 <select id="pU" class="pin"><option value="">بلا رابط (بيفتح التطبيق)</option><option value="https://mrelectroai-spec.github.io/mrelectroai/app/#books">الكتب</option><option value="https://mrelectroai-spec.github.io/mrelectroai/app/#path">مساري</option><option value="https://mrelectroai-spec.github.io/mrelectroai/app/#tools">الأدوات</option><option value="https://mrelectroai-spec.github.io/mrelectroai/panel/">مختبر التابلو</option><option value="https://mrelectroai-spec.github.io/mrelectroai/sim/">مختبر الطاقة الشمسية</option><option value="https://mrelectroai-spec.github.io/mrelectroai/lab/">مختبر القطع</option><option value="https://wa.me/96179434479">واتساب أنور</option></select>
-<input id="pC" class="pin" type="password" inputmode="numeric" placeholder="كود الأستاذ"><div id="pE" style="font-size:13px;min-height:18px;margin:4px 0;color:#ff6b6b"></div>
+<div id="pE" style="font-size:13px;min-height:18px;margin:4px 0;color:#ff6b6b"></div>
 <div class="row" style="margin-top:4px"><button type="button" class="btn" id="pGo">ابعت 📣</button><button type="button" class="btn alt" id="pX">بطّل</button></div></div></div>
 <div id="bks" hidden role="dialog" aria-modal="true"><div class="sheet2" id="bksIn"></div></div>
 <div id="onb" hidden role="dialog" aria-modal="true" aria-label="أهلا فيك"><div class="box" id="onbBox"></div></div>
 <header class="top">
   <img src="icon-192.png" alt="MrElectroAI" id="logo">
   <div><h1>MrElectro<b>AI</b></h1><p>كهرباء · كلاسيك كنترول · طاقة شمسية</p></div>
-  <div class="tops"><button type="button" id="pushBtn" hidden title="ابعت إشعار" style="width:40px;height:40px;border-radius:12px;border:1px solid rgba(34,199,155,.6);background:rgba(34,199,155,.2);font-size:18px;cursor:pointer">📣</button><button type="button" id="tchBadge" hidden title="وضع الأستاذ" style="white-space:nowrap;height:40px;padding:0 10px;border-radius:12px;border:1px solid rgba(34,199,155,.6);background:rgba(34,199,155,.2);font:700 12.5px 'Readex Pro',sans-serif;color:var(--text);cursor:pointer;width:40px;padding:0;font-size:18px">🎓</button><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
+  <div class="tops"><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
 </header>
+<div id="tchBar" hidden><span>🎓 وضع الأستاذ</span><button type="button" id="keyBtn">🔑 مفتاح</button><button type="button" id="pushBtn">📣 إشعار</button><button type="button" id="tchBadge" aria-label="طلاع من وضع الأستاذ">✕</button></div>
 <button type="button" id="nb" aria-label="الجديد" hidden><i>🔔</i><b id="nbN" hidden></b></button>
 <div id="nbl" hidden><div class="lst" id="nbList"></div></div>
 
@@ -299,7 +316,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.12i';
+var APPV='2026.11.12j';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -360,7 +377,7 @@ $('segLang').onclick=function(e){var b=e.target.closest('button');if(!b)return;i
 $('reOnb').onclick=function(){onb();};
 /* وضع الأستاذ: كلمة سر (منخزّن الـ hash بس) ← بيفتح المشاريع وبيخلّيه يتخطّى القواعد بالكورسات */
 var TCH='7c884873b4a8f2c95a579b0f275146e69fc063481b4d601ec8adff43dbd8088a';
-function tchUI(){var on=ls('meaTeacher')==='1',ok=ls('meaTeacherOk')==='1';$('tchSw').setAttribute('aria-checked',on?'true':'false');$('tchSub').textContent=on?'✅ إنت هلّق أستاذ: كل شي مفتوح':ok?'إنت هلّق متل أي طالب. شغّلو لترجع أستاذ':'بكلمة سر: بيفتح كل شي بدون أسئلة';var tb=$('tchBadge');if(tb)tb.hidden=!on;var pb=$('pushBtn');if(pb)pb.hidden=!on;}
+function tchUI(){var on=ls('meaTeacher')==='1',ok=ls('meaTeacherOk')==='1';$('tchSw').setAttribute('aria-checked',on?'true':'false');$('tchSub').textContent=on?'✅ إنت هلّق أستاذ: كل شي مفتوح':ok?'إنت هلّق متل أي طالب. شغّلو لترجع أستاذ':'بكلمة سر: بيفتح كل شي بدون أسئلة';$('tchBar').hidden=!on;}
 function tchSet(on){ls('meaTeacher',on?'1':'0');tchUI();try{paths();renderBooks();}catch(e){}}
 if(ls('meaTeacher')==='1')ls('meaTeacherOk','1');
 tchUI();
@@ -370,17 +387,53 @@ function tchToggle(){if(ls('meaTeacher')==='1'){tchSet(false);toast('👤 رجع
 (function(){var n=0,t=0;$('logo').addEventListener('click',function(){var now=Date.now();n=now-t<700?n+1:1;t=now;if(n>=5){n=0;tchToggle();}});})();
 $('tchM').onclick=function(e){if(e.target.id==='tchM')$('tchM').hidden=true;};
 $('tchBadge').onclick=function(){tchToggle();};
+
+/* ===== أدوات الأدمن بوضع الأستاذ: دخول مرة وحدة، مفاتيح، إشعارات ===== */
+function admTok(){try{return JSON.parse(ls('meaAdm')||'null');}catch(e){return null;}}
+function admSave(j){ls('meaAdm',JSON.stringify({a:j.access_token,r:j.refresh_token,exp:Date.now()+((j.expires_in||3600)-60)*1000}));}
+function admAuth(body,grant){return fetch(SBU+'/auth/v1/token?grant_type='+grant,{method:'POST',headers:{apikey:SBK,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(j){admSave(j);return j.access_token;});}
+var admWait=null;
+function admin(){var t=admTok();if(t&&Date.now()<t.exp)return Promise.resolve(t.a);
+ if(t&&t.r)return admAuth({refresh_token:t.r},'refresh_token').catch(function(){ls('meaAdm','');return admin();});
+ return new Promise(function(res){admWait=res;$('aErr').textContent='';$('admM').hidden=false;setTimeout(function(){$('aE').focus();},60);});}
+$('aGo').onclick=function(){var e=$('aE').value.trim(),p=$('aP').value;if(!e||!p){$('aErr').textContent='اكتب الإيميل وكلمة السر';return;}
+ $('aGo').disabled=true;admAuth({email:e,password:p},'password').then(function(a){$('aGo').disabled=false;$('aP').value='';$('admM').hidden=true;if(admWait){var w=admWait;admWait=null;w(a);}})
+ .catch(function(){$('aGo').disabled=false;$('aErr').textContent='الإيميل أو كلمة السر غلط';});};
+document.addEventListener('click',function(e){var c=e.target.closest('[data-close]');if(c){var m=c.closest('.mdl');if(m)m.hidden=true;}var m2=e.target.classList&&e.target.classList.contains('mdl')?e.target:null;if(m2)m2.hidden=true;});
+function chp(id){$(id).onclick=function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call($(id).children,function(x){x.classList.toggle('on',x===b);});};}
+chp('kT');chp('kD');
+function val(id){var b=$(id).querySelector('.on');return b?b.dataset.v:'';}
+$('keyBtn').onclick=function(){$('kErr').textContent='';$('kForm').hidden=false;$('kOut').hidden=true;$('keyM').hidden=false;};
+function code8(){var C='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',a=new Uint32Array(8);crypto.getRandomValues(a);var p=[].map.call(a,function(x){return C[x%C.length];}).join('');return 'MEA-'+p.slice(0,4)+'-'+p.slice(4);}
+var KT={book:['📘','كتاب «الكهرباء بالمختصر المفيد»'],book2:['📗','كتاب «الكلاسيك كنترول بالمختصر المفيد»'],book3:['📙','كتاب «الطاقة الشمسية بالمختصر المفيد»'],all:['🧰','كل أدوات MrElectroAI']};
+var KD={'3':'تجربة 3 أيام','30':'شهر','365':'سنة','0':'مدى الحياة'};
+function kMsg(L){var t=KT[L.tools];var m=t[0]+' *'+t[1]+'*\n━━━━━━━━━━━━━━━\nأهلا '+L.name+' 👋\n\n🔑 *مفتاحك:* '+L.code+'\n⏳ المدة: '+KD[L.d]+(L.exp?' (لحد '+L.exp+')':'')+'\n\n';
+ m+=L.tools==='all'?'*كيف تفعّل؟* افتح أي أداة وحط المفتاح.\n':'*كيف تفعّل؟*\n1. افتح التطبيق: https://mrelectroai-spec.github.io/mrelectroai/app/\n2. روح على «الكتب» واكبس عالكتاب\n3. اكبس «عندي مفتاح» وحط المفتاح\n';
+ return m+'\n⚠️ المفتاح بينربط بتلفونك.\n\nأنور الحسن الجاسم · MrElectroAI\n+961 79 434 479';}
+$('kMake').onclick=function(){var n=$('kN').value.trim(),ph=$('kP').value.trim(),tl=val('kT'),d=val('kD');if(!n){$('kErr').textContent='اكتب اسم الشخص';return;}
+ var exp=+d?new Date(Date.now()+(+d)*864e5).toISOString().slice(0,10):null,code=code8();$('kMake').disabled=true;$('kErr').textContent='';
+ admin().then(function(a){return fetch(SBU+'/rest/v1/licenses',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json',Prefer:'return=minimal'},
+  body:JSON.stringify([{code:code,name:n,phone:ph,tools:tl,expires:exp,active:true,note:'من التطبيق · '+KD[d]}])});})
+ .then(function(r){$('kMake').disabled=false;if(r.status===401){ls('meaAdm','');$('kErr').textContent='خلص الدخول، جرّب كمان مرة.';return;}if(!r.ok){$('kErr').textContent='ما انعمل المفتاح، جرّب كمان مرة.';return;}
+  var msg=kMsg({code:code,name:n,tools:tl,d:d,exp:exp}),p=ph.replace(/\D/g,'').replace(/^0/,''),wa='https://api.whatsapp.com/send?'+(p?'phone='+(p.length<=8?'961'+p:p)+'&':'')+'text='+encodeURIComponent(msg);
+  $('kForm').hidden=true;$('kOut').hidden=false;
+  $('kOut').innerHTML='<div style="font-weight:700;color:var(--volt)">✅ المفتاح جاهز لـ '+n.replace(/</g,'')+'</div><div class="kc"><b id="kCode">'+code+'</b><button type="button" id="kCp" aria-label="نسخ">📋</button></div><div class="mds">'+KT[tl][1]+' · '+KD[d]+(exp?' · لحد '+exp:'')+'</div>'
+   +'<div class="row" style="margin-top:10px"><a class="btn" href="'+wa+'">📲 ابعت عالواتساب</a><button type="button" class="btn alt" id="kNew">مفتاح تاني</button></div>';
+  $('kN').value='';$('kP').value='';
+  $('kCp').onclick=function(){(navigator.clipboard?navigator.clipboard.writeText(code):Promise.reject()).then(function(){toast('📋 انسخ المفتاح');}).catch(function(){var t=document.createElement('textarea');t.value=code;document.body.appendChild(t);t.select();try{document.execCommand('copy');toast('📋 انسخ المفتاح');}catch(e){}t.remove();});};
+  $('kNew').onclick=function(){$('kForm').hidden=false;$('kOut').hidden=true;};})
+ .catch(function(){$('kMake').disabled=false;$('kErr').textContent='ما في إنترنت.';});};
 /* إرسال إشعار (وضع الأستاذ) */
 var TCODE='';
-$('pushBtn').onclick=function(){$('pE').textContent='';$('pC').value=TCODE;$('pC').hidden=!!TCODE;$('pushM').hidden=false;setTimeout(function(){$('pT').focus();},60);};
+$('pushBtn').onclick=function(){$('pE').textContent='';$('pushM').hidden=false;setTimeout(function(){$('pT').focus();},60);};
 $('pX').onclick=function(){$('pushM').hidden=true;};
 $('pushM').onclick=function(e){if(e.target.id==='pushM')$('pushM').hidden=true;};
-$('pGo').onclick=function(){var t=$('pT').value.trim(),b=$('pB').value.trim(),u=$('pU').value,c=$('pC').value.trim();
- if(!t){$('pE').textContent='اكتب عنوان.';return;}if(!c){$('pC').hidden=false;$('pE').textContent='حط كود الأستاذ.';return;}
+$('pGo').onclick=function(){var t=$('pT').value.trim(),b=$('pB').value.trim(),u=$('pU').value;
+ if(!t){$('pE').textContent='اكتب عنوان.';return;}
  $('pGo').disabled=true;$('pE').style.color='var(--muted)';$('pE').textContent='عم نبعت…';
- fetch(SBU+'/rest/v1/rpc/send_news',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_code:c,p_title:t,p_body:b,p_url:u||null})})
+ admin().then(function(a){return fetch(SBU+'/rest/v1/rpc/send_news',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json'},body:JSON.stringify({p_title:t,p_body:b,p_url:u||null})});})
  .then(function(r){return r.json();}).then(function(r){$('pGo').disabled=false;$('pE').style.color='#ff6b6b';
-  if(r&&r.ok){TCODE=c;$('pushM').hidden=true;$('pT').value='';$('pB').value='';toast('✅ انبعت الإشعار للكل');loadNews().then(function(d){NEWS=(d.items||[]).slice(0,10);badge();});}
+  if(r&&r.ok){$('pushM').hidden=true;$('pT').value='';$('pB').value='';toast('✅ انبعت الإشعار للكل');loadNews().then(function(d){NEWS=(d.items||[]).slice(0,10);badge();});}
   else $('pE').textContent=(r&&r.msg)||'ما انبعت، جرّب كمان مرة.';}).catch(function(){$('pGo').disabled=false;$('pE').style.color='#ff6b6b';$('pE').textContent='ما في إنترنت.';});};
 $('tchSw').onclick=function(){if(ls('meaTeacher')==='1'){tchSet(false);return;}if(ls('meaTeacherOk')==='1'){tchSet(true);return;}var b=$('tchBox');b.hidden=!b.hidden;if(!b.hidden)$('tchPw').focus();};
 function tchGo(){var v=$('tchPw').value.trim();if(!v)return;crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)).then(function(h){var x=Array.from(new Uint8Array(h)).map(function(c){return c.toString(16).padStart(2,'0');}).join('');
