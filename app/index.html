@@ -78,7 +78,7 @@ h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
 .ver{text-align:center;color:var(--muted);font-size:12px;margin-top:6px}
 /* المساعد */
 #t-ai.on{display:flex;flex-direction:column;min-height:calc(100vh - 190px)}
-.chat{flex:1;display:flex;flex-direction:column;gap:10px;padding-bottom:10px}
+.chat{flex:1;display:flex;flex-direction:column;gap:10px;padding-bottom:10px}.msg{scroll-margin-bottom:84px}
 .msg{max-width:88%;padding:11px 14px;border-radius:18px;font-size:15px;line-height:1.75;white-space:pre-wrap;word-wrap:break-word;animation:in .2s}
 .msg.bot{background:var(--bot);border:1px solid var(--line);align-self:flex-start;border-start-start-radius:6px}
 .msg.me{background:var(--me);align-self:flex-end;border-start-end-radius:6px}
@@ -291,7 +291,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.12d';
+var APPV='2026.11.12e';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -387,7 +387,10 @@ function ask(q){q=q.trim();if(!q||busy)return;busy=true;$('send').disabled=true;
  .then(function(r){return r.json();}).then(function(d){return d&&d.text?d.text:local(q);})
  .catch(function(){return navigator.onLine===false?T.noNet:local(q);})
  .then(function(a){t.classList.remove('typing');t.innerHTML=fmt(a);t.scrollIntoView({block:'end',behavior:'smooth'});H.push({role:'model',text:a});H=H.slice(-20);ls(HK,JSON.stringify(H));busy=false;$('send').disabled=false;});}
-$('comp').onsubmit=function(e){e.preventDefault();var v=$('q').value;$('q').value='';$('q').style.height='';ask(v);};
+/* متل الواتساب: الكيبورد بيضل مفتوح بعد ما تبعت */
+$('send').addEventListener('pointerdown',function(e){if(document.activeElement===$('q'))e.preventDefault();});
+$('send').addEventListener('mousedown',function(e){if(document.activeElement===$('q'))e.preventDefault();});
+$('comp').onsubmit=function(e){e.preventDefault();var kb=document.activeElement===$('q');var v=$('q').value;$('q').value='';$('q').style.height='';ask(v);if(kb)$('q').focus({preventScroll:true});};
 $('q').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('comp').requestSubmit();}});
 $('q').addEventListener('input',function(){this.style.height='';this.style.height=Math.min(this.scrollHeight,120)+'px';});
 $('chips').onclick=function(e){var b=e.target.closest('button');if(b)ask(b.textContent);};
