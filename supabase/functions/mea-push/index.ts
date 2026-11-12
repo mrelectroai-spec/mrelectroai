@@ -34,26 +34,29 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   try {
     const auth = req.headers.get("authorization") || "";
+    const input = await req.json().catch(() => ({}));
+    // فحص بلا إرسال (validate_only): بيتأكد إنو السرّ ومشروع Firebase تمام، وما بيوصل شي لحدا
+    const dry = input.dry === true;
     const url = Deno.env.get("SUPABASE_URL")!, anon = Deno.env.get("SUPABASE_ANON_KEY")!;
     // بس الأدمن: منسأل قاعدة البيانات بنفس دخول أنور
     const chk = await fetch(url + "/rest/v1/rpc/is_site_admin", { method: "POST", headers: { apikey: anon, Authorization: auth, "Content-Type": "application/json" }, body: "{}" });
-    if (!chk.ok || (await chk.json()) !== true) return json({ ok: false, msg: "لازم تفوت كأدمن" }, 403);
+    if (!dry && (!chk.ok || (await chk.json()) !== true)) return json({ ok: false, msg: "لازم تفوت كأدمن" }, 403);
 
     const raw = Deno.env.get("FCM_SERVICE_ACCOUNT");
     if (!raw) return json({ ok: false, msg: "ناقص سرّ FCM_SERVICE_ACCOUNT" }, 500);
     const sa = JSON.parse(raw);
-    const { id, title, body, url: link } = await req.json();
+    const { id, title, body, url: link } = input;
     if (!title) return json({ ok: false, msg: "اكتب عنوان" }, 400);
 
     const tok = await googleToken(sa);
     const data: Record<string, string> = { id: String(id || "push-" + Date.now()), title: String(title), body: String(body || ""), url: String(link || "") };
     const r = await fetch(`https://fcm.googleapis.com/v1/projects/${sa.project_id}/messages:send`, {
       method: "POST", headers: { Authorization: "Bearer " + tok, "Content-Type": "application/json" },
-      body: JSON.stringify({ message: { topic: "all", data, android: { priority: "high", ttl: "86400s" } } }),
+      body: JSON.stringify({ validate_only: dry, message: { topic: "all", data, android: { priority: "high", ttl: "86400s" } } }),
     });
     const out = await r.json();
     if (!r.ok) return json({ ok: false, msg: "Firebase رفض", detail: out }, 502);
-    return json({ ok: true, name: out.name });
+    return json({ ok: true, dry, name: out.name });
   } catch (e) {
     return json({ ok: false, msg: String(e) }, 500);
   }
