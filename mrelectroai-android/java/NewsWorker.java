@@ -39,6 +39,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class NewsWorker extends Worker {
     static final String FEED = "https://mrelectroai-spec.github.io/mrelectroai/app/news.json";
+    // الإشعارات يلي بيبعتها أنور من وضع الأستاذ (Supabase)
+    static final String DB = "https://utjpvjnhffapbwpbkkuc.supabase.co/rest/v1/rpc/news_feed";
+    static final String KEY = "sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
     static final String HOME = "https://mrelectroai-spec.github.io/mrelectroai/app/";
     static final String CH = "news";
 
@@ -53,21 +56,31 @@ public class NewsWorker extends Worker {
                 new OneTimeWorkRequest.Builder(NewsWorker.class).setConstraints(k).build());
     }
 
-    @NonNull @Override
-    public Result doWork() {
+    private static JSONArray fetch(String url, boolean db) {
         try {
-            HttpURLConnection h = (HttpURLConnection) new URL(FEED + "?t=" + System.currentTimeMillis()).openConnection();
+            HttpURLConnection h = (HttpURLConnection) new URL(url + (db ? "" : "?t=" + System.currentTimeMillis())).openConnection();
             h.setConnectTimeout(15000);
             h.setReadTimeout(15000);
             h.setUseCaches(false);
-            if (h.getResponseCode() != 200) return Result.success();
+            if (db) { h.setRequestProperty("apikey", KEY); h.setRequestProperty("Authorization", "Bearer " + KEY); }
+            if (h.getResponseCode() != 200) return null;
             StringBuilder sb = new StringBuilder();
             BufferedReader r = new BufferedReader(new InputStreamReader(h.getInputStream(), "UTF-8"));
             String line;
             while ((line = r.readLine()) != null) sb.append(line).append('\n');
             r.close();
-            JSONArray items = new JSONObject(sb.toString()).optJSONArray("items");
-            if (items == null) return Result.success();
+            return new JSONObject(sb.toString()).optJSONArray("items");
+        } catch (Exception e) { return null; }
+    }
+
+    @NonNull @Override
+    public Result doWork() {
+        try {
+            JSONArray a = fetch(DB, true), b = fetch(FEED, false);
+            if (a == null && b == null) return Result.retry();
+            JSONArray items = new JSONArray();
+            if (a != null) for (int i = 0; i < a.length(); i++) items.put(a.opt(i));
+            if (b != null) for (int i = 0; i < b.length(); i++) items.put(b.opt(i));
 
             SharedPreferences sp = getApplicationContext().getSharedPreferences("news", Context.MODE_PRIVATE);
             Set<String> seen = new HashSet<>(sp.getStringSet("seen", new HashSet<>()));

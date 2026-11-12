@@ -69,6 +69,8 @@ public class MainActivity extends BridgeActivity {
             try { WebView w = getBridge().getWebView(); w.clearCache(false); w.reload(); } catch (Exception ignored) { }
         }
         pausedAt = 0;
+        // كل ما يرجع عالتطبيق منشيّك عالإشعارات الجديدة دغري
+        try { NewsWorker.schedule(this); } catch (Exception ignored) { }
     }
 
     @Override
