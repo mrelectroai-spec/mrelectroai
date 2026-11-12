@@ -292,7 +292,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.12g';
+var APPV='2026.11.12h';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -355,7 +355,7 @@ function tchSet(on){ls('meaTeacher',on?'1':'0');tchUI();try{paths();renderBooks(
 if(ls('meaTeacher')==='1')ls('meaTeacherOk','1');
 tchUI();
 function toast(t){var d=document.createElement('div');d.textContent=t;d.style.cssText='position:fixed;left:50%;top:90px;transform:translateX(-50%);z-index:70;padding:10px 16px;border-radius:14px;background:rgba(10,30,25,.92);color:#fff;font-weight:700;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.3)';document.body.appendChild(d);setTimeout(function(){d.remove();},1800);}
-function tchToggle(){if(ls('meaTeacher')==='1'){tchSet(false);toast('👤 رجعت طالب عادي');return;}if(ls('meaTeacherOk')==='1'){tchSet(true);toast('🎓 وضع الأستاذ شغّال');return;}$('tchErr').textContent='';$('tchM').hidden=false;setTimeout(function(){$('tchPw').focus();},50);}
+function tchToggle(){if(ls('meaTeacher')==='1'){tchSet(false);toast('👤 رجعت طالب عادي');return;}$('tchErr').textContent='';$('tchPw').value='';$('tchM').hidden=false;setTimeout(function(){$('tchPw').focus();},50);}
 /* 5 كبسات عاللوغو ← وضع الأستاذ (مخفي عن الناس) */
 (function(){var n=0,t=0;$('logo').addEventListener('click',function(){var now=Date.now();n=now-t<700?n+1:1;t=now;if(n>=5){n=0;tchToggle();}});})();
 $('tchM').onclick=function(e){if(e.target.id==='tchM')$('tchM').hidden=true;};
