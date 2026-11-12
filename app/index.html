@@ -207,7 +207,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <header class="top">
   <img src="icon-192.png" alt="MrElectroAI">
   <div><h1>MrElectro<b>AI</b></h1><p>كهرباء · كلاسيك كنترول · طاقة شمسية</p></div>
-  <div class="tops"><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
+  <div class="tops"><button type="button" id="tchBadge" hidden title="وضع الأستاذ" style="white-space:nowrap;height:40px;padding:0 10px;border-radius:12px;border:1px solid rgba(34,199,155,.6);background:rgba(34,199,155,.2);font:700 12.5px 'Readex Pro',sans-serif;color:var(--text);cursor:pointer">🎓 أستاذ</button><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
 </header>
 <button type="button" id="nb" aria-label="الجديد" hidden><i>🔔</i><b id="nbN" hidden></b></button>
 <div id="nbl" hidden><div class="lst" id="nbList"></div></div>
@@ -272,7 +272,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
   </div>
   <div class="set">
     <button type="button" class="si" id="reOnb"><i>🧭</i><div class="t">من وين بلّش؟<small>جاوب 2 أسئلة وبقلّك شو بيناسبك</small></div><span class="go">←</span></button>
-    <button type="button" class="si" id="tchBtn"><i>🔑</i><div class="t">وضع الأستاذ<small id="tchSub">بكلمة سر: بيفتح كل شي بدون أسئلة</small></div><span class="go">←</span></button>
+    <div class="si" id="tchRow"><i>🔑</i><div class="t">وضع الأستاذ<small id="tchSub"></small></div><button type="button" class="sw" id="tchSw" role="switch" aria-checked="false" aria-label="وضع الأستاذ"></button></div>
     <div id="tchBox" hidden style="padding:4px 12px 12px"><input id="tchPw" type="password" inputmode="numeric" placeholder="كلمة السر" autocomplete="off" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line,#ccc);background:transparent;color:inherit;font:inherit"><div id="tchErr" style="color:#e5484d;font-size:13px;min-height:18px;margin-top:4px"></div><button type="button" id="tchOk" style="width:100%;padding:11px;border:0;border-radius:12px;background:#16A37C;color:#fff;font:inherit;font-weight:700">ادخل</button></div>
     <a class="si" href="privacy.html"><i>🔒</i><div class="t">سياسة الخصوصية</div><span class="go">←</span></a>
     <a class="si" href="https://wa.me/96179434479"><i>💬</i><div class="t">تواصل مع أنور<small>واتساب: <span dir="ltr">+961 79 434 479</span></small></div><span class="go">←</span></a>
@@ -291,7 +291,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.12e';
+var APPV='2026.11.12f';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -349,11 +349,14 @@ $('segLang').onclick=function(e){var b=e.target.closest('button');if(!b)return;i
 $('reOnb').onclick=function(){onb();};
 /* وضع الأستاذ: كلمة سر (منخزّن الـ hash بس) ← بيفتح المشاريع وبيخلّيه يتخطّى القواعد بالكورسات */
 var TCH='7c884873b4a8f2c95a579b0f275146e69fc063481b4d601ec8adff43dbd8088a';
-function tchUI(){var on=ls('meaTeacher')==='1';$('tchSub').textContent=on?'✅ مفعّل: كل المشاريع مفتوحة. اكبس لتطفيه':'بكلمة سر: بيفتح كل شي بدون أسئلة';}
+function tchUI(){var on=ls('meaTeacher')==='1',ok=ls('meaTeacherOk')==='1';$('tchSw').setAttribute('aria-checked',on?'true':'false');$('tchSub').textContent=on?'✅ إنت هلّق أستاذ: كل شي مفتوح':ok?'إنت هلّق متل أي طالب. شغّلو لترجع أستاذ':'بكلمة سر: بيفتح كل شي بدون أسئلة';var tb=$('tchBadge');if(tb)tb.hidden=!on;}
+function tchSet(on){ls('meaTeacher',on?'1':'0');tchUI();try{paths();renderBooks();}catch(e){}}
+if(ls('meaTeacher')==='1')ls('meaTeacherOk','1');
 tchUI();
-$('tchBtn').onclick=function(){if(ls('meaTeacher')==='1'){ls('meaTeacher','0');tchUI();try{paths();renderBooks();}catch(e){}return;}var b=$('tchBox');b.hidden=!b.hidden;if(!b.hidden)$('tchPw').focus();};
+$('tchBadge').onclick=function(){show('settings');};
+$('tchSw').onclick=function(){if(ls('meaTeacher')==='1'){tchSet(false);return;}if(ls('meaTeacherOk')==='1'){tchSet(true);return;}var b=$('tchBox');b.hidden=!b.hidden;if(!b.hidden)$('tchPw').focus();};
 function tchGo(){var v=$('tchPw').value.trim();if(!v)return;crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)).then(function(h){var x=Array.from(new Uint8Array(h)).map(function(c){return c.toString(16).padStart(2,'0');}).join('');
- if(x===TCH){ls('meaTeacher','1');$('tchBox').hidden=true;$('tchPw').value='';$('tchErr').textContent='';tchUI();try{paths();renderBooks();}catch(e){}}else $('tchErr').textContent='كلمة السر غلط';});}
+ if(x===TCH){ls('meaTeacherOk','1');ls('meaTeacher','1');$('tchBox').hidden=true;$('tchPw').value='';$('tchErr').textContent='';tchUI();try{paths();renderBooks();}catch(e){}}else $('tchErr').textContent='كلمة السر غلط';});}
 $('tchOk').onclick=tchGo;$('tchPw').onkeydown=function(e){if(e.key==='Enter')tchGo();};
 $('share').onclick=function(){var u='https://mrelectroai-spec.github.io/mrelectroai/app/',t=EN?'MrElectroAI: labs, courses and tools for electricians':'MrElectroAI: مختبر، كورسات مجانية، وأدوات للكهربجية';
  if(navigator.share)navigator.share({title:'MrElectroAI',text:t,url:u}).catch(function(){});else location.href='https://wa.me/?text='+encodeURIComponent(t+'\n'+u);};
