@@ -42,9 +42,16 @@ Deno.serve(async (req) => {
     const chk = await fetch(url + "/rest/v1/rpc/is_site_admin", { method: "POST", headers: { apikey: anon, Authorization: auth, "Content-Type": "application/json" }, body: "{}" });
     if (!dry && (!chk.ok || (await chk.json()) !== true)) return json({ ok: false, msg: "لازم تفوت كأدمن" }, 403);
 
-    const raw = Deno.env.get("FCM_SERVICE_ACCOUNT");
-    if (!raw) return json({ ok: false, msg: "ناقص سرّ FCM_SERVICE_ACCOUNT" }, 500);
-    const sa = JSON.parse(raw);
+    // المفتاح: من سرّ الـ Edge Function، وإذا مش صالح من جدول app_secrets (ما بيقراه إلا السيرفر)
+    let sa: any = null;
+    try { const e = JSON.parse(Deno.env.get("FCM_SERVICE_ACCOUNT") || ""); if (e && e.type === "service_account") sa = e; } catch (_) { /* */ }
+    if (!sa) {
+      const srk = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const q = await fetch(url + "/rest/v1/app_secrets?name=eq.FCM_SERVICE_ACCOUNT&select=value", { headers: { apikey: srk, Authorization: "Bearer " + srk } });
+      const rows = q.ok ? await q.json() : [];
+      if (rows[0]) sa = JSON.parse(rows[0].value);
+    }
+    if (!sa) return json({ ok: false, msg: "ناقص مفتاح Firebase" }, 500);
     const { id, title, body, url: link } = input;
     if (!title) return json({ ok: false, msg: "اكتب عنوان" }, 400);
 
