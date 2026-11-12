@@ -237,6 +237,11 @@ html,body{background:transparent}
   <button type="button" data-t="ai"><i>🤖</i>المساعد</button>
 </nav>
 <script>
+/* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
+var APPV='2026.11.12a';
+(function(){var busy=0;function chk(){if(busy||!navigator.onLine)return;busy=1;fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){busy=0;
+ if(j&&j.v&&j.v!==APPV){var u=location.pathname+'?v='+encodeURIComponent(j.v)+location.hash;location.replace(u);}}).catch(function(){busy=0;});}
+ setTimeout(chk,1500);document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')chk();});})();
 (function(){
 var K='appTab',$=function(i){return document.getElementById(i);};
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){return null;}}
