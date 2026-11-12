@@ -1,18 +1,3 @@
 {
-  "items": [
-    {
-      "id": "2026-11-11-app",
-      "date": "2026-11-11",
-      "title": "تطبيق MrElectroAI صار جاهز ⚡",
-      "body": "المختبر، الكتب، الكورسات المجانية، وأدوات الفنيين، كلّن بمحل واحد عتلفونك.",
-      "url": "https://mrelectroai-spec.github.io/mrelectroai/app/"
-    },
-    {
-      "id": "2026-11-11-sim",
-      "date": "2026-11-11",
-      "title": "مختبر الطاقة الشمسية",
-      "body": "اختار الإنفرتر والبطارية، وصّل الشرايط بإيدك، وشوف شو بيصير إذا غلطت.",
-      "url": "https://mrelectroai-spec.github.io/mrelectroai/sim/"
-    }
-  ]
+  "items": []
 }
