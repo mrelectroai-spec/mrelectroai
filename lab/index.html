@@ -9,7 +9,7 @@
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
 <title>مختبر القطع</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@500;700&display=swap">
 <style>
 /* Layout: workshop bench — part picker strip, 3D part with pins, then the same part as a schematic; one dark MrElectroAI look */
 :root {
@@ -26,8 +26,8 @@
   --overlay: rgba(12, 26, 22, .94);
   --stage-1: #10231d;
   --stage-2: #070F0D;
-  --display: "Readex Pro", "IBM Plex Sans Arabic", "Noto Sans Arabic", Tahoma, sans-serif;
-  --body: "IBM Plex Sans Arabic", "Noto Sans Arabic", Tahoma, sans-serif;
+  --display: "Readex Pro", "Readex Pro", "Noto Sans Arabic", Tahoma, sans-serif;
+  --body: "Readex Pro", "Noto Sans Arabic", Tahoma, sans-serif;
   color-scheme: dark;
 }
 [data-theme="light"] {
@@ -198,7 +198,7 @@ button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 <input id="plK" placeholder="MEA-XXXX-XXXX" dir="ltr" autocomplete="off" spellcheck="false"><div id="plE"></div>
 <button id="plGo">🔑 فعّل المفتاح</button><a id="plWa" href="https://wa.me/96179434479">اشتري الكتاب عالواتساب</a><a id="plFree" href="#">شوف القطعة المجانية ←</a></div></div>
 <style>#plock{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-#plock .pb{width:min(380px,100%);text-align:center;border-radius:26px;padding:24px 18px;color:#eef6f3;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 20px 60px rgba(0,0,0,.4);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif}
+#plock .pb{width:min(380px,100%);text-align:center;border-radius:26px;padding:24px 18px;color:#eef6f3;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 20px 60px rgba(0,0,0,.4);font-family:'Readex Pro',system-ui,sans-serif}
 #plock b{display:block;font-size:18px;margin:8px 0}#plock p{color:#a5bdb6;font-size:14px;line-height:1.8;margin:0 0 12px}
 #plock input{width:100%;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.25);color:#fff;text-align:center;font-size:17px;letter-spacing:2px;text-transform:uppercase}
 #plE{color:#ff8a80;font-size:13px;min-height:18px;margin:6px 0}
@@ -1543,11 +1543,11 @@ const A = {
     g.fillStyle = o.color || "#1b2422"; g.textBaseline = "middle";
     if (o.split) {
       const n = lines.length; g.textAlign = "center";
-      g.font = `${o.weight || 700} ${Math.round(c.height * (o.scale || .7))}px "Readex Pro", "IBM Plex Sans Arabic", sans-serif`;
+      g.font = `${o.weight || 700} ${Math.round(c.height * (o.scale || .7))}px "Readex Pro", "Readex Pro", sans-serif`;
       lines.forEach((ln, i) => g.fillText(ln, c.width * (i + 0.5) / n, c.height / 2));
     } else {
       g.textAlign = "center"; const lh = c.height / lines.length;
-      lines.forEach((ln, i) => { g.font = `${o.weight || 700} ${Math.round(lh * (o.scale || .7))}px "Readex Pro", "IBM Plex Sans Arabic", sans-serif`; g.fillText(ln, c.width / 2, lh * (i + .5)); });
+      lines.forEach((ln, i) => { g.font = `${o.weight || 700} ${Math.round(lh * (o.scale || .7))}px "Readex Pro", "Readex Pro", sans-serif`; g.fillText(ln, c.width / 2, lh * (i + .5)); });
     }
     const tex = new THREE.CanvasTexture(c); tex.anisotropy = 8; tex.encoding = THREE.sRGBEncoding;
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true, toneMapped: false }));

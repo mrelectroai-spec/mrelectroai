@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>مولّد QR | وصّلني</title>
 <meta name="theme-color" content="#0E7C3A">
-<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
 :root{--g:#0E7C3A;--g2:#0A5F2C;--gs:#E3F3E8;--y:#F5B301;--ink:#14261B;--muted:#6B7C72;
   --line:#E2E8E3;--soft:#F3F6F4;--paper:#FFF;--bg:#F6F7F5;
   --sh:0 2px 8px rgba(20,38,27,.06),0 12px 28px rgba(20,38,27,.08)}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+body{background:var(--bg);color:var(--ink);font-family:'Readex Pro',system-ui,sans-serif;
   font-size:15px;line-height:1.7;padding:20px 15px 50px}
 .wrap{max-width:600px;margin:0 auto}
 h1{font-family:'Readex Pro',sans-serif;font-size:25px;margin-bottom:5px}
@@ -163,7 +163,7 @@ $('dl').onclick=async()=>{
   x.textAlign='center';x.fillStyle=fg;
   x.font='120px sans-serif';x.fillText($('em').value,W/2,170);
   x.font='700 92px "Readex Pro",sans-serif';x.fillText($('t1').value,W/2,285);
-  x.font='36px "IBM Plex Sans Arabic",sans-serif';
+  x.font='36px "Readex Pro",sans-serif';
   x.globalAlpha=.85;x.fillText($('t2').value,W/2,345);x.globalAlpha=1;
   const img=new Image();img.crossOrigin='anonymous';
   img.onerror=()=>alert('ما قدرنا نحمّل الـQR — لازم إنترنت. افتح الصفحة من رابط الموقع.');
@@ -174,7 +174,7 @@ $('dl').onclick=async()=>{
     else x.fillRect(px-34,py-34,s+68,s+68);
     x.drawImage(img,px,py,s,s);
     x.fillStyle=fg;x.textAlign='center';
-    x.font='700 50px "IBM Plex Sans Arabic",sans-serif';x.fillText($('t3').value,W/2,1075);
+    x.font='700 50px "Readex Pro",sans-serif';x.fillText($('t3').value,W/2,1075);
     x.font='700 36px "JetBrains Mono",monospace';x.globalAlpha=.8;x.fillText($('t4').value,W/2,1130);
     const a=document.createElement('a');a.download='wasselni-qr.png';a.href=c.toDataURL('image/png');a.click();
   };

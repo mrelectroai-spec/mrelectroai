@@ -8,11 +8,11 @@
 <meta name="theme-color" content="#06110e">
 <link rel="icon" href="../app/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--volt:#22C79B;--ink:#03140f;--text:#eef6f3;--muted:#a5bdb6;--glass:rgba(255,255,255,.09);--glass2:rgba(255,255,255,.14);--edge:rgba(255,255,255,.22);--edge2:rgba(255,255,255,.08);--warn:#ffb020;--bad:#ff5a52}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:#06110e;color:var(--text);font-family:'IBM Plex Sans Arabic','Readex Pro',system-ui,sans-serif}
+html,body{height:100%;overflow:hidden;background:#06110e;color:var(--text);font-family:'Readex Pro',system-ui,sans-serif}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
 [hidden]{display:none!important}
 /* الخلفية: ألوان ناعمة ورا الزجاج */
@@ -88,12 +88,12 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-
 #toast{position:fixed;z-index:9;left:50%;top:calc(max(10px,env(safe-area-inset-top)) + 62px);transform:translate(-50%,-14px);opacity:0;padding:10px 16px;border-radius:16px;font-size:14px;font-weight:600;max-width:calc(100% - 30px);text-align:center;transition:all .25s;pointer-events:none}
 #toast.show{opacity:1;transform:translate(-50%,0)}#toast.bad{background:rgba(120,20,20,.55);border-color:rgba(255,120,110,.5)}
 /* SVG */
-.tl{font:700 10.5px 'IBM Plex Sans Arabic',sans-serif;text-anchor:middle;fill:#fff;paint-order:stroke;stroke:#0b1512;stroke-width:3px;stroke-linejoin:round;pointer-events:none}
+.tl{font:700 10.5px 'Readex Pro',sans-serif;text-anchor:middle;fill:#fff;paint-order:stroke;stroke:#0b1512;stroke-width:3px;stroke-linejoin:round;pointer-events:none}
 .pl rect{fill:rgba(6,17,14,.82);stroke:rgba(34,199,155,.7);stroke-width:1.5}.pl text{font:700 13px 'Readex Pro',sans-serif;fill:#fff;text-anchor:middle;pointer-events:none}.pl{pointer-events:none}
 .tp.cand{fill:rgba(34,199,155,.16);stroke:rgba(34,199,155,.75);stroke-width:2;animation:cand 1s ease-in-out infinite alternate}@keyframes cand{to{fill:rgba(34,199,155,.34)}}
 #wbar{position:fixed;z-index:7;left:50%;transform:translateX(-50%);top:calc(max(10px,env(safe-area-inset-top)) + 62px);display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;border-radius:18px;font-size:14px;font-weight:600;max-width:calc(100% - 20px)}
 #wbar button{padding:8px 12px;border-radius:12px;background:rgba(255,90,82,.25);font-size:13px}
-.lt{font:600 11px 'IBM Plex Sans Arabic',sans-serif;text-anchor:middle;fill:#38414a;pointer-events:none}
+.lt{font:600 11px 'Readex Pro',sans-serif;text-anchor:middle;fill:#38414a;pointer-events:none}
 .lt.b{font-weight:700}.lt.s{font-size:8.5px}.lt.w{fill:#fff}
 .tag{font:700 13px 'Readex Pro',sans-serif;text-anchor:middle;fill:#e8fff6;paint-order:stroke;stroke:rgba(0,0,0,.45);stroke-width:3px;pointer-events:none}
 .part{cursor:grab}.part.sel>.ol{stroke:var(--volt);stroke-width:2.5;stroke-dasharray:6 5;fill:rgba(34,199,155,.06)}
@@ -108,7 +108,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-
 .spin{animation:spin .45s linear infinite}.spinr{animation:spin .45s linear infinite reverse}.hum{animation:hum .08s linear infinite alternate}
 @keyframes spin{to{transform:rotate(360deg)}}@keyframes hum{to{transform:translateX(1.5px)}}
 .whd{fill:#fff;stroke:var(--volt);stroke-width:2.5;cursor:ns-resize}
-.sleeve{fill:#f4f6f7;stroke:#9aa3ab;stroke-width:.8}.sleevet{font:700 9.5px 'IBM Plex Sans Arabic',sans-serif;text-anchor:middle;fill:#1d2328;pointer-events:none}
+.sleeve{fill:#f4f6f7;stroke:#9aa3ab;stroke-width:.8}.sleevet{font:700 9.5px 'Readex Pro',sans-serif;text-anchor:middle;fill:#1d2328;pointer-events:none}
 .rub{stroke:var(--volt);stroke-width:4;stroke-dasharray:8 6;fill:none;pointer-events:none}
 .frame text{font:600 13px 'Readex Pro',sans-serif;fill:rgba(255,255,255,.45);text-anchor:middle}
 @media (prefers-reduced-motion:reduce){.bg,.flow,.spin,.spinr,.hum{animation:none}}
@@ -206,7 +206,7 @@ function frame(){let s=`<rect x="0" y="0" width="${W}" height="${H}" rx="28" fil
  s+=`<g class="frame">`;for(let i=0;i<8;i++){const x=40+i*(W-80)/8;s+=`<line x1="${x}" y1="18" x2="${x}" y2="34" stroke="rgba(255,255,255,.25)"/><text x="${x+(W-80)/16}" y="31">${i+1}</text>`;}
  'ABCDE'.split('').forEach((L,i)=>{const y=60+i*(H-120)/5;s+=`<text x="22" y="${y+(H-120)/10+5}">${L}</text>`;});s+=`</g>`;
  s+=`<rect x="40" y="40" width="${W-80}" height="${H-80}" rx="16" fill="none" stroke="rgba(255,255,255,.18)" stroke-dasharray="2 8"/>`;
- s+=`<g transform="translate(${W-420} ${H-96})"><rect width="380" height="64" rx="12" fill="rgba(0,0,0,.25)" stroke="rgba(255,255,255,.2)"/><text x="190" y="27" style="font:700 15px 'Readex Pro';fill:#dffcf2;text-anchor:middle">MrElectroAI · مختبر التابلو</text><text x="190" y="49" style="font:500 12.5px 'IBM Plex Sans Arabic';fill:rgba(255,255,255,.6);text-anchor:middle">${PJ?'مشروع '+PJ.n+': '+PJ.title:'مختبر حرّ'}</text></g>`;
+ s+=`<g transform="translate(${W-420} ${H-96})"><rect width="380" height="64" rx="12" fill="rgba(0,0,0,.25)" stroke="rgba(255,255,255,.2)"/><text x="190" y="27" style="font:700 15px 'Readex Pro';fill:#dffcf2;text-anchor:middle">MrElectroAI · مختبر التابلو</text><text x="190" y="49" style="font:500 12.5px 'Readex Pro';fill:rgba(255,255,255,.6);text-anchor:middle">${PJ?'مشروع '+PJ.n+': '+PJ.title:'مختبر حرّ'}</text></g>`;
  return s;}
 function wpath(w){const a=tpos(w.a),b=tpos(w.b);if(!a||!b)return null;
  const a1={x:a.x,y:a.y+a.d*22},b1={x:b.x,y:b.y+b.d*22};

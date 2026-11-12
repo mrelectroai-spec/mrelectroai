@@ -15,7 +15,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
   background: var(--void); color: var(--text);
-  font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  font-family: 'Readex Pro', system-ui, sans-serif;
   font-size: 16px; line-height: 1.7; overflow-x: hidden;
 }
 button, input { font-family: inherit; font-size: inherit; color: inherit; }
@@ -98,7 +98,7 @@ input:focus { border-color: var(--volt); outline: none; box-shadow: 0 0 0 3px va
 
 /* ── الأسئلة ── */
 .rulehead { margin-bottom: 14px; }
-.rulehead .tag { font-family: 'IBM Plex Sans Arabic', sans-serif; color: var(--volt); font-size: 12.5px; font-weight: 700; margin-bottom: 4px; }
+.rulehead .tag { font-family: 'Readex Pro', sans-serif; color: var(--volt); font-size: 12.5px; font-weight: 700; margin-bottom: 4px; }
 .meter { display: flex; gap: 5px; margin: 12px 0 6px; }
 .meter i { flex: 1; height: 6px; border-radius: 3px; background: var(--line); }
 .meter i.on { background: var(--volt); box-shadow: 0 0 8px var(--glow); }
@@ -140,7 +140,7 @@ input:focus { border-color: var(--volt); outline: none; box-shadow: 0 0 0 3px va
 .pg {
   --p-ink: #0B1613; --p-muted: #5A6D67; --p-volt: #0E8F6E; --p-line: #E1EAE6; --p-soft: #F0F5F3; --p-dark: #070F0D;
   width: 794px; height: 1123px; background: #fff; color: var(--p-ink); padding: 56px 60px; position: relative; overflow: hidden;
-  font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 16px; line-height: 1.7;
+  font-family: 'Readex Pro', sans-serif; font-size: 16px; line-height: 1.7;
 }
 .pg h1, .pg h2 { font-family: 'Readex Pro', sans-serif; color: var(--p-ink); }
 .pg.cert { border: 18px solid var(--p-dark); outline: 3px solid var(--p-volt); outline-offset: -30px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; }
@@ -171,7 +171,7 @@ input:focus { border-color: var(--volt); outline: none; box-shadow: 0 0 0 3px va
 .sendbox + .sendbox { margin-top: 16px; }
 
 /* الكلمات الإنجليزية: رقم فوق الكلمة، والشرح تحت الصفحة */
-.en { font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; unicode-bidi: isolate; }
+.en { font-family: 'Readex Pro', system-ui, sans-serif; unicode-bidi: isolate; }
 sup.gn { font-size: 10px; font-weight: 700; color: var(--volt, #22C79B); margin-inline-start: 1px; vertical-align: super; line-height: 0; }
 .gloss { margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--line, #1E332D); font-size: 13.5px; line-height: 1.75; }
 .gloss .gh { font-weight: 600; margin-bottom: 4px; }

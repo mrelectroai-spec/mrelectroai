@@ -336,7 +336,7 @@ function render(){const b=brd();if(!b)return;const {de}=compute();KZ=Math.min(2.
  libUI();checklist(de);}
 let liveSig='',busy=false,drag=null,KZ=1;
 function chip(cx,cy,acts,K){const h=30*K,pad=8*K,fs=13*K;const ws=acts.map(a=>Math.max(30*K,(a[1].length*7.2+16)*K));const tot=ws.reduce((x,y)=>x+y,0)+(acts.length-1)*4*K;let x=cx-tot/2;
- let g=`<g class="chip">`;acts.forEach((a,i)=>{g+=`<g data-act="${a[0]}"><rect x="${x}" y="${cy-h/2}" width="${ws[i]}" height="${h}" rx="${h/2}" fill="#10221d" stroke="#22c79b" stroke-width="${1.5*K}"/><text x="${x+ws[i]/2}" y="${cy+fs*0.36}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="#e9fff7" style="font-family:'IBM Plex Sans Arabic',sans-serif">${a[1]}</text></g>`;x+=ws[i]+4*K;});
+ let g=`<g class="chip">`;acts.forEach((a,i)=>{g+=`<g data-act="${a[0]}"><rect x="${x}" y="${cy-h/2}" width="${ws[i]}" height="${h}" rx="${h/2}" fill="#10221d" stroke="#22c79b" stroke-width="${1.5*K}"/><text x="${x+ws[i]/2}" y="${cy+fs*0.36}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="#e9fff7" style="font-family:'Readex Pro',sans-serif">${a[1]}</text></g>`;x+=ws[i]+4*K;});
  return g+'</g>';}
 function updateLive(){const b=document.getElementById('bsvg');if(!b||busy||drag)return;const r=R_();
  const sig=[r.houseOn,WS&&WS.powered,Math.round((r.soc||0)*100),r.faults?[...r.faults].join():'',Math.round((r.load||0)/50),Math.round((r.pv||0)/100),r.gridPresent,typeof gridSched==='function'&&r.min!=null?gridSched(r.min/60):0].join('|');

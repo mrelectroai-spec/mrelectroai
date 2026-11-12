@@ -49,7 +49,7 @@
   #meaLock{position:fixed;inset:0;z-index:99999;background:#081311;
     background-image:radial-gradient(circle at 50% -10%,rgba(34,199,155,.16),transparent 58%);
     display:grid;place-items:center;padding:20px;
-    font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;direction:rtl}
+    font-family:'Readex Pro',system-ui,sans-serif;direction:rtl}
   #meaLock *{box-sizing:border-box;margin:0;padding:0}
   #meaLock .box{width:100%;max-width:370px;text-align:center;color:#E4F0EC}
   #meaLock .ic{width:74px;height:74px;border-radius:22px;background:#22C79B;color:#04140F;
@@ -246,7 +246,7 @@
   function trialBanner(days){
     const b = document.createElement('div');
     b.style.cssText='position:fixed;bottom:0;inset-inline:0;z-index:9998;background:#22C79B;'
-      +'color:#04140F;font-family:IBM Plex Sans Arabic,sans-serif;font-size:12.5px;font-weight:700;'
+      +'color:#04140F;font-family:Readex Pro,sans-serif;font-size:12.5px;font-weight:700;'
       +'padding:9px 14px calc(9px + env(safe-area-inset-bottom));text-align:center;direction:rtl;'
       +'display:flex;align-items:center;justify-content:center;gap:10px';
     const P=PRICE[TOOL]||PRICE.all;
