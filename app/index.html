@@ -221,7 +221,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="kErr" class="mde"></div><div class="row"><button type="button" class="btn" id="kMake">اعمل المفتاح</button><button type="button" class="btn alt" data-close>بطّل</button></div></div>
 <div id="kOut" hidden></div></div></div>
 <div id="pushM" hidden style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)"><div class="set" style="width:min(380px,100%);padding:18px;margin:0">
-<div style="font:700 17px 'Readex Pro',sans-serif;margin-bottom:4px">📣 ابعت إشعار للكل</div><p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">بيوصل لكل يلي منزّلين التطبيق خلال دقايق، وبيطلع بدائرة الجديد.</p>
+<div style="font:700 17px 'Readex Pro',sans-serif;margin-bottom:4px">📣 ابعت إشعار للكل</div><p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">بيوصل لكل يلي منزّلين التطبيق دغري، وبيطلع بدائرة الجديد.</p>
 <input id="pT" class="pin" maxlength="120" placeholder="العنوان: مثلاً كورس جديد 🔥"><textarea id="pB" class="pin" maxlength="600" rows="3" placeholder="الرسالة"></textarea>
 <select id="pU" class="pin"><option value="">بلا رابط (بيفتح التطبيق)</option><option value="https://mrelectroai-spec.github.io/mrelectroai/app/#books">الكتب</option><option value="https://mrelectroai-spec.github.io/mrelectroai/app/#path">مساري</option><option value="https://mrelectroai-spec.github.io/mrelectroai/app/#tools">الأدوات</option><option value="https://mrelectroai-spec.github.io/mrelectroai/panel/">مختبر التابلو</option><option value="https://mrelectroai-spec.github.io/mrelectroai/sim/">مختبر الطاقة الشمسية</option><option value="https://mrelectroai-spec.github.io/mrelectroai/lab/">مختبر القطع</option><option value="https://wa.me/96179434479">واتساب أنور</option></select>
 <div id="pE" style="font-size:13px;min-height:18px;margin:4px 0;color:#ff6b6b"></div>
@@ -316,7 +316,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.12j';
+var APPV='2026.11.12k';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -433,7 +433,9 @@ $('pGo').onclick=function(){var t=$('pT').value.trim(),b=$('pB').value.trim(),u=
  $('pGo').disabled=true;$('pE').style.color='var(--muted)';$('pE').textContent='عم نبعت…';
  admin().then(function(a){return fetch(SBU+'/rest/v1/rpc/send_news',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json'},body:JSON.stringify({p_title:t,p_body:b,p_url:u||null})});})
  .then(function(r){return r.json();}).then(function(r){$('pGo').disabled=false;$('pE').style.color='#ff6b6b';
-  if(r&&r.ok){$('pushM').hidden=true;$('pT').value='';$('pB').value='';toast('✅ انبعت الإشعار للكل');loadNews().then(function(d){NEWS=(d.items||[]).slice(0,10);badge();});}
+  if(r&&r.ok){$('pushM').hidden=true;$('pT').value='';$('pB').value='';toast('✅ انبعت الإشعار للكل');
+   /* فوري عبر Firebase */
+   admin().then(function(tk){return fetch(SBU+'/functions/v1/mea-push',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({id:'db-'+r.id,title:t,body:b,url:u||''})});}).then(function(x){return x.json();}).then(function(x){if(x&&x.ok)toast('⚡ وصل فوري لكل التلفونات');else toast('⏱️ بيوصل خلال ربع ساعة');}).catch(function(){});loadNews().then(function(d){NEWS=(d.items||[]).slice(0,10);badge();});}
   else $('pE').textContent=(r&&r.msg)||'ما انبعت، جرّب كمان مرة.';}).catch(function(){$('pGo').disabled=false;$('pE').style.color='#ff6b6b';$('pE').textContent='ما في إنترنت.';});};
 $('tchSw').onclick=function(){if(ls('meaTeacher')==='1'){tchSet(false);return;}if(ls('meaTeacherOk')==='1'){tchSet(true);return;}var b=$('tchBox');b.hidden=!b.hidden;if(!b.hidden)$('tchPw').focus();};
 function tchGo(){var v=$('tchPw').value.trim();if(!v)return;crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)).then(function(h){var x=Array.from(new Uint8Array(h)).map(function(c){return c.toString(16).padStart(2,'0');}).join('');
