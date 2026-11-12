@@ -273,7 +273,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
   <div class="set">
     <button type="button" class="si" id="reOnb"><i>🧭</i><div class="t">من وين بلّش؟<small>جاوب 2 أسئلة وبقلّك شو بيناسبك</small></div><span class="go">←</span></button>
     <button type="button" class="si" id="tchBtn"><i>🔑</i><div class="t">وضع الأستاذ<small id="tchSub">بكلمة سر: بيفتح كل شي بدون أسئلة</small></div><span class="go">←</span></button>
-    <div id="tchBox" hidden style="padding:4px 12px 12px"><input id="tchPw" type="password" placeholder="كلمة السر" autocomplete="off" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line,#ccc);background:transparent;color:inherit;font:inherit"><div id="tchErr" style="color:#e5484d;font-size:13px;min-height:18px;margin-top:4px"></div><button type="button" id="tchOk" style="width:100%;padding:11px;border:0;border-radius:12px;background:#16A37C;color:#fff;font:inherit;font-weight:700">ادخل</button></div>
+    <div id="tchBox" hidden style="padding:4px 12px 12px"><input id="tchPw" type="password" inputmode="numeric" placeholder="كلمة السر" autocomplete="off" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line,#ccc);background:transparent;color:inherit;font:inherit"><div id="tchErr" style="color:#e5484d;font-size:13px;min-height:18px;margin-top:4px"></div><button type="button" id="tchOk" style="width:100%;padding:11px;border:0;border-radius:12px;background:#16A37C;color:#fff;font:inherit;font-weight:700">ادخل</button></div>
     <a class="si" href="privacy.html"><i>🔒</i><div class="t">سياسة الخصوصية</div><span class="go">←</span></a>
     <a class="si" href="https://wa.me/96179434479"><i>💬</i><div class="t">تواصل مع أنور<small>واتساب: <span dir="ltr">+961 79 434 479</span></small></div><span class="go">←</span></a>
     <button type="button" class="si" id="share"><i>📤</i><div class="t">شارك التطبيق مع رفقاتك</div><span class="go">←</span></button>
@@ -291,7 +291,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.12c';
+var APPV='2026.11.12d';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -348,7 +348,7 @@ $('segTheme').onclick=function(e){var b=e.target.closest('button');if(!b)return;
 $('segLang').onclick=function(e){var b=e.target.closest('button');if(!b)return;if((b.dataset.v==='en')!==EN){ls(K,'settings');var lb=$('langBtn');if(lb)lb.click();else{ls('siteLang',b.dataset.v);location.reload();}}};
 $('reOnb').onclick=function(){onb();};
 /* وضع الأستاذ: كلمة سر (منخزّن الـ hash بس) ← بيفتح المشاريع وبيخلّيه يتخطّى القواعد بالكورسات */
-var TCH='55c90af2840c1f7960e10171cda237a4c48ea4cc00a0198c68cb8c57e4af6962';
+var TCH='7c884873b4a8f2c95a579b0f275146e69fc063481b4d601ec8adff43dbd8088a';
 function tchUI(){var on=ls('meaTeacher')==='1';$('tchSub').textContent=on?'✅ مفعّل: كل المشاريع مفتوحة. اكبس لتطفيه':'بكلمة سر: بيفتح كل شي بدون أسئلة';}
 tchUI();
 $('tchBtn').onclick=function(){if(ls('meaTeacher')==='1'){ls('meaTeacher','0');tchUI();try{paths();renderBooks();}catch(e){}return;}var b=$('tchBox');b.hidden=!b.hidden;if(!b.hidden)$('tchPw').focus();};
