@@ -35,6 +35,8 @@ public class MainActivity extends BridgeActivity {
         NewsWorker.schedule(this);
 
         WebView wv = getBridge().getWebView();
+        // تحديث لحالو: كل ما ينفتح التطبيق منمسح النسخة المحفوظة، فبيجيب آخر نسخة من الموقع
+        try { wv.clearCache(false); } catch (Exception ignored) { }
         // الكيبورد: منرفع الصفحة فوقو (مع edge-to-edge أندرويد ما بيصغّر الصفحة لحالو، فكان الكيبورد يغطّي خانة الكتابة)
         ViewCompat.setOnApplyWindowInsetsListener(wv, (v, ins) -> {
             Insets sys = ins.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
@@ -49,6 +51,24 @@ public class MainActivity extends BridgeActivity {
         // ملفات PDF وغيرها: بتنفتح برّا التطبيق لتنزل عالتلفون
         wv.setDownloadListener((url, ua, cd, mime, len) -> openOutside(url));
         handle(getIntent());
+    }
+
+    private long pausedAt = 0;
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        pausedAt = System.currentTimeMillis();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // إذا رجع عالتطبيق بعد أكتر من 20 دقيقة: منجيب آخر نسخة
+        if (pausedAt > 0 && System.currentTimeMillis() - pausedAt > 20 * 60 * 1000) {
+            try { WebView w = getBridge().getWebView(); w.clearCache(false); w.reload(); } catch (Exception ignored) { }
+        }
+        pausedAt = 0;
     }
 
     @Override
