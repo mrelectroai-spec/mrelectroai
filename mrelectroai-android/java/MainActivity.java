@@ -33,6 +33,8 @@ public class MainActivity extends BridgeActivity {
             requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 71);
         }
         NewsWorker.schedule(this);
+        // الإشعارات الفورية: كل التلفونات مشتركة بقناة «all»
+        try { com.google.firebase.messaging.FirebaseMessaging.getInstance().subscribeToTopic("all"); } catch (Exception ignored) { }
 
         WebView wv = getBridge().getWebView();
         // تحديث لحالو: كل ما ينفتح التطبيق منمسح النسخة المحفوظة، فبيجيب آخر نسخة من الموقع

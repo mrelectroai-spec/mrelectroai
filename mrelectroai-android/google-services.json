@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "795071333585",
+    "project_id": "mrelectroai-494b8",
+    "storage_bucket": "mrelectroai-494b8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795071333585:android:891cd2dbdcc03f042371f0",
+        "android_client_info": {
+          "package_name": "com.mrelectroai.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANx9-_UE1fS95txyGKacD2_tC1PlsaK4o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

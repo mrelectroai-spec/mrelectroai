@@ -74,12 +74,17 @@ jobs:
           cp $GITHUB_WORKSPACE/mrelectroai-android/java/*.java $PKG_DIR/
           mkdir -p app/src/main/res/drawable
           cp $GITHUB_WORKSPACE/mrelectroai-android/ic_stat_bolt.xml app/src/main/res/drawable/
-          sed -i '0,/^dependencies {/s//dependencies {\n    implementation "androidx.work:work-runtime:2.9.1"/' app/build.gradle
+          sed -i '0,/^dependencies {/s//dependencies {\n    implementation "androidx.work:work-runtime:2.9.1"\n    implementation "com.google.firebase:firebase-messaging:24.1.0"/' app/build.gradle
+          # Firebase: ملف المشروع + خدمة الإشعار الفوري
+          cp $GITHUB_WORKSPACE/mrelectroai-android/google-services.json app/google-services.json
+          grep -n "google-services" build.gradle app/build.gradle || echo "no gms lines"
+          grep -q "com.google.gms.google-services" app/build.gradle || echo "apply plugin: 'com.google.gms.google-services'" >> app/build.gradle
+          sed -i 's#</application>#    <service android:name=".PushService" android:exported="false">\n            <intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT" /></intent-filter>\n        </service>\n    </application>#' app/src/main/AndroidManifest.xml
           sed -i 's#</manifest>#    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n</manifest>#' app/src/main/AndroidManifest.xml
           sed -i 's/versionCode [0-9]*/versionCode ${{ github.run_number }}/; s/versionName "[^"]*"/versionName "1.${{ github.run_number }}"/' app/build.gradle
           sed -i 's#android:launchMode="singleTask"#android:launchMode="singleTask"\n            android:windowSoftInputMode="adjustResize"#' app/src/main/AndroidManifest.xml
           grep -n "versionCode\|versionName\|work-runtime" app/build.gradle
-          grep -n "permission\|launchMode" app/src/main/AndroidManifest.xml
+          grep -n "permission\|launchMode\|PushService" app/src/main/AndroidManifest.xml
           ls $PKG_DIR
 
       - name: 6. Build & sign

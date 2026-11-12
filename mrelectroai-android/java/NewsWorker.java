@@ -44,6 +44,7 @@ public class NewsWorker extends Worker {
     static final String KEY = "sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK";
     static final String HOME = "https://mrelectroai-spec.github.io/mrelectroai/app/";
     static final String CH = "news";
+    static final String PREFS = "news";
 
     public NewsWorker(@NonNull Context c, @NonNull WorkerParameters p) { super(c, p); }
 
@@ -83,29 +84,38 @@ public class NewsWorker extends Worker {
             if (b != null) for (int i = 0; i < b.length(); i++) items.put(b.opt(i));
 
             SharedPreferences sp = getApplicationContext().getSharedPreferences("news", Context.MODE_PRIVATE);
-            Set<String> seen = new HashSet<>(sp.getStringSet("seen", new HashSet<>()));
             boolean first = !sp.getBoolean("init", false);
             int shown = 0;
             for (int i = 0; i < items.length(); i++) {
                 JSONObject it = items.optJSONObject(i);
                 if (it == null) continue;
                 String id = it.optString("id", "");
-                if (id.isEmpty() || seen.contains(id)) continue;
-                seen.add(id);
+                if (id.isEmpty() || !markNew(getApplicationContext(), id)) continue;
                 // أول مرة بعد التثبيت: ما منطلّع الأخبار القديمة، بس الأحدث إذا كان مكتوب "new"
                 if (first) continue;
                 if (!it.optBoolean("notify", true)) continue;
                 if (shown < 3) { show(it, id); shown++; }
             }
-            sp.edit().putStringSet("seen", seen).putBoolean("init", true).apply();
+            sp.edit().putBoolean("init", true).apply();
         } catch (Exception e) {
             return Result.retry();
         }
         return Result.success();
     }
 
-    private void show(JSONObject it, String id) {
-        Context c = getApplicationContext();
+    private void show(JSONObject it, String id) { notify(getApplicationContext(), it, id); }
+
+    /** علّم الخبر إنو انشاف. بيرجّع false إذا كان مشوف من قبل (لحتى ما يطلع الإشعار مرتين). */
+    static synchronized boolean markNew(Context c, String id) {
+        SharedPreferences sp = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        Set<String> seen = new HashSet<>(sp.getStringSet("seen", new HashSet<>()));
+        if (seen.contains(id)) return false;
+        seen.add(id);
+        sp.edit().putStringSet("seen", seen).apply();
+        return true;
+    }
+
+    static void notify(Context c, JSONObject it, String id) {
         if (!AppPrefs.notifOn(c)) return;
         if (Build.VERSION.SDK_INT >= 33 &&
                 ContextCompat.checkSelfPermission(c, "android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) return;
