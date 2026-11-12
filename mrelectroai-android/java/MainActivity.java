@@ -5,7 +5,12 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.ViewGroup;
 import android.webkit.WebView;
+
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.getcapacitor.BridgeActivity;
 
@@ -30,6 +35,17 @@ public class MainActivity extends BridgeActivity {
         NewsWorker.schedule(this);
 
         WebView wv = getBridge().getWebView();
+        // الكيبورد: منرفع الصفحة فوقو (مع edge-to-edge أندرويد ما بيصغّر الصفحة لحالو، فكان الكيبورد يغطّي خانة الكتابة)
+        ViewCompat.setOnApplyWindowInsetsListener(wv, (v, ins) -> {
+            Insets sys = ins.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            Insets ime = ins.getInsets(WindowInsetsCompat.Type.ime());
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+            lp.leftMargin = sys.left; lp.rightMargin = sys.right; lp.topMargin = sys.top;
+            lp.bottomMargin = Math.max(sys.bottom, ime.bottom);
+            v.setLayoutParams(lp);
+            return WindowInsetsCompat.CONSUMED;
+        });
+        ViewCompat.requestApplyInsets(wv);
         // ملفات PDF وغيرها: بتنفتح برّا التطبيق لتنزل عالتلفون
         wv.setDownloadListener((url, ua, cd, mime, len) -> openOutside(url));
         handle(getIntent());

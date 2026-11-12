@@ -104,6 +104,7 @@ html,body{background:transparent}
 .card,.set,.gear,.nw,.msg.bot,.comp textarea,.aihd button,.chips button,.pth,.seg{-webkit-backdrop-filter:blur(20px) saturate(170%);backdrop-filter:blur(20px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 8px 30px rgba(0,0,0,.18)}
 .nav{-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border-top:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
 .comp{background:transparent}
+body.kb .nav{display:none}body.kb .comp{bottom:0}
 .hero{border-color:rgba(34,199,155,.45)}
 /* مساري */
 .pth{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:14px}
@@ -238,7 +239,11 @@ html,body{background:transparent}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.12a';
+var APPV='2026.11.12b';
+/* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
+(function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
+ if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
+ (vv||window).addEventListener('resize',f);addEventListener('focusin',function(){setTimeout(f,350);});addEventListener('focusout',function(){setTimeout(f,150);});})();
 (function(){var busy=0;function chk(){if(busy||!navigator.onLine)return;busy=1;fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){busy=0;
  if(j&&j.v&&j.v!==APPV){var u=location.pathname+'?v='+encodeURIComponent(j.v)+location.hash;location.replace(u);}}).catch(function(){busy=0;});}
  setTimeout(chk,1500);document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')chk();});})();

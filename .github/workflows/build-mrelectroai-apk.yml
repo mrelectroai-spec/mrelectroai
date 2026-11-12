@@ -77,6 +77,7 @@ jobs:
           sed -i '0,/^dependencies {/s//dependencies {\n    implementation "androidx.work:work-runtime:2.9.1"/' app/build.gradle
           sed -i 's#</manifest>#    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n</manifest>#' app/src/main/AndroidManifest.xml
           sed -i 's/versionCode [0-9]*/versionCode ${{ github.run_number }}/; s/versionName "[^"]*"/versionName "1.${{ github.run_number }}"/' app/build.gradle
+          sed -i 's#android:launchMode="singleTask"#android:launchMode="singleTask"\n            android:windowSoftInputMode="adjustResize"#' app/src/main/AndroidManifest.xml
           grep -n "versionCode\|versionName\|work-runtime" app/build.gradle
           grep -n "permission\|launchMode" app/src/main/AndroidManifest.xml
           ls $PKG_DIR
