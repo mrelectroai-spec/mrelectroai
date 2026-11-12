@@ -66,7 +66,7 @@
       document.head.appendChild(st);
       var d = document.createElement('div'); d.id = 'meaGate'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
       d.innerHTML = '<form novalidate><div class="lg">MrElectroAI ⚡</div><h2>أهلا فيك 👋</h2>' +
-        '<p>اكتب اسمك ورقمك وفوت عالموقع: الكتب، العيّنات المجانية، الكورسات، ومختبر القطع.</p>' +
+        '<p>اكتب اسمك ورقمك وفوت عالموقع: الكتب والعيّنات المجانية.</p>' +
         '<label for="mgN">اسمك</label><input id="mgN" type="text" autocomplete="name" placeholder="مثلاً: محمد علي">' +
         '<label for="mgP">رقمك (واتساب)</label><input id="mgP" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="70 123 456">' +
         '<div class="er" id="mgE"></div><button type="submit">فوت ⚡</button>' +
