@@ -141,6 +141,9 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 .pli{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:12px;background:var(--g-chip);border:1px solid var(--g-edge2);margin-top:6px}.pli div{flex:1;min-width:0}.pli b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pli small{color:var(--muted);font-size:12px}.pli button{width:38px;height:38px;border-radius:10px;background:rgba(255,90,82,.18);border:1px solid rgba(255,90,82,.45);font-size:17px;flex:0 0 38px}
 .kli{display:block;width:100%;text-align:start;padding:10px 12px;border-radius:14px;background:var(--g-chip);border:1px solid var(--g-edge2);margin-top:6px;color:var(--text)}.kli b{font-size:14.5px}.kli code{direction:ltr;display:inline-block;font-size:12.5px;color:var(--volt);margin-inline-start:10px}.kli small{display:block;color:var(--muted);font-size:12px;margin-top:2px}.kli.off{opacity:.55}
 #tchBar{flex-wrap:wrap}
+#inst{position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:35;border-radius:22px;padding:14px 14px 12px;display:flex;gap:12px;align-items:flex-start;animation:up .4s cubic-bezier(.2,.9,.2,1)}
+#inst img{width:48px;height:48px;border-radius:12px;flex:0 0 48px}#inst b{display:block;font-size:15px}#inst p{font-size:13px;color:var(--muted);line-height:1.7;margin:2px 0 8px}
+#inst .row{gap:8px}#inst .btn{padding:9px 14px;font-size:14px}#inst .x{position:absolute;top:6px;left:10px;font-size:18px;color:var(--muted);background:none;border:0}
 .mdl{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .mdb{width:min(380px,100%);padding:18px;margin:0;max-height:90vh;overflow:auto}.mdt{font:700 17px 'Readex Pro',sans-serif;margin-bottom:4px}.mds{font-size:12.5px;color:var(--muted);margin-bottom:6px}
 .mde{font-size:13px;min-height:18px;margin:6px 0;color:#ff6b6b}.mdl2{font-size:13px;font-weight:700;color:var(--muted);margin:12px 2px 6px}
@@ -239,6 +242,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="pE" style="font-size:13px;min-height:18px;margin:4px 0;color:#ff6b6b"></div>
 <div class="row" style="margin-top:4px"><button type="button" class="btn" id="pGo">ابعت 📣</button><button type="button" class="btn alt" id="pX">سكّر</button></div>
 <div class="mdl2" style="margin-top:16px">🗂️ الإشعارات يلي بتبيّن بالدائرة</div><div id="pList"></div></div></div>
+<div id="inst" class="set" hidden></div>
 <div id="bks" hidden role="dialog" aria-modal="true"><div class="sheet2" id="bksIn"></div></div>
 <div id="onb" hidden role="dialog" aria-modal="true" aria-label="أهلا فيك"><div class="box" id="onbBox"></div></div>
 <header class="top">
@@ -329,7 +333,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.13a';
+var APPV='2026.11.13b';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -401,6 +405,21 @@ function tchToggle(){if(ls('meaTeacher')==='1'){tchSet(false);toast('👤 رجع
 $('tchM').onclick=function(e){if(e.target.id==='tchM')$('tchM').hidden=true;};
 $('tchBadge').onclick=function(){tchToggle();};
 
+
+/* ===== حدا فاتح من المتصفّح؟ بعد ساعتين من أول زيارة منقلّو ينزّل التطبيق ===== */
+(function(){var ua=navigator.userAgent||'';if(/MrElectroAIApp/.test(ua))return;
+ var ios=/iPhone|iPad|iPod/.test(ua),standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone;if(standalone)return;
+ var and=/Android/.test(ua);if(!ios&&!and)return;
+ var first=+ls('meaFirstSeen')||0;if(!first){ls('meaFirstSeen',String(Date.now()));return;}
+ if(Date.now()-first<2*3600e3)return;
+ if(Date.now()-(+ls('meaInstLater')||0)<24*3600e3)return;
+ var box=$('inst');
+ box.innerHTML='<button type="button" class="x" aria-label="سكّر">×</button><img src="icon-192.png" alt=""><div style="flex:1"><b>نزّل تطبيق MrElectroAI 📲</b><p>'+(ios?'زيدو عالشاشة الرئيسية، بيفتح أسرع متل أي تطبيق، وبيضل محفوظ تقدّمك ومفاتيحك.':'بالتطبيق بتوصلك الإشعارات بكل جديد، وبيفتح أسرع، وبيضل محفوظ تقدّمك ومفاتيحك.')+'</p>'
+  +(ios?'<p style="color:var(--text);margin:0 0 8px">بـ Safari: اكبس زر المشاركة ⬆️ تحت ← «إضافة إلى الشاشة الرئيسية»</p><div class="row"><button type="button" class="btn alt" id="instL">بعدين</button></div>'
+       :'<div class="row"><a class="btn" href="MrElectroAI.apk" download>نزّل التطبيق</a><button type="button" class="btn alt" id="instL">بعدين</button></div>')+'</div>';
+ setTimeout(function(){box.hidden=false;},2500);
+ function later(){ls('meaInstLater',String(Date.now()));box.hidden=true;}
+ box.addEventListener('click',function(e){if(e.target.closest('.x,#instL'))later();});})();
 /* ===== أدوات الأدمن بوضع الأستاذ: دخول مرة وحدة، مفاتيح، إشعارات ===== */
 function admTok(){try{return JSON.parse(ls('meaAdm')||'null');}catch(e){return null;}}
 function admSave(j){ls('meaAdm',JSON.stringify({a:j.access_token,r:j.refresh_token,exp:Date.now()+((j.expires_in||3600)-60)*1000}));}
@@ -426,7 +445,7 @@ var KT={book:['📘','كتاب «الكهرباء بالمختصر المفيد�
 var KD={'3':'تجربة 3 أيام','30':'شهر','365':'سنة','0':'مدى الحياة'};
 function kNames(tools){return String(tools||'').split(',').filter(function(x){return KT[x];}).map(function(x){return KT[x][0]+' '+KT[x][1];});}
 function kMsg(L){var nm=kNames(L.tools);var m=(nm.length>1?'*'+nm.join('\n')+'*':'*'+nm[0]+'*')+'\n━━━━━━━━━━━━━━━\nأهلا '+L.name+' 👋\n\n🔑 *مفتاحك:* '+L.code+'\n⏳ المدة: '+(KD[L.d]||'')+(L.exp?' (لحد '+L.exp+')':' مدى الحياة')+'\n\n';
- m+=L.tools==='all'?'*كيف تفعّل؟* افتح أي أداة وحط المفتاح.\n':'*كيف تفعّل؟*\n1. افتح التطبيق: https://mrelectroai-spec.github.io/mrelectroai/app/\n2. روح على «الكتب» واكبس عالكتاب\n3. اكبس «عندي مفتاح» وحط المفتاح\n';
+ m+=L.tools==='all'?'*كيف تفعّل؟* افتح أي أداة وحط المفتاح.\n':'*كيف تفعّل؟*\n1. نزّل التطبيق:\n📱 أندرويد: https://mrelectroai-spec.github.io/mrelectroai/app/MrElectroAI.apk\n🍎 آيفون: افتح https://mrelectroai-spec.github.io/mrelectroai/app/ بـ Safari، واكبس مشاركة ⬆️ ← «إضافة إلى الشاشة الرئيسية»\n2. روح على «الكتب» واكبس عالكتاب\n3. اكبس «عندي مفتاح» وحط المفتاح\n';
  return m+'\n⚠️ المفتاح بينربط بتلفونك.\n\nأنور الحسن الجاسم · MrElectroAI\n+961 79 434 479';}
 $('kMake').onclick=function(){var n=$('kN').value.trim(),ph=$('kP').value.trim(),tl=vals('kT').join(','),d=val('kD');if(!n){$('kErr').textContent='اكتب اسم الشخص';return;}if(!tl){$('kErr').textContent='اختار كتاب واحد على الأقل';return;}
  var exp=+d?new Date(Date.now()+(+d)*864e5).toISOString().slice(0,10):null,code=code8();$('kMake').disabled=true;$('kErr').textContent='';
