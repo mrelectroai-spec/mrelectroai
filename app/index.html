@@ -139,6 +139,8 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 /* الكتب */
 #tchBar{display:flex;align-items:center;gap:6px;margin:-6px 0 14px;padding:6px 6px 6px 10px;border-radius:16px;background:rgba(34,199,155,.18);border:1px solid rgba(34,199,155,.5)}#tchBar span{flex:1;font-weight:700;font-size:13.5px;padding-inline-start:4px}#tchBar button{padding:8px 11px;border-radius:12px;background:var(--g-chip);border:1px solid var(--g-edge2);font-weight:700;font-size:13px;color:var(--text)}
 .pli{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:12px;background:var(--g-chip);border:1px solid var(--g-edge2);margin-top:6px}.pli div{flex:1;min-width:0}.pli b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pli small{color:var(--muted);font-size:12px}.pli button{width:38px;height:38px;border-radius:10px;background:rgba(255,90,82,.18);border:1px solid rgba(255,90,82,.45);font-size:17px;flex:0 0 38px}
+.kli{display:block;width:100%;text-align:start;padding:10px 12px;border-radius:14px;background:var(--g-chip);border:1px solid var(--g-edge2);margin-top:6px;color:var(--text)}.kli b{font-size:14.5px}.kli code{direction:ltr;display:inline-block;font-size:12.5px;color:var(--volt);margin-inline-start:10px}.kli small{display:block;color:var(--muted);font-size:12px;margin-top:2px}.kli.off{opacity:.55}
+#tchBar{flex-wrap:wrap}
 .mdl{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .mdb{width:min(380px,100%);padding:18px;margin:0;max-height:90vh;overflow:auto}.mdt{font:700 17px 'Readex Pro',sans-serif;margin-bottom:4px}.mds{font-size:12.5px;color:var(--muted);margin-bottom:6px}
 .mde{font-size:13px;min-height:18px;margin:6px 0;color:#ff6b6b}.mdl2{font-size:13px;font-weight:700;color:var(--muted);margin:12px 2px 6px}
@@ -217,10 +219,19 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div class="row"><button type="button" class="btn" id="aGo">ادخل</button><button type="button" class="btn alt" data-close>بطّل</button></div></div></div>
 <div id="keyM" hidden class="mdl"><div class="set mdb"><div class="mdt">🔑 مفتاح جديد</div>
 <div id="kForm"><input id="kN" class="pin" maxlength="60" placeholder="اسم الشخص"><input id="kP" class="pin" type="tel" inputmode="tel" dir="ltr" placeholder="رقمو (اختياري): 70123456">
-<div class="mdl2">شو بيفتح؟</div><div class="chp" id="kT"><button type="button" data-v="book" class="on">📘 كتاب 1</button><button type="button" data-v="book2">📗 كتاب 2</button><button type="button" data-v="book3">📙 كتاب 3</button><button type="button" data-v="all">🧰 كل الأدوات</button></div>
+<div class="mdl2">شو بيفتح؟ (فيك تختار أكتر من واحد)</div><div class="chp" id="kT"><button type="button" data-v="book" class="on">📘 كتاب 1</button><button type="button" data-v="book2">📗 كتاب 2</button><button type="button" data-v="book3">📙 كتاب 3</button><button type="button" data-v="all">🧰 كل الأدوات</button></div>
 <div class="mdl2">قدّيش؟</div><div class="chp" id="kD"><button type="button" data-v="3">🧪 تجربة 3 أيام</button><button type="button" data-v="30">📅 شهري</button><button type="button" data-v="365">🗓️ سنوي</button><button type="button" data-v="0" class="on">💎 مدى الحياة</button></div>
 <div id="kErr" class="mde"></div><div class="row"><button type="button" class="btn" id="kMake">اعمل المفتاح</button><button type="button" class="btn alt" data-close>بطّل</button></div></div>
 <div id="kOut" hidden></div></div></div>
+<div id="klM" hidden class="mdl"><div class="set mdb" style="width:min(460px,100%)"><div class="mdt">🗂️ المفاتيح يلي عملتن</div>
+<input id="klQ" class="pin" placeholder="🔍 دوّر بالاسم أو الرقم أو المفتاح" autocomplete="off"><div id="klS" class="mds" style="margin-top:6px"></div><div id="klL"></div>
+<div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
+<div id="keM" hidden class="mdl" style="z-index:62"><div class="set mdb"><div class="mdt" id="keT"></div><div class="kc"><b id="keC"></b><button type="button" id="keCp" aria-label="نسخ">📋</button></div>
+<div class="mdl2">الكتب المفتوحة</div><div class="chp" id="keB"><button type="button" data-v="book">📘 كتاب 1</button><button type="button" data-v="book2">📗 كتاب 2</button><button type="button" data-v="book3">📙 كتاب 3</button><button type="button" data-v="all">🧰 كل الأدوات</button></div>
+<div class="mdl2">المدة</div><div class="mds" id="keX"></div><div class="chp" id="keD"><button type="button" data-v="keep" class="on">خلّيها</button><button type="button" data-v="30">+ شهر</button><button type="button" data-v="365">+ سنة</button><button type="button" data-v="0">💎 مدى الحياة</button></div>
+<div class="mdl2">الحالة</div><div class="chp" id="keA"><button type="button" data-v="1">✅ شغّال</button><button type="button" data-v="0">⛔ موقوف</button></div>
+<div class="mds" id="keV" style="margin-top:10px"></div><button type="button" class="btn alt" id="keR" style="width:100%;margin-top:6px">📱 فكّ ربطو بالتلفون (إذا غيّر تلفون)</button>
+<div id="keE" class="mde"></div><div class="row"><button type="button" class="btn" id="keS">حفظ</button><button type="button" class="btn alt" data-close>بطّل</button></div><a class="btn alt" id="keW" style="display:block;text-align:center;margin-top:8px">📲 ابعتلو المفتاح عالواتساب</a></div></div>
 <div id="pushM" hidden style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)"><div class="set" style="width:min(380px,100%);padding:18px;margin:0">
 <div style="font:700 17px 'Readex Pro',sans-serif;margin-bottom:4px">📣 ابعت إشعار للكل</div><p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">بيوصل لكل يلي منزّلين التطبيق دغري، وبيطلع بدائرة الجديد.</p>
 <input id="pT" class="pin" maxlength="120" placeholder="العنوان: مثلاً كورس جديد 🔥"><textarea id="pB" class="pin" maxlength="600" rows="3" placeholder="الرسالة"></textarea>
@@ -235,7 +246,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
   <div><h1>MrElectro<b>AI</b></h1><p>كهرباء · كلاسيك كنترول · طاقة شمسية</p></div>
   <div class="tops"><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
 </header>
-<div id="tchBar" hidden><span>🎓 وضع الأستاذ</span><button type="button" id="keyBtn">🔑 مفتاح</button><button type="button" id="pushBtn">📣 إشعار</button><button type="button" id="tchBadge" aria-label="طلاع من وضع الأستاذ">✕</button></div>
+<div id="tchBar" hidden><span>🎓 وضع الأستاذ</span><button type="button" id="keyBtn">🔑 جديد</button><button type="button" id="klBtn">🗂️ المفاتيح</button><button type="button" id="pushBtn">📣</button><button type="button" id="tchBadge" aria-label="طلاع من وضع الأستاذ">✕</button></div>
 <button type="button" id="nb" aria-label="الجديد" hidden><i>🔔</i><b id="nbN" hidden></b></button>
 <div id="nbl" hidden><div class="lst" id="nbList"></div></div>
 
@@ -318,7 +329,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.12m';
+var APPV='2026.11.13a';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -403,16 +414,21 @@ $('aGo').onclick=function(){var e=$('aE').value.trim(),p=$('aP').value;if(!e||!p
  .catch(function(){$('aGo').disabled=false;$('aErr').textContent='الإيميل أو كلمة السر غلط';});};
 document.addEventListener('click',function(e){var c=e.target.closest('[data-close]');if(c){var m=c.closest('.mdl');if(m)m.hidden=true;}var m2=e.target.classList&&e.target.classList.contains('mdl')?e.target:null;if(m2)m2.hidden=true;});
 function chp(id){$(id).onclick=function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call($(id).children,function(x){x.classList.toggle('on',x===b);});};}
-chp('kT');chp('kD');
+chp('kD');
+/* الكتب: اختيار متعدد */
+function chpMulti(id){$(id).onclick=function(e){var b=e.target.closest('button');if(!b)return;b.classList.toggle('on');};}
+chpMulti('kT');
+function vals(id){return [].map.call($(id).querySelectorAll('.on'),function(b){return b.dataset.v;});}
 function val(id){var b=$(id).querySelector('.on');return b?b.dataset.v:'';}
 $('keyBtn').onclick=function(){$('kErr').textContent='';$('kForm').hidden=false;$('kOut').hidden=true;$('keyM').hidden=false;};
 function code8(){var C='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',a=new Uint32Array(8);crypto.getRandomValues(a);var p=[].map.call(a,function(x){return C[x%C.length];}).join('');return 'MEA-'+p.slice(0,4)+'-'+p.slice(4);}
 var KT={book:['📘','كتاب «الكهرباء بالمختصر المفيد»'],book2:['📗','كتاب «الكلاسيك كنترول بالمختصر المفيد»'],book3:['📙','كتاب «الطاقة الشمسية بالمختصر المفيد»'],all:['🧰','كل أدوات MrElectroAI']};
 var KD={'3':'تجربة 3 أيام','30':'شهر','365':'سنة','0':'مدى الحياة'};
-function kMsg(L){var t=KT[L.tools];var m=t[0]+' *'+t[1]+'*\n━━━━━━━━━━━━━━━\nأهلا '+L.name+' 👋\n\n🔑 *مفتاحك:* '+L.code+'\n⏳ المدة: '+KD[L.d]+(L.exp?' (لحد '+L.exp+')':'')+'\n\n';
+function kNames(tools){return String(tools||'').split(',').filter(function(x){return KT[x];}).map(function(x){return KT[x][0]+' '+KT[x][1];});}
+function kMsg(L){var nm=kNames(L.tools);var m=(nm.length>1?'*'+nm.join('\n')+'*':'*'+nm[0]+'*')+'\n━━━━━━━━━━━━━━━\nأهلا '+L.name+' 👋\n\n🔑 *مفتاحك:* '+L.code+'\n⏳ المدة: '+(KD[L.d]||'')+(L.exp?' (لحد '+L.exp+')':' مدى الحياة')+'\n\n';
  m+=L.tools==='all'?'*كيف تفعّل؟* افتح أي أداة وحط المفتاح.\n':'*كيف تفعّل؟*\n1. افتح التطبيق: https://mrelectroai-spec.github.io/mrelectroai/app/\n2. روح على «الكتب» واكبس عالكتاب\n3. اكبس «عندي مفتاح» وحط المفتاح\n';
  return m+'\n⚠️ المفتاح بينربط بتلفونك.\n\nأنور الحسن الجاسم · MrElectroAI\n+961 79 434 479';}
-$('kMake').onclick=function(){var n=$('kN').value.trim(),ph=$('kP').value.trim(),tl=val('kT'),d=val('kD');if(!n){$('kErr').textContent='اكتب اسم الشخص';return;}
+$('kMake').onclick=function(){var n=$('kN').value.trim(),ph=$('kP').value.trim(),tl=vals('kT').join(','),d=val('kD');if(!n){$('kErr').textContent='اكتب اسم الشخص';return;}if(!tl){$('kErr').textContent='اختار كتاب واحد على الأقل';return;}
  var exp=+d?new Date(Date.now()+(+d)*864e5).toISOString().slice(0,10):null,code=code8();$('kMake').disabled=true;$('kErr').textContent='';
  admin().then(function(a){return fetch(SBU+'/rest/v1/licenses',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json',Prefer:'return=minimal'},
   body:JSON.stringify([{code:code,name:n,phone:ph,tools:tl,expires:exp,active:true,note:'من التطبيق · '+KD[d]}])});})
@@ -425,6 +441,38 @@ $('kMake').onclick=function(){var n=$('kN').value.trim(),ph=$('kP').value.trim()
   $('kCp').onclick=function(){(navigator.clipboard?navigator.clipboard.writeText(code):Promise.reject()).then(function(){toast('📋 انسخ المفتاح');}).catch(function(){var t=document.createElement('textarea');t.value=code;document.body.appendChild(t);t.select();try{document.execCommand('copy');toast('📋 انسخ المفتاح');}catch(e){}t.remove();});};
   $('kNew').onclick=function(){$('kForm').hidden=false;$('kOut').hidden=true;};})
  .catch(function(){$('kMake').disabled=false;$('kErr').textContent='ما في إنترنت.';});};
+
+/* ===== إدارة المفاتيح: تشوف، تدوّر، تزيد كتاب، تمدّد، توقف، تفكّ الجهاز ===== */
+var KL=[],KE=null;
+function kExp(L){if(!L.expires)return '💎 مدى الحياة';var t=new Date().toISOString().slice(0,10);return (L.expires<t?'⛔ خلص ':'⏳ لحد ')+L.expires;}
+function klRender(){var q=$('klQ').value.trim().toLowerCase();var L=KL.filter(function(x){return !q||[x.name,x.phone,x.code].join(' ').toLowerCase().indexOf(q)>=0;});
+ $('klS').textContent=L.length+' مفتاح'+(q?' (من '+KL.length+')':'');
+ $('klL').innerHTML=L.slice(0,150).map(function(x,i){return '<button type="button" class="kli'+(x.active?'':' off')+'" data-k="'+KL.indexOf(x)+'"><b></b><code>'+x.code+'</code><small></small></button>';}).join('');
+ [].forEach.call($('klL').querySelectorAll('.kli'),function(el){var x=KL[+el.dataset.k];el.querySelector('b').textContent=x.name||'بلا اسم';
+  el.querySelector('small').textContent=(kNames(x.tools).map(function(n){return n.split(' ')[0];}).join(' ')||'—')+' · '+kExp(x)+(x.phone?' · '+x.phone:'')+(x.active?'':' · موقوف')+(x.device?' · 📱 مربوط':'');});}
+function klLoad(){$('klS').textContent='عم نجيب المفاتيح…';$('klL').innerHTML='';
+ return admin().then(function(a){return fetch(SBU+'/rest/v1/licenses?select=code,name,phone,tools,expires,active,device,uses,last_seen,created_at,note&order=created_at.desc&limit=500',{headers:{apikey:SBK,Authorization:'Bearer '+a}});})
+ .then(function(r){if(r.status===401){ls('meaAdm','');throw new Error('خلص الدخول، سكّر وافتح كمان مرة');}return r.json();}).then(function(j){KL=Array.isArray(j)?j:[];klRender();})
+ .catch(function(e){$('klS').textContent='ما زبط: '+(e.message||'ما في إنترنت');});}
+$('klBtn').onclick=function(){$('klM').hidden=false;klLoad();};
+$('klQ').oninput=klRender;
+$('klL').onclick=function(e){var b=e.target.closest('[data-k]');if(b)keOpen(KL[+b.dataset.k]);};
+chpMulti('keB');chp('keD');chp('keA');
+function setOn(id,vs){[].forEach.call($(id).children,function(x){x.classList.toggle('on',vs.indexOf(x.dataset.v)>=0);});}
+function keOpen(x){KE={code:x.code,unbind:false,x:x};$('keT').textContent='✏️ '+(x.name||'')+(x.phone?' · '+x.phone:'');$('keC').textContent=x.code;
+ setOn('keB',String(x.tools||'').split(','));setOn('keD',['keep']);setOn('keA',[x.active?'1':'0']);$('keX').textContent='هلّق: '+kExp(x);
+ $('keV').textContent=x.device?'📱 مربوط بتلفون · استُعمل '+(x.uses||0)+' مرة':'📱 لسّا ما انربط بأي تلفون';$('keR').hidden=!x.device;$('keR').textContent='📱 فكّ ربطو بالتلفون (إذا غيّر تلفون)';$('keE').textContent='';keWa();$('keM').hidden=false;}
+function keWa(){var x=KE.x,p=String(x.phone||'').replace(/\D/g,'').replace(/^0/,'');$('keW').href='https://api.whatsapp.com/send?'+(p?'phone='+(p.length<=8?'961'+p:p)+'&':'')+'text='+encodeURIComponent(kMsg({code:x.code,name:x.name||'',tools:x.tools,d:'',exp:x.expires}));}
+$('keCp').onclick=function(){var c=KE.code;(navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(function(){toast('📋 انسخ المفتاح');}).catch(function(){});};
+$('keR').onclick=function(){KE.unbind=!KE.unbind;$('keR').textContent=KE.unbind?'✅ رح ينفكّ الربط لما تحفظ':'📱 فكّ ربطو بالتلفون (إذا غيّر تلفون)';};
+$('keS').onclick=function(){var tl=vals('keB').join(',');if(!tl){$('keE').textContent='اختار كتاب واحد على الأقل';return;}
+ var d=val('keD'),x=KE.x,ch={tools:tl,active:val('keA')==='1'};
+ if(d==='0')ch.expires=null;else if(d!=='keep'){var base=x.expires&&x.expires>new Date().toISOString().slice(0,10)?new Date(x.expires):new Date();ch.expires=new Date(base.getTime()+(+d)*864e5).toISOString().slice(0,10);}
+ if(KE.unbind)ch.device=null;
+ $('keS').disabled=true;$('keE').textContent='';
+ admin().then(function(a){return fetch(SBU+'/rest/v1/licenses?code=eq.'+encodeURIComponent(x.code),{method:'PATCH',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify(ch)});})
+ .then(function(r){if(!r.ok)throw new Error('ما انحفظ ('+r.status+')');return r.json();}).then(function(j){$('keS').disabled=false;if(j&&j[0]){var i=KL.indexOf(x);KL[i]=j[0];KE.x=j[0];KE.unbind=false;keOpen(j[0]);klRender();}toast('✅ انحفظ');})
+ .catch(function(e){$('keS').disabled=false;$('keE').textContent=e.message||'ما في إنترنت';});};
 /* إرسال إشعار (وضع الأستاذ) */
 var TCODE='';
 function pList(){var L=NEWS.filter(function(n){return /^db-/.test(n.id);});
