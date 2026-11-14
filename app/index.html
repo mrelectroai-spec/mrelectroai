@@ -338,7 +338,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.14a';
+var APPV='2026.11.14b';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -583,10 +583,10 @@ $('chips').onclick=function(e){var b=e.target.closest('button');if(b)ask(b.textC
 /* ---------- الكتب: كل كتاب وشو معو ---------- */
 var WA='https://wa.me/96179434479?text=';
 var BOOKD={
- course:{n:1,t:'الكهرباء بالمختصر المفيد',cv:'../course/cover.jpg',lv:'للمبتدئ من الصفر',price:'10$',rules:18,q:180,sample:null,
+ course:{n:1,t:'الكهرباء بالمختصر المفيد',cv:'../course/cover.jpg',lv:'للمبتدئ من الصفر',price:'10$',rules:18,q:180,sample:'../sample/#course',sample:null,
   proj:{n:3,t:'مختبر التابلو',u:'../panel/'},parts:[['mcb','القاطع العادي MCB',1],['rcd','الدفرانسير RCD'],['stair','تايمر الدرج'],['photo','الفوتوسيل']],
   tools:[['توزيع الفازات','../tools/wirephase/']]},
- classic:{n:2,t:'الكلاسيك كنترول بالمختصر المفيد',cv:'../classic/cover.jpg',lv:'لوحات وموتورات',price:'',rules:25,q:250,sample:'../sample/',
+ classic:{n:2,t:'الكلاسيك كنترول بالمختصر المفيد',cv:'../classic/cover.jpg',lv:'لوحات وموتورات',price:'',rules:25,q:250,sample:'../sample/#classic',
   proj:{n:5,t:'مختبر التابلو',u:'../panel/'},parts:[['contactor','الكونتاكتور',1],['mpcb','قاطع الموتور'],['overload','الأوفرلود'],['phase','ريليه الفازات'],['relay','الريليه المساعد'],['timer','التايمر'],['buttons','كبسات Start و Stop'],['estop','كبسة الطوارئ'],['selector','السيليكتور'],['lamps','لمبات الإشارة'],['float','الفلوت'],['pressure','البرشر سويتش'],['limit','الليميت سويتش']],
   tools:[['حاسبة المحوّلات','../tools/transformer/']]},
  solar:{n:3,t:'الطاقة الشمسية بالمختصر المفيد',cv:'../solar/cover.jpg',lv:'لفنيي التركيب',price:'',rules:32,q:320,sample:'../sample/#solar',
