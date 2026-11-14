@@ -61,6 +61,13 @@
   // ---------- storage ----------
   let S = load();
   try { if (S && S.startedAt && S.startedAt < Date.parse('2026-11-13T00:00:00+02:00') && localStorage.getItem(OWN_KEY) !== '1') localStorage.setItem(OWN_KEY, '1'); } catch (e) {}
+  // كل يوم: منتأكد إنو المفتاح بعدو شغّال عهالتلفون، وإلا بيتسكّر الكتاب
+  setTimeout(async () => { try {
+    const k = localStorage.getItem('meaKey_classic'); if (!k || Date.now() - (+localStorage.getItem('meaChk_classic') || 0) < 72e6) return;
+    const r = await verifyKey(k);
+    if (r.ok) localStorage.setItem('meaChk_classic', String(Date.now()));
+    else if (r.revoked) { ['meaBook_', 'meaKey_', 'meaPdf_', 'meaChk_'].forEach((p) => localStorage.removeItem(p + 'classic')); alert(r.msg); location.reload(); }
+  } catch (e) {} }, 1500);
   function load() {
     try { const raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch (e) {}
     return null;
@@ -260,7 +267,7 @@
     const r = await verifyKey(code);
     btn.disabled = false; btn.textContent = label;
     if (!r.ok) { err.textContent = r.msg; return; }
-    try { localStorage.setItem(OWN_KEY, r.expires ? 'until:' + r.expires : '1'); } catch (e) {}
+    try { localStorage.setItem(OWN_KEY, r.expires ? 'until:' + r.expires : '1'); localStorage.setItem('meaKey_classic', code); localStorage.setItem('meaPdf_classic', r.pdf ? '1' : '0'); localStorage.setItem('meaChk_classic', String(Date.now())); } catch (e) {}
     onOk(code);
   }
   async function sb(path, opts) {
@@ -270,19 +277,21 @@
     return res.status === 204 ? null : res.json();
   }
   async function fingerprint() {
-    // بلا userAgent: نفس التلفون بالتطبيق وبالمتصفّح بيعطي نفس البصمة (مفتاح الكتاب بيشتغل بالتنين)
+    // بصمة التلفون + رقم عشوائي خاص بهالتثبيت: المفتاح ما بيشتغل إلا عتلفون واحد
     const s = [navigator.language, screen.width + 'x' + screen.height,
       new Date().getTimezoneOffset(), navigator.hardwareConcurrency || 0].join('|');
     const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-    return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('').slice(0, 24);
+    let d = null; try { d = localStorage.getItem('meaDevId'); } catch (e) {}
+    if (!d) { d = [...crypto.getRandomValues(new Uint8Array(12))].map((x) => x.toString(16).padStart(2, '0')).join(''); try { localStorage.setItem('meaDevId', d); } catch (e) {} }
+    return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('').slice(0, 24) + ':' + d;
   }
   async function verifyKey(code) {
     const fp = await fingerprint();
     let r;
     try { r = await sb('rpc/verify_license', { method: 'POST', body: JSON.stringify({ p_code: code, p_device: fp, p_tool: BOOK_TOOL }) }); }
     catch (e) { return { ok: false, msg: 'ما قدرنا نتحقق من المفتاح. تأكد إنك متصل بالإنترنت وجرّب مرة تانية.' }; }
-    if (r && r.ok) return { ok: true, expires: r.expires || null };
-    return { ok: false, msg: (r && r.msg) || 'المفتاح غلط. تأكد منو بالرسالة يلي وصلتك.' };
+    if (r && r.ok) return { ok: true, expires: r.expires || null, pdf: !!r.pdf };
+    return { ok: false, revoked: !!(r && r.revoked), msg: (r && r.msg) || 'المفتاح غلط. تأكد منو بالرسالة يلي وصلتك.' };
   }
 
   // ---------- the board (18 breakers) ----------

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>فعّل كتابك | MrElectroAI</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#06110e">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../glass.css">
+<script src="../glass.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{background:transparent}
+body{color:var(--g-text);font-family:'Readex Pro',system-ui,sans-serif;line-height:1.8;padding:max(18px,env(safe-area-inset-top)) 16px 40px}
+.w{max-width:480px;margin:0 auto}
+.top{text-align:center;margin:8px 0 14px}.top img{width:72px;height:72px;border-radius:20px}
+h1{font-size:21px;margin-top:8px}.sub{font-size:14px;color:var(--g-muted)}
+.box{border-radius:22px;padding:16px;margin-bottom:12px}
+.kc{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px;border-radius:16px;background:rgba(34,199,155,.16);border:1px solid rgba(34,199,155,.5);margin:6px 0 4px}
+.kc b{font-size:20px;letter-spacing:1px;direction:ltr}.kc button{font-size:20px;background:none;border:0;cursor:pointer}
+.btn{display:block;width:100%;text-align:center;padding:14px;border-radius:14px;background:#22C79B;color:#03140f;font:inherit;font-weight:700;font-size:16px;text-decoration:none;border:0;margin-top:10px;cursor:pointer}
+.alt{background:var(--g-chip);color:var(--g-text);border:1px solid var(--g-edge)}
+ol{padding-inline-start:22px;margin-top:6px}li{font-size:15px;margin:6px 0}
+.n{font-size:13px;color:var(--g-muted);margin-top:8px}
+.warn{font-size:13.5px;padding:10px 12px;border-radius:14px;background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.35)}
+</style>
+</head>
+<body>
+<div class="w">
+  <div class="top"><img src="icon-192.png" alt=""><h1>🔑 فعّل كتابك</h1><p class="sub">MrElectroAI · أنور الحسن الجاسم</p></div>
+  <div class="box mea-glass"><div class="sub">مفتاحك:</div><div class="kc"><b id="code">—</b><button type="button" id="cp" aria-label="نسخ">📋</button></div></div>
+
+  <div class="box mea-glass" id="and" hidden>
+    <b>📱 أندرويد</b>
+    <a class="btn" id="open">✅ التطبيق عندي: افتحو وفعّل</a>
+    <ol>
+      <li>إذا التطبيق مش عندك، نزّلو من هون:</li>
+    </ol>
+    <a class="btn alt" href="MrElectroAI.apk">⬇️ نزّل التطبيق</a>
+    <ol start="2">
+      <li>افتح الملف يلي نزل وركّبو (إذا سألك، اسمح بالتثبيت).</li>
+      <li>رجاع عهالصفحة واكبس الزر الأخضر فوق 👆</li>
+    </ol>
+    <p class="n">إذا ما زبط الزر: افتح التطبيق ← الكتب ← اكبس عالكتاب ← «عندي مفتاح» وحط المفتاح.</p>
+  </div>
+
+  <div class="box mea-glass" id="ios" hidden>
+    <b>🍎 آيفون</b>
+    <ol>
+      <li>اكبس 📋 فوق لتنسخ المفتاح.</li>
+      <li>افتح هالصفحة بـ <b>Safari</b>.</li>
+      <li>اكبس زر المشاركة ⬆️ تحت، واختار «إضافة إلى الشاشة الرئيسية». هيك بيصير التطبيق عندك.</li>
+      <li>افتح التطبيق من الشاشة الرئيسية ← الكتب ← اكبس عالكتاب ← «عندي مفتاح» وحط المفتاح.</li>
+    </ol>
+    <a class="btn alt" href="./#books">أو فعّل هون بالمتصفّح</a>
+    <p class="n">مهم: فعّل جوّا التطبيق يلي على الشاشة الرئيسية، لأنو المفتاح بينربط بمحل ما بتفعّلو أوّل مرة.</p>
+  </div>
+
+  <p class="warn">⚠️ المفتاح بيشتغل <b>عتلفون واحد بس</b>. أوّل تلفون بيفعّلو بينربط فيه، وما بيفتح عند حدا تاني. إذا غيّرت تلفونك احكي أنور: <a href="https://wa.me/96179434479" style="color:#22C79B">+961 79 434 479</a></p>
+</div>
+<script>
+(function(){
+var c=(new URLSearchParams(location.search).get('c')||'').toUpperCase().replace(/[^A-Z0-9-]/g,'');
+document.getElementById('code').textContent=c||'—';
+document.getElementById('cp').onclick=function(){(navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(function(){alert('📋 انسخ المفتاح');}).catch(function(){prompt('انسخ المفتاح:',c);});};
+var ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&'ontouchend' in document),and=/Android/.test(ua);
+document.getElementById(ios?'ios':'and').hidden=false;if(!ios&&!and)document.getElementById('ios').hidden=false;
+var fb=location.origin+location.pathname.replace(/k\.html$/,'')+'MrElectroAI.apk';
+document.getElementById('open').href='intent://open?key='+encodeURIComponent(c)+'#Intent;scheme=mrelectroai;package=com.mrelectroai.app;S.browser_fallback_url='+encodeURIComponent(fb)+';end';
+})();
+</script>
+</body>
+</html>
