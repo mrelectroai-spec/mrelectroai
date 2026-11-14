@@ -16,6 +16,8 @@
     var ref = '';
     try { if (document.referrer) { var h = new URL(document.referrer).hostname; if (h && h !== location.hostname) ref = h.slice(0, 80); } } catch (e) {}
     var dev = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
+    // جوّا التطبيق المنزّل (أندرويد): منعلّمو «app» لنعرف مين منزّل التطبيق ومين من المتصفّح
+    try { if (window.Capacitor && (window.Capacitor.isNativePlatform ? window.Capacitor.isNativePlatform() : window.Capacitor.platform === 'android')) dev = 'app'; } catch (e) {}
     function send(part) {
       var key = 'mea_pv_' + page + '_' + (part || '');
       var last = +(ls.getItem(key) || 0);

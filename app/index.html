@@ -239,6 +239,10 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div class="mdl2">الحالة</div><div class="chp" id="keA"><button type="button" data-v="1">✅ شغّال</button><button type="button" data-v="0">⛔ موقوف</button></div>
 <div class="mds" id="keV" style="margin-top:10px"></div><button type="button" class="btn alt" id="keR" style="width:100%;margin-top:6px">📱 فكّ ربطو بالتلفون (إذا غيّر تلفون)</button>
 <div id="keE" class="mde"></div><div class="row"><button type="button" class="btn" id="keS">حفظ</button><button type="button" class="btn alt" data-close>بطّل</button></div><a class="btn alt" id="keW" style="display:block;text-align:center;margin-top:8px">📲 ابعتلو المفتاح عالواتساب</a></div></div>
+<div id="ppM" hidden class="mdl"><div class="set mdb"><div class="mdt">👥 مين فات عالتطبيق</div>
+<div id="ppS" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0"></div><p class="mds" id="ppS2"></p>
+<div class="mdl2">الأسامي (الأجدد فوق)</div><div id="ppL" style="max-height:52vh;overflow:auto"></div><div id="ppE" class="mde"></div>
+<div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="prM" hidden class="mdl"><div class="set mdb"><div class="mdt">🎁 عرض نوفمبر</div><p class="mds">كل يلي طلبوا الكتاب الأول ببلاش. ✅ بيفتحلو الكتاب لحالو، ❌ بيرفض.</p>
 <div id="prL" style="max-height:60vh;overflow:auto"></div><div id="prE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="pdfM" hidden class="mdl"><div class="set mdb"><div class="mdt">📚 ملفات الكتب PDF</div><p class="mds">ارفع كل كتاب مرة وحدة. كل شاري بياخد نسخة عليها رقم مفتاحو ورقمو.</p><div id="pdfL"></div>
@@ -258,7 +262,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
   <div><h1>MrElectro<b>AI</b></h1><p>كهرباء · كلاسيك كنترول · طاقة شمسية</p></div>
   <div class="tops"><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
 </header>
-<div id="tchBar" hidden><span>🎓 وضع الأستاذ</span><button type="button" id="keyBtn">🔑 جديد</button><button type="button" id="klBtn">🗂️ المفاتيح</button><button type="button" id="prBtn">🎁</button><button type="button" id="pdfBtn">📚</button><button type="button" id="pushBtn">📣</button><button type="button" id="tchBadge" aria-label="طلاع من وضع الأستاذ">✕</button></div>
+<div id="tchBar" hidden><span>🎓 وضع الأستاذ</span><button type="button" id="keyBtn">🔑 جديد</button><button type="button" id="klBtn">🗂️ المفاتيح</button><button type="button" id="ppBtn">👥</button><button type="button" id="prBtn">🎁</button><button type="button" id="pdfBtn">📚</button><button type="button" id="pushBtn">📣</button><button type="button" id="tchBadge" aria-label="طلاع من وضع الأستاذ">✕</button></div>
 <button type="button" id="nb" aria-label="الجديد" hidden><i>🔔</i><b id="nbN" hidden></b></button>
 <div id="nbl" hidden><div class="lst" id="nbList"></div></div>
 
@@ -342,7 +346,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.14g';
+var APPV='2026.11.14h';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -499,6 +503,16 @@ function prLoad(){$('prE').textContent='⏳';
    return '<div class="pli"><div><b>'+esc(x.name||'بلا اسم')+'</b><small><span dir="ltr">'+esc(x.phone||'')+'</span></small><small>'+new Date(x.created_at).toLocaleDateString('ar-LB',{day:'numeric',month:'short'})+' · <span dir="ltr">'+esc(x.code)+'</span></small></div><div style="display:flex;gap:6px;align-items:center">'+st+'</div></div>';}).join('');})
  .catch(function(){$('prE').textContent='ما زبط. تأكد من الإنترنت.';});}
 $('prBtn').onclick=function(){$('prM').hidden=false;prLoad();};
+/* 👥 مين فات عالتطبيق */
+function ppAgo(t){if(!t)return '';var d=(Date.now()-new Date(t))/864e5;return d<1/24?'هلّق':d<1?'اليوم':d<2?'مبارح':Math.floor(d)+' يوم';}
+$('ppBtn').onclick=function(){$('ppM').hidden=false;$('ppE').textContent='⏳';$('ppL').innerHTML='';
+ prRpc('app_people',{}).then(function(j){if(!j||!j.ok){$('ppE').textContent=(j&&(j.msg||j.message))||'ما زبط.';return;}$('ppE').textContent='';
+  var box=function(n,t){return '<div style="text-align:center;padding:10px 4px;border-radius:14px;background:rgba(34,199,155,.16);border:1px solid rgba(34,199,155,.4)"><b style="font-size:22px;display:block">'+n+'</b><small style="font-size:12px">'+t+'</small></div>';};
+  $('ppS').innerHTML=box(j.today,'اليوم')+box(j.week,'هالأسبوع')+box(j.total,'من الأوّل');
+  $('ppS2').textContent='🆕 جداد اليوم: '+j.new_today+' · 📱 منزّلين التطبيق: '+j.app_total+' · 🌐 من المتصفّح: '+j.web_total;
+  var L=j.people||[];$('ppL').innerHTML=L.length?L.map(function(p){var ph=String(p.phone||'').replace(/[^\d]/g,'');if(ph.indexOf('00')===0)ph=ph.slice(2);else if(ph.length<=8)ph='961'+ph.replace(/^0/,'')else if(/^09\d{8}$/.test(ph))ph='963'+ph.slice(1);
+   return '<div class="pli"><div><b>'+esc(p.name||'بلا اسم')+(p.dev==='app'?' 📱':'')+'</b><small><span dir="ltr">'+esc(p.phone||'')+'</span> · فات '+ppAgo(p.at)+(p.last_at?' · آخر مرة '+ppAgo(p.last_at):'')+'</small></div>'+(ph?'<a class="btn alt" style="margin:0;padding:8px 12px" href="https://wa.me/'+ph+'">💬</a>':'')+'</div>';}).join(''):'<p class="mds">لسّا ما حدا كتب اسمو.</p>';})
+ .catch(function(){$('ppE').textContent='ما زبط. تأكد من الإنترنت.';});};
 $('prL').onclick=function(e){var ok=e.target.closest('[data-ok]'),no=e.target.closest('[data-no]');if(!ok&&!no)return;var b=ok||no;b.disabled=true;
  (ok?prRpc('promo_approve',{p_code:ok.dataset.ok,p_pdf:false}):prRpc('promo_reject',{p_code:no.dataset.no}))
  .then(function(j){if(j&&j.ok&&ok&&!j.already)admin().then(function(a){return fetch(SBU+'/functions/v1/mea-push',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json'},body:JSON.stringify({topic:'promo_'+ok.dataset.ok,id:'promo-'+ok.dataset.ok,title:'🎉 تم قبولك!',body:'صار عندك كتاب «الكهرباء بالمختصر المفيد». افتح التطبيق وبلّش.',url:'https://mrelectroai-spec.github.io/mrelectroai/app/#books'})});}).catch(function(){});
