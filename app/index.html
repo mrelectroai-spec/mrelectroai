@@ -204,6 +204,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 #onb .go{width:100%;height:52px;border:0;border-radius:16px;background:var(--volt);color:#04231a;font-weight:700;font-size:16px;margin-top:14px;cursor:pointer}
 #onb .skip{display:block;margin:10px auto 0;background:none;border:0;color:var(--muted);font-size:13.5px;cursor:pointer}
 #onb .er{color:#ff6b6b;font-size:13px;min-height:18px;margin-top:6px}
+.gift{display:block;width:100%;text-align:center;padding:14px;border-radius:18px;margin:0 0 12px;background:linear-gradient(135deg,rgba(255,176,32,.28),rgba(34,199,155,.22));border:1px solid rgba(255,176,32,.6);color:var(--g-text);font:inherit;text-decoration:none}.gift b{display:block;font-size:16.5px}.gift small{display:block;font-size:13px;color:var(--g-muted);margin-top:2px}
 #onb .rec{display:flex;gap:14px;align-items:center;padding:14px;border-radius:18px;background:linear-gradient(135deg,var(--hero1),var(--hero2));border:1px solid rgba(34,199,155,.45);margin-bottom:6px}
 #onb .rec img{width:56px;height:76px;object-fit:cover;border-radius:8px}#onb .rec b{display:block;font-size:16px}#onb .rec span{font-size:13px;color:var(--muted);line-height:1.6}
 .pth.mine{border-color:rgba(34,199,155,.7);box-shadow:inset 0 0 0 1px rgba(34,199,155,.5),0 8px 30px rgba(0,0,0,.18)}.mineb{display:inline-block;font-size:11.5px;font-weight:700;color:#04231a;background:var(--volt);border-radius:9px;padding:2px 8px;margin-inline-start:6px}
@@ -270,6 +271,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 
 <section class="tab" id="t-books">
   <h2>الكتب</h2><p class="sub">سلسلة «بالمختصر المفيد». اكبس عالكتاب لتشوف شو معو.</p>
+  <div id="promo"></div>
   <div class="grid" id="bookList"></div>
 </section>
 
@@ -338,7 +340,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.14c';
+var APPV='2026.11.14d';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -596,12 +598,20 @@ var BORD=['course','classic','solar'];
 function own(id){return window.MEAPATH?window.MEAPATH.owned(id):false;}
 function buyU(b){return WA+encodeURIComponent('مرحبا أنور 👋 بدي كتاب «'+b.t+'»');}
 function contents(id){var b=BOOKD[id];return [['📖','الكتاب PDF',b.rules+' قاعدة'],['🎯','كورس أسئلة',b.q+' سؤال'],['📊','تقرير بنقاط ضعفك','مع أرقام الصفحات'],['🛠️',b.proj.n+' مشاريع عملية',b.proj.t],['🧩','قطع 3D',b.parts.length+' قطعة'],['🧰','أدوات',b.tools.map(function(x){return x[0];}).join('، ')],['🎓','شهادة من أنور','إذا خلّصت بـ5 غلطات أو أقل']];}
-function renderBooks(){var h='';BORD.forEach(function(id){var b=BOOKD[id],o=own(id);
+/* 🎁 عرض بلاك نوفمبر: الكتاب الأول ببلاش لآخر الشهر. الشخص بيبعت طلب عالواتساب وأنور بيعطيه مفتاح */
+var PROMO_END='2026-11-30';
+function promoOn(){return new Date().toISOString().slice(0,10)<=PROMO_END&&!own('course');}
+function promoU(){var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(e){}var d=(ls('meaDevId')||'').slice(0,6).toUpperCase();
+ if(!d){d=Math.random().toString(16).slice(2,8).toUpperCase();}
+ return 'https://wa.me/96179434479?text='+encodeURIComponent('🎁 بدي الكتاب الأول ببلاش (عرض بلاك نوفمبر)\n'+(l&&l.name?'اسمي: '+l.name+'\n':'')+(l&&l.phone?'رقمي: '+l.phone+'\n':'')+'كود التطبيق: APP-'+d);}
+function giftH(){return '<a class="gift" href="'+promoU()+'"><b>🎁 الكتاب الأول ببلاش لآخر الشهر</b><small>عرض بلاك نوفمبر · اكبس وابعت الرسالة، وأنور بيبعتلك مفتاحك</small></a>';}
+function renderBooks(){var h='';$('promo').innerHTML=promoOn()?giftH():'';BORD.forEach(function(id){var b=BOOKD[id],o=own(id);
  h+='<button type="button" class="card bk" data-bk="'+id+'" style="width:100%;text-align:start"><img class="cv" src="'+b.cv+'" alt=""><div style="flex:1"><b>'+b.t+'</b><span>الكتاب '+b.n+' · '+b.lv+(b.price?' · '+b.price:'')+'</span><div class="tg">'+(o?'<i class="own">✅ عندك</i>':'')+'<i>🎯 '+b.q+' سؤال</i><i>🛠️ '+b.proj.n+' مشاريع</i><i>🧩 '+b.parts.length+' قطعة 3D</i>'+(b.sample?'<i>📄 عيّنة مجانية</i>':'')+'</div></div><div class="go" style="align-self:center">←</div></button>';});
  $('bookList').innerHTML=h;renderBookTools();}
 function ri(icon,t,sub,st,href,cls){return (href?'<a class="ri '+(cls||'')+'" href="'+href+'">':'<div class="ri '+(cls||'')+'" data-lk="1">')+'<i>'+icon+'</i><div class="t">'+t+(sub?'<small>'+sub+'</small>':'')+'</div><span class="st">'+st+'</span>'+(href?'</a>':'</div>');}
 function openBook(id){var b=BOOKD[id],o=own(id),L='🔒';
  var h='<div class="grab"></div><div class="bh"><img src="'+b.cv+'" alt=""><div><b>'+b.t+'</b><span>الكتاب '+b.n+' · '+b.rules+' قاعدة · '+b.lv+'</span>'+(o?'<span class="own1">✅ الكتاب عندك: كل شي مفتوح</span>':'<span class="pr">'+(b.price||'السعر عند أنور')+'</span>')+'</div></div>';
+ if(!o&&id==='course'&&promoOn())h+=giftH();
  if(!o)h+='<div class="row"><a class="btn" href="'+buyU(b)+'">اشتري عالواتساب</a><button type="button" class="btn alt" id="haveKey">🔑 عندي مفتاح</button></div><div class="kbx" id="kbx" hidden><input id="kIn" placeholder="MEA-XXXX-XXXX" dir="ltr" autocomplete="off" spellcheck="false"><div class="er" id="kEr"></div><button type="button" class="btn" id="kGo" style="width:100%">فعّل</button></div>';
  h+='<div class="sec2">'+(o?'كل شي معك':'شو في بقلبو')+'</div>';
  if(o&&window.MEAPATH.hasPdf(id))h+='<button type="button" class="ri pdf" id="pdfGo" style="width:100%;text-align:start"><i>📥</i><div class="t">نزّل الكتاب PDF<small>نسختك الخاصة، عليها رقم مفتاحك</small></div><span class="st">نزّل ←</span></button>';
@@ -686,7 +696,7 @@ function onb(){var P={},step=0,lead=null;try{lead=JSON.parse(ls('mea_lead')||'nu
   if(k===1)h+='<h3>قديش خبرتك بالكهربا؟</h3><p>بلا تكلّف، ما في جواب غلط.</p><div class="opt" data-k="exp"><button data-v="zero"><span>🌱</span><div>من الصفر<small>ما بعرف شي، أو بعرف شوي كتير</small></div></button><button data-v="some"><span>🔧</span><div>عندي شوي خبرة<small>أقل من سنتين، أو هاوي</small></div></button><button data-v="pro"><span>⚡</span><div>فني شغّال<small>سنتين وطالع بالشغل</small></div></button></div><button class="skip" id="oSkip">بعدين</button>';
   if(k===2)h+='<h3>شو بدّك تتعلّم؟</h3><p>نقّي الأقرب لإلك.</p><div class="opt" data-k="want"><button data-v="house"><span>🏠</span><div>كهربا بيوت<small>شرايط، تابلو، قواطع، أعطال</small></div></button><button data-v="classic"><span>🎛️</span><div>كلاسيك كنترول ولوحات<small>كونتاكتورات، موتورات، ATS</small></div></button><button data-v="solar"><span>☀️</span><div>طاقة شمسية<small>ألواح، إنفرترات، بطاريات</small></div></button><button data-v="all"><span>🎓</span><div>كل شي، خطوة خطوة<small>من الأساس للاحتراف</small></div></button></div><button class="skip" id="oSkip">بعدين</button>';
   if(k===3){var r=rec(),b=BK[r],why=P.exp==='zero'&&P.want!=='house'&&P.want!=='all'?'بما إنك من الصفر، بلّش بالأساس، وبعدها بتوصل لـ'+(P.want==='solar'?'الطاقة الشمسية':'الكلاسيك')+'.':P.exp==='pro'&&r!=='course'?'إنت فني، فبلّش دغري بالشي اللي بدّك ياه.':'هيدا الأنسب لإلك هلّق.';
-   h+='<h3>'+(lead&&lead.name?esc(lead.name.split(' ')[0])+'، ':'')+'هيدا بيناسبك 👇</h3><p>'+why+'</p><div class="rec"><img src="'+b[1]+'" alt=""><div><b>'+b[0]+'</b><span>'+b[2]+'</span></div></div><p style="margin:10px 0 0;font-size:13.5px">مسارك: الكتاب ← كورس الأسئلة ← التقرير ← المشاريع العملية.</p><button class="go" id="oDone">ابدا مساري ←</button>';}
+   h+='<h3>'+(lead&&lead.name?esc(lead.name.split(' ')[0])+'، ':'')+'هيدا بيناسبك 👇</h3><p>'+why+'</p><div class="rec"><img src="'+b[1]+'" alt=""><div><b>'+b[0]+'</b><span>'+b[2]+'</span></div></div><p style="margin:10px 0 0;font-size:13.5px">مسارك: الكتاب ← كورس الأسئلة ← التقرير ← المشاريع العملية.</p>'+(promoOn()?'<div style="margin-top:12px">'+giftH()+'</div>':'')+'<button class="go" id="oDone">ابدا مساري ←</button>';}
   box.innerHTML=h;
   var sk=$('oSkip');if(sk)sk.onclick=function(){ls('meaOnb','skip');close();};
   var nx=$('oNext');if(nx){var nm=$('oN');setTimeout(function(){nm.focus();},250);nx.onclick=function(){var n=$('oN').value.trim().replace(/\s+/g,' '),ph=$('oP').value.trim();
