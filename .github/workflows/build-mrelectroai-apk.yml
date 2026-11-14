@@ -83,6 +83,14 @@ jobs:
           sed -i 's#</manifest>#    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n</manifest>#' app/src/main/AndroidManifest.xml
           sed -i 's/versionCode [0-9]*/versionCode ${{ github.run_number }}/; s/versionName "[^"]*"/versionName "1.${{ github.run_number }}"/' app/build.gradle
           sed -i 's#android:launchMode="singleTask"#android:launchMode="singleTask"\n            android:windowSoftInputMode="adjustResize"#' app/src/main/AndroidManifest.xml
+          # رابط تفعيل المفتاح بيفتح التطبيق: mrelectroai://open?key=...
+          python3 - <<'PY'
+p='app/src/main/AndroidManifest.xml'; m=open(p).read()
+i=m.index('<intent-filter',m.index('MainActivity')); j=m.index('</intent-filter>',i)+len('</intent-filter>')
+m=m[:j]+'\n            <intent-filter>\n                <action android:name="android.intent.action.VIEW" />\n                <category android:name="android.intent.category.DEFAULT" />\n                <category android:name="android.intent.category.BROWSABLE" />\n                <data android:scheme="mrelectroai" android:host="open" />\n            </intent-filter>'+m[j:]
+open(p,'w').write(m)
+PY
+          grep -n "mrelectroai\"" app/src/main/AndroidManifest.xml || true
           # Google Play (الحماية التلقائية) بدها minSdk 24 أو أعلى
           sed -i 's/minSdkVersion = [0-9]*/minSdkVersion = 24/' variables.gradle
           # Google Play: لازم targetSdk 36

@@ -83,6 +83,16 @@ public class MainActivity extends BridgeActivity {
 
     private void handle(Intent i) {
         if (i == null) return;
+        // رابط تفعيل المفتاح: mrelectroai://open?key=MEA-XXXX-XXXX
+        Uri d = i.getData();
+        if (d != null && "mrelectroai".equals(d.getScheme())) {
+            i.setData(null);
+            String key = d.getQueryParameter("key");
+            String go = "https://" + HOST + "/mrelectroai/app/" + (key != null && !key.isEmpty() ? "?key=" + Uri.encode(key) + "#books" : "");
+            final WebView w0 = getBridge().getWebView();
+            w0.postDelayed(() -> w0.loadUrl(go), 400);
+            return;
+        }
         final String u = i.getStringExtra("open");
         if (u == null || u.isEmpty()) return;
         i.removeExtra("open");
