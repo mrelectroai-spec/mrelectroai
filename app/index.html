@@ -239,6 +239,10 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div class="mdl2">الحالة</div><div class="chp" id="keA"><button type="button" data-v="1">✅ شغّال</button><button type="button" data-v="0">⛔ موقوف</button></div>
 <div class="mds" id="keV" style="margin-top:10px"></div><button type="button" class="btn alt" id="keR" style="width:100%;margin-top:6px">📱 فكّ ربطو بالتلفون (إذا غيّر تلفون)</button>
 <div id="keE" class="mde"></div><div class="row"><button type="button" class="btn" id="keS">حفظ</button><button type="button" class="btn alt" data-close>بطّل</button></div><a class="btn alt" id="keW" style="display:block;text-align:center;margin-top:8px">📲 ابعتلو المفتاح عالواتساب</a></div></div>
+<div id="prM" hidden class="mdl"><div class="set mdb"><div class="mdt">🎁 تأكيد كود الهدية</div><p class="mds">حط الكود يلي بعتلك ياه الشخص (APP-…). بينفتحلو الكتاب الأول لحالو، وبيوصلو «تم تأكيد الكود».</p>
+<input id="prIn" placeholder="APP-XXXXXX" dir="ltr" autocomplete="off" spellcheck="false" style="text-transform:uppercase">
+<div class="mdl2">نسخة PDF</div><div class="chp" id="prP"><button type="button" data-v="0" class="on">📕 بلا PDF</button><button type="button" data-v="1">📄 مع PDF</button></div>
+<div id="prE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn" id="prGo">✅ أكّد</button><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="pdfM" hidden class="mdl"><div class="set mdb"><div class="mdt">📚 ملفات الكتب PDF</div><p class="mds">ارفع كل كتاب مرة وحدة. كل شاري بياخد نسخة عليها رقم مفتاحو ورقمو.</p><div id="pdfL"></div>
 <div id="pdfE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="pushM" hidden style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)"><div class="set" style="width:min(380px,100%);padding:18px;margin:0">
@@ -256,7 +260,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
   <div><h1>MrElectro<b>AI</b></h1><p>كهرباء · كلاسيك كنترول · طاقة شمسية</p></div>
   <div class="tops"><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
 </header>
-<div id="tchBar" hidden><span>🎓 وضع الأستاذ</span><button type="button" id="keyBtn">🔑 جديد</button><button type="button" id="klBtn">🗂️ المفاتيح</button><button type="button" id="pdfBtn">📚</button><button type="button" id="pushBtn">📣</button><button type="button" id="tchBadge" aria-label="طلاع من وضع الأستاذ">✕</button></div>
+<div id="tchBar" hidden><span>🎓 وضع الأستاذ</span><button type="button" id="keyBtn">🔑 جديد</button><button type="button" id="klBtn">🗂️ المفاتيح</button><button type="button" id="prBtn">🎁</button><button type="button" id="pdfBtn">📚</button><button type="button" id="pushBtn">📣</button><button type="button" id="tchBadge" aria-label="طلاع من وضع الأستاذ">✕</button></div>
 <button type="button" id="nb" aria-label="الجديد" hidden><i>🔔</i><b id="nbN" hidden></b></button>
 <div id="nbl" hidden><div class="lst" id="nbList"></div></div>
 
@@ -340,7 +344,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.14d';
+var APPV='2026.11.14e';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -488,6 +492,15 @@ function pdfLoad(){$('pdfE').textContent='عم نشوف شو مرفوع…';$('p
  .then(function(r){return r.json();}).then(function(L){$('pdfE').textContent='';PB.forEach(function(b){var f=(Array.isArray(L)?L:[]).filter(function(x){return x.name===b[0]+'.pdf';})[0];$('ps_'+b[0]).textContent=f?'✅ مرفوع · '+Math.round(((f.metadata||{}).size||0)/1048576*10)/10+' MB':'❌ لسّا ما انرفع';});})
  .catch(function(){$('pdfE').textContent='ما زبط. تأكد من الإنترنت.';});}
 $('pdfBtn').onclick=function(){$('pdfM').hidden=false;pdfLoad();};
+chp('prP');
+$('prBtn').onclick=function(){$('prM').hidden=false;$('prE').textContent='';$('prIn').value='';setTimeout(function(){$('prIn').focus();},200);};
+$('prGo').onclick=function(){var c=$('prIn').value.trim().toUpperCase().replace(/\s+/g,'');if(c&&c.indexOf('APP-')!==0)c='APP-'+c;if(c.length<10){$('prE').textContent='اكتب الكود كامل: APP-XXXXXX';return;}
+ var bt=$('prGo');bt.disabled=true;$('prE').textContent='⏳ عم نأكّد…';
+ admin().then(function(a){return fetch(SBU+'/rest/v1/rpc/promo_approve',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json'},body:JSON.stringify({p_code:c,p_pdf:val('prP')==='1'})});})
+ .then(function(r){return r.json();}).then(function(j){bt.disabled=false;
+  if(j&&j.ok){$('prE').innerHTML=(j.already?'✔️ هالكود متأكّد من قبل':'✅ تمّ! انفتح الكتاب الأول لـ<b>'+esc(j.name||'')+'</b>')+(j.phone?' · '+esc(j.phone):'')+'<br>المفتاح: <b dir="ltr">'+esc(j.key||'')+'</b> (بتلاقيه بـ🗂️ المفاتيح)';$('prIn').value='';}
+  else $('prE').textContent=(j&&(j.msg||j.message))||'ما زبط.';})
+ .catch(function(){bt.disabled=false;$('prE').textContent='ما زبط. تأكد من الإنترنت.';});};
 $('pdfL').onchange=function(e){var inp=e.target.closest('[data-up]');if(!inp||!inp.files[0])return;var bk=inp.dataset.up,file=inp.files[0],tk;
  if(file.size>50*1048576){$('pdfE').textContent='الملف أكبر من 50 MB. صغّرو أوّل.';return;}
  $('ps_'+bk).textContent='⏳ عم يرفع… ('+Math.round(file.size/1048576)+' MB)';
@@ -601,10 +614,32 @@ function contents(id){var b=BOOKD[id];return [['📖','الكتاب PDF',b.rules
 /* 🎁 عرض بلاك نوفمبر: الكتاب الأول ببلاش لآخر الشهر. الشخص بيبعت طلب عالواتساب وأنور بيعطيه مفتاح */
 var PROMO_END='2026-11-30';
 function promoOn(){return new Date().toISOString().slice(0,10)<=PROMO_END&&!own('course');}
-function promoU(){var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(e){}var d=(ls('meaDevId')||'').slice(0,6).toUpperCase();
- if(!d){d=Math.random().toString(16).slice(2,8).toUpperCase();}
- return 'https://wa.me/96179434479?text='+encodeURIComponent('🎁 بدي الكتاب الأول ببلاش (عرض بلاك نوفمبر)\n'+(l&&l.name?'اسمي: '+l.name+'\n':'')+(l&&l.phone?'رقمي: '+l.phone+'\n':'')+'كود التطبيق: APP-'+d);}
-function giftH(){return '<a class="gift" href="'+promoU()+'"><b>🎁 الكتاب الأول ببلاش لآخر الشهر</b><small>عرض بلاك نوفمبر · اكبس وابعت الرسالة، وأنور بيبعتلك مفتاحك</small></a>';}
+function giftH(){var p=ls('meaPromo');
+ if(p)return '<button type="button" class="gift" data-gift="1"><b>⏳ طلبك عند أنور: <span dir="ltr">'+esc(p)+'</span></b><small>بس يأكّد الكود بينفتحلك الكتاب الأول لحالو. اكبس لتبعتلو الكود مرة تانية</small></button>';
+ return '<button type="button" class="gift" data-gift="1"><b>🎁 الكتاب الأول ببلاش لآخر الشهر</b><small>عرض بلاك نوفمبر · اكبس، ابعت الكود لأنور، وبينفتحلك الكتاب</small></button>';}
+function giftWA(code){var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(e){}
+ location.href='https://wa.me/96179434479?text='+encodeURIComponent('🎁 بدي الكتاب الأول ببلاش (عرض بلاك نوفمبر)\n'+(l&&l.name?'اسمي: '+l.name+'\n':'')+'كودي: '+code);}
+document.addEventListener('click',function(e){var g=e.target.closest('[data-gift]');if(!g||!window.MEAPATH)return;e.preventDefault();
+ var p=ls('meaPromo');if(p){giftWA(p);return;}
+ var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(x){}g.style.opacity='.6';
+ window.MEAPATH.fp().then(function(d){return fetch(SBU+'/rest/v1/rpc/promo_request',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_device:d,p_name:(l&&l.name)||'',p_phone:(l&&l.phone)||''})});})
+ .then(function(r){return r.json();}).then(function(j){g.style.opacity='';if(j&&j.ok&&j.code){ls('meaPromo',j.code);renderBooks();giftWA(j.code);promoPoll();}else toast((j&&j.msg)||'ما زبط، جرّب كمان مرة');})
+ .catch(function(){g.style.opacity='';toast('تأكد من الإنترنت وجرّب كمان مرة');});});
+/* التطبيق بيسأل كل شوي: أنور أكّد الكود؟ */
+var prT=null;
+function promoPoll(){if(!ls('meaPromo')||own('course')||!window.MEAPATH)return;
+ window.MEAPATH.fp().then(function(d){return fetch(SBU+'/rest/v1/rpc/promo_status',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_device:d})});})
+ .then(function(r){return r.json();}).then(function(j){
+  if(j&&j.approved&&j.key)return window.MEAPATH.unlock('course',j.key).then(function(u){if(!u.ok)return;
+   try{localStorage.removeItem('meaPromo');}catch(e){}renderBooks();paths();
+   promoDone();});
+  clearTimeout(prT);prT=setTimeout(promoPoll,20000);}).catch(function(){clearTimeout(prT);prT=setTimeout(promoPoll,30000);});}
+function promoDone(){var d=document.createElement('div');d.className='mdl';d.style.zIndex=80;
+ d.innerHTML='<div class="set mdb" style="text-align:center"><div style="font-size:46px">🎉</div><div class="mdt">تم تأكيد الكود الخاص بك</div><p class="mds">صار عندك كتاب «الكهرباء بالمختصر المفيد». يلّا نبلّش!</p><button type="button" class="btn" style="width:100%">افتح الكتاب ←</button></div>';
+ document.body.appendChild(d);d.querySelector('button').onclick=function(){d.remove();show('books');openBook('course');};
+ try{if(navigator.vibrate)navigator.vibrate(200);}catch(e){}}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)promoPoll();});
+setTimeout(promoPoll,3000);
 function renderBooks(){var h='';$('promo').innerHTML=promoOn()?giftH():'';BORD.forEach(function(id){var b=BOOKD[id],o=own(id);
  h+='<button type="button" class="card bk" data-bk="'+id+'" style="width:100%;text-align:start"><img class="cv" src="'+b.cv+'" alt=""><div style="flex:1"><b>'+b.t+'</b><span>الكتاب '+b.n+' · '+b.lv+(b.price?' · '+b.price:'')+'</span><div class="tg">'+(o?'<i class="own">✅ عندك</i>':'')+'<i>🎯 '+b.q+' سؤال</i><i>🛠️ '+b.proj.n+' مشاريع</i><i>🧩 '+b.parts.length+' قطعة 3D</i>'+(b.sample?'<i>📄 عيّنة مجانية</i>':'')+'</div></div><div class="go" style="align-self:center">←</div></button>';});
  $('bookList').innerHTML=h;renderBookTools();}
