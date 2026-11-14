@@ -511,7 +511,7 @@ $('ppBtn').onclick=function(){$('ppM').hidden=false;$('ppE').textContent='⏳';$
   $('ppS').innerHTML=box(j.today,'اليوم')+box(j.week,'هالأسبوع')+box(j.total,'من الأوّل');
   $('ppS2').textContent='🆕 جداد اليوم: '+j.new_today+' · 📱 منزّلين التطبيق: '+j.app_total+' · 🌐 من المتصفّح: '+j.web_total;
   var L=j.people||[];$('ppL').innerHTML=L.length?L.map(function(p){var ph=String(p.phone||'').replace(/[^\d]/g,'');if(ph.indexOf('00')===0)ph=ph.slice(2);else if(ph.length<=8)ph='961'+ph.replace(/^0/,'');else if(/^09\d{8}$/.test(ph))ph='963'+ph.slice(1);
-   return '<div class="pli"><div><b>'+esc(p.name||'بلا اسم')+(p.dev==='app'?' 📱':'')+'</b><small><span dir="ltr">'+esc(p.phone||'')+'</span> · فات '+ppAgo(p.at)+(p.last_at?' · آخر مرة '+ppAgo(p.last_at):'')+'</small></div>'+(ph?'<a class="btn alt" style="margin:0;padding:8px 12px" href="https://wa.me/'+ph+'">💬</a>':'')+'</div>';}).join(''):'<p class="mds">لسّا ما حدا كتب اسمو.</p>';})
+   return '<div class="pli"><div><b>'+esc(p.name||'بلا اسم')+(p.dev==='app'?' 📱':'')+'</b><small><span dir="ltr">'+esc(p.phone||'')+'</span> · فات '+ppAgo(p.at)+(p.last_at?' · آخر مرة '+ppAgo(p.last_at):'')+'</small></div>'+(ph?'<a class="btn alt" style="margin:0;padding:8px 12px;width:auto;flex:0 0 auto" href="https://wa.me/'+ph+'">💬</a>':'')+'</div>';}).join(''):'<p class="mds">لسّا ما حدا كتب اسمو.</p>';})
  .catch(function(){$('ppE').textContent='ما زبط. تأكد من الإنترنت.';});};
 $('prL').onclick=function(e){var ok=e.target.closest('[data-ok]'),no=e.target.closest('[data-no]');if(!ok&&!no)return;var b=ok||no;b.disabled=true;
  (ok?prRpc('promo_approve',{p_code:ok.dataset.ok,p_pdf:false}):prRpc('promo_reject',{p_code:no.dataset.no}))
