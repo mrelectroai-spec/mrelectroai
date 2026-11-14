@@ -346,7 +346,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.14h';
+var APPV='2026.11.14i';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -514,8 +514,8 @@ $('ppBtn').onclick=function(){$('ppM').hidden=false;$('ppE').textContent='⏳';$
    return '<div class="pli"><div><b>'+esc(p.name||'بلا اسم')+(p.dev==='app'?' 📱':'')+'</b><small><span dir="ltr">'+esc(p.phone||'')+'</span> · فات '+ppAgo(p.at)+(p.last_at?' · آخر مرة '+ppAgo(p.last_at):'')+'</small></div>'+(ph?'<a class="btn alt" style="margin:0;padding:8px 12px;width:auto;flex:0 0 auto" href="https://wa.me/'+ph+'">💬</a>':'')+'</div>';}).join(''):'<p class="mds">لسّا ما حدا كتب اسمو.</p>';})
  .catch(function(){$('ppE').textContent='ما زبط. تأكد من الإنترنت.';});};
 $('prL').onclick=function(e){var ok=e.target.closest('[data-ok]'),no=e.target.closest('[data-no]');if(!ok&&!no)return;var b=ok||no;b.disabled=true;
- (ok?prRpc('promo_approve',{p_code:ok.dataset.ok,p_pdf:false}):prRpc('promo_reject',{p_code:no.dataset.no}))
- .then(function(j){if(j&&j.ok&&ok&&!j.already)admin().then(function(a){return fetch(SBU+'/functions/v1/mea-push',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json'},body:JSON.stringify({topic:'promo_'+ok.dataset.ok,id:'promo-'+ok.dataset.ok,title:'🎉 تم قبولك!',body:'صار عندك كتاب «الكهرباء بالمختصر المفيد». افتح التطبيق وبلّش.',url:'https://mrelectroai-spec.github.io/mrelectroai/app/#books'})});}).catch(function(){});
+ (ok?prRpc('promo_approve',{p_code:ok.dataset.ok,p_pdf:true}):prRpc('promo_reject',{p_code:no.dataset.no}))
+ .then(function(j){if(j&&j.ok&&ok&&!j.already)admin().then(function(a){return fetch(SBU+'/functions/v1/mea-push',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json'},body:JSON.stringify({topic:'promo_'+ok.dataset.ok,id:'promo-'+ok.dataset.ok,title:'🎉 تم قبولك!',body:'صار عندك كتاب «الكهرباء بالمختصر المفيد» مع الـPDF. افتح التطبيق ← الكتب ← الكتاب الأول.',url:'https://mrelectroai-spec.github.io/mrelectroai/app/#books'})});}).catch(function(){});
   if(j&&j.ok){toast(ok?'✅ انفتحلو الكتاب':'❌ انرفض');prLoad();}else{b.disabled=false;toast((j&&(j.msg||j.message))||'ما زبط');}})
  .catch(function(){b.disabled=false;toast('تأكد من الإنترنت');});};
 $('pdfL').onchange=function(e){var inp=e.target.closest('[data-up]');if(!inp||!inp.files[0])return;var bk=inp.dataset.up,file=inp.files[0],tk;
@@ -654,7 +654,7 @@ function promoPoll(){if(!ls('meaPromo')||own('course')||!window.MEAPATH)return;
    promoDone();});
   clearTimeout(prT);prT=setTimeout(promoPoll,20000);}).catch(function(){clearTimeout(prT);prT=setTimeout(promoPoll,30000);});}
 function promoDone(){var d=document.createElement('div');d.className='mdl';d.style.zIndex=80;
- d.innerHTML='<div class="set mdb" style="text-align:center"><div style="font-size:46px">🎉</div><div class="mdt">تم تأكيد الكود الخاص بك</div><p class="mds">صار عندك كتاب «الكهرباء بالمختصر المفيد». يلّا نبلّش!</p><button type="button" class="btn" style="width:100%">افتح الكتاب ←</button></div>';
+ d.innerHTML='<div class="set mdb" style="text-align:center"><div style="font-size:46px">🎉</div><div class="mdt">تم تأكيد الكود الخاص بك</div><p class="mds">صار عندك كتاب «الكهرباء بالمختصر المفيد». بصفحة الكتاب بتلاقي زر «📥 نزّل الكتاب PDF». يلّا نبلّش!</p><button type="button" class="btn" style="width:100%">افتح الكتاب ←</button></div>';
  document.body.appendChild(d);d.querySelector('button').onclick=function(){d.remove();show('books');openBook('course');};
  try{if(navigator.vibrate)navigator.vibrate(200);}catch(e){}}
 document.addEventListener('visibilitychange',function(){if(!document.hidden)promoPoll();});
