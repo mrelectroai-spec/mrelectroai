@@ -54,6 +54,16 @@ public class AppPrefs extends Plugin {
         call.resolve(r);
     }
 
+    /** اشتراك هالتلفون بقناة إشعارات خاصة فيه (متلاً قبول طلب هدية). */
+    @PluginMethod
+    public void sub(PluginCall call) {
+        String t = call.getString("topic", "");
+        if (t != null && t.matches("[A-Za-z0-9_\\-]{3,60}")) {
+            try { com.google.firebase.messaging.FirebaseMessaging.getInstance().subscribeToTopic(t); } catch (Exception ignored) { }
+        }
+        call.resolve();
+    }
+
     @PluginMethod
     public void openSettings(PluginCall call) {
         Context c = getContext();

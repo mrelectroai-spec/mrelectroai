@@ -1,4 +1,4 @@
-// mea-push: أنور (أدمن) بيبعت إشعار فوري لكل تلفونات التطبيق عبر Firebase (topic: all).
+// mea-push: أنور (أدمن) بيبعت إشعار فوري لكل تلفونات التطبيق عبر Firebase (topic: all)، أو لتلفون واحد (promo_APP-XXXXXX).
 // السرّ FCM_SERVICE_ACCOUNT = ملف حساب الخدمة تبع Firebase (JSON كامل)، بيتحط بـ Supabase Secrets.
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -55,11 +55,13 @@ Deno.serve(async (req) => {
     const { id, title, body, url: link } = input;
     if (!title) return json({ ok: false, msg: "اكتب عنوان" }, 400);
 
+    // قناة: «all» لكل الناس، أو قناة تلفون واحد (promo_APP-XXXXXX)
+    const topic = typeof input.topic === "string" && /^promo_APP-[A-Z0-9]{6}$/.test(input.topic) ? input.topic : "all";
     const tok = await googleToken(sa);
     const data: Record<string, string> = { id: String(id || "push-" + Date.now()), title: String(title), body: String(body || ""), url: String(link || "") };
     const r = await fetch(`https://fcm.googleapis.com/v1/projects/${sa.project_id}/messages:send`, {
       method: "POST", headers: { Authorization: "Bearer " + tok, "Content-Type": "application/json" },
-      body: JSON.stringify({ validate_only: dry, message: { topic: "all", data, android: { priority: "high", ttl: "86400s" } } }),
+      body: JSON.stringify({ validate_only: dry, message: { topic, data, android: { priority: "high", ttl: "86400s" } } }),
     });
     const out = await r.json();
     if (!r.ok) return json({ ok: false, msg: "Firebase رفض", detail: out }, 502);

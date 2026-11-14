@@ -342,7 +342,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.14f';
+var APPV='2026.11.14g';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -501,7 +501,8 @@ function prLoad(){$('prE').textContent='⏳';
 $('prBtn').onclick=function(){$('prM').hidden=false;prLoad();};
 $('prL').onclick=function(e){var ok=e.target.closest('[data-ok]'),no=e.target.closest('[data-no]');if(!ok&&!no)return;var b=ok||no;b.disabled=true;
  (ok?prRpc('promo_approve',{p_code:ok.dataset.ok,p_pdf:false}):prRpc('promo_reject',{p_code:no.dataset.no}))
- .then(function(j){if(j&&j.ok){toast(ok?'✅ انفتحلو الكتاب':'❌ انرفض');prLoad();}else{b.disabled=false;toast((j&&(j.msg||j.message))||'ما زبط');}})
+ .then(function(j){if(j&&j.ok&&ok&&!j.already)admin().then(function(a){return fetch(SBU+'/functions/v1/mea-push',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json'},body:JSON.stringify({topic:'promo_'+ok.dataset.ok,id:'promo-'+ok.dataset.ok,title:'🎉 تم قبولك!',body:'صار عندك كتاب «الكهرباء بالمختصر المفيد». افتح التطبيق وبلّش.',url:'https://mrelectroai-spec.github.io/mrelectroai/app/#books'})});}).catch(function(){});
+  if(j&&j.ok){toast(ok?'✅ انفتحلو الكتاب':'❌ انرفض');prLoad();}else{b.disabled=false;toast((j&&(j.msg||j.message))||'ما زبط');}})
  .catch(function(){b.disabled=false;toast('تأكد من الإنترنت');});};
 $('pdfL').onchange=function(e){var inp=e.target.closest('[data-up]');if(!inp||!inp.files[0])return;var bk=inp.dataset.up,file=inp.files[0],tk;
  if(file.size>50*1048576){$('pdfE').textContent='الملف أكبر من 50 MB. صغّرو أوّل.';return;}
@@ -625,10 +626,11 @@ document.addEventListener('click',function(e){var g=e.target.closest('[data-gift
  var p=ls('meaPromo');if(p){giftWA(p);return;}
  var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(x){}g.style.opacity='.6';
  window.MEAPATH.fp().then(function(d){return fetch(SBU+'/rest/v1/rpc/promo_request',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_device:d,p_name:(l&&l.name)||'',p_phone:(l&&l.phone)||''})});})
- .then(function(r){return r.json();}).then(function(j){g.style.opacity='';if(j&&j.ok&&j.code){ls('meaPromo',j.code);renderBooks();giftWA(j.code);promoPoll();}else toast((j&&j.msg)||'ما زبط، جرّب كمان مرة');})
+ .then(function(r){return r.json();}).then(function(j){g.style.opacity='';if(j&&j.ok&&j.code){ls('meaPromo',j.code);promoSub();renderBooks();giftWA(j.code);promoPoll();}else toast((j&&j.msg)||'ما زبط، جرّب كمان مرة');})
  .catch(function(){g.style.opacity='';toast('تأكد من الإنترنت وجرّب كمان مرة');});});
 /* التطبيق بيسأل كل شوي: أنور أكّد الكود؟ */
 var prT=null;
+function promoSub(){var c=ls('meaPromo');if(c&&CAP)nat('sub',{topic:'promo_'+c}).catch(function(){});}
 function promoPoll(){if(!ls('meaPromo')||own('course')||!window.MEAPATH)return;
  window.MEAPATH.fp().then(function(d){return fetch(SBU+'/rest/v1/rpc/promo_status',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_device:d})});})
  .then(function(r){return r.json();}).then(function(j){
@@ -642,7 +644,7 @@ function promoDone(){var d=document.createElement('div');d.className='mdl';d.sty
  document.body.appendChild(d);d.querySelector('button').onclick=function(){d.remove();show('books');openBook('course');};
  try{if(navigator.vibrate)navigator.vibrate(200);}catch(e){}}
 document.addEventListener('visibilitychange',function(){if(!document.hidden)promoPoll();});
-setTimeout(promoPoll,3000);
+setTimeout(function(){promoSub();promoPoll();},3000);
 function renderBooks(){var h='';$('promo').innerHTML=promoOn()?giftH():'';BORD.forEach(function(id){var b=BOOKD[id],o=own(id);
  h+='<button type="button" class="card bk" data-bk="'+id+'" style="width:100%;text-align:start"><img class="cv" src="'+b.cv+'" alt=""><div style="flex:1"><b>'+b.t+'</b><span>الكتاب '+b.n+' · '+b.lv+(b.price?' · '+b.price:'')+'</span><div class="tg">'+(o?'<i class="own">✅ عندك</i>':'')+'<i>🎯 '+b.q+' سؤال</i><i>🛠️ '+b.proj.n+' مشاريع</i><i>🧩 '+b.parts.length+' قطعة 3D</i>'+(b.sample?'<i>📄 عيّنة مجانية</i>':'')+'</div></div><div class="go" style="align-self:center">←</div></button>';});
  $('bookList').innerHTML=h;renderBookTools();}
