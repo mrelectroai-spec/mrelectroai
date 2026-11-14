@@ -387,8 +387,8 @@ function nat(m,o){return CAP?window.Capacitor.nativePromise('AppPrefs',m,o||{}):
 
 /* ---------- الإعدادات ---------- */
 function paintNotif(r){$('nfSw').setAttribute('aria-checked',r.notif?'true':'false');$('nfSys').hidden=!(r.notif&&r.system===false);}
-function loadSet(){
- if(CAP){$('nfSw').disabled=false;nat('get').then(function(r){paintNotif(r);$('ver').textContent='MrElectroAI · '+T.ver+(r.version||'');}).catch(function(){});}
+function loadSet(){$('ver').textContent='MrElectroAI · تحديث '+APPV;
+ if(CAP){$('nfSw').disabled=false;nat('get').then(function(r){paintNotif(r);$('ver').textContent='MrElectroAI · '+T.ver+(r.version||'')+' · تحديث '+APPV;}).catch(function(){});}
  else{$('nfSw').disabled=true;$('nfSw').setAttribute('aria-checked','false');$('nfTxt').textContent=T.notIn;$('ver').textContent='MrElectroAI · '+T.appOnly;$('getApk').hidden=INAPP;}
  var th=ls('siteTheme')||'auto';document.querySelectorAll('#segTheme button').forEach(function(b){b.classList.toggle('on',b.dataset.v===th);});
  document.querySelectorAll('#segLang button').forEach(function(b){b.classList.toggle('on',b.dataset.v===(EN?'en':'ar'));});}
