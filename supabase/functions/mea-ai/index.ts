@@ -120,6 +120,50 @@ async function translate(texts: string[]) {
   return hs.map((h) => map.get(h) ?? null);
 }
 
+// ---------- 📷 كاميرا القطع: صورة قطعة كهربا ← شو هيّي + الداتا شيت ----------
+const PART_SYS = `You identify ELECTRICAL parts from a photo for electricians (Lebanon). Electrical parts only: breakers (MCB, MCCB, RCD/RCCB, RCBO), contactors, relays, overloads, timers, motor protectors, PLCs, VFDs/inverters, solar panels/inverters/charge controllers/batteries, meters, sensors, switches, sockets, cables, transformers, motors, pumps controllers, lights/drivers, UPS, generators' control parts, terminals, fuses, panels, etc.
+Read every label, brand, model/part number and rating you can see on the part.
+Return ONLY JSON:
+{"electrical": true|false,
+ "type_ar": "نوع القطعة بالعربي (قصير)", "type_en": "part type in English",
+ "brand": "brand or empty", "model": "exact model / part number or empty",
+ "confidence": "high|medium|low",
+ "specs": ["short spec lines in Lebanese Arabic, keep numbers/units/English terms as is, e.g. 'التيار: 25A'", ...],
+ "what_ar": "2-3 short lines in Lebanese Arabic: what it is and what it's used for",
+ "tips_ar": ["2-4 short practical install/safety tips in Lebanese Arabic"],
+ "search": "best English search query to find its official datasheet, e.g. 'Schneider LC1D25 datasheet pdf'"}
+If the photo is not an electrical part (person, food, animal, random object), return {"electrical": false, "what_ar": "short polite Lebanese Arabic sentence saying this tool is only for electrical parts"}.
+If you can't read the model, still identify the type and say so in what_ar; set confidence low. Never invent a model number.`;
+
+async function partSearch(q: string) {
+  const links: { title: string; url: string }[] = [];
+  for (const m of MODELS) {
+    try {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${KEY}`, {
+        method: "POST", signal: AbortSignal.timeout(25000), headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: `Find the official datasheet, catalog or technical manual (PDF preferred, manufacturer site preferred) for: ${q}. List up to 4 results, one per line, exactly as: TITLE | URL . Only real URLs you found.` }] }],
+          tools: [{ google_search: {} }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 800 },
+        }),
+      });
+      if (!r.ok) { console.error("search", m, r.status, (await r.text()).slice(0, 200)); continue; }
+      const d = await r.json();
+      const text = (d?.candidates?.[0]?.content?.parts || []).map((p: { text?: string }) => p.text || "").join("\n");
+      for (const line of text.split("\n")) {
+        const mm = line.match(/^(.*?)\|\s*(https?:\/\/\S+)/);
+        if (mm) links.push({ title: mm[1].replace(/^[-*\d.\s]+/, "").trim().slice(0, 90), url: mm[2].replace(/[)\].,]+$/, "") });
+      }
+      for (const c of d?.candidates?.[0]?.groundingMetadata?.groundingChunks || []) {
+        if (c?.web?.uri) links.push({ title: String(c.web.title || "").slice(0, 90), url: c.web.uri });
+      }
+      if (links.length) break;
+    } catch (e) { console.error("search", m, String(e).slice(0, 120)); }
+  }
+  const seen = new Set<string>();
+  return links.filter((l) => { const k = l.url.split("?")[0]; if (seen.has(k) || !/^https?:/.test(l.url)) return false; seen.add(k); return true; }).slice(0, 5);
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ error: "method" }, 405);
@@ -142,6 +186,40 @@ Deno.serve(async (req) => {
       const sys = SYSTEM + (b.lang === "en" ? "\nThe app is in English mode: reply in English." : "");
       const text = await gemini(sys, msgs, { temp: 0.5, max: 2048 });
       rest("ai_chats", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ vid: String(b.vid || "").slice(0, 60) || null, q: msgs[msgs.length - 1].parts[0].text, a: text.slice(0, 4000) }) }).catch(() => {});
+      return json({ text });
+    }
+    if (b.mode === "part") {
+      if (!KEY) return json({ error: "nokey" }, 503);
+      const vid = String(b.vid || "").slice(0, 60) || null;
+      const img = String(b.image || "");
+      if (img.length < 1000 || img.length > 3_000_000) return json({ error: "img" }, 400);
+      if (vid) {
+        const since = new Date(Date.now() - 864e5).toISOString();
+        const c = await rest(`ai_chats?select=id&vid=eq.${encodeURIComponent(vid)}&q=like.${encodeURIComponent("📷 *")}&created_at=gte.${since}`, { headers: { Prefer: "count=exact", Range: "0-0" } });
+        const n = +((c.headers.get("content-range") || "").split("/")[1] || 0);
+        if (n >= 25) return json({ error: "limit" }, 429);
+      }
+      const out = await gemini(PART_SYS, [{ role: "user", parts: [{ inline_data: { mime_type: String(b.mime || "image/jpeg"), data: img } }, { text: "Identify this part." }] }], { json: true, temp: 0.2, max: 2048 });
+      let p: any; try { p = JSON.parse(out); } catch { p = null; }
+      if (!p) return json({ error: "ai" }, 502);
+      if (p.electrical) {
+        const q = String(p.search || [p.brand, p.model, p.type_en, "datasheet pdf"].filter(Boolean).join(" ")).slice(0, 160);
+        p.links = p.brand || p.model ? await partSearch(q) : [];
+        p.q = q;
+      }
+      rest("ai_chats", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ vid, q: "📷 " + [p.type_ar, p.brand, p.model].filter(Boolean).join(" · ").slice(0, 300), a: JSON.stringify(p).slice(0, 4000) }) }).catch(() => {});
+      return json(p);
+    }
+    if (b.mode === "partq") {
+      if (!KEY) return json({ error: "nokey" }, 503);
+      const part = JSON.stringify(b.part || {}).slice(0, 3000);
+      const msgs = (Array.isArray(b.messages) ? b.messages : []).slice(-8)
+        .map((m: any) => ({ role: m.role === "model" ? "model" : "user", parts: [{ text: String(m.text || "").slice(0, 1500) }] }))
+        .filter((m: any) => m.parts[0].text);
+      if (!msgs.length || msgs[msgs.length - 1].role !== "user") return json({ error: "empty" }, 400);
+      const sys = SYSTEM + `\nThe user photographed this electrical part (identified data): ${part}\nAnswer questions about THIS part: wiring, terminals, settings, ratings, compatible replacements, common faults. Be practical and short. If unsure of exact model-specific details, say so and tell them to check the datasheet.`;
+      const text = await gemini(sys, msgs, { temp: 0.4, max: 2048 });
+      rest("ai_chats", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ vid: String(b.vid || "").slice(0, 60) || null, q: "📷❓ " + msgs[msgs.length - 1].parts[0].text, a: text.slice(0, 4000) }) }).catch(() => {});
       return json({ text });
     }
     return json({ error: "mode" }, 400);
