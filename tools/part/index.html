@@ -89,6 +89,16 @@ function hist(){var L=[];try{L=JSON.parse(localStorage.getItem('meaParts')||'[]'
 function saveHist(p,thumb){var L=hist().filter(function(x){return !(x.p.model&&x.p.model===p.model&&x.p.brand===p.brand);});L.unshift({p:p,t:thumb,at:Date.now()});L=L.slice(0,8);try{localStorage.setItem('meaParts',JSON.stringify(L));}catch(e){try{localStorage.setItem('meaParts',JSON.stringify(L.slice(0,3)));}catch(x){}}}
 function drawHist(){var L=hist();$('histBox').hidden=!L.length;$('hist').innerHTML=L.map(function(x,i){return '<button type="button" data-h="'+i+'"><img src="'+x.t+'" alt=""><span>'+esc(x.p.model||x.p.type_ar||'')+'</span></button>';}).join('');}
 $('hist').onclick=function(e){var b=e.target.closest('[data-h]');if(!b)return;var x=hist()[+b.dataset.h];if(!x)return;$('start').hidden=true;$('work').hidden=false;$('pv').src=x.t;$('wait').hidden=true;show(x.p);};
+/* روابط مباشرة لمواقع الشركات (بلا ما نستنّى التفتيش) */
+var BR=[[/schneider|telemecanique|square ?d/i,'se.com',function(m){return 'https://www.se.com/ww/en/product/'+encodeURIComponent(m)+'/';}],
+ [/siemens/i,'siemens.com',function(m){return 'https://sieportal.siemens.com/en-ww/products-services/detail/'+encodeURIComponent(m.replace(/\s+/g,''));}],
+ [/abb/i,'abb.com'],[/legrand/i,'legrand.com'],[/hager/i,'hager.com'],[/chint/i,'chint.com'],[/\bls\b|ls electric|lsis/i,'ls-electric.com'],[/eaton|moeller/i,'eaton.com'],
+ [/mitsubishi/i,'mitsubishielectric.com'],[/omron/i,'omron.com'],[/finder/i,'findernet.com'],[/delta/i,'deltaww.com'],[/deye/i,'deyeinverter.com'],[/growatt/i,'growatt.com'],
+ [/felicity/i,'felicitysolar.com'],[/victron/i,'victronenergy.com'],[/huawei/i,'solar.huawei.com'],[/jinko/i,'jinkosolar.com'],[/longi/i,'longi.com'],[/fluke/i,'fluke.com'],[/danfoss/i,'danfoss.com'],[/weg/i,'weg.net'],[/tibox|ti-box/i,'tibox.com']];
+function brandLinks(p){var out=[],b=p.brand||'',m=(p.model||'').trim();if(!b)return out;
+ for(var i=0;i<BR.length;i++){if(BR[i][0].test(b)){if(m&&BR[i][2])out.push({title:'صفحة القطعة على موقع '+b,url:BR[i][2](m)});
+  out.push({title:'فتّش بموقع '+b+' الرسمي',url:'https://www.google.com/search?q='+encodeURIComponent('site:'+BR[i][1]+' '+(m||p.type_en||'')+' datasheet')});break;}}
+ return out;}
 function domain(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch(e){return '';}}
 function md(s){return esc(s).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2">$1</a>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');}
 function show(p){P=p;chat=[];var h='';
@@ -104,8 +114,9 @@ function show(p){P=p;chat=[];var h='';
  h+='</div>';
  var q=p.q||[p.brand,p.model,p.type_en,'datasheet pdf'].filter(Boolean).join(' ');
  h+='<div class="box mea-glass"><h2>📄 الداتا شيت والكاتالوج</h2>';
- (p.links||[]).forEach(function(l){var d=domain(l.url);h+='<a class="lk" href="'+esc(l.url)+'" target="_blank" rel="noopener"><i>'+(/\.pdf(\?|$)/i.test(l.url)?'📕':'🌐')+'</i><div><b>'+esc(l.title||d)+'</b><small>'+esc(d)+'</small></div><span>←</span></a>';});
- if(!(p.links||[]).length)h+='<p class="what">'+(p.model?'ما لقينا رابط رسمي مباشر. جرّب التفتيش تحت 👇':'ما قدرنا نقرا الموديل من الصورة. قرّب عالكتابة يلي عالقطعة وصوّر كمان مرة، أو فتّش بالنوع 👇')+'</p>';
+ var LK=(p.links||[]).concat(brandLinks(p));
+ LK.forEach(function(l){var d=domain(l.url);h+='<a class="lk" href="'+esc(l.url)+'" target="_blank" rel="noopener"><i>'+(/\.pdf(\?|$)/i.test(l.url)?'📕':'🌐')+'</i><div><b>'+esc(l.title||d)+'</b><small>'+esc(d)+'</small></div><span>←</span></a>';});
+ if(!LK.length)h+='<p class="what">'+(p.model?'ما لقينا رابط رسمي مباشر. جرّب التفتيش تحت 👇':'ما قدرنا نقرا الموديل من الصورة. قرّب عالكتابة يلي عالقطعة وصوّر كمان مرة، أو فتّش بالنوع 👇')+'</p>';
  h+='<a class="lk" href="https://www.google.com/search?q='+encodeURIComponent(q+' filetype:pdf')+'" target="_blank" rel="noopener"><i>🔍</i><div><b>فتّش على الداتا شيت بـ Google</b><small>'+esc(q)+'</small></div><span>←</span></a>';
  h+='</div>';
  h+='<div class="box mea-glass"><h2>💬 اسأل عن هالقطعة</h2><div class="qs" id="qs"><button type="button">كيف بوصّلها؟</button><button type="button">شو بديلها إذا ما لقيتها؟</button><button type="button">شو أعطالها المعروفة؟</button><button type="button">شو معنى الأرقام يلي عليها؟</button></div><div class="msgs" id="msgs"></div>';
