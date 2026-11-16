@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ورقة تمرين | MrElectroAI</title>
+<meta name="description" content="أوراق تمارين عملية للكهربجية: المخطط، القطع، خطوات التركيب، والفحص. من أنور الجاسم.">
+<meta name="theme-color" content="#06110e">
+<link rel="icon" href="../app/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{font-family:'Readex Pro',system-ui,sans-serif;background:#0b1512;color:#e9f3ef;padding:14px}
+a{color:inherit}
+.bar{max-width:820px;margin:0 auto 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bar h1{flex:1;font-size:18px;min-width:180px}
+.b{padding:10px 15px;border-radius:13px;background:#22C79B;color:#03140f;font:inherit;font-weight:700;border:0;cursor:pointer;text-decoration:none;font-size:14px}
+.b.alt{background:#1b2a25;color:#e9f3ef;border:1px solid #2c4a40}
+.list{max-width:820px;margin:0 auto;display:grid;gap:10px}
+.it{display:flex;gap:12px;align-items:center;padding:14px;border-radius:18px;background:#13211c;border:1px solid #23392f;text-decoration:none}
+.it i{font-style:normal;font-size:30px}.it b{display:block;font-size:16px}.it small{color:#9fb7ae;font-size:13px}
+.grp{max-width:820px;margin:14px auto 4px;color:#9fb7ae;font-weight:700;font-size:14px}
+/* الورقة: A4 */
+.page{width:210mm;min-height:297mm;margin:0 auto 16px;background:#fff;color:#16231e;padding:12mm 13mm;position:relative;box-shadow:0 10px 40px #0007}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #22C79B;padding-bottom:8px}
+.hd .lg{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;direction:ltr}
+.hd .lg i{width:30px;height:30px;border-radius:9px;background:#0e1f1a;display:grid;place-items:center}
+.hd .by{font-size:12px;color:#53645d;display:flex;align-items:center;gap:4px;justify-content:flex-end;margin-top:3px}
+.tt{font-size:22px;font-weight:700;line-height:1.4}.tt small{display:block;font-size:12.5px;color:#0e7a5f;font-weight:600}
+h2{font-size:15px;margin:12px 0 6px;color:#0e7a5f;display:flex;align-items:center;gap:6px}
+.brief{font-size:13.5px;line-height:1.85;background:#f1f8f5;border-radius:10px;padding:8px 12px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border:1px solid #d6e4de;padding:5px 8px;text-align:start}
+th{background:#eaf5f0;font-weight:700}
+td.m{direction:ltr;text-align:left;font-weight:600;font-size:12px}
+.dg{border:1px solid #d6e4de;border-radius:10px;padding:6px;text-align:center}
+.dg svg{width:100%;height:auto;max-height:118mm}
+ol.st{padding-inline-start:20px;font-size:13px;line-height:1.85}
+ul.ck{list-style:none;font-size:13px;line-height:1.9}
+ul.ck li:before{content:'☐';font-size:16px;margin-inline-end:8px;color:#0e7a5f}
+.ft{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:8px;border-top:1px solid #d6e4de;font-size:11.5px;color:#53645d}
+.ft .q{display:flex;align-items:center;gap:8px;direction:rtl}
+.warn{font-size:12px;background:#fff6e0;border:1px solid #f1d58a;border-radius:8px;padding:6px 10px;margin-top:8px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:820px){.page{width:100%;min-height:0;padding:16px}}
+@media print{
+ @page{size:A4;margin:0}
+ body{background:#fff;padding:0}.bar,.list,.grp{display:none!important}
+ .page{box-shadow:none;margin:0;width:210mm;min-height:297mm;page-break-after:always}
+}
+</style>
+</head>
+<body>
+<div class="bar"><a class="b alt" href="./" aria-label="رجوع">→ المختبر</a><h1 id="bt">📄 أوراق التمارين</h1><button class="b" id="pr" type="button" hidden>🖨️ احفظ PDF</button></div>
+<div id="home"></div>
+<div id="sheet" hidden></div>
+<script src="parts.js"></script>
+<script src="engine.js"></script>
+<script src="projects.js"></script>
+<script>
+(function(){
+/* ---------- رموز المخطط (IEC، الكهربا نازلة لتحت) ---------- */
+var S='';const st='stroke="#16231e" stroke-width="2" fill="none" stroke-linecap="round"';
+function L(x1,y1,x2,y2,d){S+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${st}${d?' stroke-dasharray="5 4" stroke-width="1.3"':''}/>`;}
+function T(x,y,t,o){o=o||{};S+=`<text x="${x}" y="${y}" font-size="${o.s||12}" font-weight="${o.b?700:500}" fill="${o.c||'#16231e'}" text-anchor="${o.a||'middle'}" font-family="Readex Pro,Arial" ${o.ltr!==false?'direction="ltr"':''}>${t}</text>`;}
+function dot(x,y){S+=`<circle cx="${x}" cy="${y}" r="3.2" fill="#16231e"/>`;}
+// كونتاك مفتوح (NO) بين y وy+40
+function no(x,y){L(x,y,x,y+12);L(x,y+28,x-11,y+11);L(x,y+28,x,y+40);}
+// كونتاك مسكّر (NC)
+function nc(x,y){L(x,y,x,y+12);L(x+11,y+12,x,y+12);L(x,y+28,x+12,y+9);L(x,y+28,x,y+40);}
+// قاطع: NO مع ×
+function brk(x,y){no(x,y);L(x-4,y+8,x+4,y+16);L(x+4,y+8,x-4,y+16);}
+// أوفرلود حراري (مستطيل مع زيكزاك) من y لـy+40
+function th(x,y){L(x,y,x,y+8);S+=`<path d="M${x} ${y+8} v4 h-7 v8 h14 v8 h-7 v4" ${st}/>`;L(x,y+32,x,y+40);}
+// كبسة: كونتاك + مقبض
+function pb(x,y,isNC){if(isNC)nc(x,y);else no(x,y);L(x-6,y+20,x-24,y+20,1);L(x-24,y+15,x-24,y+25);}
+// كويل
+function coil(x,y,lab,sub){L(x,y,x,y+8);S+=`<rect x="${x-14}" y="${y+8}" width="28" height="24" ${st}/>`;L(x,y+32,x,y+40);T(x+20,y+24,lab,{a:'start',b:1});if(sub)T(x+20,y+37,sub,{a:'start',s:10,c:'#53645d'});}
+// لمبة إشارة
+function lamp(x,y,lab){L(x,y,x,y+8);S+=`<circle cx="${x}" cy="${y+20}" r="12" ${st}/>`;L(x-8,y+12,x+8,y+28);L(x+8,y+12,x-8,y+28);L(x,y+32,x,y+40);T(x+18,y+24,lab,{a:'start',b:1});}
+// موتور 3 فاز
+function mot(cx,cy,lab){S+=`<circle cx="${cx}" cy="${cy}" r="30" ${st}/>`;T(cx,cy-2,'M',{s:18,b:1});T(cx,cy+16,'3~',{s:12});if(lab)T(cx+40,cy+5,lab,{a:'start',b:1});}
+const lab=(x,y,t,sub)=>{T(x,y,t,{a:'end',b:1});if(sub)T(x,y+13,sub,{a:'end',s:10,c:'#53645d'});};
+function svg(w,h){const o=`<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${S}</svg>`;S='';return o;}
+
+/* دارة باور: مباشر (DOL) */
+function powerDOL(x0){const X=[x0,x0+40,x0+80];X.forEach((x,i)=>{T(x,16,'L'+(i+1),{b:1});L(x,22,x,40);brk(x,40);L(x,80,x,110);no(x,110);L(x,150,x,170);th(x,170);L(x,210,x,240);});
+ L(X[0]-12,60,X[2]+12,60,1);lab(X[0]-18,62,'Q1','3P');L(X[0]-12,130,X[2]+12,130,1);lab(X[0]-18,132,'KM1','1-2 3-4 5-6');lab(X[0]-18,192,'F1','أوفرلود');
+ L(X[0],240,X[1]-14,262);L(X[2],240,X[1]+14,262);L(X[1],240,X[1],262);mot(X[1],292,'M1');T(X[0]-2,256,'U1',{s:10});T(X[1]+12,256,'V1',{s:10});T(X[2]+2,256,'W1',{s:10});}
+/* دارة تحكم: تشغيل وتوقيف مع تثبيت */
+function ctrlDOL(x){T(x,16,'L1',{b:1});L(x,22,x,40);brk(x,40);lab(x-16,62,'F2','1P');L(x,80,x,90);nc(x,90);lab(x-16,112,'F1','95-96');L(x,130,x,140);pb(x,140,1);lab(x-30,162,'S1','توقيف');
+ L(x,180,x,190);dot(x,190);pb(x,190,0);lab(x-30,212,'S2','تشغيل');L(x,190,x+60,190);no(x+60,190);T(x+76,212,'KM1',{a:'start',b:1});T(x+76,225,'13-14',{a:'start',s:10,c:'#53645d'});L(x+60,230,x,230);
+ L(x,230,x,250);dot(x,230);dot(x,250);coil(x,250,'KM1','A1-A2');L(x,250,x+110,250);lamp(x+110,250,'H1');L(x+110,290,x,290);dot(x,290);L(x,290,x,310);T(x,326,'N',{b:1});}
+/* عكس اتجاه */
+function powerREV(x0){const X=[x0,x0+36,x0+72],Y=[x0+130,x0+166,x0+202];
+ X.forEach((x,i)=>{T(x,16,'L'+(i+1),{b:1});L(x,22,x,40);brk(x,40);L(x,80,x,96);dot(x,96);L(x,96,Y[i],96);no(x,110);L(x,96,x,110);L(x,150,x,180);no(Y[i],110);L(Y[i],96,Y[i],110);});
+ L(X[0]-10,60,X[2]+10,60,1);lab(X[0]-16,62,'Q1','3P');L(X[0]-10,130,X[2]+10,130,1);lab(X[0]-16,132,'KM1','لقدّام');L(Y[0]-10,130,Y[2]+10,130,1);T(Y[2]+16,132,'KM2',{a:'start',b:1});T(Y[2]+16,145,'لورا',{a:'start',s:10,c:'#53645d'});
+ // KM2: بيبدّل L1 مع L3
+ const TG=[2,1,0],YY=[158,166,174];Y.forEach((y,i)=>{L(y,150,y,YY[i]);L(y,YY[i],X[TG[i]],YY[i]);dot(X[TG[i]],YY[i]);});T(Y[1],192,'L1 ↔ L3',{s:10,c:'#53645d'});
+ X.forEach(x=>{th(x,190);L(x,180,x,190);L(x,230,x,248);});lab(X[0]-16,212,'F1','أوفرلود');
+ L(X[0],248,X[1]-14,268);L(X[2],248,X[1]+14,268);L(X[1],248,X[1],268);mot(X[1],298,'M1');}
+function ctrlREV(x){T(x,16,'L1',{b:1});L(x,22,x,40);brk(x,40);lab(x-16,62,'F2','1P');L(x,80,x,88);nc(x,88);lab(x-16,110,'F1','95-96');L(x,128,x,136);pb(x,136,1);lab(x-30,158,'S1','توقيف');L(x,176,x,186);
+ const b=(bx,s,km,other)=>{L(bx,186,bx,196);pb(bx,196,0);T(bx-30,218,s,{a:'end',b:1});L(bx,196,bx+50,196);no(bx+50,196);T(bx+66,218,km,{a:'start',s:10,b:1});L(bx+50,236,bx,236);dot(bx,196);dot(bx,236);L(bx,236,bx,244);nc(bx,244);T(bx+18,266,other,{a:'start',s:10,b:1});T(bx+18,278,'21-22',{a:'start',s:9,c:'#53645d'});L(bx,284,bx,292);coil(bx,292,km);L(bx,332,bx,345);};
+ dot(x,186);L(x,186,x+150,186);b(x,'S2','KM1','KM2');b(x+150,'S3','KM2','KM1');L(x,345,x+150,345);dot(x,345);L(x,345,x,358);T(x,372,'N',{b:1});}
+/* ستار دلتا */
+function powerYD(x0){const X=[x0,x0+36,x0+72];
+ X.forEach((x,i)=>{T(x,16,'L'+(i+1),{b:1});L(x,22,x,40);brk(x,40);L(x,80,x,96);no(x,96);L(x,136,x,146);th(x,146);L(x,186,x,206);});
+ L(X[0]-10,60,X[2]+10,60,1);lab(X[0]-16,62,'Q1','3P');L(X[0]-10,116,X[2]+10,116,1);lab(X[0]-16,118,'KM1','رئيسي');lab(X[0]-16,168,'F1','0.58×In');
+ // موتور 6 أطراف
+ S+=`<rect x="${X[0]-16}" y="206" width="${X[2]-X[0]+32}" height="70" rx="6" ${st}/>`;T(X[1],246,'M1 3~',{s:13,b:1});['U1','V1','W1'].forEach((t,i)=>T(X[i],222,t,{s:10}));['U2','V2','W2'].forEach((t,i)=>T(X[i],270,t,{s:10}));
+ X.forEach(x=>L(x,276,x,292));
+ // KM3 دلتا: U2←L2 ، V2←L3 ، W2←L1 (بعد KM1)
+ const D=[x0+120,x0+156,x0+192];D.forEach((x,i)=>{no(x,300);L(X[i],292,x,292);L(x,292,x,300);});L(D[0]-10,320,D[2]+10,320,1);T(D[2]+16,322,'KM3',{a:'start',b:1});T(D[2]+16,335,'دلتا',{a:'start',s:10,c:'#53645d'});
+ D.forEach((x,i)=>{L(x,340,x,352);});L(D[0],352,D[0]+8,352);T(D[1],370,'لـ L2 · L3 · L1 بعد KM1',{s:10,c:'#53645d'});
+ // KM2 ستار: بيقصّر U2 V2 W2
+ X.forEach(x=>{L(x,292,x,300);no(x,300);});L(X[0]-10,320,X[2]+10,320,1);lab(X[0]-16,322,'KM2','ستار');X.forEach(x=>L(x,340,x,352));L(X[0],352,X[2],352);dot(X[1],352);}
+function ctrlYD(x){T(x,16,'L1',{b:1});L(x,22,x,40);brk(x,40);lab(x-16,62,'F2','1P');L(x,80,x,88);nc(x,88);lab(x-16,110,'F1','95-96');L(x,128,x,136);pb(x,136,1);lab(x-30,158,'S1','توقيف');L(x,176,x,186);
+ dot(x,186);pb(x,186,0);lab(x-30,208,'S2','تشغيل');L(x,186,x+46,186);no(x+46,186);T(x+60,208,'KM1',{a:'start',s:10,b:1});L(x+46,226,x,226);dot(x,226);
+ L(x,226,x+250,226);
+ // KM1 + KT1
+ L(x,226,x,240);coil(x,240,'KM1');L(x+90,226,x+90,240);coil(x+90,240,'KT1','تايمر');
+ // KM2 ستار: KT1 NC → KM3 NC → KM2
+ const s2=x+170;L(s2,226,s2,236);nc(s2,236);T(s2+16,252,'KT1',{a:'start',s:10,b:1});T(s2+16,264,'15-16',{a:'start',s:9,c:'#53645d'});L(s2,276,s2,282);nc(s2,282);T(s2+16,300,'KM3',{a:'start',s:10,b:1});L(s2,322,s2,328);coil(s2,328,'KM2');
+ const s3=x+250;L(s3,226,s3,236);no(s3,236);T(s3+16,252,'KT1',{a:'start',s:10,b:1});T(s3+16,264,'15-18',{a:'start',s:9,c:'#53645d'});L(s3,276,s3,282);nc(s3,282);T(s3+16,300,'KM2',{a:'start',s:10,b:1});L(s3,322,s3,328);coil(s3,328,'KM3');
+ L(x,280,x,380);L(x+90,280,x+90,380);L(s2,368,s2,380);L(s3,368,s3,380);L(x,380,s3,380);T(x,396,'N',{b:1});}
+/* غرفة: مفتاحين درج + بريز */
+function room(){S+='<g transform="translate(40 0)">';T(40,16,'L',{b:1});T(80,16,'N',{b:1});T(120,16,'PE',{b:1});L(40,22,40,40);L(80,22,80,380);L(120,22,120,380);
+ dot(40,40);L(40,40,260,40);brk(40,40);lab(24,62,'Q1','10A ضو');brk(260,40);T(276,62,'Q2',{a:'start',b:1});T(276,75,'16A بريز',{a:'start',s:10,c:'#53645d'});
+ // مفاتيح درج
+ const sw=(x,y,t)=>{S+=`<circle cx="${x}" cy="${y}" r="3" fill="#16231e"/><circle cx="${x-20}" cy="${y+30}" r="3" fill="#16231e"/><circle cx="${x+20}" cy="${y+30}" r="3" fill="#16231e"/>`;L(x,y,x-18,y+27);T(x-28,y+6,t,{a:'end',b:1});};
+ L(40,80,40,110);sw(40,110,'S1');L(20,140,20,180);L(60,140,60,180);T(40,166,'L1  L2',{s:9,c:'#53645d'});S+=`<circle cx="20" cy="180" r="3" fill="#16231e"/><circle cx="60" cy="180" r="3" fill="#16231e"/>`;
+ S+=`<circle cx="40" cy="210" r="3" fill="#16231e"/>`;L(20,180,38,208);T(12,214,'S2',{a:'end',b:1});L(40,210,40,250);lamp(40,250,'E1');L(40,290,40,320);L(40,320,80,320);dot(80,320);
+ // بريز
+ L(260,80,260,230);S+=`<rect x="236" y="230" width="70" height="46" rx="8" ${st}/>`;T(271,258,'بريز',{s:12,b:1,ltr:false});L(80,300,250,300);L(250,300,250,276);dot(80,300);L(120,330,290,330);L(290,330,290,276);dot(120,330);T(325,258,'X1',{a:'start',b:1});
+ S+='</g>';}
+/* توزيع (مخطط خط واحد) */
+function dist(items,main){T(60,16,'L + N',{b:1});L(60,22,60,40);brk(60,40);lab(44,58,main[0],main[1]);L(60,80,60,100);L(40,100,40+(items.length-1)*90+60,100);
+ items.forEach((it,i)=>{const x=60+i*90;dot(x,100);L(x,100,x,120);brk(x,120);T(x+14,142,it[0],{a:'start',b:1});T(x+14,155,it[1],{a:'start',s:10,c:'#53645d'});L(x,160,x,190);S+=`<rect x="${x-34}" y="190" width="68" height="40" rx="8" ${st}/>`;T(x,215,it[2],{s:12,b:1,ltr:false});T(x,250,it[3]||'',{s:10,c:'#53645d'});});}
+
+/* ---------- محتوى الأوراق ---------- */
+const SH={
+ dol:{lvl:'كلاسيك كنترول · مستوى 1',bom:[['قاطع 3P (Q1)','1','Schneider iC60N 3P C16'],['قاطع 1P للتحكم (F2)','1','Schneider iC60N 1P C6'],['كونتاكتور (KM1)','1','Schneider LC1D18M7'],['أوفرلود (F1)','1','Schneider LRD21 (12-18A)'],['كبسة تشغيل خضرا NO (S2)','1','Schneider XB5AA31'],['كبسة توقيف حمرا NC (S1)','1','Schneider XB5AA42'],['لمبة خضرا (H1)','1','Schneider XB5AVM3'],['موتور 3 فاز 7.5kW','1','Siemens 1LE1 7.5kW'],['كابل باور 2.5mm²','حسب الطول','4 شرايط + أرضي'],['كابل تحكم 1mm²','حسب الطول','']],
+  dg:()=>{powerDOL(80);ctrlDOL(330);return svg(520,340);},
+  warn:'تيار الموتور 7.5kW تقريباً 14.5A: كابل 2.5mm²، قاطع 16A، والأوفرلود على 14.5-15.5A.'},
+ rev:{lvl:'كلاسيك كنترول · مستوى 2',bom:[['قاطع 3P (Q1)','1','Schneider iC60N 3P C16'],['قاطع 1P للتحكم (F2)','1','Schneider iC60N 1P C6'],['كونتاكتور لقدّام (KM1)','1','Schneider LC1D18M7'],['كونتاكتور لورا (KM2)','1','Schneider LC1D18M7'],['أوفرلود (F1)','1','Schneider LRD21'],['كبسة توقيف (S1)','1','XB5AA42'],['كبستين تشغيل (S2، S3)','2','XB5AA31'],['موتور 3 فاز','1','Siemens 1LE1 7.5kW']],
+  dg:()=>{powerREV(60);ctrlREV(370);return svg(640,380);},
+  warn:'Interlock إجباري: NC تبع KM2 بدارة KM1، وNC تبع KM1 بدارة KM2. بلاه، إذا انكبسوا سوا بيصير قصر.'},
+ yd:{lvl:'كلاسيك كنترول · مستوى 3',bom:[['قاطع 3P (Q1)','1','Schneider iC60N 3P C32'],['قاطع 1P للتحكم (F2)','1','iC60N 1P C6'],['كونتاكتور رئيسي (KM1)','1','Schneider LC1D25M7'],['كونتاكتور ستار (KM2)','1','Schneider LC1D18M7'],['كونتاكتور دلتا (KM3)','1','Schneider LC1D25M7'],['أوفرلود (F1)','1','Schneider LRD22 (16-24A)'],['تايمر On-delay (KT1)','1','Omron H3CR-A8'],['كبسات تشغيل وتوقيف','2','XB5AA31 · XB5AA42'],['موتور 6 أطراف 15kW','1','Siemens 1LE1 15kW Δ400V']],
+  dg:()=>{powerYD(60);ctrlYD(340);return svg(680,400);},
+  warn:'الأوفرلود بعد KM1 بيشوف تيار الفاز: اضبطو على 0.58 × تيار الموتور. وInterlock بين KM2 وKM3.'},
+ ats:{lvl:'كلاسيك كنترول · مستوى 4',bom:[['قاطع 2P لكل مصدر','3','Schneider iC60N 2P C25'],['كونتاكتور لكل مصدر (KM1-3)','3','Schneider LC1D25M7'],['ريليه مساعد (KA1، KA2)','2','Finder 55.34.8.230'],['كابل 4mm²','حسب الطول','']],dg:null,
+  warn:'الأولوية: دولة ← موتير ← إنفرتر. كل كونتاكتور فيه NC من التانيين، ولازم يقطع L وN.'},
+ fire:{lvl:'كلاسيك كنترول · مستوى 5',bom:[['حسّاس دخان','1','Hochiki DCD-1E'],['ريليه إنذار (KA)','1','Omron MY4N'],['كبسة Reset حمرا','1','XB5AA42'],['جرس إنذار','1','Klaxon Sonos'],['كونتاكتور للمكيّف','1','LC1D18M7'],['قواطع للمكيّف والمروحة','2','iC60N 1P C16']],dg:null,
+  warn:'الإنذار لازم يمسك حالو (تثبيت) لحتى ولو راح الدخان، وما بيوقف إلا بـReset.'},
+ room:{lvl:'كهربا · مستوى 1',bom:[['قاطع 10A للضو (Q1)','1','Schneider iC60N 1P C10'],['قاطع 16A للبريز (Q2)','1','Schneider iC60N 1P C16'],['مفتاح درج (S1، S2)','2','Legrand Mosaic 077001'],['لمبة سقف (E1)','1',''],['بريز 16A مع أرضي (X1)','1','Legrand Mosaic 077111'],['كابل 1.5mm² للضو','حسب الطول','بنّي، أزرق، أخضر-أصفر'],['كابل 2.5mm² للبريز','حسب الطول','']],
+  dg:()=>{room();return svg(380,390);},
+  warn:'الفاز (L) بيمرق عالمفاتيح، والنوتر (N) رايح عاللمبة مباشرة. ما بيتقطع النوتر بالمفتاح.'},
+ flat:{lvl:'كهربا · مستوى 2',bom:[['ديفرنسيال 2P 40A 30mA','1','Schneider iID 2P 40A 30mA'],['قاطع 10A ضو','1','iC60N 1P C10'],['قاطع 16A بريز','1','iC60N 1P C16'],['قاطع 16A سخّان','1','iC60N 1P C16'],['كابل 1.5 / 2.5mm²','حسب الطول','']],
+  dg:()=>{dist([['Q1','10A','ضو','1.5mm²'],['Q2','16A','بريز','2.5mm²'],['Q3','16A','سخّان','2.5mm² · 13A']],['RCD','40A 30mA']);return svg(330,270);},
+  warn:'كل الـN لازم يرجعوا من تحت الديفرنسيال. إذا رجع N من برّا، الديفرنسيال بيفصل.'},
+ load:{lvl:'كهربا · مستوى 3',bom:[['قاطع رئيسي 25A','1','iC60N 1P C25'],['قاطع 16A سخّان','1','iC60N 1P C16'],['قاطع 16A مكيّف','1','iC60N 1P C16'],['كابل رئيسي 4mm²','حسب الطول',''],['كابل 2.5mm²','حسب الطول','']],
+  dg:()=>{dist([['Q2','16A','سخّان','3kW · 13A'],['Q3','16A','مكيّف','2.6kW · 11.3A']],['Q1','25A']);return svg(250,270);},
+  warn:'المجموع 24.3A: القاطع الرئيسي 25A مع كابل 4mm². ما تحط 32A على كابل 4mm² تحت بوري.'}
+};
+
+const $=i=>document.getElementById(i);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const VB='<svg width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1D9BF0"/><path fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M7.6 12.4l3 3 5.8-6.2"/></svg>';
+const PJ=(window.PROJECTS||[]);
+function home(){let h='';[['classic','⚙️ الكلاسيك كنترول'],['electro','💡 الكهربا']].forEach(([c,n])=>{h+=`<div class="grp">${n}</div><div class="list">`;
+ PJ.filter(p=>p.course===c&&SH[p.id]).forEach(p=>{h+=`<a class="it" href="?p=${p.id}"><i>${p.icon}</i><div><b>${esc(p.title)}</b><small>${SH[p.id].lvl} · مخطط، قطع، خطوات، وفحص</small></div></a>`;});h+='</div>';});
+ $('home').innerHTML=h;}
+function sheet(id){const p=PJ.find(x=>x.id===id),d=SH[id];if(!p||!d){home();return;}
+ document.title=p.title+' | ورقة تمرين MrElectroAI';$('bt').textContent=p.icon+' '+p.title;$('pr').hidden=false;$('home').hidden=true;$('sheet').hidden=false;
+ let h=`<div class="page"><div class="hd"><div><div class="tt"><small>${d.lvl} · ورقة تمرين ${p.n}</small>${esc(p.title)}</div></div><div><div class="lg"><i><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#22C79B" d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></i>MrElectroAI</div><div class="by">أنور الجاسم ${VB}</div></div></div>`;
+ h+=`<h2>🎯 المطلوب</h2><div class="brief">${esc(p.brief)}</div>`;
+ if(d.dg)h+=`<h2>📐 المخطط</h2><div class="dg">${d.dg()}</div>`;
+ h+=`<h2>🧩 القطع</h2><table><tr><th>القطعة</th><th>العدد</th><th>موديل مقترح</th></tr>${d.bom.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td class="m">${esc(r[2])}</td></tr>`).join('')}</table>`;
+ h+=`<h2>🛠️ خطوات التركيب</h2><ol class="st">${(p.hints||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`;
+ if(d.warn)h+=`<div class="warn">⚠️ ${esc(d.warn)}</div>`;
+ h+=`<h2>✅ افحص حالك</h2><ul class="ck">${(p.goals||[]).map(x=>`<li>${esc(x)}</li>`).join('')}<li>شغّل وجرّب قبل ما تسكّر التابلو، والكهربا مقطوعة وإنت عم تشتغل.</li></ul>`;
+ h+=`<div class="ft"><div class="q"><div id="qr"></div><div><b>جرّبها بمختبر التابلو</b><br>امسح الرمز وركّبها عالتلفون، والمختبر بيفحصلك ياها.</div></div><div style="text-align:left">mrelectroai-spec.github.io/mrelectroai<br>واتساب: 79 434 479</div></div></div>`;
+ $('sheet').innerHTML=h;
+ try{new QRCode($('qr'),{text:'https://mrelectroai-spec.github.io/mrelectroai/panel/#'+id,width:64,height:64,correctLevel:QRCode.CorrectLevel.M});}catch(e){}}
+const id=new URLSearchParams(location.search).get('p');
+if(id)sheet(id);else home();
+$('pr').onclick=()=>window.print();
+})();
+</script>
+<script src="../t.js" data-page="sheet" defer></script>
+</body>
+</html>
