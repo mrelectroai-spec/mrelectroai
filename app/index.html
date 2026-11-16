@@ -151,6 +151,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 .kc{display:flex;align-items:center;gap:10px;margin:12px 0;padding:14px;border-radius:16px;background:rgba(34,199,155,.16);border:1px solid rgba(34,199,155,.5)}
 .kc b{flex:1;font:700 21px 'Readex Pro',monospace;letter-spacing:1px;direction:ltr;text-align:center}.kc button{width:46px;height:46px;border-radius:12px;background:var(--volt);color:#03140f;font-size:20px}
 .pin{width:100%;border-radius:14px;border:1px solid var(--g-edge);background:var(--g-chip);color:var(--text);padding:12px 14px;font:inherit;font-size:16px;margin-top:8px;resize:none}
+.vb{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.16em;flex:0 0 auto}.byl{display:flex;align-items:center;gap:4px;font-weight:700!important}
 .sec2{font-size:13px;color:var(--muted);font-weight:700;margin:16px 4px 8px}
 .bk{align-items:stretch}.bk img.cv{width:62px;height:86px;flex:0 0 62px}
 .bk .tg{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.bk .tg i{font-style:normal;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:9px;background:var(--g-chip);border:1px solid var(--g-edge2)}
@@ -262,7 +263,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="onb" hidden role="dialog" aria-modal="true" aria-label="أهلا فيك"><div class="box" id="onbBox"></div></div>
 <header class="top">
   <img src="icon-192.png" alt="MrElectroAI" id="logo">
-  <div><h1>MrElectro<b>AI</b></h1><p>كهرباء · كلاسيك كنترول · طاقة شمسية</p></div>
+  <div><h1>MrElectro<b>AI</b></h1><p class="byl">أنور الجاسم <svg class="vb" viewBox="0 0 24 24" width="16" height="16" role="img" aria-label="موثّق"><path fill="#1D9BF0" stroke="#1D9BF0" stroke-width="1.2" stroke-linejoin="round" d="M12.00 1.00 L13.89 2.49 L16.21 1.84 L17.39 3.93 L19.78 4.22 L20.07 6.61 L22.16 7.79 L21.51 10.11 L23.00 12.00 L21.51 13.89 L22.16 16.21 L20.07 17.39 L19.78 19.78 L17.39 20.07 L16.21 22.16 L13.89 21.51 L12.00 23.00 L10.11 21.51 L7.79 22.16 L6.61 20.07 L4.22 19.78 L3.93 17.39 L1.84 16.21 L2.49 13.89 L1.00 12.00 L2.49 10.11 L1.84 7.79 L3.93 6.61 L4.22 4.22 L6.61 3.93 L7.79 1.84 L10.11 2.49Z"/><path fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M7.6 12.4l3 3 5.8-6.2"/></svg></p></div>
   <div class="tops"><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
 </header>
 <div id="tchBar" hidden><span>🎓 وضع الأستاذ</span><button type="button" id="keyBtn">🔑 جديد</button><button type="button" id="klBtn">🗂️ المفاتيح</button><button type="button" id="ppBtn">👥</button><button type="button" id="prBtn">🎁</button><button type="button" id="pdfBtn">📚</button><button type="button" id="pushBtn">📣</button><button type="button" id="tchBadge" aria-label="طلاع من وضع الأستاذ">✕</button></div>
@@ -351,7 +352,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.16a';
+var APPV='2026.11.16b';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -724,13 +725,14 @@ $('hbT').onclick=function(e){var b=e.target.closest('[data-v]');if(!b)return;hbC
 setTimeout(function(){hbLoad().catch(function(){});},2000);
 
 /* ---------- مساري ---------- */
+var VB='<svg class="vb" viewBox="0 0 24 24" width="16" height="16" role="img" aria-label="موثّق"><path fill="#1D9BF0" stroke="#1D9BF0" stroke-width="1.2" stroke-linejoin="round" d="M12.00 1.00 L13.89 2.49 L16.21 1.84 L17.39 3.93 L19.78 4.22 L20.07 6.61 L22.16 7.79 L21.51 10.11 L23.00 12.00 L21.51 13.89 L22.16 16.21 L20.07 17.39 L19.78 19.78 L17.39 20.07 L16.21 22.16 L13.89 21.51 L12.00 23.00 L10.11 21.51 L7.79 22.16 L6.61 20.07 L4.22 19.78 L3.93 17.39 L1.84 16.21 L2.49 13.89 L1.00 12.00 L2.49 10.11 L1.84 7.79 L3.93 6.61 L4.22 4.22 L6.61 3.93 L7.79 1.84 L10.11 2.49Z"/><path fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M7.6 12.4l3 3 5.8-6.2"/></svg>';
 function paths(){const M=window.MEAPATH;if(!M)return;M.rules().then(RJ=>{const box=$('paths');let h='';
  const pr=prof();let ORD=['course','classic','solar'];if(pr&&pr.rec){ORD.splice(ORD.indexOf(pr.rec),1);ORD.unshift(pr.rec);}ORD=ORD.filter(x=>M.owned(x)).concat(ORD.filter(x=>!M.owned(x)));
  for(const id of ORD){const s=M.status(id),c=s.c,R=(RJ[id]||{}).rules||[];const T=n=>{const r=R.find(x=>x.n===n);return r?r.t:'';};
-  if(!s.owned){const b=BOOKD[id];h+=`<div class="pth lkc"><div class="hd"><div class="ic">🔒</div><div><b>${c.title}</b><span>بينفتح مع كتاب «${c.book}»</span></div></div><div class="ul">${contents(id).map(x=>`<div><span>${x[0]}</span><span><b>${x[1]}</b> · ${x[2]}</span></div>`).join('')}</div><div class="row"><a class="btn" href="${buyU(b)}">اشتري عالواتساب</a><button type="button" class="btn alt" data-bk="${id}">🔑 عندي مفتاح</button></div></div>`;continue;}
+  if(!s.owned){const b=BOOKD[id];h+=`<div class="pth lkc"><div class="hd"><div class="ic">🔒</div><div><b>${c.title}</b><span>بينفتح مع كتاب «${c.book}»</span><span class="byl" style="font-size:12.5px">أنور الجاسم ${VB}</span></div></div><div class="ul">${contents(id).map(x=>`<div><span>${x[0]}</span><span><b>${x[1]}</b> · ${x[2]}</span></div>`).join('')}</div><div class="row"><a class="btn" href="${buyU(b)}">اشتري عالواتساب</a><button type="button" class="btn alt" data-bk="${id}">🔑 عندي مفتاح</button></div></div>`;continue;}
   const pct=Math.round(100*((s.read?1:0)+s.passed/s.total*2+(s.finished?1:0)+(s.unlocked?1:0))/5);
   const s1=s.read,s2=s.finished,s3=s.finished&&s.excellent,s4=s.unlocked;
-  const mine=pr&&pr.rec===id;h+=`<div class="pth${mine?' mine':''}" data-c="${id}"><div class="hd"><div class="ic">${c.icon}</div><div><b>${c.title}${mine?'<span class="mineb">مقترح إلك</span>':''}</b><span>كتاب «${c.book}»</span></div></div><div class="bar"><i style="width:${pct}%"></i></div>`;
+  const mine=pr&&pr.rec===id;h+=`<div class="pth${mine?' mine':''}" data-c="${id}"><div class="hd"><div class="ic">${c.icon}</div><div><b>${c.title}${mine?'<span class="mineb">مقترح إلك</span>':''}</b><span>كتاب «${c.book}»</span><span class="byl" style="font-size:12.5px">أنور الجاسم ${VB}</span></div></div><div class="bar"><i style="width:${pct}%"></i></div>`;
   h+=`<div class="stp${s1?' ok':''}"><div class="n">${s1?'✓':'1'}</div><div class="t">قراية الكتاب<small>${s1?'خلّصتو 👏':'اقرا الكتاب للآخر، وبعدين علّم هون.'}</small></div><button type="button" class="go" data-read="${id}">${s1?'رجّع':'✓ خلّصتو'}</button></div>`;
   h+=`<div class="stp${s2?' ok':''}${!s1?' lock':''}"><div class="n">${s2?'✓':'2'}</div><div class="t">كورس الأسئلة<small>${s.finished?`خلّصت كل القواعد بـ${s.mistakes} غلطة`:s.started?`${s.passed} من ${s.total} قاعدة · ${s.mistakes} غلطة لهلّق`:`${s.total} قاعدة، 10 أسئلة بكل وحدة`}</small></div><a class="go" href="../${c.url}">${s.finished?'افتح':s.started?'كمّل ←':'ابدا ←'}</a></div>`;
   let rep='';if(s.started){const w=s.weak.slice(0,4);
