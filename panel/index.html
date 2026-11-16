@@ -112,6 +112,12 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-
 .rub{stroke:var(--volt);stroke-width:4;stroke-dasharray:8 6;fill:none;pointer-events:none}
 .frame text{font:600 13px 'Readex Pro',sans-serif;fill:rgba(255,255,255,.45);text-anchor:middle}
 @media (prefers-reduced-motion:reduce){.bg,.flow,.spin,.spinr,.hum{animation:none}}
+.pm{font:600 10.5px 'Readex Pro',sans-serif;fill:rgba(220,235,230,.78);text-anchor:middle;direction:ltr;pointer-events:none}
+.cbr{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:6px}.cbr button{flex:0 0 auto}
+.cml{display:grid;grid-template-columns:1fr;gap:6px;max-height:34vh;overflow:auto}
+.cm{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:start;padding:9px 11px;border-radius:12px;background:var(--chip,rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.12);color:inherit;font:inherit}
+.cm b{direction:ltr;font-size:13.5px}.cm small{font-size:12px;opacity:.8}.cm.on{border-color:var(--volt);background:rgba(34,199,155,.2)}
+.csr{width:100%;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:inherit;padding:0 12px;font:inherit;font-size:15px;margin-bottom:6px}
 </style>
 <script src="../t.js" data-page="panel" defer></script>
 <script src="../lang.js" defer></script>
@@ -154,6 +160,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-
 
 <script src="../app/path.js"></script>
 <script src="parts.js"></script>
+<script src="catalog.js"></script>
 <script src="engine.js"></script>
 <script src="projects.js"></script>
 <script>
@@ -239,6 +246,8 @@ function draw(){
  s+=`<g>${wl}</g><g>${fl}</g><g>${sl}</g>`;
  // أسماء القطع: فوق كل شي، بخلفية غامقة لتنقرا
  for(const c of B.comps){if(!c.label||P[c.type].mount)continue;const L=String(c.label),w=L.length*8.5+18,x=c.x+pw(c)/2;s+=`<g class="pl"><rect x="${x-w/2}" y="${c.y-34}" width="${w}" height="22" rx="11"/><text x="${x}" y="${c.y-18}">${esc(L)}</text></g>`;}
+ // الماركة والموديل تحت القطعة
+ for(const c of B.comps){if(!c.model)continue;const x=c.x+pw(c)/2,y=c.y+P[c.type].h+16;s+=`<text class="pm" x="${x}" y="${y}">${esc(c.brand+' '+c.model)}</text>`;}
  // الأطراف (فوق كل شي لتنكبس)
  const TR=Math.max(14,Math.min(30,22*cam.w/(svg.clientWidth||400)));
  for(const c of B.comps)for(const t of P[c.type].terms){const k=c.id+'.'+t.n;s+=`<circle class="tp${pend===k?' pend':pend?' cand':''}" data-t="${k}" cx="${c.x+t.x}" cy="${c.y+t.y}" r="${TR}"/>`;}
@@ -287,13 +296,20 @@ function lib(){const cats={};const allow=PJ&&KIT[PJ.course];for(const t in P){if
    const variants=VAR[t]||[[null,d.name]];
    for(const [v,nm,ex] of variants){if(v&&ex)Object.assign(c,ex);h+=`<button class="tile" type="button" data-add="${t}" ${v?`data-v="${v}"`:''}><svg viewBox="-12 -30 ${d.w+24} ${d.h+44}">${DEFS}${d.draw(c,{on:true})}</svg><span>${nm}</span></button>`;}}
   h+='</div>';}
+ const CAT=window.CATALOG;if(CAT){const nb=new Set();Object.values(CAT.C).forEach(a=>a.forEach(x=>nb.add(x.b)));h=`<input class="csr" id="libQ" placeholder="🔍 فتّش بالموديل أو الماركة (مثلاً LC1D25، S201، Chint)" autocomplete="off"><p class="lbl" style="margin:0 2px 8px">🏷️ ${CAT.total} موديل حقيقي من ${nb.size} ماركة. ركّب القطعة وكبسها لتختار الموديل.</p><div id="libR"></div>`+h;}
  $('libBody').innerHTML=h;
- $('libBody').onclick=e=>{const b=e.target.closest('[data-add]');if(!b)return;push();const t=b.dataset.add,d=P[t];
+ const Q=$('libQ');if(Q)Q.oninput=()=>{const allow=PJ&&KIT[PJ.course];const L=CAT.find(Q.value).filter(x=>!allow||allow.includes(x.t));$('libR').innerHTML=Q.value.trim().length<2?'':L.length?`<div class="cml" style="margin-bottom:10px">${L.map((x,i)=>`<button type="button" class="cm" data-addm="${i}"><b>${esc(x.b+' '+x.m)}</b><small>${esc(P[x.t].name)} · ${esc(x.s)}</small></button>`).join('')}</div>`:'<p class="lbl">ما لقينا هالموديل.</p>';$('libR').L=L;};
+ $('libBody').onclick=e=>{const bm=e.target.closest('[data-addm]');if(bm){const x=$('libR').L[+bm.dataset.addm];if(!x)return;push();const d=P[x.t];const c=add(x.t,Math.max(60,Math.min(W-d.w-60,cam.x+cam.w/2-d.w/2)),Math.max(60,Math.min(H-d.h-60,cam.y+cam.h/2-d.h/2)));Object.assign(c,JSON.parse(JSON.stringify(x.set)),{brand:x.b,model:x.m});closeSheets();save();sim();draw();chipFor(c);return;}
+  const b=e.target.closest('[data-add]');if(!b)return;push();const t=b.dataset.add,d=P[t];
   const cx=cam.x+cam.w/2-d.w/2,cy=cam.y+cam.h/2-d.h/2;const c=add(t,Math.max(60,Math.min(W-d.w-60,cx)),Math.max(60,Math.min(H-d.h-60,cy)));if(b.dataset.v){const vv=(VAR[t]||[]).find(x=>x[0]===b.dataset.v);if(vv)Object.assign(c,vv[2]);}
   closeSheets();save();sim();draw();chipFor(c);};}
 
 /* ---------- خصائص القطعة والشريط ---------- */
+function catHTML(c){const CAT=window.CATALOG;if(!CAT||!CAT.C[c.type])return '';const BR=CAT.brands(c.type);const b=c.cb||c.brand||BR[0];
+ const L=CAT.C[c.type].filter(x=>x.b===b);
+ return `<div class="lbl">🏷️ الماركة والموديل ${c.model?`<b style="direction:ltr;color:var(--volt)">${esc(c.brand+' '+c.model)}</b>`:''}</div><div class="cbr">${BR.map(x=>`<button class="chip${x===b?' on':''}" data-cb="${esc(x)}">${esc(x)}</button>`).join('')}</div><div class="cml">${L.map((x,i)=>`<button type="button" class="cm${c.brand===x.b&&c.model===x.m?' on':''}" data-cm="${i}"><b>${esc(x.m)}</b><small>${esc(x.s)}</small></button>`).join('')}</div>`;}
 function chipFor(c){const d=P[c.type];let h=`<h3>${d.name} <span style="color:var(--volt)">${esc(c.label||'')}</span><button type="button" data-close>سكّر</button></h3>`;
+ h+=catHTML(c);
  if(c.type==='mcb1')h+=`<div class="lbl">قيمة القاطع (A)</div><div class="row">${RAT1.map(r=>`<button class="chip${c.rating===r?' on':''}" data-p="rating" data-v="${r}">${r}A</button>`).join('')}</div>`;
  if(c.type==='mcb3')h+=`<div class="lbl">قيمة القاطع (A)</div><div class="row">${RAT3.map(r=>`<button class="chip${c.rating===r?' on':''}" data-p="rating" data-v="${r}">${r}A</button>`).join('')}</div>`;
  if(c.type==='ol')h+=`<div class="lbl">ضبط الأوفرلود (A)</div><div class="step"><button data-step="setA" data-d="-0.5">−</button><b>${c.setA}A</b><button data-step="setA" data-d="0.5">+</button></div>`;
@@ -319,11 +335,13 @@ function chipWire(w){const pw=E.isPower(w);let h=`<h3>〰️ شريط ${pw?'با
  const N=$('wNum');N.onchange=()=>{push();w.num=N.value.trim();save();draw();};}
 $('propBody').onclick=e=>{const pb=$('propBody');
  const c=B.comps.find(x=>x.id===pb.dataset.c),w=B.wires.find(x=>x.id===pb.dataset.w);
+ const cb=e.target.closest('[data-cb]');if(cb&&c){c.cb=cb.dataset.cb;chipFor(c);const pb2=$('propBody').querySelector('.cbr .on');if(pb2)pb2.scrollIntoView({inline:'center',block:'nearest'});return;}
+ const cm=e.target.closest('[data-cm]');if(cm&&c){const b0=c.cb||c.brand||window.CATALOG.brands(c.type)[0];const x=window.CATALOG.C[c.type].filter(z=>z.b===b0)[+cm.dataset.cm];if(x){push();Object.assign(c,JSON.parse(JSON.stringify(x.set)),{brand:x.b,model:x.m});delete c.cb;save();sim();draw();chipFor(c);toast('🏷️ '+x.b+' '+x.m);}return;}
  const b=e.target.closest('[data-p],[data-step],[data-wp],[data-del],[data-delw]');if(!b)return;push();
  if(b.dataset.del){B.wires=B.wires.filter(x=>!x.a.startsWith(b.dataset.del+'.')&&!x.b.startsWith(b.dataset.del+'.'));B.comps=B.comps.filter(x=>x.id!==b.dataset.del);sel=null;closeSheets();}
  else if(b.dataset.delw){B.wires=B.wires.filter(x=>x.id!==b.dataset.delw);selW=null;closeSheets();}
- else if(c&&b.dataset.p){c[b.dataset.p]=b.dataset.s?b.dataset.v:+b.dataset.v;chipFor(c);}
- else if(c&&b.dataset.step){const k=b.dataset.step;c[k]=Math.round((c[k]+ +b.dataset.d)*10)/10;if(k==='setA')c[k]=Math.max(1,Math.min(32,c[k]));if(k==='sec')c[k]=Math.max(1,Math.min(60,c[k]));chipFor(c);}
+ else if(c&&b.dataset.p){c[b.dataset.p]=b.dataset.s?b.dataset.v:+b.dataset.v;if(c.model&&['rating','kw','color'].includes(b.dataset.p)){delete c.model;delete c.brand;}chipFor(c);}
+ else if(c&&b.dataset.step){const k=b.dataset.step;c[k]=Math.round((c[k]+ +b.dataset.d)*10)/10;if(k==='setA')c[k]=Math.max(c.olMin||1,Math.min(c.olMax||32,c[k]));if(k==='sec')c[k]=Math.max(1,Math.min(60,c[k]));chipFor(c);}
  else if(w&&b.dataset.wp){w[b.dataset.wp]=b.dataset.s?b.dataset.v:+b.dataset.v;chipWire(w);}
  save();sim();draw();};
 
