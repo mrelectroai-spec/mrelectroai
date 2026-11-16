@@ -137,10 +137,9 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 #nbl a.nw1{border-color:rgba(34,199,155,.6)}#nbl a.nw1 b::before{content:'● ';color:#ff4d4f;font-size:11px;vertical-align:2px}
 @keyframes pop{from{opacity:0;transform:translate(-20px,30px) scale(.4)}to{opacity:1;transform:none}}
 /* الكتب */
-#tchBar{display:flex;align-items:center;gap:6px;margin:-6px 0 14px;padding:6px 6px 6px 10px;border-radius:16px;background:rgba(34,199,155,.18);border:1px solid rgba(34,199,155,.5)}#tchBar span{flex:1;font-weight:700;font-size:13.5px;padding-inline-start:4px}#tchBar button{padding:8px 11px;border-radius:12px;background:var(--g-chip);border:1px solid var(--g-edge2);font-weight:700;font-size:13px;color:var(--text)}
+#tchBar{margin:-6px 0 14px;padding:10px;border-radius:20px;background:rgba(34,199,155,.14);border:1px solid rgba(34,199,155,.45)}#tchBar .tbh{display:flex;align-items:center;justify-content:space-between;margin:0 2px 8px}#tchBar .tbh b{font-size:14.5px}#tchBar .tbx{padding:5px 10px;border-radius:10px;background:var(--g-chip);border:1px solid var(--g-edge2);font-size:12px;font-weight:700;color:var(--muted)}#tchBar .tbg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}#tchBar .tbg button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 2px 8px;border-radius:14px;background:var(--g-chip);border:1px solid var(--g-edge2);font-weight:700;font-size:11.5px;line-height:1.2;color:var(--text);min-width:0}#tchBar .tbg i{font-style:normal;font-size:21px;line-height:1}#tchBar .tbg .pri{background:rgba(34,199,155,.3);border-color:rgba(34,199,155,.6)}
 .pli{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:12px;background:var(--g-chip);border:1px solid var(--g-edge2);margin-top:6px}.pli div{flex:1;min-width:0}.pli b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pli small{color:var(--muted);font-size:12px}.pli button{width:38px;height:38px;border-radius:10px;background:rgba(255,90,82,.18);border:1px solid rgba(255,90,82,.45);font-size:17px;flex:0 0 38px}
 .kli{display:block;width:100%;text-align:start;padding:10px 12px;border-radius:14px;background:var(--g-chip);border:1px solid var(--g-edge2);margin-top:6px;color:var(--text)}.kli b{font-size:14.5px}.kli code{direction:ltr;display:inline-block;font-size:12.5px;color:var(--volt);margin-inline-start:10px}.kli small{display:block;color:var(--muted);font-size:12px;margin-top:2px}.kli.off{opacity:.55}
-#tchBar{flex-wrap:wrap}
 #inst{position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:35;border-radius:22px;padding:14px 14px 12px;display:flex;gap:12px;align-items:flex-start;animation:up .4s cubic-bezier(.2,.9,.2,1)}
 #inst img{width:48px;height:48px;border-radius:12px;flex:0 0 48px}#inst b{display:block;font-size:15px}#inst p{font-size:13px;color:var(--muted);line-height:1.7;margin:2px 0 8px}
 #inst .row{gap:8px}#inst .btn{padding:9px 14px;font-size:14px}#inst .x{position:absolute;top:6px;left:10px;font-size:18px;color:var(--muted);background:none;border:0}
@@ -268,7 +267,19 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
   <div><h1>MrElectro<b>AI</b></h1><p class="byl">أنور الجاسم <svg class="vb" viewBox="0 0 24 24" width="16" height="16" role="img" aria-label="موثّق"><path fill="#1D9BF0" stroke="#1D9BF0" stroke-width="1.2" stroke-linejoin="round" d="M12.00 1.00 L13.89 2.49 L16.21 1.84 L17.39 3.93 L19.78 4.22 L20.07 6.61 L22.16 7.79 L21.51 10.11 L23.00 12.00 L21.51 13.89 L22.16 16.21 L20.07 17.39 L19.78 19.78 L17.39 20.07 L16.21 22.16 L13.89 21.51 L12.00 23.00 L10.11 21.51 L7.79 22.16 L6.61 20.07 L4.22 19.78 L3.93 17.39 L1.84 16.21 L2.49 13.89 L1.00 12.00 L2.49 10.11 L1.84 7.79 L3.93 6.61 L4.22 4.22 L6.61 3.93 L7.79 1.84 L10.11 2.49Z"/><path fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M7.6 12.4l3 3 5.8-6.2"/></svg></p></div>
   <div class="tops"><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
 </header>
-<div id="tchBar" hidden><span>🎓 وضع الأستاذ</span><button type="button" id="keyBtn">🔑 جديد</button><button type="button" id="klBtn">🗂️ المفاتيح</button><button type="button" id="ppBtn">👥</button><button type="button" id="ctBtn">🎓</button><button type="button" id="prBtn">🎁</button><button type="button" id="pdfBtn">📚</button><button type="button" id="pushBtn">📣</button><button type="button" id="tchBadge" aria-label="طلاع من وضع الأستاذ">✕</button></div>
+<div id="tchBar" hidden>
+ <div class="tbh"><b>🎓 وضع الأستاذ</b><button type="button" id="tchBadge" class="tbx" aria-label="طلاع من وضع الأستاذ">✕ طلاع</button></div>
+ <div class="tbg">
+  <button type="button" id="keyBtn" class="pri"><i>🔑</i>مفتاح جديد</button>
+  <button type="button" id="klBtn"><i>🗂️</i>المفاتيح</button>
+  <button type="button" id="prBtn"><i>🎁</i>الهدايا</button>
+  <button type="button" id="ctBtn"><i>🎓</i>الشهادات</button>
+  <button type="button" id="ppBtn"><i>👥</i>الناس</button>
+  <button type="button" id="pushBtn"><i>📣</i>إشعار</button>
+  <button type="button" id="pdfBtn"><i>📚</i>ملفات الكتب</button>
+  <button type="button" id="tbHelp"><i>💡</i>شو هيدا؟</button>
+ </div>
+</div>
 <button type="button" id="nb" aria-label="الجديد" hidden><i>🔔</i><b id="nbN" hidden></b></button>
 <div id="nbl" hidden><div class="lst" id="nbList"></div></div>
 
@@ -354,7 +365,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.16f';
+var APPV='2026.11.16g';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -425,6 +436,7 @@ function tchToggle(){if(ls('meaTeacher')==='1'){tchSet(false);toast('👤 رجع
 (function(){var n=0,t=0;$('logo').addEventListener('click',function(){var now=Date.now();n=now-t<700?n+1:1;t=now;if(n>=5){n=0;tchToggle();}});})();
 $('tchM').onclick=function(e){if(e.target.id==='tchM')$('tchM').hidden=true;};
 $('tchBadge').onclick=function(){tchToggle();};
+$('tbHelp').onclick=function(){alert('🔑 مفتاح جديد: لشاري الكتاب\n🗂️ المفاتيح: كل المفاتيح وتعديلها\n🎁 الهدايا: طلبات الكتاب ببلاش\n🎓 الشهادات: طلبات الشهادة ويلي بيستاهلوا\n👥 الناس: مين فات عالتطبيق\n📣 إشعار: ابعت إشعار للكل\n📚 ملفات الكتب: ارفع PDF الكتب');};
 
 
 /* ===== حدا فاتح من المتصفّح؟ بعد ساعتين من أول زيارة منقلّو ينزّل التطبيق ===== */
