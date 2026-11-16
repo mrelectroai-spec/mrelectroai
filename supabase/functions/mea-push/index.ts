@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
     if (!title) return json({ ok: false, msg: "اكتب عنوان" }, 400);
 
     // قناة: «all» لكل الناس، أو قناة تلفون واحد (promo_APP-XXXXXX)
-    const topic = typeof input.topic === "string" && /^promo_APP-[A-Z0-9]{6}$/.test(input.topic) ? input.topic : "all";
+    const topic = typeof input.topic === "string" && (/^promo_APP-[A-Z0-9]{6}$/.test(input.topic) || /^u_[a-f0-9]{16}$/.test(input.topic)) ? input.topic : "all";
     const tok = await googleToken(sa);
     const data: Record<string, string> = { id: String(id || "push-" + Date.now()), title: String(title), body: String(body || ""), url: String(link || "") };
     const r = await fetch(`https://fcm.googleapis.com/v1/projects/${sa.project_id}/messages:send`, {

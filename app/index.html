@@ -241,7 +241,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div class="mds" id="keV" style="margin-top:10px"></div><button type="button" class="btn alt" id="keR" style="width:100%;margin-top:6px">📱 فكّ ربطو بالتلفون (إذا غيّر تلفون)</button>
 <div id="keE" class="mde"></div><div class="row"><button type="button" class="btn" id="keS">حفظ</button><button type="button" class="btn alt" data-close>بطّل</button></div><a class="btn alt" id="keW" style="display:block;text-align:center;margin-top:8px">📲 ابعتلو المفتاح عالواتساب</a></div></div>
 <div id="ctM" hidden class="mdl"><div class="set mdb"><div class="mdt">🎓 طلبات الشهادات</div><p class="mds">يلي خلّصوا الكورس بـ5 أغلاط أو أقل وطلبوا شهادة. صحّح الاسم إذا لازم، وبعدين ✅. بيوصلو إشعار جوّا التطبيق إنو شهادتو جاهزة.</p>
-<div id="ctL" style="max-height:60vh;overflow:auto"></div><div id="ctE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
+<div id="ctEl"></div><div class="mdl2" style="margin-top:10px">📥 الطلبات</div><div id="ctL" style="max-height:44vh;overflow:auto"></div><div id="ctE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="ppM" hidden class="mdl"><div class="set mdb"><div class="mdt">👥 مين فات عالتطبيق</div>
 <div id="ppS" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0"></div><p class="mds" id="ppS2"></p>
 <div class="mdl2">الأسامي (الأجدد فوق)</div><div id="ppL" style="max-height:52vh;overflow:auto"></div><div id="ppE" class="mde"></div>
@@ -354,7 +354,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.16e';
+var APPV='2026.11.16f';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -521,10 +521,18 @@ function ctLoad(){$('ctE').textContent='⏳';
   $('ctL').innerHTML=L.map(function(x){var st=x.approved_at?'<a class="btn alt" style="margin:0;padding:8px 12px;width:auto" href="../cert/?c='+esc(x.code)+'">📄</a><span style="color:#22C79B;font-weight:700">✅</span>':x.rejected_at?'<span style="color:#e5484d;font-weight:700">❌</span><button type="button" class="btn" data-ctok="'+esc(x.code)+'" style="margin:0;padding:8px 12px;width:auto">✅</button>':'<button type="button" class="btn" data-ctok="'+esc(x.code)+'" style="margin:0;padding:8px 14px;width:auto">✅</button><button type="button" class="btn alt" data-ctno="'+esc(x.code)+'" style="margin:0;padding:8px 14px;width:auto">❌</button>';
    return '<div class="pli" style="flex-wrap:wrap;gap:8px"><div style="flex:1;min-width:150px">'+(x.approved_at?'<b>'+esc(x.name)+'</b>':'<input data-ctn="'+esc(x.code)+'" value="'+esc(x.name)+'" style="width:100%;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 10px;font:inherit;font-weight:700">')+'<small>'+(CTN[x.course]||x.course)+' · '+x.mistakes+' غلط · فهم '+(x.accuracy==null?'—':x.accuracy+'%')+'</small></div><div style="display:flex;gap:6px;align-items:center">'+st+'</div></div>';}).join('');})
  .catch(function(){$('ctE').textContent='ما زبط. تأكد من الإنترنت.';});}
-$('ctBtn').onclick=function(){$('ctM').hidden=false;ctLoad();};
+function pushTo(uid,title,body){return admin().then(function(a){return fetch(SBU+'/functions/v1/mea-push',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json'},body:JSON.stringify({topic:'u_'+uid,id:'u-'+uid+'-'+Date.now(),title:title,body:body,url:'https://mrelectroai-spec.github.io/mrelectroai/app/#courses'})});}).then(function(r){return r.json();});}
+var CEL=[];
+function ctElLoad(){prRpc('cert_eligible',{}).then(function(L){CEL=(Array.isArray(L)?L:[]).filter(function(x){return !x.code;});
+ $('ctEl').innerHTML=CEL.length?'<div class="mdl2">🎯 بيستاهلوا شهادة وما طلبوها ('+CEL.length+')</div>'+CEL.map(function(x,i){var ph=String(x.phone||'').replace(/[^\d]/g,'');if(ph.indexOf('00')===0)ph=ph.slice(2);else if(ph.length<=8)ph='961'+ph.replace(/^0/,'');
+  var t=encodeURIComponent('مبروك '+String(x.name||'').split(' ')[0]+' 🎉\nخلّصت '+(CTN[x.course]||'الكورس')+' بـ'+x.mistakes+' أغلاط بس، وبتستاهل شهادة موقّعة منّي 🎓\nافتح تطبيق MrElectroAI ← مساري ← لوحة الشرف ← «اطلب شهادتك»\nأنور الجاسم');
+  return '<div class="pli" style="gap:6px"><div style="flex:1;min-width:0"><b>'+esc(x.name||'')+'</b><small>'+(CTN[x.course]||x.course)+' · '+x.mistakes+' غلط · <span dir="ltr">'+esc(x.phone||'')+'</span></small></div><button type="button" class="btn" data-elp="'+i+'" style="margin:0;padding:8px 12px;width:auto">📣</button>'+(ph?'<a class="btn alt" style="margin:0;padding:8px 12px;width:auto" href="https://wa.me/'+ph+'?text='+t+'">💬</a>':'')+'</div>';}).join('')+'<p class="mds" style="margin-top:4px">📣 = إشعار عتلفونو (إذا عندو التطبيق 1.12 أو أحدث) · 💬 = رسالة واتساب جاهزة</p>':'';}).catch(function(){});}
+$('ctEl').onclick=function(e){var b=e.target.closest('[data-elp]');if(!b)return;var x=CEL[+b.dataset.elp];if(!x)return;b.disabled=true;
+ pushTo(x.uid,'🎓 مبروك! بتستاهل شهادة','خلّصت الكورس بـ'+x.mistakes+' أغلاط بس. افتح التطبيق واطلب شهادتك الموقّعة من أنور.').then(function(j){toast(j&&j.ok?'📣 انبعت الإشعار':'ما زبط الإشعار');}).catch(function(){b.disabled=false;toast('تأكد من الإنترنت');});};
+$('ctBtn').onclick=function(){$('ctM').hidden=false;ctLoad();ctElLoad();};
 $('ctL').onclick=function(e){var ok=e.target.closest('[data-ctok]'),no=e.target.closest('[data-ctno]');if(!ok&&!no)return;var b=ok||no,code=b.dataset.ctok||b.dataset.ctno;b.disabled=true;
  var inp=$('ctL').querySelector('[data-ctn="'+code+'"]');
- prRpc('cert_decide',{p_code:code,p_ok:!!ok,p_name:inp?inp.value:null}).then(function(j){if(j&&j.ok){toast(ok?'🎓 انبعتت الشهادة':'❌ انرفض');ctLoad();}else{b.disabled=false;toast((j&&(j.msg||j.message))||'ما زبط');}}).catch(function(){b.disabled=false;toast('تأكد من الإنترنت');});};
+ prRpc('cert_decide',{p_code:code,p_ok:!!ok,p_name:inp?inp.value:null}).then(function(j){if(j&&j.ok&&ok&&j.uid)pushTo(j.uid,'🎓 شهادتك جاهزة!','أنور وافق على شهادتك. افتح التطبيق، احفظها PDF وشاركها.').catch(function(){});if(j&&j.ok){toast(ok?'🎓 انبعتت الشهادة':'❌ انرفض');ctLoad();ctElLoad();}else{b.disabled=false;toast((j&&(j.msg||j.message))||'ما زبط');}}).catch(function(){b.disabled=false;toast('تأكد من الإنترنت');});};
 $('ppBtn').onclick=function(){$('ppM').hidden=false;$('ppE').textContent='⏳';$('ppL').innerHTML='';
  prRpc('app_people',{}).then(function(j){if(!j||!j.ok){$('ppE').textContent=(j&&(j.msg||j.message))||'ما زبط.';return;}$('ppE').textContent='';
   var box=function(n,t){return '<div style="text-align:center;padding:10px 4px;border-radius:14px;background:rgba(34,199,155,.16);border:1px solid rgba(34,199,155,.4)"><b style="font-size:22px;display:block">'+n+'</b><small style="font-size:12px">'+t+'</small></div>';};
@@ -746,7 +754,17 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-cert
  fetch(SBU+'/rest/v1/rpc/cert_request',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_vid:ls('mea_vid'),p_course:c})}).then(function(r){return r.json();})
  .then(function(j){if(j&&j.ok){toast('✅ انبعت طلب الشهادة لأنور');certLoad().then(function(){if(!$('hbM').hidden)hbDraw();paths();});}else{b.disabled=false;b.textContent='🎓 اطلب شهادتك';toast((j&&j.msg)||'ما زبط');}})
  .catch(function(){b.disabled=false;b.textContent='🎓 اطلب شهادتك';toast('تأكد من الإنترنت');});});
-setTimeout(function(){certLoad().catch(function(){});},2500);
+setTimeout(function(){certLoad().then(certNudge).catch(function(){});},2500);
+/* كل تلفون إلو قناة إشعارات خاصة فيه (u_ + أوّل 16 حرف من بصمة mea_vid) لحتى أنور يبعتلو إشعار لحالو */
+function uid16(v){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)).then(function(b){return [...new Uint8Array(b)].map(function(x){return x.toString(16).padStart(2,'0');}).join('').slice(0,16);});}
+setTimeout(function(){var v=ls('mea_vid');if(v&&CAP)uid16(v).then(function(u){return nat('sub',{topic:'u_'+u});}).catch(function(){});},3500);
+/* إذا بيستاهل شهادة وما طلبها، منذكّرو جوّا التطبيق (مرة باليوم) */
+function certNudge(){if(!window.MEAPATH)return;var day=new Date().toISOString().slice(0,10);if(ls('meaCertNudge')===day)return;
+ var ids=['course','classic','solar'].filter(function(id){var st=window.MEAPATH.status(id);return st&&st.cert&&!certOf(id==='course'?'electro':id);});
+ if(!ids.length)return;ls('meaCertNudge',day);var c=ids[0]==='course'?'electro':ids[0];
+ var d=document.createElement('div');d.className='mdl';d.style.zIndex=80;
+ d.innerHTML='<div class="set mdb" style="text-align:center"><div style="font-size:46px">🎓</div><div class="mdt">بتستاهل شهادة!</div><p class="mds">خلّصت الكورس بـ5 أغلاط أو أقل 👏 اطلب شهادتك الموقّعة من أنور.</p><button type="button" class="btn" style="width:100%" data-certreq="'+c+'">🎓 اطلب شهادتي</button><button type="button" class="btn alt" style="width:100%;margin-top:8px" data-x>بعدين</button></div>';
+ document.body.appendChild(d);d.onclick=function(e){if(e.target.closest('[data-x]')||e.target.closest('[data-certreq]'))setTimeout(function(){d.remove();},50);};}
 document.addEventListener('visibilitychange',function(){if(!document.hidden)certLoad().catch(function(){});});
 
 /* ---------- 🏆 لوحة الشرف ---------- */
