@@ -240,6 +240,8 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div class="mdl2">الحالة</div><div class="chp" id="keA"><button type="button" data-v="1">✅ شغّال</button><button type="button" data-v="0">⛔ موقوف</button></div>
 <div class="mds" id="keV" style="margin-top:10px"></div><button type="button" class="btn alt" id="keR" style="width:100%;margin-top:6px">📱 فكّ ربطو بالتلفون (إذا غيّر تلفون)</button>
 <div id="keE" class="mde"></div><div class="row"><button type="button" class="btn" id="keS">حفظ</button><button type="button" class="btn alt" data-close>بطّل</button></div><a class="btn alt" id="keW" style="display:block;text-align:center;margin-top:8px">📲 ابعتلو المفتاح عالواتساب</a></div></div>
+<div id="ctM" hidden class="mdl"><div class="set mdb"><div class="mdt">🎓 طلبات الشهادات</div><p class="mds">يلي خلّصوا الكورس بـ5 أغلاط أو أقل وطلبوا شهادة. صحّح الاسم إذا لازم، وبعدين ✅. بيوصلو إشعار جوّا التطبيق إنو شهادتو جاهزة.</p>
+<div id="ctL" style="max-height:60vh;overflow:auto"></div><div id="ctE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="ppM" hidden class="mdl"><div class="set mdb"><div class="mdt">👥 مين فات عالتطبيق</div>
 <div id="ppS" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0"></div><p class="mds" id="ppS2"></p>
 <div class="mdl2">الأسامي (الأجدد فوق)</div><div id="ppL" style="max-height:52vh;overflow:auto"></div><div id="ppE" class="mde"></div>
@@ -250,7 +252,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="pdfE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="hbM" hidden class="mdl"><div class="set mdb"><div class="mdt">🏆 لوحة الشرف</div><p class="byl" id="hbBy" style="font-size:13px;margin:2px 0 4px">بإشراف أنور الجاسم</p><p class="mds">يلي خلّصوا كورس الأسئلة. الترتيب حسب الأغلاط: الأقل غلط هوّي الأوّل. 🎓 = 5 أغلاط أو أقل (بياخد شهادة موقّعة من أنور).</p>
 <div class="chp" id="hbT"><button type="button" data-v="electro" class="on">⚡ الكهربا</button><button type="button" data-v="classic">⚙️ الكلاسيك</button><button type="button" data-v="solar">☀️ الشمسية</button></div>
-<div id="hbL" style="max-height:58vh;overflow:auto;margin-top:8px"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
+<div id="hbMe"></div><div id="hbL" style="max-height:52vh;overflow:auto;margin-top:8px"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="pushM" hidden style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)"><div class="set" style="width:min(380px,100%);padding:18px;margin:0">
 <div style="font:700 17px 'Readex Pro',sans-serif;margin-bottom:4px">📣 ابعت إشعار للكل</div><p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">بيوصل لكل يلي منزّلين التطبيق دغري، وبيطلع بدائرة الجديد.</p>
 <input id="pT" class="pin" maxlength="120" placeholder="العنوان: مثلاً كورس جديد 🔥"><textarea id="pB" class="pin" maxlength="600" rows="3" placeholder="الرسالة"></textarea>
@@ -266,7 +268,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
   <div><h1>MrElectro<b>AI</b></h1><p class="byl">أنور الجاسم <svg class="vb" viewBox="0 0 24 24" width="16" height="16" role="img" aria-label="موثّق"><path fill="#1D9BF0" stroke="#1D9BF0" stroke-width="1.2" stroke-linejoin="round" d="M12.00 1.00 L13.89 2.49 L16.21 1.84 L17.39 3.93 L19.78 4.22 L20.07 6.61 L22.16 7.79 L21.51 10.11 L23.00 12.00 L21.51 13.89 L22.16 16.21 L20.07 17.39 L19.78 19.78 L17.39 20.07 L16.21 22.16 L13.89 21.51 L12.00 23.00 L10.11 21.51 L7.79 22.16 L6.61 20.07 L4.22 19.78 L3.93 17.39 L1.84 16.21 L2.49 13.89 L1.00 12.00 L2.49 10.11 L1.84 7.79 L3.93 6.61 L4.22 4.22 L6.61 3.93 L7.79 1.84 L10.11 2.49Z"/><path fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M7.6 12.4l3 3 5.8-6.2"/></svg></p></div>
   <div class="tops"><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
 </header>
-<div id="tchBar" hidden><span>🎓 وضع الأستاذ</span><button type="button" id="keyBtn">🔑 جديد</button><button type="button" id="klBtn">🗂️ المفاتيح</button><button type="button" id="ppBtn">👥</button><button type="button" id="prBtn">🎁</button><button type="button" id="pdfBtn">📚</button><button type="button" id="pushBtn">📣</button><button type="button" id="tchBadge" aria-label="طلاع من وضع الأستاذ">✕</button></div>
+<div id="tchBar" hidden><span>🎓 وضع الأستاذ</span><button type="button" id="keyBtn">🔑 جديد</button><button type="button" id="klBtn">🗂️ المفاتيح</button><button type="button" id="ppBtn">👥</button><button type="button" id="ctBtn">🎓</button><button type="button" id="prBtn">🎁</button><button type="button" id="pdfBtn">📚</button><button type="button" id="pushBtn">📣</button><button type="button" id="tchBadge" aria-label="طلاع من وضع الأستاذ">✕</button></div>
 <button type="button" id="nb" aria-label="الجديد" hidden><i>🔔</i><b id="nbN" hidden></b></button>
 <div id="nbl" hidden><div class="lst" id="nbList"></div></div>
 
@@ -352,7 +354,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.16c';
+var APPV='2026.11.16e';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -511,6 +513,18 @@ function prLoad(){$('prE').textContent='⏳';
 $('prBtn').onclick=function(){$('prM').hidden=false;prLoad();};
 /* 👥 مين فات عالتطبيق */
 function ppAgo(t){if(!t)return '';var d=(Date.now()-new Date(t))/864e5;return d<1/24?'هلّق':d<1?'اليوم':d<2?'مبارح':Math.floor(d)+' يوم';}
+var CTN={electro:'⚡ الكهربا',classic:'⚙️ الكلاسيك',solar:'☀️ الشمسية'};
+function ctLoad(){$('ctE').textContent='⏳';
+ admin().then(function(a){return fetch(SBU+'/rest/v1/certificates?select=code,name,course,mistakes,accuracy,requested_at,approved_at,rejected_at&order=requested_at.desc',{headers:{apikey:SBK,Authorization:'Bearer '+a}});})
+ .then(function(r){return r.json();}).then(function(L){if(!Array.isArray(L)){$('ctE').textContent='ما زبط.';return;}
+  var n=L.filter(function(x){return !x.approved_at&&!x.rejected_at;}).length;$('ctE').textContent=L.length?(n?'⏳ '+n+' عم يستنّوا':'ما في حدا عم يستنّى'):'لسّا ما حدا طلب شهادة.';
+  $('ctL').innerHTML=L.map(function(x){var st=x.approved_at?'<a class="btn alt" style="margin:0;padding:8px 12px;width:auto" href="../cert/?c='+esc(x.code)+'">📄</a><span style="color:#22C79B;font-weight:700">✅</span>':x.rejected_at?'<span style="color:#e5484d;font-weight:700">❌</span><button type="button" class="btn" data-ctok="'+esc(x.code)+'" style="margin:0;padding:8px 12px;width:auto">✅</button>':'<button type="button" class="btn" data-ctok="'+esc(x.code)+'" style="margin:0;padding:8px 14px;width:auto">✅</button><button type="button" class="btn alt" data-ctno="'+esc(x.code)+'" style="margin:0;padding:8px 14px;width:auto">❌</button>';
+   return '<div class="pli" style="flex-wrap:wrap;gap:8px"><div style="flex:1;min-width:150px">'+(x.approved_at?'<b>'+esc(x.name)+'</b>':'<input data-ctn="'+esc(x.code)+'" value="'+esc(x.name)+'" style="width:100%;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 10px;font:inherit;font-weight:700">')+'<small>'+(CTN[x.course]||x.course)+' · '+x.mistakes+' غلط · فهم '+(x.accuracy==null?'—':x.accuracy+'%')+'</small></div><div style="display:flex;gap:6px;align-items:center">'+st+'</div></div>';}).join('');})
+ .catch(function(){$('ctE').textContent='ما زبط. تأكد من الإنترنت.';});}
+$('ctBtn').onclick=function(){$('ctM').hidden=false;ctLoad();};
+$('ctL').onclick=function(e){var ok=e.target.closest('[data-ctok]'),no=e.target.closest('[data-ctno]');if(!ok&&!no)return;var b=ok||no,code=b.dataset.ctok||b.dataset.ctno;b.disabled=true;
+ var inp=$('ctL').querySelector('[data-ctn="'+code+'"]');
+ prRpc('cert_decide',{p_code:code,p_ok:!!ok,p_name:inp?inp.value:null}).then(function(j){if(j&&j.ok){toast(ok?'🎓 انبعتت الشهادة':'❌ انرفض');ctLoad();}else{b.disabled=false;toast((j&&(j.msg||j.message))||'ما زبط');}}).catch(function(){b.disabled=false;toast('تأكد من الإنترنت');});};
 $('ppBtn').onclick=function(){$('ppM').hidden=false;$('ppE').textContent='⏳';$('ppL').innerHTML='';
  prRpc('app_people',{}).then(function(j){if(!j||!j.ok){$('ppE').textContent=(j&&(j.msg||j.message))||'ما زبط.';return;}$('ppE').textContent='';
   var box=function(n,t){return '<div style="text-align:center;padding:10px 4px;border-radius:14px;background:rgba(34,199,155,.16);border:1px solid rgba(34,199,155,.4)"><b style="font-size:22px;display:block">'+n+'</b><small style="font-size:12px">'+t+'</small></div>';};
@@ -711,16 +725,41 @@ renderBooks();
 /* كل يوم: منتأكد إنو المفاتيح بعدها شغّالة عهالتلفون */
 if(window.MEAPATH)setTimeout(function(){window.MEAPATH.recheck().then(function(out){if(out.length){renderBooks();paths();alert('🔒 '+out[0].msg);}});},2500);
 
+/* ---------- 🎓 الشهادات + 📤 شارك نتيجتك ---------- */
+var CERTS=[];var PID={electro:'course',classic:'classic',solar:'solar'};
+function myName(x){var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(e){}return (l&&l.name)||x.n;}
+function shareU(x){return '../r/?n='+encodeURIComponent(myName(x))+'&c='+x.c+'&r='+x.r+'&m='+x.m+'&a='+(x.a==null?'':x.a);}
+function certOf(c){return CERTS.filter(function(z){return z.course===c;})[0];}
+function certBtn(c){var z=certOf(c);
+ if(z&&z.approved)return '<a class="btn" href="../cert/?c='+z.code+'">📄 افتح شهادتي</a>';
+ if(z&&z.rejected)return '';
+ if(z)return '<button type="button" class="btn alt" disabled>⏳ طلب الشهادة عند أنور</button>';
+ return '<button type="button" class="btn" data-certreq="'+c+'">🎓 اطلب شهادتك</button>';}
+function myBox(x){return '<div style="margin-top:8px;padding:12px;border-radius:16px;background:rgba(34,199,155,.16);border:1px solid rgba(34,199,155,.45)"><b>إنت رقم '+x.r+' '+(x.r<=3?['','🥇','🥈','🥉'][x.r]:'💪')+'</b><div class="row" style="margin-top:8px"><a class="btn alt" href="'+shareU(x)+'">📤 شارك نتيجتك</a>'+(x.cert?certBtn(x.c):'')+'</div></div>';}
+function certLoad(){var v=ls('mea_vid');if(!v)return Promise.resolve([]);
+ return fetch(SBU+'/rest/v1/rpc/cert_status',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_vid:v})}).then(function(r){return r.json();}).then(function(j){CERTS=Array.isArray(j)?j:[];
+  CERTS.forEach(function(z){if(z.approved&&ls('meaCertSeen_'+z.code)!=='1'){ls('meaCertSeen_'+z.code,'1');certPop(z);}});return CERTS;});}
+function certPop(z){var d=document.createElement('div');d.className='mdl';d.style.zIndex=80;
+ d.innerHTML='<div class="set mdb" style="text-align:center"><div style="font-size:46px">🎓</div><div class="mdt">شهادتك جاهزة!</div><p class="mds">أنور وافق على شهادتك. فيك تفتحها، تحفظها PDF، وتشاركها.</p><a class="btn" style="width:100%" href="../cert/?c='+z.code+'">📄 افتح شهادتي</a><button type="button" class="btn alt" style="width:100%;margin-top:8px">بعدين</button></div>';
+ document.body.appendChild(d);d.querySelector('button').onclick=function(){d.remove();};}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-certreq]');if(!b)return;var c=b.dataset.certreq;b.disabled=true;b.textContent='⏳';
+ fetch(SBU+'/rest/v1/rpc/cert_request',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_vid:ls('mea_vid'),p_course:c})}).then(function(r){return r.json();})
+ .then(function(j){if(j&&j.ok){toast('✅ انبعت طلب الشهادة لأنور');certLoad().then(function(){if(!$('hbM').hidden)hbDraw();paths();});}else{b.disabled=false;b.textContent='🎓 اطلب شهادتك';toast((j&&j.msg)||'ما زبط');}})
+ .catch(function(){b.disabled=false;b.textContent='🎓 اطلب شهادتك';toast('تأكد من الإنترنت');});});
+setTimeout(function(){certLoad().catch(function(){});},2500);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)certLoad().catch(function(){});});
+
 /* ---------- 🏆 لوحة الشرف ---------- */
 var HB=null,hbC='electro';
 function hbDraw(){var L=(HB||[]).filter(function(x){return x.c===hbC;});
+ var me=L.filter(function(x){return x.me;})[0];$('hbMe').innerHTML=me?myBox(me):'';
  $('hbL').innerHTML=L.length?L.map(function(x){var md=x.r===1?'🥇':x.r===2?'🥈':x.r===3?'🥉':'<b style="display:inline-block;min-width:26px;text-align:center">'+x.r+'</b>';
   return '<div class="pli" style="'+(x.me?'background:rgba(34,199,155,.22);border-radius:14px;padding-inline:8px':'')+'"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px">'+md+'</span><div><b>'+esc(x.n)+(x.cert?' 🎓':'')+(x.me?' (إنت)':'')+'</b><small>'+x.m+' غلط'+(x.a!=null?' · فهم '+x.a+'%':'')+'</small></div></div></div>';}).join('')
   :'<p class="mds" style="text-align:center;padding:16px">لسّا ما حدا خلّص هالكورس. كون إنت الأوّل! 💪</p>';}
 function hbLoad(){return fetch(SBU+'/rest/v1/rpc/honor_board',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_vid:ls('mea_vid')||null})}).then(function(r){return r.json();}).then(function(j){HB=Array.isArray(j)?j:[];
   var n=HB.length,c=HB.filter(function(x){return x.cert;}).length,me=HB.filter(function(x){return x.me;})[0];
   if(n)$('hbSub').textContent=me?'إنت رقم '+me.r+' 💪 · '+n+' خلّصوا الكورس':n+' خلّصوا الكورس'+(c?' · '+c+' 🎓':'');return HB;});}
-$('hbOpen').onclick=function(){if(!$('hbBy').dataset.v){$('hbBy').insertAdjacentHTML('beforeend',' '+VB);$('hbBy').dataset.v=1;}$('hbM').hidden=false;$('hbL').innerHTML='<p class="mds" style="text-align:center">⏳</p>';hbLoad().then(hbDraw).catch(function(){$('hbL').innerHTML='<p class="mds">تأكد من الإنترنت.</p>';});};
+$('hbOpen').onclick=function(){certLoad().catch(function(){});if(!$('hbBy').dataset.v){$('hbBy').insertAdjacentHTML('beforeend',' '+VB);$('hbBy').dataset.v=1;}$('hbM').hidden=false;$('hbL').innerHTML='<p class="mds" style="text-align:center">⏳</p>';hbLoad().then(hbDraw).catch(function(){$('hbL').innerHTML='<p class="mds">تأكد من الإنترنت.</p>';});};
 $('hbT').onclick=function(e){var b=e.target.closest('[data-v]');if(!b)return;hbC=b.dataset.v;$('hbT').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});hbDraw();};
 setTimeout(function(){hbLoad().catch(function(){});},2000);
 
@@ -738,7 +777,7 @@ function paths(){const M=window.MEAPATH;if(!M)return;M.rules().then(RJ=>{const b
   let rep='';if(s.started){const w=s.weak.slice(0,4);
    const PG=n=>{const r=R.find(x=>x.n===n);return r&&r.p?` · <b>صفحة ${r.p}</b>`:'';};
    rep=w.length?`<div class="weak">${w.map(r=>`<div>⚠️ <b>القاعدة ${r.n}: ${T(r.n)}</b>${PG(r.n)} · ${r.m} غلطات. ارجع اقراها بالكتاب.</div>`).join('')}</div><details class="qd" data-q="${id}"><summary>📝 الأسئلة اللي غلطت فيها</summary><div class="ql">…</div></details>`:(s.passed?'<div class="weak"><div style="background:rgba(34,199,155,.1);border-color:rgba(34,199,155,.35)">✅ ما في قاعدة ضعيفة لهلّق. كمّل هيك!</div></div>':'');}
-  h+=`<div class="stp${s3?' ok':''}${!s.started?' lock':''}"><div class="n">${s3?'✓':'3'}</div><div class="t">التقرير: وين لازم تقوّي<small>${!s.started?'بيطلع بس تبلّش الكورس.':s.excellent?(s.cert?'نتيجتك ممتازة 🎉 وبتستاهل الشهادة من أنور.':'نتيجتك منيحة 👍 والمشاريع انفتحت. ركّز عالغلطات تحت.'):s.finished?`${s.mistakes} غلطة: لازم ${M.MAX_MISTAKES} أو أقل لتنفتح المشاريع. راجع القواعد تحت وعيد الكورس.`:'هول القواعد اللي غلطت فيها أكتر شي:'}</small>${rep}<div class="rep" id="rep_${id}" hidden></div></div>${s.started?`<button type="button" class="go" data-rep="${id}">🤖 حلّلي</button>`:''}</div>`;
+  h+=`<div class="stp${s3?' ok':''}${!s.started?' lock':''}"><div class="n">${s3?'✓':'3'}</div><div class="t">التقرير: وين لازم تقوّي<small>${!s.started?'بيطلع بس تبلّش الكورس.':s.excellent?(s.cert?'نتيجتك ممتازة 🎉 وبتستاهل الشهادة من أنور.'+'</small><div style="margin-top:6px">'+certBtn(id==='course'?'electro':id)+'</div><small>':'نتيجتك منيحة 👍 والمشاريع انفتحت. ركّز عالغلطات تحت.'):s.finished?`${s.mistakes} غلطة: لازم ${M.MAX_MISTAKES} أو أقل لتنفتح المشاريع. راجع القواعد تحت وعيد الكورس.`:'هول القواعد اللي غلطت فيها أكتر شي:'}</small>${rep}<div class="rep" id="rep_${id}" hidden></div></div>${s.started?`<button type="button" class="go" data-rep="${id}">🤖 حلّلي</button>`:''}</div>`;
   h+=`<div class="stp${s4?' ok':' lock'}"><div class="n">${s4?'✓':'🔒'}</div><div class="t">المشاريع العملية (${c.projN})<small>${s4?'انفتحت! طبّق بإيدك بالمختبر.':`بتنفتح بس تخلّص الكورس بـ${M.MAX_MISTAKES} غلطات أو أقل.`}</small></div>${s4?`<a class="go" href="../${c.proj}">افتح ←</a>`:''}</div></div>`;}
  box.innerHTML=h;});}
 $('paths').addEventListener('toggle',e=>{const d=e.target;if(!d.matches||!d.matches('details.qd')||!d.open||d.dataset.done)return;d.dataset.done=1;const id=d.dataset.q,M=window.MEAPATH,s=M.status(id);
