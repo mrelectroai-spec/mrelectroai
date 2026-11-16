@@ -252,6 +252,10 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="hbM" hidden class="mdl"><div class="set mdb"><div class="mdt">🏆 لوحة الشرف</div><p class="byl" id="hbBy" style="font-size:13px;margin:2px 0 4px">بإشراف أنور الجاسم</p><p class="mds">يلي خلّصوا كورس الأسئلة. الترتيب حسب الأغلاط: الأقل غلط هوّي الأوّل. 🎓 = 5 أغلاط أو أقل (بياخد شهادة موقّعة من أنور).</p>
 <div class="chp" id="hbT"><button type="button" data-v="electro" class="on">⚡ الكهربا</button><button type="button" data-v="classic">⚙️ الكلاسيك</button><button type="button" data-v="solar">☀️ الشمسية</button></div>
 <div id="hbMe"></div><div id="hbL" style="max-height:52vh;overflow:auto;margin-top:8px"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
+<div id="accM" hidden class="mdl"><div class="set mdb"><div class="mdt">👤 حسابي</div><p class="mds">الاسم يلي بيطلع بلوحة الشرف والشهادة، ورقمك لنتواصل معك.</p>
+<label class="mdl2" for="accN">اسمك</label><input id="accN" autocomplete="name" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 12px;font:inherit;font-size:16px">
+<label class="mdl2" for="accP">رقمك</label><input id="accP" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 12px;font:inherit;font-size:16px;text-align:right">
+<div id="accE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn" id="accSave">حفظ</button><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="pushM" hidden style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)"><div class="set" style="width:min(380px,100%);padding:18px;margin:0">
 <div style="font:700 17px 'Readex Pro',sans-serif;margin-bottom:4px">📣 ابعت إشعار للكل</div><p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">بيوصل لكل يلي منزّلين التطبيق دغري، وبيطلع بدائرة الجديد.</p>
 <input id="pT" class="pin" maxlength="120" placeholder="العنوان: مثلاً كورس جديد 🔥"><textarea id="pB" class="pin" maxlength="600" rows="3" placeholder="الرسالة"></textarea>
@@ -336,6 +340,10 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 
 <section class="tab" id="t-settings">
   <h2>الإعدادات</h2>
+  <div class="set" id="accBox">
+    <div class="si"><i>👤</i><div class="t"><span id="accName">حسابي</span><small id="accSub"></small></div><button type="button" class="btn alt" id="accEdit" style="margin:0;padding:7px 12px;width:auto;flex:0 0 auto;font-size:13px">✏️ عدّل</button></div>
+    <div class="si"><i>📚</i><div class="t">كتبي<small id="accBooks"></small></div><button type="button" class="btn" id="accKey" style="margin:0;padding:7px 12px;width:auto;flex:0 0 auto;font-size:13px">🔑 حط مفتاح</button></div>
+  </div>
   <div class="set">
     <div class="si"><i>🔔</i><div class="t">الإشعارات<small id="nfTxt">أخبار، كورسات وأدوات جديدة.</small></div><button type="button" class="sw" id="nfSw" role="switch" aria-checked="true" aria-label="الإشعارات"></button></div>
     <button type="button" class="si" id="nfSys" hidden><i>📱</i><div class="t">الإشعارات مسكّرة من التلفون<small>اكبس هون وشغّلها من إعدادات التلفون.</small></div><span class="go">←</span></button>
@@ -365,7 +373,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.16g';
+var APPV='2026.11.16h';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -410,7 +418,18 @@ function nat(m,o){return CAP?window.Capacitor.nativePromise('AppPrefs',m,o||{}):
 
 /* ---------- الإعدادات ---------- */
 function paintNotif(r){$('nfSw').setAttribute('aria-checked',r.notif?'true':'false');$('nfSys').hidden=!(r.notif&&r.system===false);}
-function loadSet(){$('ver').textContent='MrElectroAI · تحديث '+APPV;
+function accPaint(){var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(e){}
+ $('accName').textContent=(l&&l.name)?l.name:'ما كتبت اسمك بعد';var sub=(l&&l.phone)?'📞 '+l.phone:'اكتب اسمك ورقمك';
+ if(ls('meaTeacher')==='1')sub+=' · 🎓 أستاذ';var t=admTok();if(t&&t.a){try{var em=JSON.parse(atob(t.a.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).email;if(em)sub+=' · 🔐 '+em;}catch(e){}}
+ $('accSub').textContent=sub;
+ var M=window.MEAPATH,ids=['course','classic','solar'],own=[];if(M)ids.forEach(function(id){if(ls('meaKey_'+id)||(M.owned(id)&&ls('meaTeacher')!=='1'))own.push(id);});
+ $('accBooks').textContent=own.length?own.map(function(id){return 'كتاب '+({course:1,classic:2,solar:3}[id]||id)+(ls('meaPdf_'+id)==='1'?' 📄':'');}).join(' · ')+(own.length&&ls('meaKey_'+own[0])?' · مفتاح '+String(ls('meaKey_'+own[0])).slice(0,8)+'…':''):(ls('meaTeacher')==='1'?'وضع الأستاذ فاتحلك كل شي (بلا PDF)':'ولا كتاب مفعّل لهلّق');}
+$('accEdit').onclick=function(){var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(e){}$('accN').value=(l&&l.name)||'';$('accP').value=(l&&l.phone)||'';$('accE').textContent='';$('accM').hidden=false;};
+$('accSave').onclick=function(){var n=$('accN').value.trim(),ph=$('accP').value.trim();if(n.length<2){$('accE').textContent='اكتب اسمك.';return;}if(ph.replace(/\D/g,'').length<7){$('accE').textContent='اكتب رقمك كامل.';return;}
+ var lead={name:n,phone:ph};ls('mea_lead',JSON.stringify(lead));try{window.meaLead&&window.meaLead(lead);}catch(e){}$('accM').hidden=true;accPaint();toast('✅ انحفظ');};
+$('accKey').onclick=function(){var c=prompt('🔑 حط مفتاحك (متل MEA-XXXX-XXXX):');if(!c||!window.MEAPATH)return;toast('⏳ عم نفعّل…');
+ window.MEAPATH.activateAll(c).then(function(r){if(r.ok){renderBooks();paths();accPaint();toast('✅ انفتح: '+r.books.map(function(x){return 'كتاب '+BOOKD[x].n;}).join(' و'));}else alert('🔑 '+r.msg);});};
+function loadSet(){accPaint();$('ver').textContent='MrElectroAI · تحديث '+APPV;
  if(CAP){$('nfSw').disabled=false;nat('get').then(function(r){paintNotif(r);$('ver').textContent='MrElectroAI · '+T.ver+(r.version||'')+' · تحديث '+APPV;}).catch(function(){});}
  else{$('nfSw').disabled=true;$('nfSw').setAttribute('aria-checked','false');$('nfTxt').textContent=T.notIn;$('ver').textContent='MrElectroAI · '+T.appOnly;$('getApk').hidden=INAPP;}
  var th=ls('siteTheme')||'auto';document.querySelectorAll('#segTheme button').forEach(function(b){b.classList.toggle('on',b.dataset.v===th);});
