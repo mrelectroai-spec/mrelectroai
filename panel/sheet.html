@@ -65,7 +65,7 @@ ul.ck li:before{content:'☐';font-size:16px;margin-inline-end:8px;color:#0e7a5f
 /* ---------- رموز المخطط (IEC، الكهربا نازلة لتحت) ---------- */
 var S='';const st='stroke="#16231e" stroke-width="2" fill="none" stroke-linecap="round"';
 function L(x1,y1,x2,y2,d){S+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${st}${d?' stroke-dasharray="5 4" stroke-width="1.3"':''}/>`;}
-function T(x,y,t,o){o=o||{};S+=`<text x="${x}" y="${y}" font-size="${o.s||12}" font-weight="${o.b?700:500}" fill="${o.c||'#16231e'}" text-anchor="${o.a||'middle'}" font-family="Readex Pro,Arial" ${o.ltr!==false?'direction="ltr"':''}>${t}</text>`;}
+function T(x,y,t,o){o=o||{};S+=`<text x="${x}" y="${y}" font-size="${o.s||12}" font-weight="${o.b?700:500}" fill="${o.c||'#16231e'}" text-anchor="${o.a||'middle'}" font-family="Readex Pro,Arial" direction="ltr">${t}</text>`;}
 function dot(x,y){S+=`<circle cx="${x}" cy="${y}" r="3.2" fill="#16231e"/>`;}
 // كونتاك مفتوح (NO) بين y وy+40
 function no(x,y){L(x,y,x,y+12);L(x,y+28,x-11,y+11);L(x,y+28,x,y+40);}
@@ -85,6 +85,72 @@ function lamp(x,y,lab){L(x,y,x,y+8);S+=`<circle cx="${x}" cy="${y+20}" r="12" ${
 function mot(cx,cy,lab){S+=`<circle cx="${cx}" cy="${cy}" r="30" ${st}/>`;T(cx,cy-2,'M',{s:18,b:1});T(cx,cy+16,'3~',{s:12});if(lab)T(cx+40,cy+5,lab,{a:'start',b:1});}
 const lab=(x,y,t,sub)=>{T(x,y,t,{a:'end',b:1});if(sub)T(x,y+13,sub,{a:'end',s:10,c:'#53645d'});};
 function svg(w,h){const o=`<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${S}</svg>`;S='';return o;}
+
+
+/* ---------- رموز إضافية: صناديق، فيوز، SPD، أرضي ---------- */
+function box(x,y,w,h,t,sub,fill){S+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${fill||'#f3faf7'}" stroke="#16231e" stroke-width="2"/>`;T(x+w/2,y+h/2+(sub?-3:4),t,{b:1,s:12,ltr:false});if(sub)T(x+w/2,y+h/2+13,sub,{s:10,c:'#53645d'});}
+function fuse(x,y,lab){L(x,y,x,y+10);S+=`<rect x="${x-6}" y="${y+10}" width="12" height="22" ${st}/>`;L(x,y+10,x,y+32);L(x,y+32,x,y+40);if(lab)T(x+12,y+25,lab,{a:'start',s:10,b:1});}
+function earth(x,y){L(x,y,x,y+8);L(x-10,y+8,x+10,y+8);L(x-6,y+12,x+6,y+12);L(x-2,y+16,x+2,y+16);}
+function spd(x,y,lab){S+=`<rect x="${x-10}" y="${y}" width="20" height="26" ${st}/>`;S+=`<path d="M${x-3} ${y+5} L${x+3} ${y+13} L${x-3} ${y+13} L${x+3} ${y+21}" ${st} stroke-width="1.5"/>`;L(x,y+26,x,y+34);earth(x,y+34);if(lab)T(x+14,y+16,lab,{a:'start',s:10,b:1});}
+// خط واحد مع عدد الشرايط (///)
+function bus(x1,y1,x2,y2,n){L(x1,y1,x2,y2);if(n){const mx=(x1+x2)/2,my=(y1+y2)/2;for(let i=0;i<Math.min(n,4);i++){const o=(i-(Math.min(n,4)-1)/2)*5;L(mx-5+o,my+4,mx+5+o,my-4);}T(mx+14,my+4,String(n),{a:'start',s:9,c:'#53645d'});}}
+function brkS(x,y,lab,sub){brk(x,y);if(lab)lab2(x,y,lab,sub);}
+function lab2(x,y,t,sub){T(x+14,y+22,t,{a:'start',b:1,s:11});if(sub)T(x+14,y+34,sub,{a:'start',s:9,c:'#53645d'});}
+
+/* ATS مونوفاز: 3 مصادر بأولوية (دولة ← موتير ← سولر) */
+function atsMono(){const SRC=[['الدولة',60],['الموتير',230],['الإنفرتر',400]];
+ SRC.forEach(([n,x],i)=>{T(x+20,16,n,{b:1,ltr:false});T(x,34,'L',{s:10});T(x+40,34,'N',{s:10});
+  [x,x+40].forEach(xx=>{L(xx,38,xx,50);brk(xx,50);L(xx,90,xx,104);no(xx,104);L(xx,144,xx,170);});L(x-6,70,x+46,70,1);L(x-6,124,x+46,124,1);
+  T(x+56,72,'Q'+(i+1),{a:'start',b:1,s:11});T(x+56,84,'2P',{a:'start',s:9,c:'#53645d'});T(x+56,126,'KM'+(i+1),{a:'start',b:1,s:11});
+  dot(x,170);dot(x+40,170);});
+ L(60,170,440,170);L(100,182,440,182);dot(100,182);dot(270,182);dot(440,182);L(100,170,100,170);
+ [100,270,440].forEach(x=>{L(x,170,x,182);});L(60,170,60,170);
+ T(470,174,'L',{a:'start',s:10});T(470,186,'N',{a:'start',s:10});L(250,182,250,206);L(230,170,230,206);box(190,206,100,36,'للبيت','L + N');
+ // التحكم: كل مصدر بيغذّي كويل تبعو
+ const C=[[70,'KT1','10s','KM1',[['KM2','21-22'],['KM3','21-22']]],[250,'KT2','30s','KM2',[['KT1','15-16'],['KM1','21-22'],['KM3','21-22']]],[430,'KT3','5s','KM3',[['KT1','15-16'],['KT2','15-16'],['KM1','21-22'],['KM2','21-22']]]];
+ C.forEach(([x,kt,tm,km,ncs],i)=>{const y0=262;T(x,y0,['L الدولة','L الموتير','L الإنفرتر'][i],{s:10,b:1,ltr:false});L(x,y0+6,x,y0+16);dot(x,y0+16);L(x,y0+16,x+60,y0+16);L(x+60,y0+16,x+60,y0+26);coil(x+60,y0+26,kt,tm);L(x+60,y0+66,x+60,y0+76);
+  L(x,y0+16,x,y0+26);no(x,y0+26);T(x-14,y0+46,kt,{a:'end',s:10,b:1});T(x-14,y0+58,'15-18',{a:'end',s:9,c:'#53645d'});let y=y0+66;
+  ncs.forEach(([k,t])=>{L(x,y,x,y+4);nc(x,y+4);T(x-14,y+24,k,{a:'end',s:10,b:1});T(x-14,y+36,t,{a:'end',s:9,c:'#53645d'});y+=44;});
+  L(x,y,x,y+4);coil(x,y+4,km);L(x,y+44,x,y+56);L(x+60,y0+76,x+60,y+56);L(x,y+56,x+60,y+56);T(x+30,y+72,['N الدولة','N الموتير','N الإنفرتر'][i],{s:10,b:1,ltr:false});});}
+
+/* ATS تريفاز (خط واحد) + ريليه مراقبة فازات */
+function atsTri(){const SRC=[['الدولة',70],['الموتير',250],['الإنفرتر',430]];
+ SRC.forEach(([n,x],i)=>{T(x,16,n,{b:1,ltr:false});bus(x,22,x,40,4);brk(x,40);T(x+14,62,'Q'+(i+1),{a:'start',b:1,s:11});T(x+14,74,'4P',{a:'start',s:9,c:'#53645d'});bus(x,80,x,96,4);no(x,96);T(x+14,118,'KM'+(i+1),{a:'start',b:1,s:11});T(x+14,130,'4P',{a:'start',s:9,c:'#53645d'});bus(x,136,x,170,4);dot(x,170);
+  if(i<2){dot(x,30);L(x,30,x-34,30);L(x-34,30,x-34,48);box(x-60,48,52,30,'KF'+(i+1),'فازات');}});
+ L(70,170,430,170);bus(250,170,250,200,4);box(190,200,120,38,'للتابلو','L1 L2 L3 N');
+ T(250,262,'التحكم متل المونوفاز، وبزيادة: كونتاك ريليه الفازات (KF) بالسلسلة قبل التايمر',{s:11,ltr:false});
+ const x=250,y0=280;T(x,y0,'L1 الدولة',{s:10,b:1,ltr:false});L(x,y0+6,x,y0+14);no(x,y0+14);T(x-14,y0+34,'KF1',{a:'end',s:10,b:1});T(x-14,y0+46,'11-14',{a:'end',s:9,c:'#53645d'});L(x,y0+54,x,y0+60);coil(x,y0+60,'KT1','10s');L(x,y0+100,x,y0+112);T(x,y0+126,'N الدولة',{s:10,b:1,ltr:false});
+ T(250,y0+150,'الـKT1 بيشتغل بس إذا الفازات التلاتة موجودة ومش مقلوبة، وبعدين بيسكّر KM1',{s:10,c:'#53645d',ltr:false});}
+
+/* تبديل الأحمال بين 3 موتيرات حسب التيار */
+function gen3(){const G=[['G1','30kVA',70],['G2','60kVA',250],['G3','100kVA',430]];
+ G.forEach(([g,k,x],i)=>{S+=`<circle cx="${x}" cy="34" r="20" ${st}/>`;T(x,38,'G',{b:1,s:14});T(x+26,30,g,{a:'start',b:1,s:11});T(x+26,42,k,{a:'start',s:9,c:'#53645d'});bus(x,54,x,64,4);brk(x,64);T(x+14,86,'Q'+(i+1),{a:'start',b:1,s:11});bus(x,104,x,114,4);no(x,114);T(x+14,136,'KM'+(i+1),{a:'start',b:1,s:11});bus(x,154,x,180,4);dot(x,180);});
+ L(70,180,430,180);bus(250,180,250,206,4);S+=`<circle cx="250" cy="222" r="10" ${st}/>`;T(268,226,'CT',{a:'start',b:1,s:11});T(330,226,'محوّل تيار',{a:'start',s:9,c:'#53645d'});L(250,206,250,212);bus(250,232,250,256,4);box(190,256,120,36,'الأحمال','L1 L2 L3 N');
+ L(240,222,120,222);box(40,206,80,32,'KI1 · KI2','ريليه تيار');T(80,252,'KI1 > 35A',{s:10,b:1});T(80,265,'KI2 > 70A',{s:10,b:1});
+ // التحكم
+ const y0=300,cx=[90,250,410],rows=[[['KI1','11-12','nc']],[['KI1','11-14','no'],['KI2','11-12','nc']],[['KI2','11-14','no']]];
+ cx.forEach((x,i)=>{T(x,y0,'L1 '+G[i][0],{s:10,b:1});L(x,y0+6,x,y0+14);let y=y0+14;rows[i].forEach(([k,t,ty])=>{if(ty==='nc')nc(x,y);else no(x,y);T(x-14,y+20,k,{a:'end',s:10,b:1});T(x-14,y+32,t,{a:'end',s:9,c:'#53645d'});y+=40;});
+  const o=[1,2,3].filter(n=>n!==i+1);o.forEach(n=>{nc(x,y);T(x-14,y+20,'KM'+n,{a:'end',s:10,b:1});T(x-14,y+32,'21-22',{a:'end',s:9,c:'#53645d'});y+=40;});
+  coil(x,y,'KM'+(i+1));T(x,y+54,'N',{s:10,b:1});});}
+
+/* تابلو طاقة شمسية (إنفرتر هايبرد) */
+function solarDB(tri){const n=tri?4:2,nd=tri?'4P':'2P';
+ // ألواح ← حماية DC
+ box(20,20,120,44,'الألواح PV',tri?'سترينغين (2 MPPT)':'سترينغ واحد');
+ const xs=tri?[60,100]:[80];xs.forEach((x,i)=>{L(x,64,x,80);fuse(x,80,'');});T(xs[0]-12,105,'F1 gPV',{a:'end',s:10,b:1});
+ const dx=tri?80:80;L(xs[0],120,xs[xs.length-1],120);L(dx,120,dx,134);spd(dx+40,134,'SPD DC');L(dx,134,dx+40,134);L(dx,134,dx,150);brk(dx,150);T(dx-14,172,'Q1',{a:'end',b:1,s:11});T(dx-14,184,'عازل DC',{a:'end',s:9,c:'#53645d',ltr:false});L(dx,190,dx,218);
+ // الإنفرتر
+ box(40,218,420,64,tri?'إنفرتر هايبرد تريفاز':'إنفرتر هايبرد مونوفاز',tri?'مثلاً Deye SUN-12K-SG04LP3 · 12kW':'مثلاً Deye SUN-6K-SG03LP1 · 6kW','#eaf5f0');T(dx,232,'PV',{s:9,b:1});
+ // البطارية
+ const bx=200;L(bx,218,bx,190);brk(bx,150);L(bx,150,bx,130);fuse(bx,90);L(bx,90,bx,64);box(bx-60,20,120,44,'بطارية ليثيوم','48V');T(bx+14,172,'Q2',{a:'start',b:1,s:11});T(bx+14,184,tri?'DC 250A':'DC 125A',{a:'start',s:9,c:'#53645d'});T(bx+12,114,'F2',{a:'start',s:10,b:1});T(bx,232,'BAT',{s:9,b:1});
+ // دخل AC (دولة/موتير)
+ const gx=330;box(gx-50,20,100,44,'دولة / موتير','بعد الـATS');bus(gx,64,gx,150,n);brk(gx,150);T(gx+14,172,'Q3',{a:'start',b:1,s:11});T(gx+14,184,nd+(tri?' 40A':' 40A'),{a:'start',s:9,c:'#53645d'});bus(gx,190,gx,218,n);T(gx,232,'GRID',{s:9,b:1});
+ dot(gx,100);L(gx,100,430,100);L(430,100,430,330);T(470,116,'بايباس',{s:10,b:1});
+ // خرج AC (LOAD) + بايباس
+ const lx=250;T(lx,276,'LOAD',{s:9,b:1});bus(lx,282,lx,310,n);brk(lx,310);T(lx+14,332,'Q4',{a:'start',b:1,s:11});T(lx+14,344,nd+(tri?' 32A':' 32A'),{a:'start',s:9,c:'#53645d'});bus(lx,350,lx,370,n);
+ S+=`<circle cx="${lx}" cy="380" r="4" fill="#16231e"/><circle cx="430" cy="380" r="4" fill="#16231e"/><circle cx="340" cy="410" r="4" fill="#16231e"/>`;L(lx,370,lx,376);L(430,330,430,376);L(340,410,lx+4,383);T(340,372,'S1 · 1-0-2',{s:10,b:1});T(250,426,'مفتاح بايباس يدوي',{s:9,c:'#53645d'});
+ bus(340,414,340,440,n);spd(380,446,'SPD AC');L(340,446,380,446);box(270,470,140,36,'تابلو البيت','RCD 30mA + قواطع');L(340,440,340,470);
+ earth(30,470);T(48,486,'أرضي واحد للكل: الألواح، الإنفرتر، الـSPD',{a:'start',s:10});}
 
 /* دارة باور: مباشر (DOL) */
 function powerDOL(x0){const X=[x0,x0+40,x0+80];X.forEach((x,i)=>{T(x,16,'L'+(i+1),{b:1});L(x,22,x,40);brk(x,40);L(x,80,x,110);no(x,110);L(x,150,x,170);th(x,170);L(x,210,x,240);});
@@ -166,25 +232,66 @@ const SH={
   warn:'المجموع 24.3A: القاطع الرئيسي 25A مع كابل 4mm². ما تحط 32A على كابل 4mm² تحت بوري.'}
 };
 
+
+/* أوراق إضافية (مش مربوطة بمشروع بالمختبر) */
+const EX={
+ ats1:{icon:'🔀',grp:'ats',title:'ATS مونوفاز: دولة، موتير، إنفرتر',lvl:'ATS · مونوفاز',
+  brief:'بيت على مونوفاز إلو 3 مصادر: الدولة، الموتير، والإنفرتر (السولر). بدّك تبديل أوتوماتيك بالأولوية: الدولة أوّل، بعدها الموتير، وآخر شي الإنفرتر. كل مصدر إلو تايمر On-delay لحتى ما ينقلب عليه إلا لما يثبت.',
+  bom:[['قاطع 2P لكل مصدر (Q1-Q3)','3','Schneider iC60N 2P C40'],['كونتاكتور 2 قطب لكل مصدر (KM1-KM3)','3','Schneider LC1D40AM7 (أو 4P LC1DT40)'],['تايمر On-delay لكل مصدر (KT1-KT3)','3','Omron H3CR-A8'],['قاطع 1P تحكم لكل مصدر','3','iC60N 1P C2'],['لمبات إشارة (دولة، موتير، إنفرتر)','3','XB5AVM3 · XB5AVM5 · XB5AVM4'],['كابل 6mm² للباور','حسب الطول','L + N لكل مصدر'],['كابل 1mm² للتحكم','حسب الطول','']],
+  dg:()=>{atsMono();return svg(520,560);},
+  steps:['كل مصدر: L وN ← قاطع 2P ← كونتاكتور (يقطع L وN سوا) ← بار الخرج المشترك ← البيت.','كل كويل بياخد كهربا من مصدرو هوّي: KM1 من الدولة، KM2 من الموتير، KM3 من الإنفرتر. هيك إذا المصدر مقطوع، الكونتاكتور تبعو ما بيسكّر.','تايمر لكل مصدر: الدولة 10 ثواني، الموتير 30 ثانية (ليسخن ويثبت الفولت)، الإنفرتر 5 ثواني.','KM1 (دولة): KT1 NO 15-18 ← KM2 NC ← KM3 NC ← كويل KM1.','KM2 (موتير): KT2 NO ← KT1 NC 15-16 (إذا الدولة موجودة بيوقف) ← KM1 NC ← KM3 NC ← كويل KM2.','KM3 (إنفرتر): KT3 NO ← KT1 NC ← KT2 NC ← KM1 NC ← KM2 NC ← كويل KM3.','لمبة لكل مصدر بالتوازي مع كويل الكونتاكتور تبعو.'],
+  checks:['الدولة موجودة: بعد 10 ثواني بيسكّر KM1 بس','قطعت الدولة والموتير شغّال: بعد 30 ثانية بيسكّر KM2','قطعت الدولة والموتير: بيسكّر KM3 (الإنفرتر)','رجعت الدولة: بيفتح KM2 أو KM3 وبيسكّر KM1','ما في وقت بيسكّروا فيه كونتاكتورين سوا (Interlock)','الكونتاكتورات بتقطع L وN سوا'],
+  warn:'ممنوع مصدرين يوصلوا سوا: Interlock كهربائي بالـNC، ويا ريت كمان ميكانيكي بين الكونتاكتورات. والـN ما بيتشارك بين المصادر.'},
+ ats3:{icon:'🔀',grp:'ats',title:'ATS تريفاز: دولة، موتير، إنفرتر',lvl:'ATS · تريفاز',
+  brief:'بناية أو محل على تريفاز إلو 3 مصادر. نفس فكرة المونوفاز، بس الكونتاكتورات 4 قطب (L1 L2 L3 N)، وريليه مراقبة فازات للدولة وللموتير: إذا فاز راح أو انقلب الترتيب، ما بينقلب عليه.',
+  bom:[['قاطع 4P لكل مصدر (Q1-Q3)','3','Schneider iC60N 4P C63 أو NSX100'],['كونتاكتور 4P لكل مصدر (KM1-KM3)','3','Schneider LC1D65AM7 + LADN11'],['ريليه مراقبة فازات (KF1، KF2)','2','Schneider RM22TG20'],['تايمر On-delay (KT1-KT3)','3','Omron H3CR-A8'],['قاطع 1P تحكم لكل مصدر','3','iC60N 1P C2'],['لمبات إشارة','3','XB5AVM3/4/5'],['كابل 16mm² للباور','حسب الطول','4 شرايط + أرضي']],
+  dg:()=>{atsTri();return svg(520,440);},
+  steps:['كل مصدر: L1 L2 L3 N ← قاطع 4P ← كونتاكتور 4P ← بار مشترك ← التابلو.','ريليه الفازات KF1 بياخد L1 L2 L3 N من الدولة قبل القاطع، وKF2 من الموتير.','الكونتاك 11-14 تبع KF بالسلسلة قبل التايمر: إذا فاز ناقص أو مقلوب، التايمر ما بيبلّش.','باقي التحكم متل المونوفاز: كل كويل من مصدرو، وNC من الكونتاكتورات التانية، وNC من تايمرات المصادر الأعلى أولوية.','الكويلات 220V: بين L1 وN تبع نفس المصدر.'],
+  checks:['فاز ناقص بالدولة: KM1 ما بيسكّر وبينقلب عالموتير','ترتيب الفازات مقلوب: KF ما بيعطي إذن','الأولوية: دولة ← موتير ← إنفرتر','ما في كونتاكتورين سوا','الكابل والقواطع عحسب تيار البناية'],
+  warn:'جرّب اتجاه دوران أي موتور (مضخة، مصعد) على كل مصدر: إذا انعكس عمصدر، صلّح ترتيب الفازات عند المصدر نفسو، مش بالتابلو.'},
+ gen3:{icon:'🏭',grp:'ats',title:'تبديل الحمل بين 3 موتيرات حسب الحمل',lvl:'موتيرات · تريفاز',
+  brief:'عندك 3 موتيرات: G1 = 30kVA، وG2 = 60kVA، وG3 = 100kVA. بدّك الموتير يلي بيغذّي يكون على قدّ الحمل: حمل خفيف ← الزغير، حمل وسط ← الوسط، حمل كبير ← الكبير. محوّل تيار (CT) وريليهين تيار بيقرّروا. (الكفاءات بتتغيّر حسب مشروعك.)',
+  bom:[['قاطع 4P لكل موتير (Q1-Q3)','3','NSX100 / NSX160 / NSX250'],['كونتاكتور 4P لكل موتير (KM1-KM3)','3','LC1D50A · LC1D95 · LC1F150'],['محوّل تيار CT','1','Schneider METSECT5CC020 (200/5A)'],['ريليه مراقبة تيار (KI1، KI2)','2','Schneider RM22JA31MR'],['تايمر On-delay ضد التقلّب','2','Omron H3CR-A8'],['قاطع 1P تحكم لكل موتير','3','iC60N 1P C2']],
+  dg:()=>{gen3();return svg(520,520);},
+  steps:['كل موتير: قاطع 4P ← كونتاكتور 4P ← بار مشترك ← CT ← الأحمال.','تيار الموتيرات تقريباً: G1 = 43A، وG2 = 87A، وG3 = 144A. منشتغل عـ80% منن: KI1 على 35A، وKI2 على 70A.','KM1 (G1): KI1 NC ← KM2 NC ← KM3 NC ← كويل KM1. يعني حمل أقل من 35A.','KM2 (G2): KI1 NO ← KI2 NC ← KM1 NC ← KM3 NC ← كويل KM2. يعني بين 35A و70A.','KM3 (G3): KI2 NO ← KM1 NC ← KM2 NC ← كويل KM3. يعني فوق 70A.','حط تأخير (On-delay أو Hysteresis بالريليه) لحتى ما يقلب كل ما يطلع وينزل الحمل لحظة.','كل كويل بياخد كهربا من الموتير تبعو: إذا الموتير مطفي، الكونتاكتور ما بيسكّر.'],
+  checks:['حمل 20A: G1 بس','حمل 50A: G2 بس','حمل 120A: G3 بس','ما في موتيرين سوا (Interlock)','بالتبديل في انقطاع ثانية أو تنتين: نبّه الزبون','كل موتير مشغّل قبل ما يحتاجو الحمل'],
+  warn:'هيدا تبديل مع انقطاع قصير (مش تزامن). لتشغيل موتيرين سوا عنفس البار بدّك لوحة تزامن (Synchronizing)، وهيدي شغلة تانية.'},
+ sol1:{icon:'☀️',grp:'solar',title:'تابلو طاقة شمسية مونوفاز (إنفرتر هايبرد)',lvl:'طاقة شمسية · مونوفاز',
+  brief:'بيت على مونوفاز: إنفرتر هايبرد 6kW، ألواح، بطارية ليثيوم 48V، ودخل من الدولة أو الموتير. التابلو فيه حماية DC للألواح والبطارية، وحماية AC للدخل والخرج، ومفتاح بايباس إذا الإنفرتر تعطّل.',
+  bom:[['فيوز gPV للسترينغ (F1)','2','15A 1000V DC + قاعدة'],['SPD DC','1','Type 2 · 600V / 1000V DC'],['عازل DC (Q1)','1','2P 1000V DC 32A'],['قاطع بطارية DC (Q2)','1','2P 125A DC'],['فيوز بطارية (F2)','1','NH 125A'],['قاطع دخل AC (Q3)','1','iC60N 2P C40'],['قاطع خرج AC (Q4)','1','iC60N 2P C32'],['مفتاح بايباس 1-0-2 (S1)','1','Changeover 2P 40A'],['SPD AC','1','Type 2 · 2P 275V'],['كابل سولر','حسب الطول','PV1-F 4/6mm² أحمر + أسود'],['كابل بطارية','قصير','35mm² + كوس']],
+  dg:()=>{solarDB(false);return svg(500,510);},
+  steps:['الألواح: كل سترينغ ← فيوز gPV عالموجب والسالب ← SPD DC ← عازل DC ← PV بالإنفرتر.','البطارية: موجب وسالب ← فيوز ← قاطع DC ← BAT بالإنفرتر. الكابل قصير وتخين (35mm² لـ6kW على 48V).','الدخل: بعد الـATS ← قاطع 2P 40A ← GRID بالإنفرتر.','الخرج: LOAD بالإنفرتر ← قاطع 2P 32A ← مفتاح البايباس (وضع 1) ← SPD AC ← تابلو البيت.','البايباس: من الدخل مباشرة لوضع 2 بالمفتاح، لتغذّي البيت إذا الإنفرتر بالصيانة.','الأرضي: هيكل الألواح، الإنفرتر، والـSPD على نفس الأرضي.'],
+  checks:['قطبية الألواح والبطارية صح قبل ما تسكّر أي قاطع','فولت السترينغ أقل من أقصى PV للإنفرتر بالبرد','كابل البطارية على قدّ التيار (6000W ÷ 48V ≈ 125A)','البايباس بيبدّل بلا ما يوصل الإنفرتر عالدخل مباشرة','الديفرنسيال 30mA بتابلو البيت بعد الإنفرتر'],
+  warn:'الـDC ما بينطفى متل الـAC: استعمل قطع DC بس (قواطع وعوازل مكتوب عليها DC). وما تفصل عازل الألواح وهوّي عم يسحب تيار كبير.'},
+ sol3:{icon:'☀️',grp:'solar',title:'تابلو طاقة شمسية تريفاز (إنفرتر هايبرد)',lvl:'طاقة شمسية · تريفاز',
+  brief:'بناية أو محل تريفاز: إنفرتر هايبرد 12kW تريفاز، سترينغين ألواح، بطارية 48V، ودخل تريفاز من الدولة أو الموتير. نفس فكرة المونوفاز، بس الـAC كلّو 4P.',
+  bom:[['فيوز gPV لكل سترينغ','4','15A 1000V DC'],['SPD DC','2','Type 2 · 1000V DC'],['عازل DC','2','2P 1000V DC 32A'],['قاطع بطارية DC (Q2)','1','2P 250A DC'],['فيوز بطارية','1','NH 250A'],['قاطع دخل AC (Q3)','1','iC60N 4P C40'],['قاطع خرج AC (Q4)','1','iC60N 4P C32'],['مفتاح بايباس 1-0-2 4P','1','Changeover 4P 63A'],['SPD AC','1','Type 2 · 4P 275V'],['كابل بطارية','قصير','70mm² + كوس']],
+  dg:()=>{solarDB(true);return svg(500,510);},
+  steps:['كل سترينغ على MPPT لحالو، ولكل واحد فيوز وSPD وعازل.','البطارية: 12000W ÷ 48V ≈ 250A، فبدّك قاطع DC 250A وكابل 70mm² قصير.','الدخل: L1 L2 L3 N بعد الـATS ← قاطع 4P ← GRID.','الخرج: LOAD ← قاطع 4P ← بايباس 4P ← SPD AC ← التابلو.','وزّع الأحمال المونوفاز على الفازات التلاتة بالتساوي.'],
+  checks:['ترتيب الفازات عالدخل صح (الإنفرتر بيشيّك)','الـN موصول، والأحمال موزّعة عالفازات','قواطع وفيوزات الـDC مكتوب عليها DC وعلى قدّ التيار','البايباس 4P بيبدّل كل الفازات والـN','الأرضي واحد للكل'],
+  warn:'الإنفرتر التريفاز بيحتاج الـN. وإذا حمل مونوفاز كبير على فاز واحد، الإنفرتر ممكن يفصل من عدم التوازن.'}
+};
+
 const $=i=>document.getElementById(i);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const VB='<svg width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1D9BF0"/><path fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M7.6 12.4l3 3 5.8-6.2"/></svg>';
 const PJ=(window.PROJECTS||[]);
-function home(){let h='';[['classic','⚙️ الكلاسيك كنترول'],['electro','💡 الكهربا']].forEach(([c,n])=>{h+=`<div class="grp">${n}</div><div class="list">`;
+function home(){let h='';[['ats','🔀 ATS وموتيرات'],['solar','☀️ تابلوهات طاقة شمسية']].forEach(([g,n])=>{h+=`<div class="grp">${n}</div><div class="list">`;Object.entries(EX).filter(([k,e])=>e.grp===g).forEach(([k,e])=>{h+=`<a class="it" href="?p=${k}"><i>${e.icon}</i><div><b>${esc(e.title)}</b><small>${e.lvl} · مخطط، قطع، خطوات، وفحص</small></div></a>`;});h+='</div>';});
+ [['classic','⚙️ الكلاسيك كنترول'],['electro','💡 الكهربا']].forEach(([c,n])=>{h+=`<div class="grp">${n}</div><div class="list">`;
  PJ.filter(p=>p.course===c&&SH[p.id]).forEach(p=>{h+=`<a class="it" href="?p=${p.id}"><i>${p.icon}</i><div><b>${esc(p.title)}</b><small>${SH[p.id].lvl} · مخطط، قطع، خطوات، وفحص</small></div></a>`;});h+='</div>';});
  $('home').innerHTML=h;}
-function sheet(id){const p=PJ.find(x=>x.id===id),d=SH[id];if(!p||!d){home();return;}
+function sheet(id){let p=PJ.find(x=>x.id===id),d=SH[id];const e=EX[id];if(e){d=e;p={id,n:'',title:e.title,icon:e.icon,brief:e.brief,goals:e.checks,hints:e.steps,ex:1};}if(!p||!d){home();return;}
  document.title=p.title+' | ورقة تمرين MrElectroAI';$('bt').textContent=p.icon+' '+p.title;$('pr').hidden=false;$('home').hidden=true;$('sheet').hidden=false;
- let h=`<div class="page"><div class="hd"><div><div class="tt"><small>${d.lvl} · ورقة تمرين ${p.n}</small>${esc(p.title)}</div></div><div><div class="lg"><i><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#22C79B" d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></i>MrElectroAI</div><div class="by">أنور الجاسم ${VB}</div></div></div>`;
+ let h=`<div class="page"><div class="hd"><div><div class="tt"><small>${d.lvl} ${p.n?' · ورقة تمرين '+p.n:''}</small>${esc(p.title)}</div></div><div><div class="lg"><i><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#22C79B" d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></i>MrElectroAI</div><div class="by">أنور الجاسم ${VB}</div></div></div>`;
  h+=`<h2>🎯 المطلوب</h2><div class="brief">${esc(p.brief)}</div>`;
  if(d.dg)h+=`<h2>📐 المخطط</h2><div class="dg">${d.dg()}</div>`;
  h+=`<h2>🧩 القطع</h2><table><tr><th>القطعة</th><th>العدد</th><th>موديل مقترح</th></tr>${d.bom.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td class="m">${esc(r[2])}</td></tr>`).join('')}</table>`;
  h+=`<h2>🛠️ خطوات التركيب</h2><ol class="st">${(p.hints||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`;
  if(d.warn)h+=`<div class="warn">⚠️ ${esc(d.warn)}</div>`;
  h+=`<h2>✅ افحص حالك</h2><ul class="ck">${(p.goals||[]).map(x=>`<li>${esc(x)}</li>`).join('')}<li>شغّل وجرّب قبل ما تسكّر التابلو، والكهربا مقطوعة وإنت عم تشتغل.</li></ul>`;
- h+=`<div class="ft"><div class="q"><div id="qr"></div><div><b>جرّبها بمختبر التابلو</b><br>امسح الرمز وركّبها عالتلفون، والمختبر بيفحصلك ياها.</div></div><div style="text-align:left">mrelectroai-spec.github.io/mrelectroai<br>واتساب: 79 434 479</div></div></div>`;
+ h+=`<div class="ft"><div class="q"><div id="qr"></div><div>${p.ex?'<b>الورقة أونلاين</b><br>امسح الرمز لتفتحها عالتلفون.':'<b>جرّبها بمختبر التابلو</b><br>امسح الرمز وركّبها عالتلفون، والمختبر بيفحصلك ياها.'}</div></div><div style="text-align:left">mrelectroai-spec.github.io/mrelectroai<br>واتساب: 79 434 479</div></div></div>`;
  $('sheet').innerHTML=h;
- try{new QRCode($('qr'),{text:'https://mrelectroai-spec.github.io/mrelectroai/panel/#'+id,width:64,height:64,correctLevel:QRCode.CorrectLevel.M});}catch(e){}}
+ try{new QRCode($('qr'),{text:p.ex?'https://mrelectroai-spec.github.io/mrelectroai/panel/sheet.html?p='+id:'https://mrelectroai-spec.github.io/mrelectroai/panel/#'+id,width:64,height:64,correctLevel:QRCode.CorrectLevel.M});}catch(e){}}
 const id=new URLSearchParams(location.search).get('p');
 if(id)sheet(id);else home();
 $('pr').onclick=()=>window.print();
