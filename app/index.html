@@ -248,7 +248,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="prL" style="max-height:60vh;overflow:auto"></div><div id="prE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="pdfM" hidden class="mdl"><div class="set mdb"><div class="mdt">📚 ملفات الكتب PDF</div><p class="mds">ارفع كل كتاب مرة وحدة. كل شاري بياخد نسخة عليها رقم مفتاحو ورقمو.</p><div id="pdfL"></div>
 <div id="pdfE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
-<div id="hbM" hidden class="mdl"><div class="set mdb"><div class="mdt">🏆 لوحة الشرف</div><p class="mds">يلي خلّصوا كورس الأسئلة. الترتيب حسب الأغلاط: الأقل غلط هوّي الأوّل. 🎓 = 5 أغلاط أو أقل (بياخد شهادة من أنور).</p>
+<div id="hbM" hidden class="mdl"><div class="set mdb"><div class="mdt">🏆 لوحة الشرف</div><p class="byl" id="hbBy" style="font-size:13px;margin:2px 0 4px">بإشراف أنور الجاسم</p><p class="mds">يلي خلّصوا كورس الأسئلة. الترتيب حسب الأغلاط: الأقل غلط هوّي الأوّل. 🎓 = 5 أغلاط أو أقل (بياخد شهادة موقّعة من أنور).</p>
 <div class="chp" id="hbT"><button type="button" data-v="electro" class="on">⚡ الكهربا</button><button type="button" data-v="classic">⚙️ الكلاسيك</button><button type="button" data-v="solar">☀️ الشمسية</button></div>
 <div id="hbL" style="max-height:58vh;overflow:auto;margin-top:8px"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="pushM" hidden style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)"><div class="set" style="width:min(380px,100%);padding:18px;margin:0">
@@ -352,7 +352,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.16b';
+var APPV='2026.11.16c';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -720,7 +720,7 @@ function hbDraw(){var L=(HB||[]).filter(function(x){return x.c===hbC;});
 function hbLoad(){return fetch(SBU+'/rest/v1/rpc/honor_board',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_vid:ls('mea_vid')||null})}).then(function(r){return r.json();}).then(function(j){HB=Array.isArray(j)?j:[];
   var n=HB.length,c=HB.filter(function(x){return x.cert;}).length,me=HB.filter(function(x){return x.me;})[0];
   if(n)$('hbSub').textContent=me?'إنت رقم '+me.r+' 💪 · '+n+' خلّصوا الكورس':n+' خلّصوا الكورس'+(c?' · '+c+' 🎓':'');return HB;});}
-$('hbOpen').onclick=function(){$('hbM').hidden=false;$('hbL').innerHTML='<p class="mds" style="text-align:center">⏳</p>';hbLoad().then(hbDraw).catch(function(){$('hbL').innerHTML='<p class="mds">تأكد من الإنترنت.</p>';});};
+$('hbOpen').onclick=function(){if(!$('hbBy').dataset.v){$('hbBy').insertAdjacentHTML('beforeend',' '+VB);$('hbBy').dataset.v=1;}$('hbM').hidden=false;$('hbL').innerHTML='<p class="mds" style="text-align:center">⏳</p>';hbLoad().then(hbDraw).catch(function(){$('hbL').innerHTML='<p class="mds">تأكد من الإنترنت.</p>';});};
 $('hbT').onclick=function(e){var b=e.target.closest('[data-v]');if(!b)return;hbC=b.dataset.v;$('hbT').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});hbDraw();};
 setTimeout(function(){hbLoad().catch(function(){});},2000);
 
