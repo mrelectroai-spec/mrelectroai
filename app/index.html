@@ -411,7 +411,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.17g";
+var APPV="2026.11.17h";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -661,12 +661,16 @@ var BUYTPL='مرحبا {الاسم} 👋\nأنا أنور الجاسم، وصل�
 chp('byB');
 document.addEventListener('click',function(e){var a=e.target.closest('[data-buy]');if(!a)return;e.preventDefault();var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(x){}
  $('byN').value=(l&&l.name)||'';$('byP').value=(l&&l.phone)||'';setOn('byB',[a.dataset.buy]);$('byE').textContent='';$('byF').hidden=false;$('byOk').hidden=true;$('byGo').disabled=false;
- $('byWa').href=a.getAttribute('href');$('byM').hidden=false;},true);
+ $('byWa').href=a.getAttribute('href');BYK=a.dataset.kind||'';
+ $('byM').querySelector('.mdt').textContent=BYK==='paper'?'📕 اطلب الكتاب المطبوع':BYK==='ask'?'💬 اسأل أنور':'🛒 اطلب الكتاب';
+ $('byF').querySelector('.mds').textContent=BYK==='paper'?'بلبنان بس · التوصيل ببلاش · الدفع عند الاستلام. أنور بيحكيك عالواتساب ليتفق معك.':BYK==='ask'?'اكتب اسمك ورقمك، وأنور بيحكيك عالواتساب.':'أنور بيبعتلك الأسعار وطريقة الدفع عالواتساب.';
+ $('byOk').querySelector('p').textContent=BYK==='ask'?'بيحكيك عالواتساب بأقرب وقت 🙏':BYK==='paper'?'بيحكيك عالواتساب ليتفق معك عالتوصيل 🚚':'بيبعتلك الأسعار وطريقة الدفع عالواتساب بأقرب وقت 🙏';
+ $('byM').hidden=false;},true);var BYK='';
 $('byGo').onclick=function(){var n=$('byN').value.trim().replace(/\s+/g,' '),p=$('byP').value.trim(),bk=val('byB');
  if(n.length<2){$('byE').textContent='اكتب اسمك.';return;}if(p.replace(/\D/g,'').length<7){$('byE').textContent='اكتب رقمك كامل.';return;}
  if(!ls('mea_lead')){ls('mea_lead',JSON.stringify({name:n,phone:p}));try{window.meaLead&&window.meaLead({name:n,phone:p});}catch(x){}}
  $('byGo').disabled=true;$('byE').textContent='';
- fetch(SBU+'/rest/v1/rpc/buy_request',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_name:n,p_phone:p,p_vid:ls('mea_vid')||'',p_book:bk})})
+ fetch(SBU+'/rest/v1/rpc/buy_request',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_name:n,p_phone:p,p_vid:ls('mea_vid')||'',p_book:bk+(BYK?':'+BYK:'')})})
  .then(function(r){return r.json();}).then(function(j){$('byGo').disabled=false;if(!j||!j.ok){$('byE').textContent=(j&&j.msg)||'ما زبط، جرّب كمان مرة.';return;}
   $('byWa').href=WA+encodeURIComponent('مرحبا أنور 👋 بدي '+BYN[bk]+'\nاسمي: '+n);$('byF').hidden=true;$('byOk').hidden=false;try{window.meaTrack&&meaTrack('buy_'+bk);}catch(x){}})
  .catch(function(){$('byGo').disabled=false;$('byE').textContent='ما في إنترنت.';});};
@@ -677,8 +681,9 @@ function btLink(){var ph=waPh(BT.phone);$('btGo').href='https://api.whatsapp.com
  $('btW').textContent=$('btX').value.indexOf('..$')>=0?'⚠️ حطّ الأسعار مكان ..$ وبعدها اكبس «💾 خلّيها هيك للكل»، مرة وحدة بس.':'';}
 function buyOpen(id){if(ls('meaTeacher')!=='1')return;$('btM').hidden=false;$('btS').textContent='⏳';$('btX').value='';
  Promise.all([admGet('buy_requests?id=eq.'+(+id)+'&select=*'),admGet('site_settings?key=eq.buy_msg&select=value')]).then(function(R2){BT=(R2[0]||[])[0];if(!BT){$('btS').textContent='ما لقينا الطلب.';return;}
+  var kp=String(BT.book||'').split(':');BT.book=kp[0];BT.kind=kp[1]||'';
   var tpl=((R2[1]||[])[0]||{}).value||BUYTPL;$('btT').textContent='🛒 '+(BT.name||'')+' بدّو كتاب';
-  $('btS').innerHTML='<span dir="ltr">'+esc(BT.phone||'')+'</span> · '+esc(BYN[BT.book]||BT.book||'')+' · '+ppAgo(BT.created_at)+(BT.sent_at?' · ✅ بعتلو قبل':'');
+  $('btS').innerHTML='<span dir="ltr">'+esc(BT.phone||'')+'</span> · '+esc(BYN[BT.book]||BT.book||'')+(BT.kind==='paper'?' · 📕 مطبوع':BT.kind==='ask'?' · 💬 سؤال':'')+' · '+ppAgo(BT.created_at)+(BT.sent_at?' · ✅ بعتلو قبل':'');
   $('btX').value=tpl.split('{الاسم}').join(String(BT.name||'').split(' ')[0]).split('{الكتاب}').join(BYN[BT.book]||'الكتاب');btLink();})
  .catch(function(){$('btS').textContent='ما زبط. تأكد من الإنترنت.';});}
 $('btX').oninput=btLink;
@@ -712,7 +717,7 @@ function hubLoad(){return Promise.all([prRpc('people_hub',{}),admGet('buy_reques
  var dg=function(x){return String(x||'').replace(/\D/g,'').slice(-8);};
  (Array.isArray(R2[1])?R2[1]:[]).forEach(function(b){var p=j.people.filter(function(x){return (b.vid&&x.vid===b.vid)||(dg(b.phone)&&dg(x.phone)===dg(b.phone));})[0];
   if(!p){p={name:b.name,phone:b.phone,vid:b.vid||null,at:b.created_at,last_at:b.created_at};j.people.unshift(p);}
-  if(!p.buy||!b.sent_at||p.buy.sent_at)p.buy=b;});
+  b.book=String(b.book||'').split(':')[0];if(!p.buy||!b.sent_at||p.buy.sent_at)p.buy=b;});
  j.people.sort(function(a,b){return (a.buy&&!a.buy.sent_at?0:1)-(b.buy&&!b.buy.sent_at?0:1);});
  HUB=j;window.PPL=j.people;ppBadge();return j;});}
 $('ppBtn').onclick=function(){$('ppM').hidden=false;$('ppE').textContent='⏳';
@@ -844,6 +849,11 @@ var BOOKD={
   tools:[['حساب المنظومة','../tools/load/'],['عرض السعر للزبون','../tools/quote/']]}};
 var BORD=['course','classic','solar'];
 function own(id){return window.MEAPATH?window.MEAPATH.owned(id):false;}
+/* نسخة غوغل بلاي (التطبيق الأصلي): ما في أسعار ولا «اشتري» للـPDF؛ بس «اطلب المطبوع» (شي ملموس) و«اسأل أنور» */
+var PLAY=!!CAP;if(PLAY)[].forEach.call(document.querySelectorAll('button'),function(x){if(x.textContent==='بدي اشتري كتاب')x.hidden=true;});
+function buyBtns(id,b){if(!PLAY)return '<a class="btn" href="'+buyU(b)+'" data-buy="'+id+'">🛒 بدي اشتري</a>';
+ return '<a class="btn" href="'+buyU(b)+'" data-buy="'+id+'" data-kind="ask">💬 اسأل أنور</a>';}
+function paperBtn(id,b){return PLAY?'<a class="btn alt" href="'+buyU(b)+'" data-buy="'+id+'" data-kind="paper" style="display:block;width:100%;margin-top:8px;text-align:center">📕 اطلب الكتاب المطبوع'+(b.price?' · <span dir="ltr">'+b.price+'</span>':'')+'<small style="display:block;font-weight:500;font-size:12px;opacity:.8">بلبنان · توصيل ببلاش · الدفع عند الاستلام</small></a>':'';}
 function buyU(b){return WA+encodeURIComponent('مرحبا أنور 👋 بدي كتاب «'+b.t+'»');}
 function contents(id){var b=BOOKD[id];return [['📖','الكتاب PDF',b.rules+' قاعدة'],['🎯','كورس أسئلة',b.q+' سؤال'],['📊','تقرير بنقاط ضعفك','مع أرقام الصفحات'],['🛠️',b.proj.n+' مشاريع عملية',b.proj.t],['🧩','قطع 3D',b.parts.length+' قطعة'],['🧰','أدوات',b.tools.map(function(x){return x[0];}).join('، ')],['🎓','شهادة من أنور','إذا خلّصت بـ5 غلطات أو أقل']];}
 /* 🎁 عرض بلاك نوفمبر: الكتاب الأول ببلاش لآخر الشهر. الشخص بيبعت طلب عالواتساب وأنور بيعطيه مفتاح */
@@ -878,13 +888,13 @@ function promoDone(){var d=document.createElement('div');d.className='mdl';d.sty
 document.addEventListener('visibilitychange',function(){if(!document.hidden)promoPoll();});
 setTimeout(function(){promoSub();promoPoll();},3000);
 function renderBooks(){var h='';$('promo').innerHTML=promoOn()?giftH():'';BORD.forEach(function(id){var b=BOOKD[id],o=own(id);
- h+='<button type="button" class="card bk" data-bk="'+id+'" style="width:100%;text-align:start"><img class="cv" src="'+b.cv+'" alt=""><div style="flex:1"><b>'+b.t+'</b><span>الكتاب '+b.n+' · '+b.lv+(b.price?' · '+b.price:'')+'</span><div class="tg">'+(o?'<i class="own">✅ عندك</i>':'')+'<i>🎯 '+b.q+' سؤال</i><i>🛠️ '+b.proj.n+' مشاريع</i><i>🧩 '+b.parts.length+' قطعة 3D</i>'+(b.sample?'<i>📄 عيّنة مجانية</i>':'')+'</div></div><div class="go" style="align-self:center">←</div></button>';});
+ h+='<button type="button" class="card bk" data-bk="'+id+'" style="width:100%;text-align:start"><img class="cv" src="'+b.cv+'" alt=""><div style="flex:1"><b>'+b.t+'</b><span>الكتاب '+b.n+' · '+b.lv+(b.price&&!PLAY?' · '+b.price:'')+'</span><div class="tg">'+(o?'<i class="own">✅ عندك</i>':'')+'<i>🎯 '+b.q+' سؤال</i><i>🛠️ '+b.proj.n+' مشاريع</i><i>🧩 '+b.parts.length+' قطعة 3D</i>'+(b.sample?'<i>📄 عيّنة مجانية</i>':'')+'</div></div><div class="go" style="align-self:center">←</div></button>';});
  $('bookList').innerHTML=h;renderBookTools();}
 function ri(icon,t,sub,st,href,cls){return (href?'<a class="ri '+(cls||'')+'" href="'+href+'">':'<div class="ri '+(cls||'')+'" data-lk="1">')+'<i>'+icon+'</i><div class="t">'+t+(sub?'<small>'+sub+'</small>':'')+'</div><span class="st">'+st+'</span>'+(href?'</a>':'</div>');}
 function openBook(id){var b=BOOKD[id],o=own(id),L='🔒';
- var h='<div class="grab"></div><div class="bh"><img src="'+b.cv+'" alt=""><div><b>'+b.t+'</b><span>الكتاب '+b.n+' · '+b.rules+' قاعدة · '+b.lv+'</span>'+(o?'<span class="own1">✅ الكتاب عندك: كل شي مفتوح</span>':'<span class="pr">'+(b.price||'السعر عند أنور')+'</span>')+'</div></div>';
+ var h='<div class="grab"></div><div class="bh"><img src="'+b.cv+'" alt=""><div><b>'+b.t+'</b><span>الكتاب '+b.n+' · '+b.rules+' قاعدة · '+b.lv+'</span>'+(o?'<span class="own1">✅ الكتاب عندك: كل شي مفتوح</span>':(PLAY?'':'<span class="pr">'+(b.price||'السعر عند أنور')+'</span>'))+'</div></div>';
  if(!o&&id==='course'&&promoOn())h+=giftH();
- if(!o)h+='<div class="row"><a class="btn" href="'+buyU(b)+'" data-buy="'+id+'">🛒 بدي اشتري</a><button type="button" class="btn alt" id="haveKey">🔑 عندي مفتاح</button></div><div class="kbx" id="kbx" hidden><input id="kIn" placeholder="MEA-XXXX-XXXX" dir="ltr" autocomplete="off" spellcheck="false"><div class="er" id="kEr"></div><button type="button" class="btn" id="kGo" style="width:100%">فعّل</button></div>';
+ if(!o)h+='<div class="row">'+buyBtns(id,b)+'<button type="button" class="btn alt" id="haveKey">🔑 عندي مفتاح</button></div>'+paperBtn(id,b)+'<div class="kbx" id="kbx" hidden><input id="kIn" placeholder="MEA-XXXX-XXXX" dir="ltr" autocomplete="off" spellcheck="false"><div class="er" id="kEr"></div><button type="button" class="btn" id="kGo" style="width:100%">فعّل</button></div>';
  h+='<div class="sec2">'+(o?'كل شي معك':'شو في بقلبو')+'</div>';
  if(o&&window.MEAPATH.hasPdf(id))h+='<button type="button" class="ri pdf" id="pdfGo" style="width:100%;text-align:start"><i>📥</i><div class="t">نزّل الكتاب PDF<small>نسختك الخاصة، عليها رقم مفتاحك</small></div><span class="st">نزّل ←</span></button>';
  if(b.sample)h+=ri('📄','العيّنة المجانية','اقرا أول صفحات الكتاب','مفتوحة ←',b.sample,'fr');
@@ -987,7 +997,7 @@ var VB='<svg class="vb" viewBox="0 0 24 24" width="16" height="16" role="img" ar
 function paths(){const M=window.MEAPATH;if(!M)return;M.rules().then(RJ=>{const box=$('paths');let h='';
  const pr=prof();let ORD=['course','classic','solar'];if(pr&&pr.rec){ORD.splice(ORD.indexOf(pr.rec),1);ORD.unshift(pr.rec);}ORD=ORD.filter(x=>M.owned(x)).concat(ORD.filter(x=>!M.owned(x)));
  for(const id of ORD){const s=M.status(id),c=s.c,R=(RJ[id]||{}).rules||[];const T=n=>{const r=R.find(x=>x.n===n);return r?r.t:'';};
-  if(!s.owned){const b=BOOKD[id];h+=`<div class="pth lkc"><div class="hd"><div class="ic">🔒</div><div><b>${c.title}</b><span>بينفتح مع كتاب «${c.book}»</span><span class="byl" style="font-size:12.5px">أنور الجاسم ${VB}</span></div></div><div class="ul">${contents(id).map(x=>`<div><span>${x[0]}</span><span><b>${x[1]}</b> · ${x[2]}</span></div>`).join('')}</div><div class="row"><a class="btn" href="${buyU(b)}" data-buy="${id}">🛒 بدي اشتري</a><button type="button" class="btn alt" data-bk="${id}">🔑 عندي مفتاح</button></div></div>`;continue;}
+  if(!s.owned){const b=BOOKD[id];h+=`<div class="pth lkc"><div class="hd"><div class="ic">🔒</div><div><b>${c.title}</b><span>بينفتح مع كتاب «${c.book}»</span><span class="byl" style="font-size:12.5px">أنور الجاسم ${VB}</span></div></div><div class="ul">${contents(id).map(x=>`<div><span>${x[0]}</span><span><b>${x[1]}</b> · ${x[2]}</span></div>`).join('')}</div><div class="row">${buyBtns(id,b)}<button type="button" class="btn alt" data-bk="${id}">🔑 عندي مفتاح</button></div></div>`;continue;}
   const pct=Math.round(100*((s.read?1:0)+s.passed/s.total*2+(s.finished?1:0)+(s.unlocked?1:0))/5);
   const s1=s.read,s2=s.finished,s3=s.finished&&s.excellent,s4=s.unlocked;
   const mine=pr&&pr.rec===id;h+=`<div class="pth${mine?' mine':''}" data-c="${id}"><div class="hd"><div class="ic">${c.icon}</div><div><b>${c.title}${mine?'<span class="mineb">مقترح إلك</span>':''}</b><span>كتاب «${c.book}»</span><span class="byl" style="font-size:12.5px">أنور الجاسم ${VB}</span></div></div><div class="bar"><i style="width:${pct}%"></i></div>`;
