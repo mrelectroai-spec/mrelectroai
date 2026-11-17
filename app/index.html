@@ -411,7 +411,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.17i";
+var APPV="2026.11.17j";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -822,7 +822,7 @@ function local(q){for(var i=0;i<R.length;i++)if(R[i][0].test(q))return R[i][EN?2
 var busy=false;
 function ask(q){q=q.trim();if(!q||busy)return;busy=true;$('send').disabled=true;$('chips').hidden=true;
  H.push({role:'user',text:q});bubble('user',q);var t=bubble('model',T.thinking,'typing');
- fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'chat',lang:EN?'en':'ar',vid:ls('mea_vid')||'',messages:H.slice(-10)})})
+ fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'chat',lang:EN?'en':'ar',vid:ls('mea_vid')||'',play:PLAY,messages:H.slice(-10)})})
  .then(function(r){return r.json();}).then(function(d){return d&&d.text?d.text:local(q);})
  .catch(function(){return navigator.onLine===false?T.noNet:local(q);})
  .then(function(a){t.classList.remove('typing');t.innerHTML=fmt(a);t.scrollIntoView({block:'end',behavior:'smooth'});H.push({role:'model',text:a});H=H.slice(-20);ls(HK,JSON.stringify(H));busy=false;$('send').disabled=false;});}
@@ -1020,7 +1020,7 @@ function report(id,btn){const M=window.MEAPATH,s=M.status(id);const out=$('rep_'
   const lines=s.per.sort((a,b)=>a.n-b.n).map(r=>`القاعدة ${r.n} (${T2(r.n)}${P2(r.n)}): ${r.m} غلطات من ${r.a} جواب${r.p?' ✓':''}`).join('\n');
   const q=`اكتبلي تقرير قصير بالعامية اللبنانية لطالب بـ«${s.c.title}» (كتاب ${s.c.book}). خلّص ${s.passed} من ${s.total} قاعدة، ومجموع غلطاتو ${s.mistakes}. هيدي نتايجو:\n${lines}\nقلّو بنقاط قصيرة: شو منيح فيه، وأي قواعد لازم يرجع يقراها بالكتاب بالإسم والرقم والصفحة إذا موجودة، وشو الخطوة الجاية. المشاريع العملية بتنفتح بس يخلّص بـ${M.MAX_MISTAKES} غلطات أو أقل. بلا روابط.`;
   const local=()=>{const w=s.weak.slice(0,4);return (w.length?'ركّز على هول القواعد وارجع اقراها بالكتاب:\n'+w.map(r=>`• القاعدة ${r.n}: ${T2(r.n)}${P2(r.n)} (${r.m} غلطات)`).join('\n'):'شغلك منيح لهلّق، ما في قاعدة ضعيفة.')+(s.finished?(s.excellent?'\n\n🎉 نتيجتك ممتازة، والمشاريع انفتحت.':`\n\nخلّصت بـ${s.mistakes} غلطات. راجع القواعد فوق وعيد الكورس لتنزل لـ${M.MAX_MISTAKES} أو أقل.`):'\n\nكمّل القواعد الباقية.');};
-  fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'chat',lang:EN?'en':'ar',vid:ls('mea_vid')||'',messages:[{role:'user',text:q}]})})
+  fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'chat',lang:EN?'en':'ar',vid:ls('mea_vid')||'',play:PLAY,messages:[{role:'user',text:q}]})})
   .then(r=>r.json()).then(d=>d&&d.text?d.text:local()).catch(local).then(t=>{out.innerHTML=fmt(t);btn.disabled=false;});});}
 paths();document.addEventListener('visibilitychange',()=>{if(!document.hidden)paths();});
 
