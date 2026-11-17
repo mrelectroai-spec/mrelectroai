@@ -252,6 +252,10 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="hbM" hidden class="mdl"><div class="set mdb"><div class="mdt">🏆 لوحة الشرف</div><p class="byl" id="hbBy" style="font-size:13px;margin:2px 0 4px">بإشراف أنور الجاسم</p><p class="mds">يلي خلّصوا كورس الأسئلة. الترتيب حسب الأغلاط: الأقل غلط هوّي الأوّل. 🎓 = 5 أغلاط أو أقل (بياخد شهادة موقّعة من أنور).</p>
 <div class="chp" id="hbT"><button type="button" data-v="electro" class="on">⚡ الكهربا</button><button type="button" data-v="classic">⚙️ الكلاسيك</button><button type="button" data-v="solar">☀️ الشمسية</button></div>
 <div id="hbMe"></div><div id="hbL" style="max-height:52vh;overflow:auto;margin-top:8px"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
+<div id="grM" hidden class="mdl" style="z-index:66"><div class="set mdb"><div class="mdt">🔑 فعّل كتب لـ<span id="grN"></span></div><p class="mds">بينفتحولو عتلفونو لحالن، بلا ما تبعتلو مفتاح، وبيوصلو إشعار.</p>
+<div class="mdl2">شو الكتب؟</div><div class="chp" id="grB"><button type="button" data-v="book">📘 الكهربا</button><button type="button" data-v="book2">⚙️ الكلاسيك</button><button type="button" data-v="book3">☀️ الشمسية</button></div>
+<div class="mdl2">نسخة PDF</div><div class="chp" id="grP"><button type="button" data-v="1" class="on">📄 مع PDF</button><button type="button" data-v="0">📕 ورقي بس</button></div>
+<div id="grE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn" id="grGo">✅ فعّل</button><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="accM" hidden class="mdl"><div class="set mdb"><div class="mdt">👤 حسابي</div><p class="mds">الاسم يلي بيطلع بلوحة الشرف والشهادة، ورقمك لنتواصل معك.</p>
 <label class="mdl2" for="accN">اسمك</label><input id="accN" autocomplete="name" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 12px;font:inherit;font-size:16px">
 <label class="mdl2" for="accP">رقمك</label><input id="accP" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 12px;font:inherit;font-size:16px;text-align:right">
@@ -373,7 +377,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.16h';
+var APPV='2026.11.17a';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -564,13 +568,23 @@ $('ctBtn').onclick=function(){$('ctM').hidden=false;ctLoad();ctElLoad();};
 $('ctL').onclick=function(e){var ok=e.target.closest('[data-ctok]'),no=e.target.closest('[data-ctno]');if(!ok&&!no)return;var b=ok||no,code=b.dataset.ctok||b.dataset.ctno;b.disabled=true;
  var inp=$('ctL').querySelector('[data-ctn="'+code+'"]');
  prRpc('cert_decide',{p_code:code,p_ok:!!ok,p_name:inp?inp.value:null}).then(function(j){if(j&&j.ok&&ok&&j.uid)pushTo(j.uid,'🎓 شهادتك جاهزة!','أنور وافق على شهادتك. افتح التطبيق، احفظها PDF وشاركها.').catch(function(){});if(j&&j.ok){toast(ok?'🎓 انبعتت الشهادة':'❌ انرفض');ctLoad();ctElLoad();}else{b.disabled=false;toast((j&&(j.msg||j.message))||'ما زبط');}}).catch(function(){b.disabled=false;toast('تأكد من الإنترنت');});};
+chpMulti('grB');chp('grP');var GRP=null;
+$('ppL').addEventListener('click',function(e){var b=e.target.closest('[data-gv]');if(!b)return;GRP=(window.PPL||[])[+b.dataset.gv];if(!GRP)return;
+ $('grN').textContent=' '+(GRP.name||'بلا اسم');$('grE').textContent='';$('grB').querySelectorAll('button').forEach(function(x){x.classList.remove('on');});$('grM').hidden=false;});
+$('grGo').onclick=function(){if(!GRP)return;var tl=vals('grB');if(!tl.length){$('grE').textContent='اختار كتاب واحد عالأقل.';return;}var bt=$('grGo');bt.disabled=true;$('grE').textContent='⏳';
+ prRpc('grant_books',{p_vid:GRP.vid,p_tools:tl.join(','),p_pdf:val('grP')==='1',p_name:GRP.name||'',p_phone:GRP.phone||''}).then(function(j){bt.disabled=false;
+  if(!j||!j.ok){$('grE').textContent=(j&&(j.msg||j.message))||'ما زبط.';return;}
+  var nm=tl.map(function(t){return {book:'الكهربا',book2:'الكلاسيك',book3:'الشمسية'}[t];}).join(' و');
+  pushTo(j.uid,'🎉 انفعّللك الكتاب!','أنور فعّللك كتاب '+nm+'. افتح التطبيق ← الكتب، وبلّش.').catch(function(){});
+  $('grM').hidden=true;toast('✅ انفعّل لـ'+(GRP.name||'')+' · '+nm);$('ppBtn').onclick();})
+ .catch(function(){bt.disabled=false;$('grE').textContent='تأكد من الإنترنت.';});};
 $('ppBtn').onclick=function(){$('ppM').hidden=false;$('ppE').textContent='⏳';$('ppL').innerHTML='';
  prRpc('app_people',{}).then(function(j){if(!j||!j.ok){$('ppE').textContent=(j&&(j.msg||j.message))||'ما زبط.';return;}$('ppE').textContent='';
   var box=function(n,t){return '<div style="text-align:center;padding:10px 4px;border-radius:14px;background:rgba(34,199,155,.16);border:1px solid rgba(34,199,155,.4)"><b style="font-size:22px;display:block">'+n+'</b><small style="font-size:12px">'+t+'</small></div>';};
   $('ppS').innerHTML=box(j.today,'اليوم')+box(j.week,'هالأسبوع')+box(j.total,'من الأوّل');
   $('ppS2').textContent='🆕 جداد اليوم: '+j.new_today+' · 📱 منزّلين التطبيق: '+j.app_total+' · 🌐 من المتصفّح: '+j.web_total;
-  var L=j.people||[];$('ppL').innerHTML=L.length?L.map(function(p){var ph=String(p.phone||'').replace(/[^\d]/g,'');if(ph.indexOf('00')===0)ph=ph.slice(2);else if(ph.length<=8)ph='961'+ph.replace(/^0/,'');else if(/^09\d{8}$/.test(ph))ph='963'+ph.slice(1);
-   return '<div class="pli"><div><b>'+esc(p.name||'بلا اسم')+(p.dev==='app'?' 📱':'')+'</b><small><span dir="ltr">'+esc(p.phone||'')+'</span> · فات '+ppAgo(p.at)+(p.last_at?' · آخر مرة '+ppAgo(p.last_at):'')+'</small></div>'+(ph?'<a class="btn alt" style="margin:0;padding:8px 12px;width:auto;flex:0 0 auto" href="https://wa.me/'+ph+'">💬</a>':'')+'</div>';}).join(''):'<p class="mds">لسّا ما حدا كتب اسمو.</p>';})
+  var L=j.people||[];window.PPL=L;$('ppL').innerHTML=L.length?L.map(function(p,pi){var ph=String(p.phone||'').replace(/[^\d]/g,'');if(ph.indexOf('00')===0)ph=ph.slice(2);else if(ph.length<=8)ph='961'+ph.replace(/^0/,'');else if(/^09\d{8}$/.test(ph))ph='963'+ph.slice(1);
+   return '<div class="pli"><div><b>'+esc(p.name||'بلا اسم')+(p.dev==='app'?' 📱':'')+'</b><small><span dir="ltr">'+esc(p.phone||'')+'</span> · فات '+ppAgo(p.at)+(p.last_at?' · آخر مرة '+ppAgo(p.last_at):'')+(p.books?' · 📚 '+p.books.split(',').map(function(t){return {book:'1',book2:'2',book3:'3'}[t]||t;}).sort().join('،'):'')+'</small></div><div style="display:flex;gap:6px;flex:0 0 auto">'+(p.vid?'<button type="button" class="btn" style="margin:0;padding:8px 12px;width:auto" data-gv="'+pi+'">🔑</button>':'')+(ph?'<a class="btn alt" style="margin:0;padding:8px 12px;width:auto;flex:0 0 auto" href="https://wa.me/'+ph+'">💬</a>':'')+'</div></div>';}).join(''):'<p class="mds">لسّا ما حدا كتب اسمو.</p>';})
  .catch(function(){$('ppE').textContent='ما زبط. تأكد من الإنترنت.';});};
 $('prL').onclick=function(e){var ok=e.target.closest('[data-ok]'),no=e.target.closest('[data-no]');if(!ok&&!no)return;var b=ok||no;b.disabled=true;
  (ok?prRpc('promo_approve',{p_code:ok.dataset.ok,p_pdf:true}):prRpc('promo_reject',{p_code:no.dataset.no}))
@@ -786,6 +800,17 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-cert
  .then(function(j){if(j&&j.ok){toast('✅ انبعت طلب الشهادة لأنور');certLoad().then(function(){if(!$('hbM').hidden)hbDraw();paths();});}else{b.disabled=false;b.textContent='🎓 اطلب شهادتك';toast((j&&j.msg)||'ما زبط');}})
  .catch(function(){b.disabled=false;b.textContent='🎓 اطلب شهادتك';toast('تأكد من الإنترنت');});});
 setTimeout(function(){certLoad().then(certNudge).catch(function(){});},2500);
+/* كتب انفعّلتلي من أنور (من 👥 الناس): منفعّلن لحالن */
+function grantPoll(){var v=ls('mea_vid');if(!v||!window.MEAPATH)return;
+ fetch(SBU+'/rest/v1/rpc/my_grants',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_vid:v})}).then(function(r){return r.json();})
+ .then(function(L){if(!Array.isArray(L)||!L.length)return;var got=[];var ch=Promise.resolve();
+  L.forEach(function(g){ch=ch.then(function(){return window.MEAPATH.activateAll(g.code).then(function(r){if(r.ok)got=got.concat(r.books);});});});
+  return ch.then(function(){if(!got.length)return;renderBooks();paths();try{accPaint();}catch(e){}
+   var nm=got.filter(function(x,i){return got.indexOf(x)===i;}).map(function(x){return 'كتاب '+({course:1,classic:2,solar:3}[x]);}).join(' و');
+   var d=document.createElement('div');d.className='mdl';d.style.zIndex=80;
+   d.innerHTML='<div class="set mdb" style="text-align:center"><div style="font-size:46px">🎉</div><div class="mdt">أنور فعّللك '+nm+'!</div><p class="mds">صار كل شي مفتوح: الكورس والمشاريع والأدوات'+(L.some(function(g){return g.pdf;})?'، والـPDF بصفحة الكتاب':'')+'.</p><button type="button" class="btn" style="width:100%">افتح الكتب ←</button></div>';
+   document.body.appendChild(d);d.querySelector('button').onclick=function(){d.remove();show('books');};});}).catch(function(){});}
+setTimeout(grantPoll,3000);document.addEventListener('visibilitychange',function(){if(!document.hidden)grantPoll();});
 /* كل تلفون إلو قناة إشعارات خاصة فيه (u_ + أوّل 16 حرف من بصمة mea_vid) لحتى أنور يبعتلو إشعار لحالو */
 function uid16(v){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)).then(function(b){return [...new Uint8Array(b)].map(function(x){return x.toString(16).padStart(2,'0');}).join('').slice(0,16);});}
 setTimeout(function(){var v=ls('mea_vid');if(v&&CAP)uid16(v).then(function(u){return nat('sub',{topic:'u_'+u});}).catch(function(){});},3500);
