@@ -36,14 +36,12 @@ ol{padding-inline-start:22px;margin-top:6px}li{font-size:15px;margin:6px 0}
   <div class="box mea-glass" id="and" hidden>
     <b>📱 أندرويد</b>
     <a class="btn" id="open">✅ التطبيق عندي: افتحو وفعّل</a>
-    <ol>
-      <li>إذا التطبيق مش عندك، نزّلو من هون:</li>
-    </ol>
-    <a class="btn alt" href="MrElectroAI.apk">⬇️ نزّل التطبيق</a>
-    <ol start="2">
-      <li>افتح الملف يلي نزل وركّبو (إذا سألك، اسمح بالتثبيت).</li>
-      <li>رجاع عهالصفحة واكبس الزر الأخضر فوق 👆</li>
-    </ol>
+    <p style="margin-top:12px">التطبيق مش عندك؟ نزّلو من غوغل بلاي:</p>
+    <div id="grp"><ol><li>انضمّ للمجموعة (اكبس «الانضمام إلى المجموعة»):</li></ol>
+    <a class="btn alt" href="https://groups.google.com/g/mrelectroai-testers" target="_blank" rel="noopener">👥 انضمّ للمجموعة</a></div>
+    <ol id="plS" start="2"><li>نزّل التطبيق من غوغل بلاي:</li></ol>
+    <a class="btn alt" id="play" href="https://play.google.com/apps/testing/com.mrelectroai.app" target="_blank" rel="noopener">📲 نزّل من غوغل بلاي</a>
+    <ol start="3"><li>رجاع عهالصفحة واكبس الزر الأخضر فوق 👆</li></ol>
     <p class="n">إذا ما زبط الزر: افتح التطبيق ← الكتب ← اكبس عالكتاب ← «عندي مفتاح» وحط المفتاح.</p>
   </div>
 
@@ -68,7 +66,7 @@ document.getElementById('code').textContent=c||'—';
 document.getElementById('cp').onclick=function(){(navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(function(){alert('📋 انسخ المفتاح');}).catch(function(){prompt('انسخ المفتاح:',c);});};
 var ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&'ontouchend' in document),and=/Android/.test(ua);
 document.getElementById(ios?'ios':'and').hidden=false;if(!ios&&!and)document.getElementById('ios').hidden=false;
-var fb=location.origin+location.pathname.replace(/k\.html$/,'')+'MrElectroAI.apk';
+var fb=document.getElementById('play').href;
 document.getElementById('open').href='intent://open?key='+encodeURIComponent(c)+'#Intent;scheme=mrelectroai;package=com.mrelectroai.app;S.browser_fallback_url='+encodeURIComponent(fb)+';end';
 })();
 </script>
