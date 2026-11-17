@@ -411,7 +411,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.17e";
+var APPV="2026.11.17f";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -657,7 +657,7 @@ $('exL').addEventListener('click',function(e){var b=e.target.closest('[data-exd]
  admin().then(function(a){return fetch(SBU+'/rest/v1/expenses?id=eq.'+id,{method:'DELETE',headers:{apikey:SBK,Authorization:'Bearer '+a}});}).then(function(){WL.E=WL.E.filter(function(x){return String(x.id)!==id;});wlDraw();});});
 /* 🛒 طلبات الشراء: الطالب بيكبس «بدي اشتري» ← إشعار لتلفون أنور ← بيكبس ← رسالة الأسعار جاهزة عالواتساب */
 var BYN={course:'كتاب «الكهرباء بالمختصر المفيد» 📘',classic:'كتاب «الكلاسيك كنترول بالمختصر المفيد» 📗',solar:'كتاب «الطاقة الشمسية بالمختصر المفيد» 📙',all:'الكتب التلاتة 🎁'};
-var BUYTPL='مرحبا {الاسم} 👋\nأنا أنور الجاسم، وصلني طلبك على {الكتاب} 🙏\n\n📦 *شو بيوصلك:*\n📖 الكتاب PDF (أو نسخة ورقية)\n🎯 كورس أسئلة جوّا التطبيق، مع تقرير بنقاط ضعفك وأرقام الصفحات\n🛠️ مشاريع عملية بمختبر التابلو\n👨‍🏫 متابعة شخصية مني عالواتساب لأي سؤال\n🎓 شهادة موقّعة مني إذا خلّصت الكورس بـ5 غلطات أو أقل\n\n💵 *الأسعار:*\n📘 الكهرباء بالمختصر المفيد: 10$\n📗 الكلاسيك كنترول بالمختصر المفيد: ..$\n📙 الطاقة الشمسية بالمختصر المفيد: ..$\n🎁 التلاتة سوا: ..$\n\n💳 *طريقة الدفع:*\n🇱🇧 بلبنان: Whish Money أو OMT عالرقم 79434479\n🌍 برّا لبنان: USDT أو تحويل بنكي (بعتلك التفاصيل)\n\nبس تحوّل ابعتلي صورة الوصل، وبيوصلك مفتاحك ورابط التطبيق دغري ✅';
+var BUYTPL='مرحبا {الاسم} 👋\nأنا أنور الجاسم، وصلني طلبك على {الكتاب} 🙏\n\n📦 *شو بيوصلك:*\n📖 الكتاب PDF (أو نسخة ورقية)\n🎯 كورس أسئلة جوّا التطبيق، مع تقرير بنقاط ضعفك وأرقام الصفحات\n🛠️ مشاريع عملية بمختبر التابلو\n👨‍🏫 متابعة شخصية مني عالواتساب لأي سؤال\n🎓 شهادة موقّعة مني إذا خلّصت الكورس بـ5 غلطات أو أقل\n\n💵 *الأسعار:*\n📘 الكهرباء بالمختصر المفيد: 10$\n📗 الكلاسيك كنترول بالمختصر المفيد: 19$\n📙 الطاقة الشمسية بالمختصر المفيد: 39$\n\n🎁 *التلاتة سوا (بدل 68$):*\n📄 PDF: خصم 20% ← *54.40$*\n📕 ورقي: خصم 10% ← *61.20$*\n\n📕 النسخة الورقية بس بلبنان، والتوصيل ببلاش 🚚\n\n💳 *طريقة الدفع:*\n🇱🇧 بلبنان: Whish Money أو OMT عالرقم 79434479\n🌍 برّا لبنان: USDT أو تحويل بنكي (بعتلك التفاصيل)\n\nبس تحوّل ابعتلي صورة الوصل، وبيوصلك مفتاحك ورابط التطبيق دغري ✅';
 chp('byB');
 document.addEventListener('click',function(e){var a=e.target.closest('[data-buy]');if(!a)return;e.preventDefault();var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(x){}
  $('byN').value=(l&&l.name)||'';$('byP').value=(l&&l.phone)||'';setOn('byB',[a.dataset.buy]);$('byE').textContent='';$('byF').hidden=false;$('byOk').hidden=true;$('byGo').disabled=false;
@@ -836,10 +836,10 @@ var BOOKD={
  course:{n:1,t:'الكهرباء بالمختصر المفيد',cv:'../course/cover.jpg',lv:'للمبتدئ من الصفر',price:'10$',rules:18,q:180,sample:null,
   proj:{n:3,t:'مختبر التابلو',u:'../panel/'},parts:[['mcb','القاطع العادي MCB',1],['rcd','الدفرانسير RCD'],['stair','تايمر الدرج'],['photo','الفوتوسيل']],
   tools:[['توزيع الفازات','../tools/wirephase/']]},
- classic:{n:2,t:'الكلاسيك كنترول بالمختصر المفيد',cv:'../classic/cover.jpg',lv:'لوحات وموتورات',price:'',rules:25,q:250,sample:'../sample/',
+ classic:{n:2,t:'الكلاسيك كنترول بالمختصر المفيد',cv:'../classic/cover.jpg',lv:'لوحات وموتورات',price:'19$',rules:25,q:250,sample:'../sample/',
   proj:{n:5,t:'مختبر التابلو',u:'../panel/'},parts:[['contactor','الكونتاكتور',1],['mpcb','قاطع الموتور'],['overload','الأوفرلود'],['phase','ريليه الفازات'],['relay','الريليه المساعد'],['timer','التايمر'],['buttons','كبسات Start و Stop'],['estop','كبسة الطوارئ'],['selector','السيليكتور'],['lamps','لمبات الإشارة'],['float','الفلوت'],['pressure','البرشر سويتش'],['limit','الليميت سويتش']],
   tools:[['حاسبة المحوّلات','../tools/transformer/']]},
- solar:{n:3,t:'الطاقة الشمسية بالمختصر المفيد',cv:'../solar/cover.jpg',lv:'لفنيي التركيب',price:'',rules:32,q:320,sample:'../sample/#solar',
+ solar:{n:3,t:'الطاقة الشمسية بالمختصر المفيد',cv:'../solar/cover.jpg',lv:'لفنيي التركيب',price:'39$',rules:32,q:320,sample:'../sample/#solar',
   proj:{n:6,t:'مختبر الطاقة الشمسية',u:'../sim/#projects'},parts:[['pv','اللوح الشمسي',1],['mc4','وصلة MC4'],['gpv','فيوز الـgPV'],['dciso','عازل الـDC'],['dcspd','الـSPD'],['lfp','بطارية الليثيوم'],['hybrid','الانفرتر الهايبرد']],
   tools:[['حساب المنظومة','../tools/load/'],['عرض السعر للزبون','../tools/quote/']]}};
 var BORD=['course','classic','solar'];
