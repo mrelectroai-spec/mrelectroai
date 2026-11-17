@@ -95,7 +95,7 @@ document.querySelector('.pick').onclick=function(e){var b=e.target.closest('[dat
 function paint(){['1','2'].forEach(function(i){document.getElementById('a'+i).classList.toggle('done',get('meaFree'+i)==='1');});}
 document.getElementById('g1').addEventListener('click',function(){set('meaFree1','1');setTimeout(paint,500);});
 document.getElementById('g2').addEventListener('click',function(){set('meaFree2','1');setTimeout(paint,500);});
-var saved=get('meaFreeOS');if(saved)pick(saved);paint();
+var qo=(location.search.match(/os=(and|ios)/)||[])[1];var saved=qo||get('meaFreeOS');if(saved)pick(saved);paint();
 })();
 </script>
 <script src="../t.js" data-page="free" defer></script>

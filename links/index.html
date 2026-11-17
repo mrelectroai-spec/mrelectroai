@@ -34,6 +34,13 @@ a.b.main small{color:rgba(3,19,16,.75)}
 a.b.main .ar{color:var(--ink)}
 a.b.main .i{background:rgba(3,19,16,.12)}
 .offer{margin:-2px 0 14px;font-size:14px;color:#ffd27a;font-weight:600}
+.gift{border-radius:22px;padding:16px;margin-bottom:16px;background:linear-gradient(135deg,rgba(34,199,155,.22),rgba(255,196,0,.14));border:1px solid rgba(34,199,155,.55);text-align:center}
+.gift .tg{display:inline-block;padding:3px 12px;border-radius:20px;background:#111;color:#fff;font:700 12px 'Readex Pro',sans-serif}
+.gift h2{font:700 21px 'Readex Pro',sans-serif;margin-top:8px;line-height:1.4}.gift h2 span{color:var(--volt)}
+.gift p{color:var(--muted);font-size:14px;margin-top:4px}
+.os{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.os a{display:block;padding:13px 6px;border-radius:16px;background:var(--volt);color:var(--ink);text-decoration:none;font:700 16px 'Readex Pro',sans-serif}
+.os a i{display:block;font-style:normal;font-size:28px;line-height:1.2}
 .ft{margin-top:28px;color:var(--muted);font-size:13px}
 svg{display:block}
 </style>
@@ -45,13 +52,20 @@ svg{display:block}
   <div class="br">MrElectroAI</div>
   <p class="sub">كهربجي ومدرّب · 13 سنة بالشغل<br>كتب كهربا بالمختصر المفيد: الكهرباء، الكلاسيك كنترول، والطاقة الشمسية</p>
 
+  <div class="gift" id="gift">
+    <span class="tg">BLACK NOVEMBER 🖤</span>
+    <h2>الكتاب الأول <span>ببلاش PDF 🎁</span></h2>
+    <p>بس نزّل تطبيق MrElectroAI · لآخر تشرين التاني</p>
+    <div class="os"><a data-k="and" href="../free/?os=and"><i>🤖</i>أندرويد</a><a data-k="ios" href="../free/?os=ios"><i>🍎</i>آيفون</a></div>
+  </div>
+
   <div class="btns">
     <a class="b main" data-k="order" href="https://wa.me/96179434479?text=%D8%A8%D8%AF%D9%91%D9%8A%20%D8%A7%D9%84%D9%83%D8%AA%D8%A8" target="_blank" rel="noopener">
       <span class="i"><svg width="24" height="24" viewBox="0 0 24 24" fill="#031310"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9 0-1.4.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.3.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg></span>
       <span class="t">اطلب الكتب عالواتساب<small>بتوصلك رسالة «بدّي الكتب» جاهزة، بس اكبس إرسال</small></span><span class="ar">‹</span>
     </a>
   </div>
-  <div class="offer" style="margin-top:10px">🎁 التلاتة مطبوعين بـ65$ مع توصيل ببلاش لكل لبنان · الدفع عند الاستلام</div>
+  <div class="offer" style="margin-top:10px;line-height:1.8">🎁 التلاتة سوا بدل 68$:<br>📄 PDF بـ<b>51$</b> · 📕 مطبوعين بـ<b>61.20$</b><br>🚚 المطبوع توصيل ببلاش لكل لبنان · الدفع عند الاستلام</div>
 
   <div class="btns">
     <a class="b" data-k="wa" href="https://wa.me/96179434479" target="_blank" rel="noopener">
@@ -95,7 +109,7 @@ svg{display:block}
     name: 'Anwar',
     sub: 'Electrician & trainer · 13 years in the field<br>Electrical books, short and practical: Electricity, Classic Control, and Solar Energy',
     order: ['Order the books on WhatsApp', 'A ready message opens, just tap send'],
-    offer: '🎁 All 3 printed books for $65 with free delivery across Lebanon · Cash on delivery',
+    offer: '🎁 All 3 books (instead of $68): PDF $51 · Printed $61.20 · free delivery across Lebanon, cash on delivery',
     wa: ['Chat on WhatsApp', null],
     channel: ['WhatsApp channel', 'Tips and offers'],
     tiktok: ['TikTok', null], insta: ['Instagram', null], telegram: ['Telegram', null],
@@ -107,6 +121,7 @@ svg{display:block}
   document.querySelector('h1').textContent = EN.name;
   document.querySelector('.sub').innerHTML = EN.sub;
   document.querySelector('.offer').textContent = EN.offer;
+  var g = document.getElementById('gift'); g.querySelector('h2').innerHTML = 'Book 1 <span>free PDF 🎁</span>'; g.querySelector('p').textContent = 'Just install the MrElectroAI app · until Nov 30'; g.querySelectorAll('.os a')[0].lastChild.textContent = 'Android'; g.querySelectorAll('.os a')[1].lastChild.textContent = 'iPhone';
   document.querySelector('.ft').textContent = EN.ft;
   document.querySelectorAll('a.b').forEach(function (a) {
     var t = EN[a.dataset.k]; if (!t) return;
@@ -117,10 +132,11 @@ svg{display:block}
     a.querySelector('.ar').textContent = '›';
   });
 })();
-document.querySelectorAll('a.b').forEach(function (a) {
+document.querySelectorAll('a.b,.os a').forEach(function (a) {
   a.addEventListener('click', function () { try { if (window.meaTrack) window.meaTrack('btn-' + a.dataset.k); } catch (e) {} });
 });
 </script>
+<script>if(new Date().toISOString().slice(0,10)>'2026-11-30')document.getElementById('gift').hidden=true;</script>
 <script src="../t.js" data-page="links" defer></script>
 </body>
 </html>
