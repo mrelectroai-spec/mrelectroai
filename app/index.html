@@ -411,7 +411,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.17f";
+var APPV="2026.11.17g";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -657,7 +657,7 @@ $('exL').addEventListener('click',function(e){var b=e.target.closest('[data-exd]
  admin().then(function(a){return fetch(SBU+'/rest/v1/expenses?id=eq.'+id,{method:'DELETE',headers:{apikey:SBK,Authorization:'Bearer '+a}});}).then(function(){WL.E=WL.E.filter(function(x){return String(x.id)!==id;});wlDraw();});});
 /* 🛒 طلبات الشراء: الطالب بيكبس «بدي اشتري» ← إشعار لتلفون أنور ← بيكبس ← رسالة الأسعار جاهزة عالواتساب */
 var BYN={course:'كتاب «الكهرباء بالمختصر المفيد» 📘',classic:'كتاب «الكلاسيك كنترول بالمختصر المفيد» 📗',solar:'كتاب «الطاقة الشمسية بالمختصر المفيد» 📙',all:'الكتب التلاتة 🎁'};
-var BUYTPL='مرحبا {الاسم} 👋\nأنا أنور الجاسم، وصلني طلبك على {الكتاب} 🙏\n\n📦 *شو بيوصلك:*\n📖 الكتاب PDF (أو نسخة ورقية)\n🎯 كورس أسئلة جوّا التطبيق، مع تقرير بنقاط ضعفك وأرقام الصفحات\n🛠️ مشاريع عملية بمختبر التابلو\n👨‍🏫 متابعة شخصية مني عالواتساب لأي سؤال\n🎓 شهادة موقّعة مني إذا خلّصت الكورس بـ5 غلطات أو أقل\n\n💵 *الأسعار:*\n📘 الكهرباء بالمختصر المفيد: 10$\n📗 الكلاسيك كنترول بالمختصر المفيد: 19$\n📙 الطاقة الشمسية بالمختصر المفيد: 39$\n\n🎁 *التلاتة سوا (بدل 68$):*\n📄 PDF: خصم 20% ← *54.40$*\n📕 ورقي: خصم 10% ← *61.20$*\n\n📕 النسخة الورقية بس بلبنان، والتوصيل ببلاش 🚚\n\n💳 *طريقة الدفع:*\n🇱🇧 بلبنان: Whish Money أو OMT عالرقم 79434479\n🌍 برّا لبنان: USDT أو تحويل بنكي (بعتلك التفاصيل)\n\nبس تحوّل ابعتلي صورة الوصل، وبيوصلك مفتاحك ورابط التطبيق دغري ✅';
+var BUYTPL='مرحبا {الاسم} 👋\nأنا أنور الجاسم، وصلني طلبك على {الكتاب} 🙏\n\n📦 *شو بيوصلك:*\n📖 الكتاب PDF (أو نسخة ورقية)\n🎯 كورس أسئلة جوّا التطبيق، مع تقرير بنقاط ضعفك وأرقام الصفحات\n🛠️ مشاريع عملية بمختبر التابلو\n👨‍🏫 متابعة شخصية مني عالواتساب لأي سؤال\n🎓 شهادة موقّعة مني إذا خلّصت الكورس بـ5 غلطات أو أقل\n\n💵 *الأسعار:*\n📘 الكهرباء بالمختصر المفيد: 10$\n📗 الكلاسيك كنترول بالمختصر المفيد: 19$\n📙 الطاقة الشمسية بالمختصر المفيد: 39$\n\n🎁 *التلاتة سوا (بدل 68$):*\n📄 PDF: خصم 25% ← *51$*\n📕 ورقي: خصم 10% ← *61.20$*\n\n📕 النسخة الورقية بس بلبنان، والتوصيل ببلاش 🚚\n\n💳 *طريقة الدفع:*\n🇱🇧 بلبنان: Whish Money أو OMT عالرقم 79434479\n🌍 برّا لبنان: USDT أو تحويل بنكي (بعتلك التفاصيل)\n\nبس تحوّل ابعتلي صورة الوصل، وبيوصلك مفتاحك ورابط التطبيق دغري ✅';
 chp('byB');
 document.addEventListener('click',function(e){var a=e.target.closest('[data-buy]');if(!a)return;e.preventDefault();var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(x){}
  $('byN').value=(l&&l.name)||'';$('byP').value=(l&&l.phone)||'';setOn('byB',[a.dataset.buy]);$('byE').textContent='';$('byF').hidden=false;$('byOk').hidden=true;$('byGo').disabled=false;
