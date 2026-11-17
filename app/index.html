@@ -223,7 +223,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <input id="aE" class="pin" type="email" dir="ltr" placeholder="الإيميل" autocomplete="username"><input id="aP" class="pin" type="password" dir="ltr" placeholder="كلمة السر" autocomplete="current-password"><div id="aErr" class="mde"></div>
 <div class="row"><button type="button" class="btn" id="aGo">ادخل</button><button type="button" class="btn alt" data-close>بطّل</button></div></div></div>
 <div id="keyM" hidden class="mdl"><div class="set mdb"><div class="mdt">🔑 مفتاح جديد</div>
-<div id="kForm"><input id="kN" class="pin" maxlength="60" placeholder="اسم الشخص"><input id="kP" class="pin" type="tel" inputmode="tel" dir="ltr" placeholder="رقمو (اختياري): 70123456">
+<div id="kForm"><input id="kN" class="pin" maxlength="60" placeholder="اسم الشخص"><input id="kP" class="pin" type="tel" inputmode="tel" dir="ltr" placeholder="رقمو (اختياري): 70123456"><input id="kPr" class="pin" type="number" inputmode="decimal" min="0" step="0.5" placeholder="💵 قدّيش دفع؟ ($، اختياري)">
 <div class="mdl2">شو بيفتح؟ (فيك تختار أكتر من واحد)</div><div class="chp" id="kT"><button type="button" data-v="book" class="on">📘 كتاب 1</button><button type="button" data-v="book2">📗 كتاب 2</button><button type="button" data-v="book3">📙 كتاب 3</button><button type="button" data-v="all">🧰 كل الأدوات</button></div>
 <div class="mdl2">شو اشترى؟</div><div class="chp" id="kF"><button type="button" data-v="1" class="on">📄 مع PDF</button><button type="button" data-v="0">📕 نسخة ورقية بس</button></div>
 <div class="mdl2">قدّيش؟</div><div class="chp" id="kD"><button type="button" data-v="3">🧪 تجربة 3 أيام</button><button type="button" data-v="30">📅 شهري</button><button type="button" data-v="365">🗓️ سنوي</button><button type="button" data-v="0" class="on">💎 مدى الحياة</button></div>
@@ -235,6 +235,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="keM" hidden class="mdl" style="z-index:62"><div class="set mdb"><div class="mdt" id="keT"></div><div class="kc"><b id="keC"></b><button type="button" id="keCp" aria-label="نسخ">📋</button></div>
 <div class="mdl2">الكتب المفتوحة</div><div class="chp" id="keB"><button type="button" data-v="book">📘 كتاب 1</button><button type="button" data-v="book2">📗 كتاب 2</button><button type="button" data-v="book3">📙 كتاب 3</button><button type="button" data-v="all">🧰 كل الأدوات</button></div>
 <div class="mdl2">المدة</div><div class="mds" id="keX"></div><div class="chp" id="keD"><button type="button" data-v="keep" class="on">خلّيها</button><button type="button" data-v="30">+ شهر</button><button type="button" data-v="365">+ سنة</button><button type="button" data-v="0">💎 مدى الحياة</button></div>
+<div class="mdl2">💵 السعر يلي دفعو ($)</div><input id="kePr" type="number" inputmode="decimal" min="0" step="0.5" placeholder="فاضي = ما انكتب" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 12px;font:inherit;font-size:16px">
 <div class="mdl2">نسخة PDF</div><div class="chp" id="keP"><button type="button" data-v="1">📄 مع PDF</button><button type="button" data-v="0">📕 بلا PDF</button></div>
 <div class="mdl2">الحالة</div><div class="chp" id="keA"><button type="button" data-v="1">✅ شغّال</button><button type="button" data-v="0">⛔ موقوف</button></div>
 <div class="mds" id="keV" style="margin-top:10px"></div><button type="button" class="btn alt" id="keR" style="width:100%;margin-top:6px">📱 فكّ ربطو بالتلفون (إذا غيّر تلفون)</button>
@@ -255,7 +256,16 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="grM" hidden class="mdl" style="z-index:66"><div class="set mdb"><div class="mdt">🔑 فعّل كتب لـ<span id="grN"></span></div><p class="mds">بينفتحولو عتلفونو لحالن، بلا ما تبعتلو مفتاح، وبيوصلو إشعار.</p>
 <div class="mdl2">شو الكتب؟</div><div class="chp" id="grB"><button type="button" data-v="book">📘 الكهربا</button><button type="button" data-v="book2">⚙️ الكلاسيك</button><button type="button" data-v="book3">☀️ الشمسية</button></div>
 <div class="mdl2">نسخة PDF</div><div class="chp" id="grP"><button type="button" data-v="1" class="on">📄 مع PDF</button><button type="button" data-v="0">📕 ورقي بس</button></div>
-<div id="grE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn" id="grGo">✅ فعّل</button><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
+<div class="mdl2">💵 قدّيش دفع؟ ($)</div><input id="grPr" type="number" inputmode="decimal" min="0" step="0.5" placeholder="مثلاً 10 (اختياري)" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 12px;font:inherit;font-size:16px"><div id="grE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn" id="grGo">✅ فعّل</button><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
+<div id="wlM" hidden class="mdl"><div class="set mdb" style="width:min(480px,100%)"><div class="mdt">💰 محفظتي</div><p class="mds">خاصة فيك بس. السعر بتكتبو إنت لكل شخص، والطباعة بتزيدها تحت.</p>
+<div class="chp" id="wlR"><button type="button" data-v="m" class="on">📅 هالشهر</button><button type="button" data-v="a">♾️ من الأوّل</button></div>
+<div id="wlS" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0"></div>
+<div style="max-height:56vh;overflow:auto">
+<div class="mdl2">💵 المبيعات <small style="font-weight:500;opacity:.75">(اكتب السعر حدّ كل واحد)</small></div><div id="wlL"></div>
+<div class="mdl2" style="margin-top:12px">🖨️ تكاليف الطباعة</div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px"><input id="exT" placeholder="شو؟ مثلاً 20 نسخة كتاب 1" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 12px;font:inherit;font-size:14px"><input id="exQ" type="number" inputmode="numeric" min="0" placeholder="العدد" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 12px;font:inherit;font-size:14px"><input id="exA" type="number" inputmode="decimal" min="0" step="0.5" placeholder="$ المبلغ" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 12px;font:inherit;font-size:14px"></div>
+<button type="button" class="btn" id="exAdd" style="margin-top:6px;width:100%">➕ زيد تكلفة</button><div id="exL"></div></div>
+<div id="wlE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="accM" hidden class="mdl"><div class="set mdb"><div class="mdt">👤 حسابي</div><p class="mds">الاسم يلي بيطلع بلوحة الشرف والشهادة، ورقمك لنتواصل معك.</p>
 <label class="mdl2" for="accN">اسمك</label><input id="accN" autocomplete="name" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 12px;font:inherit;font-size:16px">
 <label class="mdl2" for="accP">رقمك</label><input id="accP" type="tel" inputmode="tel" dir="ltr" autocomplete="tel" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 12px;font:inherit;font-size:16px;text-align:right">
@@ -276,7 +286,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
   <div class="tops"><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
 </header>
 <div id="tchBar" hidden>
- <div class="tbh"><b>🎓 وضع الأستاذ</b><button type="button" id="tchBadge" class="tbx" aria-label="طلاع من وضع الأستاذ">✕ طلاع</button></div>
+ <div class="tbh"><b>🎓 وضع الأستاذ</b><span style="display:flex;gap:6px"><button type="button" id="tbHelp" class="tbx" aria-label="شو هيدا">💡</button><button type="button" id="tchBadge" class="tbx" aria-label="طلاع من وضع الأستاذ">✕ طلاع</button></span></div>
  <div class="tbg">
   <button type="button" id="keyBtn" class="pri"><i>🔑</i>مفتاح جديد</button>
   <button type="button" id="klBtn"><i>🗂️</i>المفاتيح</button>
@@ -285,7 +295,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
   <button type="button" id="ppBtn"><i>👥</i>الناس</button>
   <button type="button" id="pushBtn"><i>📣</i>إشعار</button>
   <button type="button" id="pdfBtn"><i>📚</i>ملفات الكتب</button>
-  <button type="button" id="tbHelp"><i>💡</i>شو هيدا؟</button>
+  <button type="button" id="wlBtn"><i>💰</i>المحفظة</button>
  </div>
 </div>
 <button type="button" id="nb" aria-label="الجديد" hidden><i>🔔</i><b id="nbN" hidden></b></button>
@@ -377,7 +387,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV='2026.11.17a';
+var APPV='2026.11.17b';
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -459,7 +469,7 @@ function tchToggle(){if(ls('meaTeacher')==='1'){tchSet(false);toast('👤 رجع
 (function(){var n=0,t=0;$('logo').addEventListener('click',function(){var now=Date.now();n=now-t<700?n+1:1;t=now;if(n>=5){n=0;tchToggle();}});})();
 $('tchM').onclick=function(e){if(e.target.id==='tchM')$('tchM').hidden=true;};
 $('tchBadge').onclick=function(){tchToggle();};
-$('tbHelp').onclick=function(){alert('🔑 مفتاح جديد: لشاري الكتاب\n🗂️ المفاتيح: كل المفاتيح وتعديلها\n🎁 الهدايا: طلبات الكتاب ببلاش\n🎓 الشهادات: طلبات الشهادة ويلي بيستاهلوا\n👥 الناس: مين فات عالتطبيق\n📣 إشعار: ابعت إشعار للكل\n📚 ملفات الكتب: ارفع PDF الكتب');};
+$('tbHelp').onclick=function(){alert('🔑 مفتاح جديد: لشاري الكتاب\n🗂️ المفاتيح: كل المفاتيح وتعديلها\n🎁 الهدايا: طلبات الكتاب ببلاش\n🎓 الشهادات: طلبات الشهادة ويلي بيستاهلوا\n👥 الناس: مين فات عالتطبيق\n📣 إشعار: ابعت إشعار للكل\n📚 ملفات الكتب: ارفع PDF الكتب\n💰 المحفظة: قدّيش بعت، وتكاليف الطباعة، والربح');};
 
 
 /* ===== حدا فاتح من المتصفّح؟ بعد ساعتين من أول زيارة منقلّو ينزّل التطبيق ===== */
@@ -506,13 +516,13 @@ function kMsg(L){var nm=kNames(L.tools);var m=(nm.length>1?'*'+nm.join('\n')+'*'
 $('kMake').onclick=function(){var n=$('kN').value.trim(),ph=$('kP').value.trim(),tl=vals('kT').join(','),d=val('kD');if(!n){$('kErr').textContent='اكتب اسم الشخص';return;}if(!tl){$('kErr').textContent='اختار كتاب واحد على الأقل';return;}
  var exp=+d?new Date(Date.now()+(+d)*864e5).toISOString().slice(0,10):null,code=code8();$('kMake').disabled=true;$('kErr').textContent='';
  admin().then(function(a){return fetch(SBU+'/rest/v1/licenses',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json',Prefer:'return=minimal'},
-  body:JSON.stringify([{code:code,name:n,phone:ph,tools:tl,expires:exp,active:true,pdf:val('kF')==='1',note:'من التطبيق · '+KD[d]+(val('kF')==='1'?' · PDF':' · ورقي')}])});})
+  body:JSON.stringify([{code:code,name:n,phone:ph,tools:tl,expires:exp,active:true,pdf:val('kF')==='1',price:($('kPr').value===''?null:+$('kPr').value),note:'من التطبيق · '+KD[d]+(val('kF')==='1'?' · PDF':' · ورقي')}])});})
  .then(function(r){$('kMake').disabled=false;if(r.status===401){ls('meaAdm','');$('kErr').textContent='خلص الدخول، جرّب كمان مرة.';return;}if(!r.ok){$('kErr').textContent='ما انعمل المفتاح، جرّب كمان مرة.';return;}
   var msg=kMsg({code:code,name:n,tools:tl,d:d,exp:exp,pdf:val('kF')==='1'}),p=ph.replace(/\D/g,'').replace(/^0/,''),wa='https://api.whatsapp.com/send?'+(p?'phone='+(p.length<=8?'961'+p:p)+'&':'')+'text='+encodeURIComponent(msg);
   $('kForm').hidden=true;$('kOut').hidden=false;
   $('kOut').innerHTML='<div style="font-weight:700;color:var(--volt)">✅ المفتاح جاهز لـ '+n.replace(/</g,'')+'</div><div class="kc"><b id="kCode">'+code+'</b><button type="button" id="kCp" aria-label="نسخ">📋</button></div><div class="mds">'+kNames(tl).join(' + ')+' · '+(val('kF')==='1'?'📄 مع PDF · ':'')+KD[d]+(exp?' · لحد '+exp:'')+'</div>'
    +'<div class="row" style="margin-top:10px"><a class="btn" href="'+wa+'">📲 ابعت عالواتساب</a><button type="button" class="btn alt" id="kNew">مفتاح تاني</button></div>';
-  $('kN').value='';$('kP').value='';
+  $('kN').value='';$('kP').value='';$('kPr').value='';
   $('kCp').onclick=function(){(navigator.clipboard?navigator.clipboard.writeText(code):Promise.reject()).then(function(){toast('📋 انسخ المفتاح');}).catch(function(){var t=document.createElement('textarea');t.value=code;document.body.appendChild(t);t.select();try{document.execCommand('copy');toast('📋 انسخ المفتاح');}catch(e){}t.remove();});};
   $('kNew').onclick=function(){$('kForm').hidden=false;$('kOut').hidden=true;};})
  .catch(function(){$('kMake').disabled=false;$('kErr').textContent='ما في إنترنت.';});};
@@ -526,7 +536,7 @@ function klRender(){var q=$('klQ').value.trim().toLowerCase();var L=KL.filter(fu
  [].forEach.call($('klL').querySelectorAll('.kli'),function(el){var x=KL[+el.dataset.k];el.querySelector('b').textContent=x.name||'بلا اسم';
   el.querySelector('small').textContent=(kNames(x.tools).map(function(n){return n.split(' ')[0];}).join(' ')||'—')+' · '+kExp(x)+(x.phone?' · '+x.phone:'')+(x.active?'':' · موقوف')+(x.pdf?' · 📄':'')+(x.device?' · 📱 مربوط':'');});}
 function klLoad(){$('klS').textContent='عم نجيب المفاتيح…';$('klL').innerHTML='';
- return admin().then(function(a){return fetch(SBU+'/rest/v1/licenses?select=code,name,phone,tools,expires,active,pdf,device,uses,last_seen,created_at,note&order=created_at.desc&limit=500',{headers:{apikey:SBK,Authorization:'Bearer '+a}});})
+ return admin().then(function(a){return fetch(SBU+'/rest/v1/licenses?select=code,name,phone,tools,expires,active,pdf,price,device,uses,last_seen,created_at,note&order=created_at.desc&limit=500',{headers:{apikey:SBK,Authorization:'Bearer '+a}});})
  .then(function(r){if(r.status===401){ls('meaAdm','');throw new Error('خلص الدخول، سكّر وافتح كمان مرة');}return r.json();}).then(function(j){KL=Array.isArray(j)?j:[];klRender();})
  .catch(function(e){$('klS').textContent='ما زبط: '+(e.message||'ما في إنترنت');});}
 $('klBtn').onclick=function(){$('klM').hidden=false;klLoad();};
@@ -570,14 +580,39 @@ $('ctL').onclick=function(e){var ok=e.target.closest('[data-ctok]'),no=e.target.
  prRpc('cert_decide',{p_code:code,p_ok:!!ok,p_name:inp?inp.value:null}).then(function(j){if(j&&j.ok&&ok&&j.uid)pushTo(j.uid,'🎓 شهادتك جاهزة!','أنور وافق على شهادتك. افتح التطبيق، احفظها PDF وشاركها.').catch(function(){});if(j&&j.ok){toast(ok?'🎓 انبعتت الشهادة':'❌ انرفض');ctLoad();ctElLoad();}else{b.disabled=false;toast((j&&(j.msg||j.message))||'ما زبط');}}).catch(function(){b.disabled=false;toast('تأكد من الإنترنت');});};
 chpMulti('grB');chp('grP');var GRP=null;
 $('ppL').addEventListener('click',function(e){var b=e.target.closest('[data-gv]');if(!b)return;GRP=(window.PPL||[])[+b.dataset.gv];if(!GRP)return;
- $('grN').textContent=' '+(GRP.name||'بلا اسم');$('grE').textContent='';$('grB').querySelectorAll('button').forEach(function(x){x.classList.remove('on');});$('grM').hidden=false;});
+ $('grN').textContent=' '+(GRP.name||'بلا اسم');$('grE').textContent='';$('grPr').value='';$('grB').querySelectorAll('button').forEach(function(x){x.classList.remove('on');});$('grM').hidden=false;});
 $('grGo').onclick=function(){if(!GRP)return;var tl=vals('grB');if(!tl.length){$('grE').textContent='اختار كتاب واحد عالأقل.';return;}var bt=$('grGo');bt.disabled=true;$('grE').textContent='⏳';
- prRpc('grant_books',{p_vid:GRP.vid,p_tools:tl.join(','),p_pdf:val('grP')==='1',p_name:GRP.name||'',p_phone:GRP.phone||''}).then(function(j){bt.disabled=false;
+ prRpc('grant_books',{p_vid:GRP.vid,p_tools:tl.join(','),p_pdf:val('grP')==='1',p_name:GRP.name||'',p_phone:GRP.phone||''}).then(function(j){bt.disabled=false;var pr=$('grPr').value;if(j&&j.ok&&pr!=='')admin().then(function(a){return fetch(SBU+'/rest/v1/licenses?code=eq.'+encodeURIComponent(j.code),{method:'PATCH',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({price:+pr})});}).catch(function(){});
   if(!j||!j.ok){$('grE').textContent=(j&&(j.msg||j.message))||'ما زبط.';return;}
   var nm=tl.map(function(t){return {book:'الكهربا',book2:'الكلاسيك',book3:'الشمسية'}[t];}).join(' و');
   pushTo(j.uid,'🎉 انفعّللك الكتاب!','أنور فعّللك كتاب '+nm+'. افتح التطبيق ← الكتب، وبلّش.').catch(function(){});
   $('grM').hidden=true;toast('✅ انفعّل لـ'+(GRP.name||'')+' · '+nm);$('ppBtn').onclick();})
  .catch(function(){bt.disabled=false;$('grE').textContent='تأكد من الإنترنت.';});};
+/* 💰 المحفظة */
+var WL={L:[],E:[]},wlR='m';chp('wlR');
+function money(n){n=Math.round((+n||0)*100)/100;return (n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-US');}
+function inR(d){if(wlR==='a')return true;var t=new Date(d),n=new Date();return t.getFullYear()===n.getFullYear()&&t.getMonth()===n.getMonth();}
+function wlDraw(){var L=WL.L.filter(function(x){return inR(x.created_at);}),E=WL.E.filter(function(x){return inR(x.at);});
+ var sale=L.reduce(function(a,x){return a+(+x.price||0);},0),cost=E.reduce(function(a,x){return a+(+x.amount||0);},0),cnt=L.filter(function(x){return +x.price>0;}).length;
+ var bx=function(t,v,c){return '<div style="text-align:center;padding:10px 4px;border-radius:14px;background:'+c+'"><small style="font-size:12px">'+t+'</small><b style="display:block;font-size:19px;direction:ltr">'+v+'</b></div>';};
+ $('wlS').innerHTML=bx('💵 المبيعات ('+cnt+')',money(sale),'rgba(34,199,155,.18)')+bx('🖨️ الطباعة',money(cost),'rgba(255,176,32,.18)')+bx('✅ الربح',money(sale-cost),'rgba(29,155,240,.18)');
+ var BN={book:'1',book2:'2',book3:'3',all:'🧰'};
+ $('wlL').innerHTML=L.length?L.map(function(x){return '<div class="pli" style="gap:8px"><div style="flex:1;min-width:0"><b>'+esc(x.name||'بلا اسم')+'</b><small>📚 '+String(x.tools||'').split(',').map(function(t){return BN[t]||t;}).join('،')+(x.pdf?' · 📄':' · 📕')+' · '+String(x.created_at).slice(0,10)+'</small></div><input data-pr="'+esc(x.code)+'" type="number" inputmode="decimal" min="0" step="0.5" value="'+(x.price==null?'':x.price)+'" placeholder="$" style="width:78px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:inherit;padding:0 8px;font:inherit;font-weight:700;direction:ltr"></div>';}).join(''):'<p class="mds">ما في مبيعات بهالفترة.</p>';
+ $('exL').innerHTML=E.map(function(x){return '<div class="pli"><div style="flex:1"><b>'+esc(x.title)+'</b><small>'+(x.qty?x.qty+' نسخة · ':'')+x.at+'</small></div><b style="direction:ltr">'+money(x.amount)+'</b><button type="button" data-exd="'+x.id+'" aria-label="احذف">✕</button></div>';}).join('');}
+function wlLoad(){$('wlE').textContent='⏳';admin().then(function(a){var H={apikey:SBK,Authorization:'Bearer '+a};
+ return Promise.all([fetch(SBU+'/rest/v1/licenses?select=code,name,tools,pdf,price,created_at,note&order=created_at.desc&note=not.ilike.*بلاك نوفمبر*&note=not.ilike.*شخصي*',{headers:H}).then(function(r){return r.json();}),
+  fetch(SBU+'/rest/v1/expenses?select=*&order=at.desc,id.desc',{headers:H}).then(function(r){return r.json();})]);})
+ .then(function(R2){WL.L=Array.isArray(R2[0])?R2[0]:[];WL.E=Array.isArray(R2[1])?R2[1]:[];$('wlE').textContent='';wlDraw();}).catch(function(){$('wlE').textContent='ما زبط. تأكد من الإنترنت.';});}
+$('wlBtn').onclick=function(){$('wlM').hidden=false;wlLoad();};
+$('wlR').addEventListener('click',function(){setTimeout(function(){wlR=val('wlR');wlDraw();},0);});
+$('wlL').addEventListener('change',function(e){var i=e.target.closest('[data-pr]');if(!i)return;var v=i.value===''?null:+i.value,code=i.dataset.pr;
+ admin().then(function(a){return fetch(SBU+'/rest/v1/licenses?code=eq.'+encodeURIComponent(code),{method:'PATCH',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({price:v})});})
+ .then(function(r){if(!r.ok)throw 0;WL.L.forEach(function(x){if(x.code===code)x.price=v;});wlDraw();toast('💵 انحفظ');}).catch(function(){toast('ما انحفظ، جرّب كمان مرة');});});
+$('exAdd').onclick=function(){var t=$('exT').value.trim(),q=$('exQ').value,a=$('exA').value;if(!t||a===''){$('wlE').textContent='اكتب شو هيّي والمبلغ.';return;}
+ admin().then(function(tok){return fetch(SBU+'/rest/v1/expenses',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+tok,'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify({title:t,qty:q===''?null:+q,amount:+a,kind:'print'})});})
+ .then(function(r){return r.json();}).then(function(j){if(!Array.isArray(j))throw 0;WL.E.unshift(j[0]);$('exT').value='';$('exQ').value='';$('exA').value='';$('wlE').textContent='';wlDraw();toast('🖨️ انزادت');}).catch(function(){$('wlE').textContent='ما انزادت، جرّب كمان مرة.';});};
+$('exL').addEventListener('click',function(e){var b=e.target.closest('[data-exd]');if(!b||!confirm('تمحي هالتكلفة؟'))return;var id=b.dataset.exd;
+ admin().then(function(a){return fetch(SBU+'/rest/v1/expenses?id=eq.'+id,{method:'DELETE',headers:{apikey:SBK,Authorization:'Bearer '+a}});}).then(function(){WL.E=WL.E.filter(function(x){return String(x.id)!==id;});wlDraw();});});
 $('ppBtn').onclick=function(){$('ppM').hidden=false;$('ppE').textContent='⏳';$('ppL').innerHTML='';
  prRpc('app_people',{}).then(function(j){if(!j||!j.ok){$('ppE').textContent=(j&&(j.msg||j.message))||'ما زبط.';return;}$('ppE').textContent='';
   var box=function(n,t){return '<div style="text-align:center;padding:10px 4px;border-radius:14px;background:rgba(34,199,155,.16);border:1px solid rgba(34,199,155,.4)"><b style="font-size:22px;display:block">'+n+'</b><small style="font-size:12px">'+t+'</small></div>';};
@@ -606,13 +641,13 @@ $('klL').onclick=function(e){var b=e.target.closest('[data-k]');if(b)keOpen(KL[+
 chpMulti('keB');chp('keD');chp('keA');chp('keP');
 function setOn(id,vs){[].forEach.call($(id).children,function(x){x.classList.toggle('on',vs.indexOf(x.dataset.v)>=0);});}
 function keOpen(x){KE={code:x.code,unbind:false,x:x};$('keT').textContent='✏️ '+(x.name||'')+(x.phone?' · '+x.phone:'');$('keC').textContent=x.code;
- setOn('keB',String(x.tools||'').split(','));setOn('keD',['keep']);setOn('keA',[x.active?'1':'0']);setOn('keP',[x.pdf?'1':'0']);$('keX').textContent='هلّق: '+kExp(x);
+ setOn('keB',String(x.tools||'').split(','));setOn('keD',['keep']);setOn('keA',[x.active?'1':'0']);setOn('keP',[x.pdf?'1':'0']);$('kePr').value=(x.price==null?'':x.price);$('keX').textContent='هلّق: '+kExp(x);
  $('keV').textContent=x.device?'📱 مربوط بتلفون · استُعمل '+(x.uses||0)+' مرة':'📱 لسّا ما انربط بأي تلفون';$('keR').hidden=!x.device;$('keR').textContent='📱 فكّ ربطو بالتلفون (إذا غيّر تلفون)';$('keE').textContent='';keWa();$('keM').hidden=false;}
 function keWa(){var x=KE.x,p=String(x.phone||'').replace(/\D/g,'').replace(/^0/,'');$('keW').href='https://api.whatsapp.com/send?'+(p?'phone='+(p.length<=8?'961'+p:p)+'&':'')+'text='+encodeURIComponent(kMsg({code:x.code,name:x.name||'',tools:x.tools,d:'',exp:x.expires,pdf:x.pdf}));}
 $('keCp').onclick=function(){var c=KE.code;(navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(function(){toast('📋 انسخ المفتاح');}).catch(function(){});};
 $('keR').onclick=function(){KE.unbind=!KE.unbind;$('keR').textContent=KE.unbind?'✅ رح ينفكّ الربط لما تحفظ':'📱 فكّ ربطو بالتلفون (إذا غيّر تلفون)';};
 $('keS').onclick=function(){var tl=vals('keB').join(',');if(!tl){$('keE').textContent='اختار كتاب واحد على الأقل';return;}
- var d=val('keD'),x=KE.x,ch={tools:tl,active:val('keA')==='1',pdf:val('keP')==='1'};
+ var d=val('keD'),x=KE.x,ch={tools:tl,active:val('keA')==='1',pdf:val('keP')==='1',price:($('kePr').value===''?null:+$('kePr').value)};
  if(d==='0')ch.expires=null;else if(d!=='keep'){var base=x.expires&&x.expires>new Date().toISOString().slice(0,10)?new Date(x.expires):new Date();ch.expires=new Date(base.getTime()+(+d)*864e5).toISOString().slice(0,10);}
  if(KE.unbind)ch.device=null;
  $('keS').disabled=true;$('keE').textContent='';
