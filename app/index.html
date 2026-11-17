@@ -411,7 +411,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.17h";
+var APPV="2026.11.17i";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -838,13 +838,13 @@ $('chips').onclick=function(e){var b=e.target.closest('button');if(b)ask(b.textC
 /* ---------- الكتب: كل كتاب وشو معو ---------- */
 var WA='https://wa.me/96179434479?text=';
 var BOOKD={
- course:{n:1,t:'الكهرباء بالمختصر المفيد',cv:'../course/cover.jpg',lv:'للمبتدئ من الصفر',price:'10$',rules:18,q:180,sample:null,
+ course:{n:1,t:'الكهرباء بالمختصر المفيد',cv:'../course/cover.jpg',lv:'للمبتدئ من الصفر',price:'',rules:18,q:180,sample:null,
   proj:{n:3,t:'مختبر التابلو',u:'../panel/'},parts:[['mcb','القاطع العادي MCB',1],['rcd','الدفرانسير RCD'],['stair','تايمر الدرج'],['photo','الفوتوسيل']],
   tools:[['توزيع الفازات','../tools/wirephase/']]},
- classic:{n:2,t:'الكلاسيك كنترول بالمختصر المفيد',cv:'../classic/cover.jpg',lv:'لوحات وموتورات',price:'19$',rules:25,q:250,sample:'../sample/',
+ classic:{n:2,t:'الكلاسيك كنترول بالمختصر المفيد',cv:'../classic/cover.jpg',lv:'لوحات وموتورات',price:'',rules:25,q:250,sample:'../sample/',
   proj:{n:5,t:'مختبر التابلو',u:'../panel/'},parts:[['contactor','الكونتاكتور',1],['mpcb','قاطع الموتور'],['overload','الأوفرلود'],['phase','ريليه الفازات'],['relay','الريليه المساعد'],['timer','التايمر'],['buttons','كبسات Start و Stop'],['estop','كبسة الطوارئ'],['selector','السيليكتور'],['lamps','لمبات الإشارة'],['float','الفلوت'],['pressure','البرشر سويتش'],['limit','الليميت سويتش']],
   tools:[['حاسبة المحوّلات','../tools/transformer/']]},
- solar:{n:3,t:'الطاقة الشمسية بالمختصر المفيد',cv:'../solar/cover.jpg',lv:'لفنيي التركيب',price:'39$',rules:32,q:320,sample:'../sample/#solar',
+ solar:{n:3,t:'الطاقة الشمسية بالمختصر المفيد',cv:'../solar/cover.jpg',lv:'لفنيي التركيب',price:'',rules:32,q:320,sample:'../sample/#solar',
   proj:{n:6,t:'مختبر الطاقة الشمسية',u:'../sim/#projects'},parts:[['pv','اللوح الشمسي',1],['mc4','وصلة MC4'],['gpv','فيوز الـgPV'],['dciso','عازل الـDC'],['dcspd','الـSPD'],['lfp','بطارية الليثيوم'],['hybrid','الانفرتر الهايبرد']],
   tools:[['حساب المنظومة','../tools/load/'],['عرض السعر للزبون','../tools/quote/']]}};
 var BORD=['course','classic','solar'];
@@ -892,7 +892,7 @@ function renderBooks(){var h='';$('promo').innerHTML=promoOn()?giftH():'';BORD.f
  $('bookList').innerHTML=h;renderBookTools();}
 function ri(icon,t,sub,st,href,cls){return (href?'<a class="ri '+(cls||'')+'" href="'+href+'">':'<div class="ri '+(cls||'')+'" data-lk="1">')+'<i>'+icon+'</i><div class="t">'+t+(sub?'<small>'+sub+'</small>':'')+'</div><span class="st">'+st+'</span>'+(href?'</a>':'</div>');}
 function openBook(id){var b=BOOKD[id],o=own(id),L='🔒';
- var h='<div class="grab"></div><div class="bh"><img src="'+b.cv+'" alt=""><div><b>'+b.t+'</b><span>الكتاب '+b.n+' · '+b.rules+' قاعدة · '+b.lv+'</span>'+(o?'<span class="own1">✅ الكتاب عندك: كل شي مفتوح</span>':(PLAY?'':'<span class="pr">'+(b.price||'السعر عند أنور')+'</span>'))+'</div></div>';
+ var h='<div class="grab"></div><div class="bh"><img src="'+b.cv+'" alt=""><div><b>'+b.t+'</b><span>الكتاب '+b.n+' · '+b.rules+' قاعدة · '+b.lv+'</span>'+(o?'<span class="own1">✅ الكتاب عندك: كل شي مفتوح</span>':'')+'</div></div>';
  if(!o&&id==='course'&&promoOn())h+=giftH();
  if(!o)h+='<div class="row">'+buyBtns(id,b)+'<button type="button" class="btn alt" id="haveKey">🔑 عندي مفتاح</button></div>'+paperBtn(id,b)+'<div class="kbx" id="kbx" hidden><input id="kIn" placeholder="MEA-XXXX-XXXX" dir="ltr" autocomplete="off" spellcheck="false"><div class="er" id="kEr"></div><button type="button" class="btn" id="kGo" style="width:100%">فعّل</button></div>';
  h+='<div class="sec2">'+(o?'كل شي معك':'شو في بقلبو')+'</div>';
