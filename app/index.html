@@ -241,11 +241,11 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="kErr" class="mde"></div><div class="row"><button type="button" class="btn" id="kMake">اعمل المفتاح</button><button type="button" class="btn alt" data-close>بطّل</button></div></div>
 <div id="kOut" hidden></div></div></div>
 <div id="byM" hidden class="mdl" style="z-index:63"><div class="set mdb"><div class="mdt">🛒 اطلب الكتاب</div><div id="byF"><p class="mds">أنور بيبعتلك الأسعار وطريقة الدفع عالواتساب.</p>
-<input id="byN" class="pin" maxlength="60" placeholder="اسمك" autocomplete="name"><input id="byP" class="pin" type="tel" inputmode="tel" dir="ltr" placeholder="رقمك عالواتساب" autocomplete="tel">
+<input id="byN" class="pin" maxlength="60" placeholder="اسمك" autocomplete="name"><select id="byC" class="pin" style="appearance:auto"><option value="">🌍 اختار دولتك…</option><option value="961">🇱🇧 لبنان +961</option><option value="963">🇸🇾 سوريا +963</option><option value="964">🇮🇶 العراق +964</option><option value="962">🇯🇴 الأردن +962</option><option value="970">🇵🇸 فلسطين +970</option><option value="966">🇸🇦 السعودية +966</option><option value="971">🇦🇪 الإمارات +971</option><option value="965">🇰🇼 الكويت +965</option><option value="974">🇶🇦 قطر +974</option><option value="973">🇧🇭 البحرين +973</option><option value="968">🇴🇲 عُمان +968</option><option value="967">🇾🇪 اليمن +967</option><option value="20">🇪🇬 مصر +20</option><option value="218">🇱🇾 ليبيا +218</option><option value="216">🇹🇳 تونس +216</option><option value="213">🇩🇿 الجزائر +213</option><option value="212">🇲🇦 المغرب +212</option><option value="249">🇸🇩 السودان +249</option><option value="90">🇹🇷 تركيا +90</option><option value="49">🇩🇪 ألمانيا +49</option><option value="33">🇫🇷 فرنسا +33</option><option value="46">🇸🇪 السويد +46</option><option value="31">🇳🇱 هولندا +31</option><option value="32">🇧🇪 بلجيكا +32</option><option value="44">🇬🇧 بريطانيا +44</option><option value="1">🇺🇸 أمريكا / كندا +1</option><option value="61">🇦🇺 أستراليا +61</option><option value="55">🇧🇷 البرازيل +55</option><option value="x">🌐 دولة تانية (اكتب الرقم مع +)</option></select><input id="byP" class="pin" type="tel" inputmode="tel" dir="ltr" placeholder="رقمك عالواتساب" autocomplete="tel">
 <div class="mdl2">شو بدّك؟</div><div class="chp" id="byB"><button type="button" data-v="course">📘 الكهربا</button><button type="button" data-v="classic">📗 الكلاسيك</button><button type="button" data-v="solar">📙 الشمسية</button><button type="button" data-v="all">🎁 التلاتة</button></div>
 <div id="byE" class="mde"></div><div class="row"><button type="button" class="btn" id="byGo">📩 ابعت الطلب لأنور</button><button type="button" class="btn alt" data-close>بطّل</button></div></div>
 <div id="byOk" hidden style="text-align:center;padding:6px 0"><div style="font-size:46px">✅</div><b style="font-size:18px">وصل طلبك لأنور!</b><p class="mds" style="margin:6px 0 12px">بيبعتلك الأسعار وطريقة الدفع عالواتساب بأقرب وقت 🙏</p><a class="btn alt" id="byWa" style="display:block">💬 أو احكيه دغري</a><button type="button" class="btn" data-close style="width:100%;margin-top:8px">تمام</button></div></div></div>
-<div id="btM" hidden class="mdl" style="z-index:63"><div class="set mdb"><div class="mdt" id="btT">🛒 طلب شراء</div><div class="mds" id="btS"></div>
+<div id="btM" hidden class="mdl" style="z-index:63"><div class="set mdb"><div class="mdt" id="btT">🛒 طلب شراء</div><div class="mds" id="btS"></div><div class="row" style="margin-top:8px;align-items:center"><input id="btP" class="pin" type="tel" dir="ltr" style="flex:1;margin:0" placeholder="+961…"><a class="btn alt" id="btCall" style="flex:0 0 auto;padding:0 14px;display:grid;place-items:center">📞</a><button type="button" class="btn alt" id="btPS" style="flex:0 0 auto;padding:0 14px">💾</button></div><div class="mds" id="btPN" style="font-size:12.5px"></div>
 <div class="mdl2">الرسالة <small style="font-weight:500;opacity:.75">(فيك تعدّلها)</small></div><textarea id="btX" class="pin" rows="11" style="height:auto;min-height:220px;padding:10px;line-height:1.6;font-size:14px"></textarea><div id="btW" class="mde"></div>
 <a class="btn" id="btGo" style="display:block;margin-top:10px;background:#25D366;color:#fff;font-size:17px;padding:15px;text-align:center">📲 ابعتلو عالواتساب</a>
 <div class="row" style="margin-top:8px"><button type="button" class="btn alt" id="btSave">💾 خلّيها هيك للكل</button><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
@@ -411,7 +411,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.17j";
+var APPV="2026.11.18a";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -660,14 +660,21 @@ var BYN={course:'كتاب «الكهرباء بالمختصر المفيد» �
 var BUYTPL='مرحبا {الاسم} 👋\nأنا أنور الجاسم، وصلني طلبك على {الكتاب} 🙏\n\n📦 *شو بيوصلك:*\n📖 الكتاب PDF (أو نسخة ورقية)\n🎯 كورس أسئلة جوّا التطبيق، مع تقرير بنقاط ضعفك وأرقام الصفحات\n🛠️ مشاريع عملية بمختبر التابلو\n👨‍🏫 متابعة شخصية مني عالواتساب لأي سؤال\n🎓 شهادة موقّعة مني إذا خلّصت الكورس بـ5 غلطات أو أقل\n\n💵 *الأسعار:*\n📘 الكهرباء بالمختصر المفيد: 10$\n📗 الكلاسيك كنترول بالمختصر المفيد: 19$\n📙 الطاقة الشمسية بالمختصر المفيد: 39$\n\n🎁 *التلاتة سوا (بدل 68$):*\n📄 PDF: خصم 25% ← *51$*\n📕 ورقي: خصم 10% ← *61.20$*\n\n📕 النسخة الورقية بس بلبنان، والتوصيل ببلاش 🚚\n\n💳 *طريقة الدفع:*\n🇱🇧 بلبنان: Whish Money أو OMT عالرقم 79434479\n🌍 برّا لبنان: USDT أو تحويل بنكي (بعتلك التفاصيل)\n\nبس تحوّل ابعتلي صورة الوصل، وبيوصلك مفتاحك ورابط التطبيق دغري ✅';
 chp('byB');
 document.addEventListener('click',function(e){var a=e.target.closest('[data-buy]');if(!a)return;e.preventDefault();var l=null;try{l=JSON.parse(ls('mea_lead')||'null');}catch(x){}
- $('byN').value=(l&&l.name)||'';$('byP').value=(l&&l.phone)||'';setOn('byB',[a.dataset.buy]);$('byE').textContent='';$('byF').hidden=false;$('byOk').hidden=true;$('byGo').disabled=false;
+ $('byN').value=(l&&l.name)||'';var lp=String((l&&l.phone)||'').trim(),cc=ls('meaCC')||'';
+ if(/^(\+|00)/.test(lp)){var d=lp.replace(/\D/g,'').replace(/^00/,'');cc='';[].forEach.call($('byC').options,function(o){if(o.value&&o.value!=='x'&&d.indexOf(o.value)===0&&o.value.length>cc.length)cc=o.value;});if(cc)lp=d.slice(cc.length);else cc='x';}
+ $('byC').value=cc;$('byP').value=lp;setOn('byB',[a.dataset.buy]);$('byE').textContent='';$('byF').hidden=false;$('byOk').hidden=true;$('byGo').disabled=false;
  $('byWa').href=a.getAttribute('href');BYK=a.dataset.kind||'';
  $('byM').querySelector('.mdt').textContent=BYK==='paper'?'📕 اطلب الكتاب المطبوع':BYK==='ask'?'💬 اسأل أنور':'🛒 اطلب الكتاب';
  $('byF').querySelector('.mds').textContent=BYK==='paper'?'بلبنان بس · التوصيل ببلاش · الدفع عند الاستلام. أنور بيحكيك عالواتساب ليتفق معك.':BYK==='ask'?'اكتب اسمك ورقمك، وأنور بيحكيك عالواتساب.':'أنور بيبعتلك الأسعار وطريقة الدفع عالواتساب.';
  $('byOk').querySelector('p').textContent=BYK==='ask'?'بيحكيك عالواتساب بأقرب وقت 🙏':BYK==='paper'?'بيحكيك عالواتساب ليتفق معك عالتوصيل 🚚':'بيبعتلك الأسعار وطريقة الدفع عالواتساب بأقرب وقت 🙏';
  $('byM').hidden=false;},true);var BYK='';
-$('byGo').onclick=function(){var n=$('byN').value.trim().replace(/\s+/g,' '),p=$('byP').value.trim(),bk=val('byB');
- if(n.length<2){$('byE').textContent='اكتب اسمك.';return;}if(p.replace(/\D/g,'').length<7){$('byE').textContent='اكتب رقمك كامل.';return;}
+$('byGo').onclick=function(){var n=$('byN').value.trim().replace(/\s+/g,' '),p=$('byP').value.trim(),bk=val('byB'),cc=$('byC').value;
+ if(n.length<2){$('byE').textContent='اكتب اسمك.';return;}
+ if(!cc){$('byE').textContent='اختار دولتك 🌍';$('byC').focus();return;}
+ var dg=p.replace(/\D/g,'');
+ if(cc==='x'){if(!/^(\+|00)/.test(p)||dg.replace(/^00/,'').length<8){$('byE').textContent='اكتب الرقم مع مفتاح الدولة، مثلاً +49…';return;}p='+'+dg.replace(/^00/,'');}
+ else{if(dg.indexOf('00'+cc)===0)dg=dg.slice(2+cc.length);else if(/^\+/.test(p)&&dg.indexOf(cc)===0)dg=dg.slice(cc.length);dg=dg.replace(/^0+/,'');if(dg.length<6){$('byE').textContent='اكتب رقمك كامل.';return;}p='+'+cc+dg;}
+ ls('meaCC',cc);
  if(!ls('mea_lead')){ls('mea_lead',JSON.stringify({name:n,phone:p}));try{window.meaLead&&window.meaLead({name:n,phone:p});}catch(x){}}
  $('byGo').disabled=true;$('byE').textContent='';
  fetch(SBU+'/rest/v1/rpc/buy_request',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_name:n,p_phone:p,p_vid:ls('mea_vid')||'',p_book:bk+(BYK?':'+BYK:'')})})
@@ -677,16 +684,20 @@ $('byGo').onclick=function(){var n=$('byN').value.trim().replace(/\s+/g,' '),p=$
 /* عند أنور */
 var BT=null;
 function admGet(path){return admin().then(function(a){return fetch(SBU+'/rest/v1/'+path,{headers:{apikey:SBK,Authorization:'Bearer '+a}});}).then(function(r){if(r.status===401){ls('meaAdm','');throw 0;}return r.json();});}
-function btLink(){var ph=waPh(BT.phone);$('btGo').href='https://api.whatsapp.com/send?'+(ph?'phone='+ph+'&':'')+'text='+encodeURIComponent($('btX').value);
+function btLink(){var ph=waPh($('btP').value||BT.phone);$('btCall').href='tel:+'+ph;$('btPN').innerHTML=ph?'واتساب على: <span dir="ltr">+'+ph+'</span>':'';$('btGo').href='https://api.whatsapp.com/send?'+(ph?'phone='+ph+'&':'')+'text='+encodeURIComponent($('btX').value);
  $('btW').textContent=$('btX').value.indexOf('..$')>=0?'⚠️ حطّ الأسعار مكان ..$ وبعدها اكبس «💾 خلّيها هيك للكل»، مرة وحدة بس.':'';}
 function buyOpen(id){if(ls('meaTeacher')!=='1')return;$('btM').hidden=false;$('btS').textContent='⏳';$('btX').value='';
  Promise.all([admGet('buy_requests?id=eq.'+(+id)+'&select=*'),admGet('site_settings?key=eq.buy_msg&select=value')]).then(function(R2){BT=(R2[0]||[])[0];if(!BT){$('btS').textContent='ما لقينا الطلب.';return;}
   var kp=String(BT.book||'').split(':');BT.book=kp[0];BT.kind=kp[1]||'';
   var tpl=((R2[1]||[])[0]||{}).value||BUYTPL;$('btT').textContent='🛒 '+(BT.name||'')+' بدّو كتاب';
   $('btS').innerHTML='<span dir="ltr">'+esc(BT.phone||'')+'</span> · '+esc(BYN[BT.book]||BT.book||'')+(BT.kind==='paper'?' · 📕 مطبوع':BT.kind==='ask'?' · 💬 سؤال':'')+' · '+ppAgo(BT.created_at)+(BT.sent_at?' · ✅ بعتلو قبل':'');
+  $('btP').value=BT.phone||'';
   $('btX').value=tpl.split('{الاسم}').join(String(BT.name||'').split(' ')[0]).split('{الكتاب}').join(BYN[BT.book]||'الكتاب');btLink();})
  .catch(function(){$('btS').textContent='ما زبط. تأكد من الإنترنت.';});}
-$('btX').oninput=btLink;
+$('btX').oninput=btLink;$('btP').oninput=btLink;
+$('btPS').onclick=function(){if(!BT)return;var v=$('btP').value.trim();if(v.replace(/\D/g,'').length<7){toast('الرقم ناقص');return;}var nv='+'+waPh(v);
+ admin().then(function(a){return fetch(SBU+'/rest/v1/buy_requests?id=eq.'+BT.id,{method:'PATCH',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({phone:nv})});})
+ .then(function(r){if(!r.ok)throw 0;BT.phone=nv;$('btP').value=nv;btLink();toast('💾 انحفظ الرقم');if(HUB)hubLoad().catch(function(){});}).catch(function(){toast('ما انحفظ، جرّب كمان مرة');});};
 $('btGo').addEventListener('click',function(){if(!BT)return;var id=BT.id;admin().then(function(a){return fetch(SBU+'/rest/v1/buy_requests?id=eq.'+id,{method:'PATCH',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({sent_at:new Date().toISOString()})});})
  .then(function(){if(HUB)hubLoad().then(function(){if(!$('ppM').hidden)ppDraw();});}).catch(function(){});setTimeout(function(){$('btM').hidden=true;},400);});
 $('btSave').onclick=function(){if(!BT)return;var fn=String(BT.name||'').split(' ')[0],t=$('btX').value;if(fn)t=t.split(fn).join('{الاسم}');t=t.split(BYN[BT.book]||'\u0000').join('{الكتاب}');
