@@ -184,7 +184,7 @@
     const p = preStatus();
     const pct = Math.round(100 * p.passed / PRE_TOTAL);
     $app.innerHTML = `
-      <img class="cover" src="cover.jpg?v=1121" alt="غلاف كتاب ${BOOK}">
+      <img class="cover" src="cover.jpg?v=1121b" alt="غلاف كتاب ${BOOK}">
       <h1>بلّش بالكورس الأول</h1>
       <p>كورس الكلاسيك كنترول مبني عالكتاب الأول «الكهرباء بالمختصر المفيد»: الفولت والأمبير، الشرايط، القواطع، الكونتاكتور والتابلو.
       إذا هودي مش ثابتين، الكلاسيك رح يطلع صعب وما رح يفهم معك. لهيك بينفتح بس تخلّص الكورس الأول.</p>
@@ -200,7 +200,7 @@
   // ---------- welcome ----------
   function welcome() {
     $app.innerHTML = `
-      <img class="cover" src="cover.jpg?v=1121" alt="غلاف كتاب ${BOOK}">
+      <img class="cover" src="cover.jpg?v=1121b" alt="غلاف كتاب ${BOOK}">
       <h1>بصّم الكتاب قاعدة قاعدة</h1>
       ${CFG.banner ? `<p class="err">${CFG.banner}</p>` : ''}
       <p>رح نسألك ${RULES[0].q.length} أسئلة على كل قاعدة من الـ ${TOTAL}. كل سؤال بتغلط فيه بيرجعلك لحتى تجاوبو صح${STREAK_TARGET ? `، وبالآخر لازم تجاوب ${STREAK_TARGET} أسئلة صح ورا بعض` : ''}. ما بتنفتحلك القاعدة يلي بعدها إلا بس تكون باصم يلي قبلها.</p>
