@@ -143,6 +143,10 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 #inst{position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:35;border-radius:22px;padding:14px 14px 12px;display:flex;gap:12px;align-items:flex-start;animation:up .4s cubic-bezier(.2,.9,.2,1)}
 #inst img{width:48px;height:48px;border-radius:12px;flex:0 0 48px}#inst b{display:block;font-size:15px}#inst p{font-size:13px;color:var(--muted);line-height:1.7;margin:2px 0 8px}
 #inst .row{gap:8px}#inst .btn{padding:9px 14px;font-size:14px}#inst .x{position:absolute;top:6px;left:10px;font-size:18px;color:var(--muted);background:none;border:0}
+.bn{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px;border-radius:20px;border:0;background:#e5484d;color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px #e5484d55}
+.bn i{width:8px;height:8px;border-radius:50%;background:#fff;animation:bnp 1.4s infinite}
+.bn.seen{background:var(--panel);color:var(--text);border:1px solid var(--line);box-shadow:none}.bn.seen i{background:#e5484d;animation:none}
+@keyframes bnp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
 .mdl{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .mdb{width:min(380px,100%);padding:18px;margin:0;max-height:90vh;overflow:auto}.mdt{font:700 17px 'Readex Pro',sans-serif;margin-bottom:4px}.mds{font-size:12.5px;color:var(--muted);margin-bottom:6px}
 .mde{font-size:13px;min-height:18px;margin:6px 0;color:#ff6b6b}.mdl2{font-size:13px;font-weight:700;color:var(--muted);margin:12px 2px 6px}
@@ -231,6 +235,10 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="admM" hidden class="mdl" style="z-index:65"><div class="set mdb"><div class="mdt">🔐 دخول الأدمن</div><p class="mds">نفس الإيميل وكلمة السر تبع صفحة المفاتيح. بتحطّن مرة وحدة عهالتلفون.</p>
 <input id="aE" class="pin" type="email" dir="ltr" placeholder="الإيميل" autocomplete="username"><input id="aP" class="pin" type="password" dir="ltr" placeholder="كلمة السر" autocomplete="current-password"><div id="aErr" class="mde"></div>
 <div class="row"><button type="button" class="btn" id="aGo">ادخل</button><button type="button" class="btn alt" data-close>بطّل</button></div></div></div>
+<div id="bnM" hidden class="mdl" style="z-index:62"><div class="set mdb"><div class="mdt">📰 آخر أخبار الكتب</div><div class="mds" id="bnD" style="margin-top:-2px"></div>
+<div id="bnT" style="font-size:16px;line-height:1.9;white-space:pre-line;margin:10px 0 4px"></div>
+<div id="bnE" hidden><div class="mdl2">✏️ عدّل الخبر (وضع الأستاذ) <small style="font-weight:500;opacity:.75">كل سطر لحالو · فاضي = بتختفي</small></div><textarea id="bnX" class="pin" rows="7" style="height:auto;padding:10px;line-height:1.7"></textarea><button type="button" class="btn" id="bnS" style="width:100%;margin-top:6px">💾 احفظ وورجيها للكل</button></div>
+<button type="button" class="btn alt" data-close style="width:100%;margin-top:10px">تمام</button></div></div>
 <div id="keyM" hidden class="mdl"><div class="set mdb"><div class="mdt">🔑 مفتاح جديد</div>
 <div id="kForm"><input id="kN" class="pin" maxlength="60" placeholder="اسم الشخص"><input id="kP" class="pin" type="tel" inputmode="tel" dir="ltr" placeholder="📱 رقمو عالواتساب: 70123456 أو +963…"><input id="kI" class="pin" maxlength="120" placeholder="📝 معلومات (اختياري): من وين، كيف دفع…">
 <div class="mdl2">شو اشترى؟</div><div class="chp" id="kQ"><button type="button" data-v="1" class="on">📘 نسخة</button><button type="button" data-v="2">📚 نسختين</button><button type="button" data-v="3">🎁 نسخة كاملة (3)</button></div>
@@ -335,7 +343,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </section>
 
 <section class="tab" id="t-books">
-  <h2>الكتب</h2><p class="sub">سلسلة «بالمختصر المفيد». اكبس عالكتاب لتشوف شو معو.</p>
+  <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">الكتب <button type="button" id="bnBtn" class="bn" hidden><i></i><span>جديد: تحديث الكتب</span></button></h2><p class="sub">سلسلة «بالمختصر المفيد». اكبس عالكتاب لتشوف شو معو.</p>
   <div id="promo"></div>
   <div class="grid" id="bookList"></div>
 </section>
@@ -411,7 +419,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.21b";
+var APPV="2026.11.21c";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -707,6 +715,20 @@ function buyHash(){var m=location.hash.match(/buy=(\d+)/);if(!m)return;try{histo
 window.addEventListener('hashchange',buyHash);setTimeout(buyHash,600);
 /* تلفون أنور بيسمع لطلبات الشراء */
 setTimeout(function(){if(CAP&&ls('meaTeacher')==='1')nat('sub',{topic:'teacher'}).catch(function(){});},3200);
+/* 📰 أخبار الكتب: نوت حمرا حدّ «الكتب»، بتنعدّل من وضع الأستاذ */
+var BN=null;
+function bnPaint(){var b=$('bnBtn');if(!BN||!BN.value||!BN.value.trim()){b.hidden=ls('meaTeacher')!=='1';b.classList.add('seen');b.querySelector('span').textContent=b.hidden?'':'＋ خبر';return;}
+ b.hidden=false;var seen=ls('meaBN')===BN.updated_at;b.classList.toggle('seen',seen);b.querySelector('span').textContent=seen?'📰 آخر الأخبار':'جديد: '+(BN.value.trim().split('\n')[0].replace(/^[^؀-ۿa-zA-Z0-9]+/,'').slice(0,26));}
+function bnLoad(){fetch(SBU+'/rest/v1/site_settings?key=eq.books_news&select=value,updated_at',{headers:{apikey:SBK,Authorization:'Bearer '+SBK}}).then(function(r){return r.json();}).then(function(j){BN=(j||[])[0]||null;bnPaint();}).catch(function(){});}
+$('bnBtn').onclick=function(){var t=BN&&BN.value?BN.value.trim():'';$('bnT').textContent=t||'ما في أخبار هلّق.';
+ $('bnD').textContent=BN&&BN.updated_at?'آخر تحديث: '+new Date(BN.updated_at).toLocaleDateString('ar-LB',{day:'numeric',month:'long'}):'';
+ var T=ls('meaTeacher')==='1';$('bnE').hidden=!T;if(T)$('bnX').value=t;
+ $('bnM').hidden=false;if(BN&&BN.updated_at){ls('meaBN',BN.updated_at);bnPaint();}};
+$('bnS').onclick=function(){var v=$('bnX').value.trim();$('bnS').disabled=true;
+ admin().then(function(a){return fetch(SBU+'/rest/v1/site_settings',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({key:'books_news',value:v,updated_at:new Date().toISOString()})});})
+ .then(function(r){$('bnS').disabled=false;if(!r.ok)throw 0;toast(v?'💾 انحفظ، وبيطلع أحمر للكل':'🗑️ انشال الخبر');$('bnM').hidden=true;bnLoad();})
+ .catch(function(){$('bnS').disabled=false;toast('ما انحفظ، جرّب كمان مرة');});};
+bnLoad();
 var HUB=null;chp('ppF');
 var CRS={electro:'⚡ الكهربا',classic:'⚙️ الكلاسيك',solar:'☀️ الشمسية'};
 function needs(p){return (p.buy&&!p.buy.sent_at)||(p.gift&&p.gift.s==='wait')||(p.certs||[]).some(function(c){return c.s==='wait';})||(p.elig&&p.elig.length);}
