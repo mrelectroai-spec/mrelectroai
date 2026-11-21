@@ -411,7 +411,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.21a";
+var APPV="2026.11.21b";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -849,13 +849,13 @@ $('chips').onclick=function(e){var b=e.target.closest('button');if(b)ask(b.textC
 /* ---------- الكتب: كل كتاب وشو معو ---------- */
 var WA='https://wa.me/96179434479?text=';
 var BOOKD={
- course:{n:1,t:'الكهرباء بالمختصر المفيد',cv:'../course/cover.jpg',lv:'للمبتدئ من الصفر',price:'',rules:18,q:180,sample:null,
+ course:{n:1,t:'الكهرباء بالمختصر المفيد',cv:'../course/cover.jpg?v=1121',lv:'للمبتدئ من الصفر',price:'',rules:18,q:180,sample:null,
   proj:{n:3,t:'مختبر التابلو',u:'../panel/'},parts:[['mcb','القاطع العادي MCB',1],['rcd','الدفرانسير RCD'],['stair','تايمر الدرج'],['photo','الفوتوسيل']],
   tools:[['توزيع الفازات','../tools/wirephase/']]},
- classic:{n:2,t:'الكلاسيك كنترول بالمختصر المفيد',cv:'../classic/cover.jpg',lv:'لوحات وموتورات',price:'',rules:25,q:250,sample:'../sample/',
+ classic:{n:2,t:'الكلاسيك كنترول بالمختصر المفيد',cv:'../classic/cover.jpg?v=1121',lv:'لوحات وموتورات',price:'',rules:25,q:250,sample:'../sample/',
   proj:{n:5,t:'مختبر التابلو',u:'../panel/'},parts:[['contactor','الكونتاكتور',1],['mpcb','قاطع الموتور'],['overload','الأوفرلود'],['phase','ريليه الفازات'],['relay','الريليه المساعد'],['timer','التايمر'],['buttons','كبسات Start و Stop'],['estop','كبسة الطوارئ'],['selector','السيليكتور'],['lamps','لمبات الإشارة'],['float','الفلوت'],['pressure','البرشر سويتش'],['limit','الليميت سويتش']],
   tools:[['حاسبة المحوّلات','../tools/transformer/']]},
- solar:{n:3,t:'الطاقة الشمسية بالمختصر المفيد',cv:'../solar/cover.jpg',lv:'لفنيي التركيب',price:'',rules:32,q:320,sample:'../sample/#solar',
+ solar:{n:3,t:'الطاقة الشمسية بالمختصر المفيد',cv:'../solar/cover.jpg?v=1121',lv:'لفنيي التركيب',price:'',rules:32,q:320,sample:'../sample/#solar',
   proj:{n:6,t:'مختبر الطاقة الشمسية',u:'../sim/#projects'},parts:[['pv','اللوح الشمسي',1],['mc4','وصلة MC4'],['gpv','فيوز الـgPV'],['dciso','عازل الـDC'],['dcspd','الـSPD'],['lfp','بطارية الليثيوم'],['hybrid','الانفرتر الهايبرد']],
   tools:[['حساب المنظومة','../tools/load/'],['عرض السعر للزبون','../tools/quote/']]}};
 var BORD=['course','classic','solar'];
@@ -1037,7 +1037,7 @@ paths();document.addEventListener('visibilitychange',()=>{if(!document.hidden)pa
 
 
 /* ---------- الترحيب بأوّل فتحة: 20 ثانية ---------- */
-var BK={course:['الكهرباء بالمختصر المفيد','../course/cover.jpg','18 قاعدة من الصفر: الشرايط، التابلو، الديجنتير، وكيف تلاقي العطل.'],classic:['الكلاسيك كنترول بالمختصر المفيد','../classic/cover.jpg','25 قاعدة: كونتاكتور، أوفرلود، تايمر، ستار دلتا، وATS.'],solar:['الطاقة الشمسية بالمختصر المفيد','../solar/cover.jpg','32 قاعدة: ألواح، إنفرترات، بطاريات، وتركيب كامل.']};
+var BK={course:['الكهرباء بالمختصر المفيد','../course/cover.jpg?v=1121','18 قاعدة من الصفر: الشرايط، التابلو، الديجنتير، وكيف تلاقي العطل.'],classic:['الكلاسيك كنترول بالمختصر المفيد','../classic/cover.jpg?v=1121','25 قاعدة: كونتاكتور، أوفرلود، تايمر، ستار دلتا، وATS.'],solar:['الطاقة الشمسية بالمختصر المفيد','../solar/cover.jpg?v=1121','32 قاعدة: ألواح، إنفرترات، بطاريات، وتركيب كامل.']};
 function prof(){try{return JSON.parse(ls('meaProfile')||'null');}catch(e){return null;}}
 function onb(){var P={},step=0,lead=null;try{lead=JSON.parse(ls('mea_lead')||'null');}catch(e){}
  var box=$('onbBox'),pre=!!(lead&&lead.name&&lead.phone),N=pre?3:4;

@@ -151,7 +151,7 @@
   // ---------- welcome ----------
   function welcome() {
     $app.innerHTML = `
-      <img class="cover" src="cover.jpg" alt="غلاف كتاب الكهرباء بالمختصر المفيد">
+      <img class="cover" src="cover.jpg?v=1121" alt="غلاف كتاب الكهرباء بالمختصر المفيد">
       <h1>بصّم الكتاب قاعدة قاعدة</h1>
       ${CFG.banner ? `<p class="err">${CFG.banner}</p>` : ''}
       <p>رح نسألك ${RULES[0].q.length} أسئلة على كل قاعدة من الـ ${TOTAL}. كل سؤال بتغلط فيه بيرجعلك لحتى تجاوبو صح${STREAK_TARGET ? `، وبالآخر لازم تجاوب ${STREAK_TARGET} أسئلة صح ورا بعض` : ''}. ما بتنفتحلك القاعدة يلي بعدها إلا بس تكون باصم يلي قبلها.</p>
