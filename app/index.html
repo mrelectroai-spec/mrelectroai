@@ -432,7 +432,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.24a";
+var APPV="2026.11.24b";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -755,8 +755,9 @@ function ppRow(p,i){var ph=waPh(p.phone),h='<div class="pli" style="flex-directi
  (p.certs||[]).forEach(function(c){if(c.s==='wait')a+='<span class="tg">🎓 بدّو شهادة '+(CRS[c.course]||'')+' ('+c.m+' غلط)</span><button type="button" class="mini ok" data-ca="'+esc(c.code)+'" data-u="'+p.uid+'">✅ وافق</button><button type="button" class="mini no" data-cr="'+esc(c.code)+'">❌</button>';else if(c.s==='ok')a+='<a class="tg" href="../cert/?c='+esc(c.code)+'">🎓 شهادة '+(CRS[c.course]||'')+' ✅ 📄</a>';});
  (p.elig||[]).forEach(function(c){a+='<span class="tg">🎓 بيستاهل شهادة '+(CRS[c.course]||'')+' ('+c.m+' غلط)</span><button type="button" class="mini" data-cn="'+p.uid+'" data-m="'+c.m+'">📣 ذكّرو</button>';});
  if(a)h+='<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">'+a+'</div>';return h+'</div>';}
-function ppDraw(){if(!HUB)return;var f=val('ppF'),q=$('ppQ').value.trim().toLowerCase(),L=HUB.people.map(function(p,i){return [p,i];});
- L=L.filter(function(x){var p=x[0];if(q&&(String(p.name||'')+String(p.phone||'')).toLowerCase().indexOf(q)<0)return false;
+function ppNorm(t){return String(t||'').toLowerCase().replace(/[\u064B-\u0652\u0640\s]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي');}
+function ppDraw(){if(!HUB)return;var f=val('ppF'),q=ppNorm($('ppQ').value),qd=$('ppQ').value.replace(/\D/g,''),L=HUB.people.map(function(p,i){return [p,i];});
+ L=L.filter(function(x){var p=x[0];if(q){var hit=ppNorm(p.name).indexOf(q)>=0||(qd.length>=3&&String(p.phone||'').replace(/\D/g,'').indexOf(qd)>=0);return hit;}
   if(f==='act')return needs(p);if(f==='buy')return !!p.buy;if(f==='gift')return !!p.gift;if(f==='cert')return (p.certs&&p.certs.length)||(p.elig&&p.elig.length);if(f==='books')return !!p.books;return true;});
  $('ppL').innerHTML=L.length?L.map(function(x){return ppRow(x[0],x[1]);}).join(''):'<p class="mds" style="text-align:center;padding:14px">'+(f==='act'?'✅ ما في شي عم يستنّاك':'ما في حدا هون.')+'</p>';}
 function ppBadge(){var n=HUB?HUB.people.filter(needs).length+(HUB.gifts_extra||[]).length:0;$('ppBadge').hidden=!n;$('ppBadge').textContent=n;}
