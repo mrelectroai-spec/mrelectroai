@@ -23,7 +23,7 @@
 #langSlot #langBtn{background:var(--panel)!important;border-color:var(--line)!important;height:40px}
 html{-webkit-tap-highlight-color:transparent;background:var(--bg)}
 body{background:var(--bg);color:var(--text);font-family:'Readex Pro',system-ui,sans-serif;min-height:100vh;
- padding:max(14px,env(safe-area-inset-top)) 16px calc(86px + env(safe-area-inset-bottom));transition:background .25s,color .25s}
+ padding:max(14px,env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom));transition:background .25s,color .25s}
 a{color:inherit;text-decoration:none}
 button{font-family:inherit;color:inherit}
 .top{display:flex;align-items:center;gap:12px;margin:6px 0 16px}.top>div:nth-child(2){min-width:0}.top p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}html,body{overflow-x:hidden}.tops{gap:6px!important}
@@ -87,7 +87,7 @@ h2{font:700 18px 'Readex Pro',sans-serif;margin:4px 0 10px}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 10px}
 .chips button{border:1px solid #22c79b66;background:var(--panel);color:var(--text);border-radius:99px;padding:8px 13px;font-size:13.5px;cursor:pointer;transition:transform .14s}
 .chips button:active{transform:scale(.95)}
-.comp{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom));display:flex;gap:8px;background:var(--bg);padding:8px 0 4px}
+.comp{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom));display:flex;gap:8px;background:var(--bg);padding:8px 0 4px}
 .comp textarea{flex:1;resize:none;height:48px;max-height:120px;border-radius:16px;border:1px solid var(--line);background:var(--panel);color:var(--text);padding:12px 14px;font:inherit;font-size:16px;line-height:1.4}
 .comp textarea:focus{outline:2px solid var(--volt);border-color:transparent}
 .comp button{width:48px;height:48px;border-radius:16px;border:0;background:var(--volt);color:var(--ink);font-size:20px;cursor:pointer;flex:0 0 48px}
@@ -111,6 +111,18 @@ html,body{background:transparent}
 .hero .ic{background:var(--g-chip);color:inherit}
 .seg{background:var(--g-chip);border:1px solid var(--g-edge2)}.seg button.on{background:linear-gradient(180deg,var(--g-top),var(--g-bot));box-shadow:inset 0 1px 0 var(--g-hi),0 2px 8px rgba(0,0,0,.15);color:var(--text)}
 .nav{background:var(--navbg);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);border-top:1px solid var(--g-edge);box-shadow:inset 0 1px 0 var(--g-hi)}
+/* 🟢 شريط زجاجي عايم + دائرة خضرا بتطلع فوق الزر المختار */
+.nav{left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));height:66px;padding:0 6px;border-radius:26px;border:1px solid var(--g-edge);box-shadow:inset 0 1px 0 var(--g-hi),0 12px 34px rgba(0,0,0,.28);overflow:visible;align-items:stretch}
+.nav button{position:relative;z-index:1;justify-content:flex-end;gap:2px;padding:0 0 9px;font-size:11px;font-weight:600}
+.nav button i{display:grid;place-items:center;width:26px;height:26px;transition:transform .45s cubic-bezier(.34,1.56,.64,1),color .3s}
+.nav button i svg{width:23px;height:23px}
+.nav button b{font-weight:600;transition:opacity .3s,transform .3s}
+.nav button.on{color:var(--volt)}
+.nav button.on i{transform:translateY(-24px) scale(1.02);color:#fff}
+.nav button.on b{font-weight:700}
+.nind{position:absolute;top:-22px;left:0;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4fe3b8,#22C79B 55%,#0f8f6c);box-shadow:0 0 0 5px var(--navbg),0 0 0 6px var(--g-edge),0 10px 26px rgba(34,199,155,.55),inset 0 1px 0 rgba(255,255,255,.45);transition:transform .45s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:0}
+.nind:after{content:'';position:absolute;left:50%;bottom:-30px;width:34px;height:10px;margin-left:-17px;border-radius:50%;background:radial-gradient(closest-side,rgba(34,199,155,.55),transparent);filter:blur(2px)}
+@media (prefers-reduced-motion:reduce){.nind,.nav button i{transition:none}}
 .msg.me{background:linear-gradient(180deg,rgba(34,199,155,.34),rgba(34,199,155,.2));border:1px solid rgba(34,199,155,.45)}
 .btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 24px rgba(34,199,155,.28)}
 .stp .n{background:var(--g-chip);border-color:var(--g-edge2)}
@@ -411,15 +423,16 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </section>
 
 <nav class="nav" aria-label="الأقسام">
-  <button type="button" data-t="lab" class="on"><i>🔌</i>المختبر</button>
-  <button type="button" data-t="books"><i>📘</i>الكتب</button>
-  <button type="button" data-t="courses"><i>🎓</i>مساري</button>
-  <button type="button" data-t="tools"><i>🛠️</i>الأدوات</button>
-  <button type="button" data-t="ai"><i>🤖</i>المساعد</button>
+  <span class="nind" aria-hidden="true"></span>
+  <button type="button" data-t="lab" class="on"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v5M15 2v5"/><path d="M6 7h12v4a6 6 0 0 1-12 0z"/><path d="M12 17v5"/></svg></i><b>المختبر</b></button>
+  <button type="button" data-t="books"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5"/><path d="M9 7h7M9 11h5"/></svg></i><b>الكتب</b></button>
+  <button type="button" data-t="courses"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 9v6"/></svg></i><b>مساري</b></button>
+  <button type="button" data-t="tools"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></i><b>الأدوات</b></button>
+  <button type="button" data-t="ai"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg></i><b>المساعد</b></button>
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.21d";
+var APPV="2026.11.24a";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -435,8 +448,10 @@ var T=EN?{noNet:'No internet. Try again.',notIn:'Notifications work in the Andro
  :{noNet:'ما في إنترنت، جرّب كمان مرّة.',notIn:'الإشعارات بتشتغل بتطبيق الأندرويد بس.',thinking:'عم فكّر…',hi:'أهلا 👋 أنا مساعد MrElectroAI. قلّي شو بدّك، وبدلّك عالأداة أو الكورس اللي بيناسبك.',appOnly:'الموقع',ver:'نسخة '};
 
 /* ---------- التبويبات ---------- */
+function navInd(){var b=document.querySelector('.nav button.on'),k=document.querySelector('.nind');if(!b||!k)return;k.style.transform='translateX('+(b.offsetLeft+b.offsetWidth/2-27)+'px)';}
+window.addEventListener('resize',navInd);setTimeout(navInd,60);setTimeout(navInd,600);
 function show(t){if(!$('t-'+t))t='lab';document.querySelectorAll('.tab').forEach(function(s){s.classList.toggle('on',s.id==='t-'+t);});
- document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});if(t!=='settings')ls(K,t);$('nb').hidden=!NEWS.length||t==='ai'||t==='settings';$('nbl').hidden=true;scrollTo(0,0);
+ document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});navInd();if(t!=='settings')ls(K,t);$('nb').hidden=!NEWS.length||t==='ai'||t==='settings';$('nbl').hidden=true;scrollTo(0,0);
  if(t==='ai')openAI();if(t==='settings')loadSet();}
 document.querySelector('.nav').addEventListener('click',function(e){var b=e.target.closest('[data-t]');if(b)show(b.dataset.t);});
 $('gear').onclick=function(){show('settings');};
