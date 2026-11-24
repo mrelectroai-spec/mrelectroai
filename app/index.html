@@ -269,6 +269,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div class="mdl2">الرسالة <small style="font-weight:500;opacity:.75">(فيك تعدّلها)</small></div><textarea id="btX" class="pin" rows="11" style="height:auto;min-height:220px;padding:10px;line-height:1.6;font-size:14px"></textarea><div id="btW" class="mde"></div>
 <a class="btn" id="btGo" style="display:block;margin-top:10px;background:#25D366;color:#fff;font-size:17px;padding:15px;text-align:center">📲 ابعتلو عالواتساب</a>
 <div class="row" style="margin-top:8px"><button type="button" class="btn alt" id="btSave">💾 خلّيها هيك للكل</button><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
+<div id="stM" hidden class="mdl" style="z-index:63"><div class="set mdb" style="max-height:88vh;overflow:auto"><div class="mdt" id="stT">📊 نتيجة الكورس</div><div id="stB"></div><button type="button" class="btn alt" data-close style="width:100%;margin-top:10px">سكّر</button></div></div>
 <div id="klM" hidden class="mdl"><div class="set mdb" style="width:min(460px,100%)"><div class="mdt">🗂️ المفاتيح يلي عملتن</div>
 <input id="klQ" class="pin" placeholder="🔍 دوّر بالاسم أو الرقم أو المفتاح" autocomplete="off"><div id="klS" class="mds" style="margin-top:6px"></div><div id="klL"></div>
 <div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
@@ -432,7 +433,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.24b";
+var APPV="2026.11.24c";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -744,12 +745,30 @@ $('bnS').onclick=function(){var v=$('bnX').value.trim();$('bnS').disabled=true;
  .then(function(r){$('bnS').disabled=false;if(!r.ok)throw 0;toast(v?'💾 انحفظ، وبيطلع أحمر للكل':'🗑️ انشال الخبر');$('bnM').hidden=true;bnLoad();})
  .catch(function(){$('bnS').disabled=false;toast('ما انحفظ، جرّب كمان مرة');});};
 bnLoad();
+/* 📊 نتيجة كورس الأسئلة لكل طالب: شو خلّص، وين غلط، وكم مرة */
+var CRS2={electro:'⚡ كورس الكهربا',classic:'⚙️ كورس الكلاسيك',solar:'☀️ كورس الطاقة الشمسية'};
+function stOpen(p){if(!p)return;$('stT').textContent='📊 '+(p.name||'')+' · نتيجة الكورسات';$('stB').innerHTML='<p class="mds">⏳</p>';$('stM').hidden=false;
+ var d8=String(p.phone||'').replace(/\D/g,'').slice(-8),or=[];if(d8.length>=7)or.push('phone.like.*'+d8);if(p.vid)or.push('vid.eq.'+encodeURIComponent(p.vid));
+ if(!or.length){$('stB').innerHTML='<p class="mds">ما في رقم لنفتّش فيه.</p>';return;}
+ admGet('students?select=course,rules_done,total,cur_rule,mistakes,answers,started_at,finished_at,last_seen,data&or=('+or.join(',')+')&order=last_seen.desc').then(function(L){
+  if(!L||!L.length){$('stB').innerHTML='<p class="mds">لسّا ما بلّش ولا كورس.</p>';return;}
+  var seen={},h='';L.forEach(function(x){if(seen[x.course])return;seen[x.course]=1;var d=x.data||{},R=d.rules||[],W=(d.weak||[]).slice().sort(function(a,b){return (b.c||0)-(a.c||0);});
+   var pct=x.total?Math.round((x.rules_done||0)*100/x.total):0,acc=x.answers?Math.round((x.answers-(x.mistakes||0))*100/x.answers):null;
+   h+='<div class="pli" style="flex-direction:column;align-items:stretch;gap:8px;margin-bottom:10px"><b style="font-size:16px">'+(CRS2[x.course]||x.course)+(x.finished_at?' 🏁':'')+'</b>'
+    +'<div style="height:8px;border-radius:6px;background:var(--panel2);overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--volt)"></div></div>'
+    +'<small>خلّص <span style="font-weight:700">'+(x.rules_done||0)+'</span> من '+(x.total||'?')+' قاعدة'+(x.cur_rule&&!x.finished_at?' · هلّق بالقاعدة '+x.cur_rule:'')+' · غلط <span style="font-weight:700">'+(x.mistakes||0)+'</span> مرة'+(acc!=null?' · فهم '+acc+'%':'')+' · آخر مرة '+ppAgo(x.last_seen)+'</small>';
+   var bad=R.filter(function(r){return r.m>0;}).sort(function(a,b){return b.m-a.m;});
+   if(bad.length)h+='<div class="mdl2" style="margin:4px 0 0">❌ القواعد يلي غلط فيها</div>'+bad.map(function(r){return '<div style="display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:4px 0;border-bottom:1px solid var(--line)"><span>'+r.n+'. '+esc(r.t||'')+'</span><span style="font-weight:700;flex:0 0 auto;color:'+(r.m>=3?'#e5484d':'var(--text)')+'">'+r.m+'×</span></div>';}).join('');
+   else if(R.length)h+='<small>✅ ما غلط بولا قاعدة</small>';
+   if(W.length)h+='<div class="mdl2" style="margin:6px 0 0">🔁 الأسئلة يلي غلط فيها</div>'+W.map(function(w){return '<div style="font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)"><b>'+esc(w.q||'')+'</b><br><small style="color:#e5484d">جاوب غلط: '+esc(w.a||'')+'</small><small> · القاعدة '+(w.n||'?')+(w.c>1?' · '+w.c+' مرات':'')+'</small></div>';}).join('');
+   h+='</div>';});
+  $('stB').innerHTML=h;}).catch(function(){$('stB').innerHTML='<p class="mds">ما زبط. فوت كأدمن وجرّب كمان مرة.</p>';});}
 var HUB=null;chp('ppF');
 var CRS={electro:'⚡ الكهربا',classic:'⚙️ الكلاسيك',solar:'☀️ الشمسية'};
 function needs(p){return (p.buy&&!p.buy.sent_at)||(p.gift&&p.gift.s==='wait')||(p.certs||[]).some(function(c){return c.s==='wait';})||(p.elig&&p.elig.length);}
 function waPh(x){var ph=String(x||'').replace(/[^\d]/g,'');if(ph.indexOf('00')===0)ph=ph.slice(2);else if(ph.length<=8)ph='961'+ph.replace(/^0/,'');else if(/^09\d{8}$/.test(ph))ph='963'+ph.slice(1);return ph;}
 function ppRow(p,i){var ph=waPh(p.phone),h='<div class="pli" style="flex-direction:column;align-items:stretch;gap:6px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div style="min-width:0"><b>'+esc(p.name||'بلا اسم')+(p.dev==='app'?' 📱':'')+'</b><small><span dir="ltr">'+esc(p.phone||'')+'</span>'+(p.last_at?' · '+ppAgo(p.last_at):'')+(p.books?' · 📚 '+p.books.split(',').map(function(t){return {book:'1',book2:'2',book3:'3'}[t]||t;}).sort().join('،'):'')+'</small></div>'+
- '<div style="display:flex;gap:6px;flex:0 0 auto">'+(p.vid?'<button type="button" class="btn" style="margin:0;padding:7px 10px;width:auto" data-gv="'+i+'" title="فعّل كتب">🔑</button>':'')+(ph?'<a class="btn alt" style="margin:0;padding:7px 10px;width:auto;flex:0 0 auto" href="https://wa.me/'+ph+'">💬</a>':'')+'</div></div>',a='';
+ '<div style="display:flex;gap:6px;flex:0 0 auto">'+(p.phone||p.vid?'<button type="button" class="btn alt" style="margin:0;padding:7px 10px;width:auto" data-st="'+i+'" title="نتيجة الكورس">📊</button>':'')+(p.vid?'<button type="button" class="btn" style="margin:0;padding:7px 10px;width:auto" data-gv="'+i+'" title="فعّل كتب">🔑</button>':'')+(ph?'<a class="btn alt" style="margin:0;padding:7px 10px;width:auto;flex:0 0 auto" href="https://wa.me/'+ph+'">💬</a>':'')+'</div></div>',a='';
  if(p.buy)a+='<span class="tg">🛒 بدّو '+esc((BYN[p.buy.book]||'كتاب').replace(/ [^ ]+$/,''))+(p.buy.sent_at?' · ✅ بعتلو':'')+'</span>'+(p.buy.sent_at?'':'<button type="button" class="mini ok" data-bt="'+p.buy.id+'">📲 ابعتلو الأسعار</button>');
  if(p.gift){if(p.gift.s==='wait')a+='<span class="tg">🎁 بدّو الهدية</span><button type="button" class="mini ok" data-ga="'+esc(p.gift.code)+'">✅ عطيه</button><button type="button" class="mini no" data-gr="'+esc(p.gift.code)+'">❌</button>';else a+='<span class="tg">'+(p.gift.s==='ok'?'🎁 أخد الهدية ✅':'🎁 مرفوضة ❌')+'</span>';}
  (p.certs||[]).forEach(function(c){if(c.s==='wait')a+='<span class="tg">🎓 بدّو شهادة '+(CRS[c.course]||'')+' ('+c.m+' غلط)</span><button type="button" class="mini ok" data-ca="'+esc(c.code)+'" data-u="'+p.uid+'">✅ وافق</button><button type="button" class="mini no" data-cr="'+esc(c.code)+'">❌</button>';else if(c.s==='ok')a+='<a class="tg" href="../cert/?c='+esc(c.code)+'">🎓 شهادة '+(CRS[c.course]||'')+' ✅ 📄</a>';});
@@ -776,7 +795,7 @@ $('ppBtn').onclick=function(){$('ppM').hidden=false;$('ppE').textContent='⏳';
   if(!j.people.some(needs)&&val('ppF')==='act'){setOn('ppF',['all']);}ppDraw();})
  .catch(function(e){$('ppE').textContent=(e&&(e.msg||e.message))||'ما زبط. تأكد من الإنترنت.';});};
 $('ppF').addEventListener('click',function(){setTimeout(ppDraw,0);});$('ppQ').oninput=ppDraw;
-$('ppL').addEventListener('click',function(e){var t=e.target.closest('[data-bt]');if(t){buyOpen(t.dataset.bt);return;}var b=e.target.closest('[data-ga],[data-gr],[data-ca],[data-cr],[data-cn]');if(!b)return;b.disabled=true;var P;
+$('ppL').addEventListener('click',function(e){var st=e.target.closest('[data-st]');if(st){stOpen(HUB.people[+st.dataset.st]);return;}var t=e.target.closest('[data-bt]');if(t){buyOpen(t.dataset.bt);return;}var b=e.target.closest('[data-ga],[data-gr],[data-ca],[data-cr],[data-cn]');if(!b)return;b.disabled=true;var P;
  if(b.dataset.ga)P=prRpc('promo_approve',{p_code:b.dataset.ga,p_pdf:true}).then(function(j){if(j&&j.ok&&!j.already)admin().then(function(a){return fetch(SBU+'/functions/v1/mea-push',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+a,'Content-Type':'application/json'},body:JSON.stringify({topic:'promo_'+b.dataset.ga,id:'promo-'+b.dataset.ga,title:'🎉 تم قبولك!',body:'صار عندك كتاب «الكهرباء بالمختصر المفيد» مع الـPDF. افتح التطبيق ← الكتب ← الكتاب الأول.',url:'https://mrelectroai-spec.github.io/mrelectroai/app/#books'})});}).catch(function(){});return j;});
  else if(b.dataset.gr)P=prRpc('promo_reject',{p_code:b.dataset.gr});
  else if(b.dataset.ca)P=prRpc('cert_decide',{p_code:b.dataset.ca,p_ok:true,p_name:null}).then(function(j){if(j&&j.ok&&j.uid)pushTo(j.uid,'🎓 شهادتك جاهزة!','أنور وافق على شهادتك. افتح التطبيق، احفظها PDF وشاركها.').catch(function(){});return j;});
