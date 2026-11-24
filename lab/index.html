@@ -196,14 +196,15 @@ button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 <script src="../app/path.js"></script>
 <div id="plock" hidden><div class="pb"><div style="font-size:42px">🔒</div><b id="plT"></b><p id="plP"></p>
 <input id="plK" placeholder="MEA-XXXX-XXXX" dir="ltr" autocomplete="off" spellcheck="false"><div id="plE"></div>
-<button id="plGo">🔑 فعّل المفتاح</button><a id="plWa" href="https://wa.me/96179434479">اشتري الكتاب عالواتساب</a><a id="plFree" href="#">شوف القطعة المجانية ←</a></div></div>
+<button id="plGo">🔑 فعّل المفتاح</button><a id="plWa" href="https://wa.me/96179434479">اشتري الكتاب عالواتساب</a><a id="plApp" hidden href="intent://open#Intent;scheme=mrelectroai;package=com.mrelectroai.app;end">📲 عندك التطبيق؟ افتحو واكبس 📷 فوق، وامسح الـQR من جوّاتو</a><a id="plFree" href="#">شوف القطعة المجانية ←</a></div></div>
+<script>try{if(/Android/i.test(navigator.userAgent)&&!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()))document.getElementById('plApp').hidden=false;}catch(e){}</script>
 <style>#plock{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 #plock .pb{width:min(380px,100%);text-align:center;border-radius:26px;padding:24px 18px;color:#eef6f3;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 20px 60px rgba(0,0,0,.4);font-family:'Readex Pro',system-ui,sans-serif}
 #plock b{display:block;font-size:18px;margin:8px 0}#plock p{color:#a5bdb6;font-size:14px;line-height:1.8;margin:0 0 12px}
 #plock input{width:100%;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.25);color:#fff;text-align:center;font-size:17px;letter-spacing:2px;text-transform:uppercase}
 #plE{color:#ff8a80;font-size:13px;min-height:18px;margin:6px 0}
 #plock button,#plock a{display:block;width:100%;padding:12px;border-radius:14px;font:700 15px inherit;text-decoration:none;margin-top:8px;border:0;cursor:pointer}
-#plGo{background:#22C79B;color:#03140f}#plWa{background:rgba(255,255,255,.12);color:#eef6f3}#plFree{background:none;color:#22C79B;font-size:14px!important}</style>
+#plGo{background:#22C79B;color:#03140f}#plWa{background:rgba(255,255,255,.12);color:#eef6f3}#plFree{background:none;color:#22C79B;font-size:14px!important}#plApp{background:rgba(34,199,155,.16);color:#22C79B;border:1px solid rgba(34,199,155,.5)!important;font-size:14px!important;line-height:1.5}</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function () {

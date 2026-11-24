@@ -155,6 +155,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 #inst{position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:35;border-radius:22px;padding:14px 14px 12px;display:flex;gap:12px;align-items:flex-start;animation:up .4s cubic-bezier(.2,.9,.2,1)}
 #inst img{width:48px;height:48px;border-radius:12px;flex:0 0 48px}#inst b{display:block;font-size:15px}#inst p{font-size:13px;color:var(--muted);line-height:1.7;margin:2px 0 8px}
 #inst .row{gap:8px}#inst .btn{padding:9px 14px;font-size:14px}#inst .x{position:absolute;top:6px;left:10px;font-size:18px;color:var(--muted);background:none;border:0}
+.qrc{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;margin:0 0 14px;cursor:pointer;border:1px solid var(--g-edge)}.qrc span{font-size:28px}.qrc b{display:block;font-size:15px}.qrc small{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
 .bn{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px;border-radius:20px;border:0;background:#e5484d;color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px #e5484d55}
 .bn i{width:8px;height:8px;border-radius:50%;background:#fff;animation:bnp 1.4s infinite}
 .bn.seen{background:var(--panel);color:var(--text);border:1px solid var(--line);box-shadow:none}.bn.seen i{background:#e5484d;animation:none}
@@ -327,7 +328,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <header class="top">
   <img src="icon-192.png" alt="MrElectroAI" id="logo">
   <div><h1>MrElectro<b>AI</b></h1><p class="byl">أنور الجاسم <svg class="vb" viewBox="0 0 24 24" width="16" height="16" role="img" aria-label="موثّق"><path fill="#1D9BF0" stroke="#1D9BF0" stroke-width="1.2" stroke-linejoin="round" d="M12.00 1.00 L13.89 2.49 L16.21 1.84 L17.39 3.93 L19.78 4.22 L20.07 6.61 L22.16 7.79 L21.51 10.11 L23.00 12.00 L21.51 13.89 L22.16 16.21 L20.07 17.39 L19.78 19.78 L17.39 20.07 L16.21 22.16 L13.89 21.51 L12.00 23.00 L10.11 21.51 L7.79 22.16 L6.61 20.07 L4.22 19.78 L3.93 17.39 L1.84 16.21 L2.49 13.89 L1.00 12.00 L2.49 10.11 L1.84 7.79 L3.93 6.61 L4.22 4.22 L6.61 3.93 L7.79 1.84 L10.11 2.49Z"/><path fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M7.6 12.4l3 3 5.8-6.2"/></svg></p></div>
-  <div class="tops"><div id="langSlot"></div><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
+  <div class="tops"><div id="langSlot"></div><label class="gear" id="qrBtn" aria-label="امسح QR الكتاب" title="امسح QR الكتاب" style="display:grid;place-items:center;cursor:pointer"><input type="file" id="qrIn" accept="image/*" capture="environment" hidden><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><rect x="8" y="8" width="3" height="3"/><rect x="13" y="8" width="3" height="3"/><rect x="8" y="13" width="3" height="3"/><path d="M13 13h3v3"/></svg></label><button class="gear" type="button" id="gear" aria-label="الإعدادات">⚙️</button></div>
 </header>
 <div id="tchBar" hidden>
  <div class="tbh"><b>🎓 وضع الأستاذ</b><span style="display:flex;gap:6px"><button type="button" id="tbHelp" class="tbx" aria-label="شو هيدا">💡</button><button type="button" id="tchBadge" class="tbx" aria-label="طلاع من وضع الأستاذ">✕ طلاع</button></span></div>
@@ -356,7 +357,8 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </section>
 
 <section class="tab" id="t-books">
-  <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">الكتب <button type="button" id="bnBtn" class="bn" hidden><i></i><span>جديد: تحديث الكتب</span></button></h2><p class="sub">سلسلة «بالمختصر المفيد». اكبس عالكتاب لتشوف شو معو.</p>
+  <label class="qrc mea-glass" for="qrIn"><span>📷</span><div><b>معك الكتاب؟ امسح الـQR من هون</b><small>صوّر الـQR يلي بالكتاب، وبينفتحلك جوّا التطبيق مع مفتاحك</small></div></label>
+<h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">الكتب <button type="button" id="bnBtn" class="bn" hidden><i></i><span>جديد: تحديث الكتب</span></button></h2><p class="sub">سلسلة «بالمختصر المفيد». اكبس عالكتاب لتشوف شو معو.</p>
   <div id="promo"></div>
   <div class="grid" id="bookList"></div>
 </section>
@@ -433,7 +435,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.24c";
+var APPV="2026.11.24d";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -763,6 +765,19 @@ function stOpen(p){if(!p)return;$('stT').textContent='📊 '+(p.name||'')+' · �
    if(W.length)h+='<div class="mdl2" style="margin:6px 0 0">🔁 الأسئلة يلي غلط فيها</div>'+W.map(function(w){return '<div style="font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)"><b>'+esc(w.q||'')+'</b><br><small style="color:#e5484d">جاوب غلط: '+esc(w.a||'')+'</small><small> · القاعدة '+(w.n||'?')+(w.c>1?' · '+w.c+' مرات':'')+'</small></div>';}).join('');
    h+='</div>';});
   $('stB').innerHTML=h;}).catch(function(){$('stB').innerHTML='<p class="mds">ما زبط. فوت كأدمن وجرّب كمان مرة.</p>';});}
+/* 📷 مسح QR الكتاب من جوّا التطبيق: هيك بيضلّ المفتاح شغّال (الكاميرا برّا بتفتح المتصفّح، والمفتاح مربوط بالتطبيق) */
+function qrLib(){return new Promise(function(ok,no){if(window.jsQR)return ok();var sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';sc.onload=ok;sc.onerror=no;document.head.appendChild(sc);});}
+function qrRead(file){return new Promise(function(ok,no){var u=URL.createObjectURL(file),im=new Image();im.onload=function(){
+  var tries=[1600,1000,700];function go(k){if(k>=tries.length){URL.revokeObjectURL(u);return ok(null);}var sc=Math.min(1,tries[k]/Math.max(im.width,im.height)),w=Math.round(im.width*sc),h=Math.round(im.height*sc),c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d');x.drawImage(im,0,0,w,h);
+   var d=x.getImageData(0,0,w,h),r=window.jsQR&&jsQR(d.data,w,h,{inversionAttempts:'attemptBoth'});if(r&&r.data){URL.revokeObjectURL(u);return ok(r.data);}go(k+1);}
+  if('BarcodeDetector' in window){try{new BarcodeDetector({formats:['qr_code']}).detect(im).then(function(L){if(L&&L[0]){URL.revokeObjectURL(u);ok(L[0].rawValue);}else qrLib().then(function(){go(0);},function(){ok(null);});}).catch(function(){qrLib().then(function(){go(0);},function(){ok(null);});});return;}catch(e){}}
+  qrLib().then(function(){go(0);},function(){ok(null);});};im.onerror=function(){no();};im.src=u;});}
+$('qrIn').addEventListener('change',function(){var f=this.files&&this.files[0];this.value='';if(!f)return;toast('⏳ عم إقرا الـQR…');
+ qrRead(f).then(function(t){if(!t){toast('ما قدرت إقرا الـQR. قرّب أكتر وخلّي الضو منيح وجرّب كمان مرة 📷');return;}t=String(t).trim();
+  var m=t.match(/^https?:\/\/mrelectroai-spec\.github\.io\/mrelectroai\/(.*)$/i);
+  if(m){try{window.meaTrack&&meaTrack('qr_scan');}catch(e){}location.href='https://mrelectroai-spec.github.io/mrelectroai/'+m[1];return;}
+  if(/^https?:\/\//i.test(t)){toast('هالـQR مش من كتب MrElectroAI');setTimeout(function(){window.open(t,'_blank');},900);return;}
+  toast('الـQR مكتوب فيه: '+t.slice(0,60));}).catch(function(){toast('ما زبط، جرّب كمان مرة');});});
 var HUB=null;chp('ppF');
 var CRS={electro:'⚡ الكهربا',classic:'⚙️ الكلاسيك',solar:'☀️ الشمسية'};
 function needs(p){return (p.buy&&!p.buy.sent_at)||(p.gift&&p.gift.s==='wait')||(p.certs||[]).some(function(c){return c.s==='wait';})||(p.elig&&p.elig.length);}
