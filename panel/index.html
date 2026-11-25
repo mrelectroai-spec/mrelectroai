@@ -193,6 +193,7 @@ function open(p){PJ=p;KEY='panel_'+(p?p.id:'free');$('home').hidden=true;$('lab'
  let saved=null;try{saved=JSON.parse(ls(KEY)||'null');}catch(e){}
  if(saved&&saved.comps){B.comps=saved.comps;B.wires=saved.wires;for(const c of B.comps){c.st={};if(c.type.startsWith('mcb')||c.type==='rcd')c.st.on=true;}}
  else{B.comps=[];B.wires=[];if(p)p.setup((t,x,y)=>add(t,x,y,true));}
+ if(p)B.comps.forEach(autoBrand);
  lib();undo=[];sel=null;selW=null;pend=null;$('task').hidden=!p;if(p)taskCard();setTool('move');fit(false);draw();}
 $('wbarX').onclick=()=>{pend=null;draw();};
 $('bBack').onclick=()=>{location.hash='';};
@@ -200,8 +201,18 @@ $('bBack').onclick=()=>{location.hash='';};
 /* ---------- القطع ---------- */
 function nid(t){let i=1;while(B.comps.some(c=>c.id===t+i))i++;return t+i;}
 function nlabel(t){const pre=P[t].pre;if(!pre)return '';let i=1;while(B.comps.some(c=>c.label===pre+i))i++;return pre+i;}
+/* 🏷️ بالمشاريع: كل قطعة بتنحط بموديل Schneider حقيقي، مطابق لقيمها (أمبير، كيلوات، لون…) */
+const BRAND0='Schneider';
+function autoBrand(c){const CAT=window.CATALOG;if(!PJ||!CAT||!c||c.model||!CAT.C[c.type])return;
+ const L=CAT.C[c.type].filter(x=>x.b===BRAND0);if(!L.length)return;
+ const keys=x=>Object.keys(x.set||{});
+ let hit=L.find(x=>keys(x).every(k=>c[k]===undefined||String(c[k])===String(x.set[k])));
+ if(!hit){const num=L.filter(x=>x.set&&x.set.rating!=null&&c.rating!=null);if(num.length)hit=num.slice().sort((a,b)=>Math.abs(a.set.rating-c.rating)-Math.abs(b.set.rating-c.rating))[0];}
+ if(!hit&&c.setA!=null)hit=L.find(x=>x.set&&x.set.olMin<=c.setA&&c.setA<=x.set.olMax);
+ if(!hit&&L.every(x=>!keys(x).length))hit=L[0];
+ if(hit){c.brand=hit.b;c.model=hit.m;}}
 function add(t,x,y,quiet){const d=P[t];const c=Object.assign({id:nid(t),type:t,x:snap(x),y:y,label:nlabel(t),st:{}},JSON.parse(JSON.stringify(d.def||{})));
- if(t.startsWith('mcb')||t==='rcd')c.st.on=true;c.y=railY(c,y);B.comps.push(c);if(!quiet){sel=c.id;selW=null;}return c;}
+ if(t.startsWith('mcb')||t==='rcd')c.st.on=true;c.y=railY(c,y);B.comps.push(c);autoBrand(c);if(!quiet){sel=c.id;selW=null;}return c;}
 const snap=v=>Math.round(v/10)*10;
 const DIN={mcb1:1,mcb3:1,rcd:1,kc:1,ol:1,relay:1,tmr:1,tb:1};
 function railY(c,y){const h=P[c.type].h;if(!DIN[c.type])return snap(y);
@@ -306,7 +317,7 @@ function lib(){const cats={};const allow=PJ&&KIT[PJ.course];for(const t in P){if
   closeSheets();save();sim();draw();chipFor(c);};}
 
 /* ---------- خصائص القطعة والشريط ---------- */
-function catHTML(c){const CAT=window.CATALOG;if(!CAT||!CAT.C[c.type])return '';const BR=CAT.brands(c.type);const b=c.cb||c.brand||BR[0];
+function catHTML(c){const CAT=window.CATALOG;if(!CAT||!CAT.C[c.type])return '';const BR=CAT.brands(c.type);const b=c.cb||c.brand||(PJ&&BR.includes(BRAND0)?BRAND0:BR[0]);
  const L=CAT.C[c.type].filter(x=>x.b===b);
  return `<div class="lbl">🏷️ الماركة والموديل ${c.model?`<b style="direction:ltr;color:var(--volt)">${esc(c.brand+' '+c.model)}</b>`:''}</div><div class="cbr">${BR.map(x=>`<button class="chip${x===b?' on':''}" data-cb="${esc(x)}">${esc(x)}</button>`).join('')}</div><div class="cml">${L.map((x,i)=>`<button type="button" class="cm${c.brand===x.b&&c.model===x.m?' on':''}" data-cm="${i}"><b>${esc(x.m)}</b><small>${esc(x.s)}</small></button>`).join('')}</div>`;}
 function chipFor(c){const d=P[c.type];let h=`<h3>${d.name} <span style="color:var(--volt)">${esc(c.label||'')}</span><button type="button" data-close>سكّر</button></h3>`;
@@ -341,7 +352,7 @@ $('propBody').onclick=e=>{const pb=$('propBody');
  const b=e.target.closest('[data-p],[data-step],[data-wp],[data-del],[data-delw]');if(!b)return;push();
  if(b.dataset.del){B.wires=B.wires.filter(x=>!x.a.startsWith(b.dataset.del+'.')&&!x.b.startsWith(b.dataset.del+'.'));B.comps=B.comps.filter(x=>x.id!==b.dataset.del);sel=null;closeSheets();}
  else if(b.dataset.delw){B.wires=B.wires.filter(x=>x.id!==b.dataset.delw);selW=null;closeSheets();}
- else if(c&&b.dataset.p){c[b.dataset.p]=b.dataset.s?b.dataset.v:+b.dataset.v;if(c.model&&['rating','kw','color'].includes(b.dataset.p)){delete c.model;delete c.brand;}chipFor(c);}
+ else if(c&&b.dataset.p){c[b.dataset.p]=b.dataset.s?b.dataset.v:+b.dataset.v;if(c.model&&['rating','kw','color'].includes(b.dataset.p)){delete c.model;delete c.brand;autoBrand(c);}chipFor(c);}
  else if(c&&b.dataset.step){const k=b.dataset.step;c[k]=Math.round((c[k]+ +b.dataset.d)*10)/10;if(k==='setA')c[k]=Math.max(c.olMin||1,Math.min(c.olMax||32,c[k]));if(k==='sec')c[k]=Math.max(1,Math.min(60,c[k]));chipFor(c);}
  else if(w&&b.dataset.wp){w[b.dataset.wp]=b.dataset.s?b.dataset.v:+b.dataset.v;chipWire(w);}
  save();sim();draw();};
