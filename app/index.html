@@ -296,7 +296,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <div id="pdfE" class="mde"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="hbM" hidden class="mdl"><div class="set mdb"><div class="mdt">🏆 لوحة الشرف</div><p class="byl" id="hbBy" style="font-size:13px;margin:2px 0 4px">بإشراف أنور الجاسم</p><p class="mds">يلي خلّصوا كورس الأسئلة. الترتيب حسب الأغلاط: الأقل غلط هوّي الأوّل. 🎓 = 5 أغلاط أو أقل (بياخد شهادة موقّعة من أنور).</p>
 <div class="chp" id="hbT"><button type="button" data-v="electro" class="on">⚡ الكهربا</button><button type="button" data-v="classic">⚙️ الكلاسيك</button><button type="button" data-v="solar">☀️ الشمسية</button></div>
-<div id="hbMe"></div><div id="hbL" style="max-height:52vh;overflow:auto;margin-top:8px"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
+<div id="hbMe"></div><div id="hbL" style="max-height:52vh;overflow:auto;margin-top:8px"></div><div id="hbS" hidden style="margin-top:12px;max-height:40vh;overflow:auto"></div><div class="row" style="margin-top:10px"><button type="button" class="btn alt" data-close>سكّر</button></div></div></div>
 <div id="grM" hidden class="mdl" style="z-index:66"><div class="set mdb"><div class="mdt">🔑 فعّل كتب لـ<span id="grN"></span></div><p class="mds">بينفتحولو عتلفونو لحالن، بلا ما تبعتلو مفتاح، وبيوصلو إشعار.</p>
 <div class="mdl2">شو الكتب؟</div><div class="chp" id="grB"><button type="button" data-v="book">📘 الكهربا</button><button type="button" data-v="book2">⚙️ الكلاسيك</button><button type="button" data-v="book3">☀️ الشمسية</button></div>
 <div class="mdl2">نسخة PDF</div><div class="chp" id="grP"><button type="button" data-v="1" class="on">📄 مع PDF</button><button type="button" data-v="0">📕 ورقي بس</button></div>
@@ -435,7 +435,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.24d";
+var APPV="2026.11.25a";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -1067,7 +1067,26 @@ function hbDraw(){var L=(HB||[]).filter(function(x){return x.c===hbC;});
  var me=L.filter(function(x){return x.me;})[0];$('hbMe').innerHTML=me?myBox(me):'';
  $('hbL').innerHTML=L.length?L.map(function(x){var md=x.r===1?'🥇':x.r===2?'🥈':x.r===3?'🥉':'<b style="display:inline-block;min-width:26px;text-align:center">'+x.r+'</b>';
   return '<div class="pli" style="'+(x.me?'background:rgba(34,199,155,.22);border-radius:14px;padding-inline:8px':'')+'"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px">'+md+'</span><div><b>'+esc(x.n)+(x.cert?' 🎓':'')+(x.me?' (إنت)':'')+'</b><small>'+x.m+' غلط'+(x.a!=null?' · فهم '+x.a+'%':'')+'</small></div></div></div>';}).join('')
-  :'<p class="mds" style="text-align:center;padding:16px">لسّا ما حدا خلّص هالكورس. كون إنت الأوّل! 💪</p>';}
+  :'<p class="mds" style="text-align:center;padding:16px">لسّا ما حدا خلّص هالكورس. كون إنت الأوّل! 💪</p>';
+ hbTeach();}
+/* 🎓 وضع الأستاذ: كبسة عأي اسم بلوحة الشرف بتورجيك أسئلتو ووين وصل، وتحت لستة كل الطلاب بهالكورس */
+var HBT={};
+function hbTeach(){var T=ls('meaTeacher')==='1',box=$('hbS');box.hidden=!T;if(!T)return;
+ [].forEach.call($('hbL').children,function(el,i){if(!el.classList.contains('pli'))return;el.style.cursor='pointer';var x=(HB||[]).filter(function(y){return y.c===hbC;})[i];if(!x)return;
+  if(!el.querySelector('.hbx'))el.firstChild.insertAdjacentHTML('beforeend','<span class="hbx" style="margin-inline-start:auto;font-size:18px">📊</span>');
+  el.firstChild.style.width='100%';el.onclick=function(){hbOpen(x.n);};});
+ if(HBT[hbC]){hbTDraw();return;}box.innerHTML='<p class="mds">⏳ عم جيب كل الطلاب…</p>';
+ admGet('students?course=eq.'+hbC+'&select=name,phone,vid,rules_done,total,cur_rule,mistakes,answers,last_seen,finished_at&order=last_seen.desc&limit=300').then(function(L){HBT[hbC]=Array.isArray(L)?L:[];hbTDraw();})
+ .catch(function(){box.innerHTML='<p class="mds">فوت كأدمن لتشوف كل الطلاب.</p>';});}
+function hbTDraw(){var L=HBT[hbC]||[],box=$('hbS');
+ box.innerHTML='<div class="mdl2" style="display:flex;justify-content:space-between"><span>🎓 كل الطلاب بهالكورس ('+L.length+')</span><small style="font-weight:500;opacity:.75">بس إنت بتشوفها</small></div>'+(L.length?L.map(function(x,i){var pct=x.total?Math.round((x.rules_done||0)*100/x.total):0;
+  return '<div class="pli" data-hbt="'+i+'" style="cursor:pointer;display:block"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>'+esc(x.name||'بلا اسم')+(x.finished_at?' 🏁':'')+'</b><span style="font-size:18px">📊</span></div>'
+  +'<div style="height:6px;border-radius:5px;background:var(--g-edge2);overflow:hidden;margin:6px 0 4px"><div style="height:100%;width:'+pct+'%;background:'+(x.mistakes>5?'#ffb020':'var(--volt)')+'"></div></div>'
+  +'<small>'+(x.rules_done||0)+'/'+(x.total||'?')+' قاعدة'+(x.cur_rule&&!x.finished_at?' · هلّق بالـ'+x.cur_rule:'')+' · غلط '+(x.mistakes||0)+' · '+ppAgo(x.last_seen)+'</small></div>';}).join(''):'<p class="mds">لسّا ما حدا بلّش.</p>');
+ [].forEach.call(box.querySelectorAll('[data-hbt]'),function(el){el.onclick=function(){var x=L[+el.dataset.hbt];stOpen({name:x.name,phone:x.phone,vid:x.vid});};});}
+function hbOpen(n){var L=HBT[hbC]||[],x=L.filter(function(y){return ppNorm(y.name)===ppNorm(n);})[0];
+ if(x){stOpen({name:x.name,phone:x.phone,vid:x.vid});return;}
+ admGet('students?course=eq.'+hbC+'&name=eq.'+encodeURIComponent(n)+'&select=name,phone,vid&limit=1').then(function(R2){var y=(R2||[])[0];if(y)stOpen(y);else toast('ما لقيت تفاصيلو');}).catch(function(){toast('فوت كأدمن');});}
 function hbLoad(){return fetch(SBU+'/rest/v1/rpc/honor_board',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+SBK,'Content-Type':'application/json'},body:JSON.stringify({p_vid:ls('mea_vid')||null})}).then(function(r){return r.json();}).then(function(j){HB=Array.isArray(j)?j:[];
   var n=HB.length,c=HB.filter(function(x){return x.cert;}).length,me=HB.filter(function(x){return x.me;})[0];
   if(n)$('hbSub').textContent=me?'إنت رقم '+me.r+' 💪 · '+n+' خلّصوا الكورس':n+' خلّصوا الكورس'+(c?' · '+c+' 🎓':'');return HB;});}
