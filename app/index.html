@@ -435,7 +435,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.25c";
+var APPV="2026.11.25d";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -747,6 +747,20 @@ $('bnS').onclick=function(){var v=$('bnX').value.trim();$('bnS').disabled=true;
  .then(function(r){$('bnS').disabled=false;if(!r.ok)throw 0;toast(v?'💾 انحفظ، وبيطلع أحمر للكل':'🗑️ انشال الخبر');$('bnM').hidden=true;bnLoad();})
  .catch(function(){$('bnS').disabled=false;toast('ما انحفظ، جرّب كمان مرة');});};
 bnLoad();
+/* 📝 رسالة تقييم شخصية حسب نتيجة الطالب: مستواه، شو لازم يقوّي، وأي كتاب بيناسبو */
+function stMsg(name,L){var nw=String(name||'').trim().split(/\s+/),fn=(/^(ابو|أبو|عبد|ام|أم|ابن)$/.test(nw[0])&&nw[1]?nw[0]+' '+nw[1]:nw[0])||'يا بطل',seen={},parts=[],rec=null;
+ var BK={electro:'«الكهرباء بالمختصر المفيد» 📘',classic:'«الكلاسيك كنترول بالمختصر المفيد» 📗',solar:'«الطاقة الشمسية بالمختصر المفيد» 📙'},NX={electro:'classic',classic:'solar',solar:null};
+ (L||[]).forEach(function(x){if(seen[x.course])return;seen[x.course]=1;var d=x.data||{},R2=(d.rules||[]).filter(function(r){return r.m>0;}).sort(function(a,b){return b.m-a.m;}).slice(0,3);
+  var acc=x.answers?Math.round((x.answers-(x.mistakes||0))*100/x.answers):null,fin=!!x.finished_at,cn=(CRS2[x.course]||x.course).replace(/^\S+\s/,'');
+  var lvl=acc==null?'لسّا بالأوّل':acc>=95?'ممتاز 🔥':acc>=85?'منيح كتير 👍':acc>=70?'عندك أساس منيح، وبدّك شوية تقوية 💪':'عندك أساس، بس محتاج تقوّي حالك بكذا نقطة 💪';
+  var t='📊 *'+cn+'*: '+(fin?'خلّصتو كلّو ✅':'وصلت للقاعدة '+(x.cur_rule||((x.rules_done||0)+1))+' من '+(x.total||'?'))+(acc!=null?' · فهمك '+acc+'%':'')+'\nمستواك: '+lvl;
+  if(R2.length)t+=(acc!=null&&acc>=95?'\n🔎 بس راجع هالنقطة:\n':'\n🎯 لازم تقوّي حالك بـ:\n')+R2.map(function(r){return '• '+r.t;}).join('\n');
+  if(fin&&(x.mistakes||0)<=5)t+='\n🎓 بتستاهل شهادة موقّعة منّي!';
+  parts.push(t);
+  if(!rec)rec=(acc!=null&&acc<85)||!fin?x.course:(NX[x.course]||x.course);});
+ var m='مرحبا '+fn+' 👋 أنا أنور الجاسم، تابعت نتيجتك بكورس الأسئلة 🙏\n\n'+parts.join('\n\n');
+ if(rec)m+='\n\n📚 نصيحتي إلك: كتاب '+BK[rec]+(rec===((L[0]||{}).course)?'، فيه شرح كل هالنقاط بالتفصيل مع رسومات ومشاريع عملية.':'، لأنك جاهز للخطوة الجاية 🚀');
+ return m+'\n\nإذا عندك أي سؤال أنا حاضر 🙏';}
 /* 📊 نتيجة كورس الأسئلة لكل طالب: شو خلّص، وين غلط، وكم مرة */
 var CRS2={electro:'⚡ كورس الكهربا',classic:'⚙️ كورس الكلاسيك',solar:'☀️ كورس الطاقة الشمسية'};
 function stOpen(p){if(!p)return;$('stT').textContent='📊 '+(p.name||'')+' · نتيجة الكورسات';$('stB').innerHTML='<p class="mds">⏳</p>';$('stM').hidden=false;
@@ -754,8 +768,8 @@ function stOpen(p){if(!p)return;$('stT').textContent='📊 '+(p.name||'')+' · �
  if(!or.length){$('stB').innerHTML='<p class="mds">ما في رقم لنفتّش فيه.</p>';return;}
  admGet('students?select=phone,name,client_id,course,rules_done,total,cur_rule,mistakes,answers,started_at,finished_at,last_seen,reset_at,data&or=('+or.join(',')+')&order=last_seen.desc').then(function(L){
   if(!L||!L.length){$('stB').innerHTML='<p class="mds">لسّا ما بلّش ولا كورس.</p>';return;}
-  var ph=String(p.phone||(L[0]&&L[0].phone)||'').trim(),wp=waPh(ph);
-  var seen={},h=ph?'<div class="pli" style="justify-content:space-between;margin-bottom:10px"><div><small>رقمو يلي سجّلو</small><b dir="ltr" style="font-size:17px">'+esc(ph)+'</b></div><div style="display:flex;gap:6px;flex:0 0 auto"><a class="btn" style="margin:0;padding:8px 12px;width:auto;background:#25D366;color:#fff" href="https://api.whatsapp.com/send?phone='+wp+'">💬</a><a class="btn alt" style="margin:0;padding:8px 12px;width:auto" href="tel:+'+wp+'">📞</a></div></div>':'';L.forEach(function(x){if(seen[x.course])return;seen[x.course]=1;var d=x.data||{},R=d.rules||[],W=(d.weak||[]).slice().sort(function(a,b){return (b.c||0)-(a.c||0);});
+  var ph=String(p.phone||(L[0]&&L[0].phone)||'').trim(),wp=waPh(ph),msg=stMsg(p.name||(L[0]&&L[0].name)||'',L);
+  var seen={},h=ph?'<div class="pli" style="justify-content:space-between;margin-bottom:10px"><div><small>رقمو يلي سجّلو</small><b dir="ltr" style="font-size:17px">'+esc(ph)+'</b></div><div style="display:flex;gap:6px;flex:0 0 auto"><a class="btn" style="margin:0;padding:8px 12px;width:auto;background:#25D366;color:#fff" href="https://api.whatsapp.com/send?phone='+wp+'">💬</a><a class="btn alt" style="margin:0;padding:8px 12px;width:auto" href="tel:+'+wp+'">📞</a></div></div><a class="btn" style="display:block;text-align:center;margin:0 0 10px;background:#25D366;color:#fff;padding:13px" href="https://api.whatsapp.com/send?phone='+wp+'&text='+encodeURIComponent(msg)+'">📝 ابعتلو تقييمو ونصيحتك عالواتساب</a>':'';L.forEach(function(x){if(seen[x.course])return;seen[x.course]=1;var d=x.data||{},R=d.rules||[],W=(d.weak||[]).slice().sort(function(a,b){return (b.c||0)-(a.c||0);});
    var pct=x.total?Math.round((x.rules_done||0)*100/x.total):0,acc=x.answers?Math.round((x.answers-(x.mistakes||0))*100/x.answers):null;
    h+='<div class="pli" style="flex-direction:column;align-items:stretch;gap:8px;margin-bottom:10px"><b style="font-size:16px">'+(CRS2[x.course]||x.course)+(x.finished_at?' 🏁':'')+'</b>'
     +'<div style="height:8px;border-radius:6px;background:var(--panel2);overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--volt)"></div></div>'
