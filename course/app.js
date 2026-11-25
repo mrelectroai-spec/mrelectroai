@@ -554,5 +554,15 @@
   }
 
   render();
+  // 🔁 إذا أنور عمل «إعادة» للكورس، منبلّش من جديد (منخلّي الاسم والرقم)
+  (async () => { try {
+    if (!S || !S.name || TEACHER) return;
+    const r = await fetch(SB_URL + '/rest/v1/rpc/course_reset_check', { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_client_id: cid(), p_course: COURSE_ID }) });
+    const t = r.ok ? await r.json() : null; const at = t ? Date.parse(t) : 0;
+    if (at && at > (S.startedAt || 0) && at > (S.resetSeen || 0)) {
+      S = Object.assign(fresh(S.name, S.phone), { resetSeen: at }); save(); view = 'home'; render(); top();
+      alert('🔁 أنور فتحلك الكورس من جديد. بالتوفيق! 💪');
+    }
+  } catch (e) {} })();
   if (S) report();
 })();
