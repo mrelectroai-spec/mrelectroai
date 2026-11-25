@@ -435,7 +435,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.25b";
+var APPV="2026.11.25c";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -752,9 +752,10 @@ var CRS2={electro:'⚡ كورس الكهربا',classic:'⚙️ كورس الك�
 function stOpen(p){if(!p)return;$('stT').textContent='📊 '+(p.name||'')+' · نتيجة الكورسات';$('stB').innerHTML='<p class="mds">⏳</p>';$('stM').hidden=false;
  var d8=String(p.phone||'').replace(/\D/g,'').slice(-8),or=[];if(d8.length>=7)or.push('phone.like.*'+d8);if(p.vid)or.push('vid.eq.'+encodeURIComponent(p.vid));
  if(!or.length){$('stB').innerHTML='<p class="mds">ما في رقم لنفتّش فيه.</p>';return;}
- admGet('students?select=client_id,course,rules_done,total,cur_rule,mistakes,answers,started_at,finished_at,last_seen,reset_at,data&or=('+or.join(',')+')&order=last_seen.desc').then(function(L){
+ admGet('students?select=phone,name,client_id,course,rules_done,total,cur_rule,mistakes,answers,started_at,finished_at,last_seen,reset_at,data&or=('+or.join(',')+')&order=last_seen.desc').then(function(L){
   if(!L||!L.length){$('stB').innerHTML='<p class="mds">لسّا ما بلّش ولا كورس.</p>';return;}
-  var seen={},h='';L.forEach(function(x){if(seen[x.course])return;seen[x.course]=1;var d=x.data||{},R=d.rules||[],W=(d.weak||[]).slice().sort(function(a,b){return (b.c||0)-(a.c||0);});
+  var ph=String(p.phone||(L[0]&&L[0].phone)||'').trim(),wp=waPh(ph);
+  var seen={},h=ph?'<div class="pli" style="justify-content:space-between;margin-bottom:10px"><div><small>رقمو يلي سجّلو</small><b dir="ltr" style="font-size:17px">'+esc(ph)+'</b></div><div style="display:flex;gap:6px;flex:0 0 auto"><a class="btn" style="margin:0;padding:8px 12px;width:auto;background:#25D366;color:#fff" href="https://api.whatsapp.com/send?phone='+wp+'">💬</a><a class="btn alt" style="margin:0;padding:8px 12px;width:auto" href="tel:+'+wp+'">📞</a></div></div>':'';L.forEach(function(x){if(seen[x.course])return;seen[x.course]=1;var d=x.data||{},R=d.rules||[],W=(d.weak||[]).slice().sort(function(a,b){return (b.c||0)-(a.c||0);});
    var pct=x.total?Math.round((x.rules_done||0)*100/x.total):0,acc=x.answers?Math.round((x.answers-(x.mistakes||0))*100/x.answers):null;
    h+='<div class="pli" style="flex-direction:column;align-items:stretch;gap:8px;margin-bottom:10px"><b style="font-size:16px">'+(CRS2[x.course]||x.course)+(x.finished_at?' 🏁':'')+'</b>'
     +'<div style="height:8px;border-radius:6px;background:var(--panel2);overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--volt)"></div></div>'
@@ -1087,7 +1088,7 @@ function hbTDraw(){var L=HBT[hbC]||[],box=$('hbS');
  box.innerHTML='<div class="mdl2" style="display:flex;justify-content:space-between"><span>🎓 كل الطلاب بهالكورس ('+L.length+')</span><small style="font-weight:500;opacity:.75">بس إنت بتشوفها</small></div>'+(L.length?L.map(function(x,i){var pct=x.total?Math.round((x.rules_done||0)*100/x.total):0;
   return '<div class="pli" data-hbt="'+i+'" style="cursor:pointer;display:block"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>'+esc(x.name||'بلا اسم')+(x.finished_at?' 🏁':'')+'</b><span style="font-size:18px">📊</span></div>'
   +'<div style="height:6px;border-radius:5px;background:var(--g-edge2);overflow:hidden;margin:6px 0 4px"><div style="height:100%;width:'+pct+'%;background:'+(x.mistakes>5?'#ffb020':'var(--volt)')+'"></div></div>'
-  +'<small>'+(x.rules_done||0)+'/'+(x.total||'?')+' قاعدة'+(x.cur_rule&&!x.finished_at?' · هلّق بالـ'+x.cur_rule:'')+' · غلط '+(x.mistakes||0)+' · '+ppAgo(x.last_seen)+'</small></div>';}).join(''):'<p class="mds">لسّا ما حدا بلّش.</p>');
+  +'<small><span dir="ltr">'+esc(x.phone||'')+'</span> · '+(x.rules_done||0)+'/'+(x.total||'?')+' قاعدة'+(x.cur_rule&&!x.finished_at?' · هلّق بالـ'+x.cur_rule:'')+' · غلط '+(x.mistakes||0)+' · '+ppAgo(x.last_seen)+'</small></div>';}).join(''):'<p class="mds">لسّا ما حدا بلّش.</p>');
  [].forEach.call(box.querySelectorAll('[data-hbt]'),function(el){el.onclick=function(){var x=L[+el.dataset.hbt];stOpen({name:x.name,phone:x.phone,vid:x.vid});};});}
 function hbOpen(n){var L=HBT[hbC]||[],x=L.filter(function(y){return ppNorm(y.name)===ppNorm(n);})[0];
  if(x){stOpen({name:x.name,phone:x.phone,vid:x.vid});return;}
