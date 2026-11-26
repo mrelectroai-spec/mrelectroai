@@ -435,7 +435,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.26a";
+var APPV="2026.11.26b";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -1101,20 +1101,29 @@ function hbDraw(){var L=(HB||[]).filter(function(x){return x.c===hbC;});
   :'<p class="mds" style="text-align:center;padding:16px">لسّا ما حدا خلّص هالكورس. كون إنت الأوّل! 💪</p>';
  hbTeach();}
 /* 🎓 وضع الأستاذ: كبسة عأي اسم بلوحة الشرف بتورجيك أسئلتو ووين وصل، وتحت لستة كل الطلاب بهالكورس */
-var HBT={};
+var HBT={},HBL={};
 function hbTeach(){var T=ls('meaTeacher')==='1',box=$('hbS');box.hidden=!T;if(!T)return;
  [].forEach.call($('hbL').children,function(el,i){if(!el.classList.contains('pli'))return;el.style.cursor='pointer';var x=(HB||[]).filter(function(y){return y.c===hbC;})[i];if(!x)return;
   if(!el.querySelector('.hbx'))el.firstChild.insertAdjacentHTML('beforeend','<span class="hbx" style="margin-inline-start:auto;font-size:18px">📊</span>');
   el.firstChild.style.width='100%';el.onclick=function(){hbOpen(x.n);};});
  if(HBT[hbC]){hbTDraw();return;}box.innerHTML='<p class="mds">⏳ عم جيب كل الطلاب…</p>';
- admGet('students?course=eq.'+hbC+'&select=name,phone,vid,rules_done,total,cur_rule,mistakes,answers,last_seen,finished_at&order=last_seen.desc&limit=300').then(function(L){HBT[hbC]=Array.isArray(L)?L:[];hbTDraw();})
+ var c0=hbC;Promise.all([admGet('students?course=eq.'+c0+'&select=name,phone,vid,rules_done,total,cur_rule,mistakes,answers,last_seen,finished_at&order=last_seen.desc&limit=300'),admGet('lab_progress?course=eq.'+c0+'&select=vid,name,phone,project,best,total,checks,hints,done_at,last_fail,updated_at&order=updated_at.desc&limit=500').catch(function(){return [];})]).then(function(R){HBT[c0]=Array.isArray(R[0])?R[0]:[];HBL[c0]=Array.isArray(R[1])?R[1]:[];hbTDraw();})
  .catch(function(){box.innerHTML='<p class="mds">فوت كأدمن لتشوف كل الطلاب.</p>';});}
 function hbTDraw(){var L=HBT[hbC]||[],box=$('hbS');
  box.innerHTML='<div class="mdl2" style="display:flex;justify-content:space-between"><span>🎓 كل الطلاب بهالكورس ('+L.length+')</span><small style="font-weight:500;opacity:.75">بس إنت بتشوفها</small></div>'+(L.length?L.map(function(x,i){var pct=x.total?Math.round((x.rules_done||0)*100/x.total):0;
   return '<div class="pli" data-hbt="'+i+'" style="cursor:pointer;display:block"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>'+esc(x.name||'بلا اسم')+(x.finished_at?' 🏁':'')+'</b><span style="font-size:18px">📊</span></div>'
   +'<div style="height:6px;border-radius:5px;background:var(--g-edge2);overflow:hidden;margin:6px 0 4px"><div style="height:100%;width:'+pct+'%;background:'+(x.mistakes>5?'#ffb020':'var(--volt)')+'"></div></div>'
   +'<small><span dir="ltr">'+esc(x.phone||'')+'</span> · '+(x.rules_done||0)+'/'+(x.total||'?')+' قاعدة'+(x.cur_rule&&!x.finished_at?' · هلّق بالـ'+x.cur_rule:'')+' · غلط '+(x.mistakes||0)+' · '+ppAgo(x.last_seen)+'</small></div>';}).join(''):'<p class="mds">لسّا ما حدا بلّش.</p>');
- [].forEach.call(box.querySelectorAll('[data-hbt]'),function(el){el.onclick=function(){var x=L[+el.dataset.hbt];stOpen({name:x.name,phone:x.phone,vid:x.vid});};});}
+ box.insertAdjacentHTML('beforeend',hbLab());
+ [].forEach.call(box.querySelectorAll('[data-hbt]'),function(el){el.onclick=function(){var x=L[+el.dataset.hbt];stOpen({name:x.name,phone:x.phone,vid:x.vid});};});
+ [].forEach.call(box.querySelectorAll('[data-hbl]'),function(el){el.onclick=function(){var x=HBLG[+el.dataset.hbl];stOpen({name:x.name,phone:x.phone,vid:x.vid});};});}
+/* 🎛️ مين عم يشتغل مشاريع التابلو بهالكورس (حتى لو ما عمل كورس الأسئلة) */
+var HBLG=[];
+function hbLab(){var R=HBL[hbC]||[],G={},O=[];R.forEach(function(x){var g=G[x.vid];if(!g){g=G[x.vid]={vid:x.vid,name:x.name,phone:x.phone,P:[],last:x.updated_at};O.push(g);}if(!g.name&&x.name)g.name=x.name;if(!g.phone&&x.phone)g.phone=x.phone;g.P.push(x);});HBLG=O;
+ return '<div class="mdl2" style="margin-top:14px">🎛️ مشاريع التابلو ('+O.length+')</div>'+(O.length?O.map(function(g,i){var d=g.P.filter(function(x){return x.done_at;}).length,st=g.P.filter(function(x){return !x.done_at;})[0];
+  return '<div class="pli" data-hbl="'+i+'" style="cursor:pointer;display:block"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>'+esc(g.name||'بلا اسم')+'</b><span style="font-size:18px">📊</span></div>'
+  +'<small><span dir="ltr">'+esc(g.phone||'')+'</span> · خلّص '+d+' مشروع'+(st?' · ⏳ '+esc(PJN[st.project]||st.project)+' '+(st.best||0)+'/'+(st.total||'?'):'')+' · '+ppAgo(g.last)+'</small>'
+  +(st&&(st.last_fail||[]).length?'<small style="display:block;color:#e5484d">❌ عالق بـ: '+esc(st.last_fail[0])+'</small>':'')+'</div>';}).join(''):'<p class="mds">لسّا ما حدا فحص مشروع.</p>');}
 function hbOpen(n){var L=HBT[hbC]||[],x=L.filter(function(y){return ppNorm(y.name)===ppNorm(n);})[0];
  if(x){stOpen({name:x.name,phone:x.phone,vid:x.vid});return;}
  admGet('students?course=eq.'+hbC+'&name=eq.'+encodeURIComponent(n)+'&select=name,phone,vid&limit=1').then(function(R2){var y=(R2||[])[0];if(y)stOpen(y);else toast('ما لقيت تفاصيلو');}).catch(function(){toast('فوت كأدمن');});}
