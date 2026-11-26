@@ -22,7 +22,9 @@ function status(id){const c=C[id];let S=null;try{S=JSON.parse(get(c.key)||'null'
  const teacher=get('meaTeacher')==='1';
  // أضعف القواعد: اللي فيها أكتر غلطات (2 أو أكتر، أو أكتر من 20% من أجوبتها)
  const weak=per.filter(r=>r.m>=2||(r.a&&r.m/r.a>0.2)).sort((a,b)=>b.m-a.m);
- return {id,c,cert,read,started:!!S,passed,total,mistakes,answers,finished,excellent,unlocked:(excellent&&owned(id))||teacher,owned:owned(id),teacher,weak,per,current:S?S.current:1};}
+ // مرة بينفتحو المشاريع، بيضلّو مفتوحين حتى لو عاد الكورس من الأول
+ if(excellent)set('meaUnl_'+id,'1');const unl=excellent||get('meaUnl_'+id)==='1';
+ return {id,c,cert,read,started:!!S,passed,total,mistakes,answers,finished,excellent,unlocked:(unl&&owned(id))||teacher,owned:owned(id),teacher,weak,per,current:S?S.current:1};}
 // الكتاب مشتري؟ (مفتاح الكتاب انحط عهالتلفون، أو وضع الأستاذ)
 function okVal(v){return v==='1'||(!!v&&v.slice(0,6)==='until:'&&v.slice(6)>=new Date().toISOString().slice(0,10));}
 function owned(id){if(okVal(get('meaBook_'+id))||get('meaTeacher')==='1')return true;
@@ -74,5 +76,10 @@ function questions(id){if(QS[id])return Promise.resolve(QS[id]);const base=(docu
 function lockHTML(id,root){const s=status(id);if(s.unlocked)return null;root=root||'../';
  const step=!s.owned?'🔑 اشتري الكتاب وحط المفتاح':!s.read?'📖 خلّص قراية الكتاب':!s.finished?`🎯 خلّص كورس الأسئلة (${s.passed}/${s.total} قاعدة)`:`📊 نتيجتك ${s.mistakes} غلطات: لازم ${MAX_MISTAKES} أو أقل`;
  return `<div class="lockc"><div style="font-size:40px">🔒</div><b>المشاريع بتنفتح بس تكون جاهز</b><p>${s.c.title}: ${step}.</p><a href="${root}app/#path">شوف مسارك ←</a></div>`;}
+/* إذا خلّص الكورس قبل (محاولة قديمة أو تلفون تاني) بنعرف من السيرفر ومنفتحلو المشاريع */
+function srvUnl(){const v=get('mea_vid')||'';let ph='';try{ph=(JSON.parse(get('mea_lead')||'{}')||{}).phone||'';}catch(e){}if(!v&&!ph)return;const CC={course:'electro',classic:'classic',solar:'solar'};
+ Object.keys(C).forEach(id=>{const s=status(id);if(s.unlocked||!s.owned)return;
+  fetch(SB+'/rest/v1/rpc/course_passed',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({p_vid:v,p_course:CC[id],p_phone:ph})}).then(r=>r.json()).then(ok=>{if(ok===true){set('meaUnl_'+id,'1');try{window.dispatchEvent(new Event('mea-unl'));}catch(e){}}}).catch(()=>{});});}
+setTimeout(srvUnl,800);
 window.MEAPATH={C,owned,unlock,activateAll,recheck,hasPdf,pdf,fp,status,markRead,rules,questions,lockHTML,MAX_MISTAKES,CERT_MAX};
 })();

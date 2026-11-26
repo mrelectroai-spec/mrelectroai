@@ -159,7 +159,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-
  <div id="wbar" class="glass" hidden><span id="wbarT"></span><button type="button" id="wbarX">✕ إلغاء</button></div>
 </section>
 
-<script src="../app/path.js"></script>
+<script src="../app/path.js?v=1126"></script>
 <script src="parts.js"></script>
 <script src="catalog.js"></script>
 <script src="engine.js"></script>
@@ -187,6 +187,7 @@ function route(){const h=location.hash.slice(1);if(h.startsWith('view='))return 
  if(p&&locked(p)){const lk=window.MEAPATH.lockHTML(PCID[p.course]);$('lockBox').innerHTML=lk+'<p style="margin-top:12px"><a href="#" style="background:none;color:var(--muted);padding:0">رجوع للمشاريع</a></p>';$('lockBox').hidden=false;$('home').hidden=true;$('lab').hidden=true;return;}$('lockBox').hidden=true;
  open(p||null);}
 window.addEventListener('hashchange',route);
+window.addEventListener('mea-unl',()=>{if(!$('lockBox').hidden)route();else if(!$('home').hidden)homeList();});
 
 /* 👀 أنور بيفتح تابلو الطالب متل ما وصّلو (نسخة، ما بتأثّر عالطالب) */
 function viewOpen(id){let t=null;try{t=JSON.parse(ls('meaAdm')||'null');}catch(e){}
