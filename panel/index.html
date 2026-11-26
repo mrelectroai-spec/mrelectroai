@@ -459,7 +459,7 @@ function labLog(ev,x){try{const v=ls('mea_vid');if(!v||ls('meaTeacher')==='1')re
 const ltr=s=>String(s).replace(/[A-Za-z0-9][A-Za-z0-9.\-\/() ]*[A-Za-z0-9)]|[A-Za-z0-9]/g,m=>'<span dir="ltr" style="unicode-bidi:isolate">'+m+'</span>');
 let hi=0;function hint(){const h=ltr(PJ.hints[hi%PJ.hints.length]);hi++;labLog('hint');$('resBody').innerHTML=`<h3>💡 تلميح ${((hi-1)%PJ.hints.length)+1} من ${PJ.hints.length}<button type="button" data-close>سكّر</button></h3><p style="font-size:15px;line-height:1.9;margin:0 4px 10px">${h}</p><button class="big alt" type="button" id="nh">التلميح الجاي</button>`;openSheet('sRes');$('nh').onclick=hint;}
 function check(){const r=PJ.check(B);const n=r.filter(x=>x.pass).length,all=n===r.length;
- labLog('check',{n,t:r.length,fail:r.filter(x=>!x.pass).map(x=>String(x.txt).replace(/<[^>]*>/g,'').slice(0,200))});
+ labLog('check',{n,t:r.length,fail:r.filter(x=>!x.pass).map(x=>String(x.txt).replace(/<[^>]*>/g,'').slice(0,200)),tip:r.filter(x=>!x.pass).map(x=>String(x.hint||'').replace(/<[^>]*>/g,'').slice(0,300))});
  if(all){ls('panelDone_'+PJ.id,'1');try{window.meaTrack&&window.meaTrack('done_'+PJ.id);}catch(e){}}
  $('resBody').innerHTML=`<h3>${all?'🎉 مشروعك زابط!':'نتيجة الفحص'}<button type="button" data-close>سكّر</button></h3>
  <div class="score">${n} / ${r.length}<small>${all?'برافو! الدارة شغّالة متل التابلو الحقيقي.':'صلّح اللي عليه ✗ وافحص كمان مرّة.'}</small></div>
