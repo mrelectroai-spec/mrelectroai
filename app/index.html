@@ -435,7 +435,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.25d";
+var APPV="2026.11.26a";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -766,8 +766,10 @@ var CRS2={electro:'⚡ كورس الكهربا',classic:'⚙️ كورس الك�
 function stOpen(p){if(!p)return;$('stT').textContent='📊 '+(p.name||'')+' · نتيجة الكورسات';$('stB').innerHTML='<p class="mds">⏳</p>';$('stM').hidden=false;
  var d8=String(p.phone||'').replace(/\D/g,'').slice(-8),or=[];if(d8.length>=7)or.push('phone.like.*'+d8);if(p.vid)or.push('vid.eq.'+encodeURIComponent(p.vid));
  if(!or.length){$('stB').innerHTML='<p class="mds">ما في رقم لنفتّش فيه.</p>';return;}
- admGet('students?select=phone,name,client_id,course,rules_done,total,cur_rule,mistakes,answers,started_at,finished_at,last_seen,reset_at,data&or=('+or.join(',')+')&order=last_seen.desc').then(function(L){
-  if(!L||!L.length){$('stB').innerHTML='<p class="mds">لسّا ما بلّش ولا كورس.</p>';return;}
+ var LQ=admGet('lab_progress?select=*&or=('+or.join(',')+')&order=updated_at.desc').catch(function(){return [];});
+ admGet('students?select=phone,name,client_id,course,rules_done,total,cur_rule,mistakes,answers,started_at,finished_at,last_seen,reset_at,data&or=('+or.join(',')+')&order=last_seen.desc').then(function(L){return LQ.then(function(LB){
+  L=L||[];LB=LB||[];if(!L.length&&!LB.length){$('stB').innerHTML='<p class="mds">لسّا ما بلّش ولا كورس ولا مشروع.</p>';return;}
+  if(!p.phone&&LB[0]&&LB[0].phone)p.phone=LB[0].phone;
   var ph=String(p.phone||(L[0]&&L[0].phone)||'').trim(),wp=waPh(ph),msg=stMsg(p.name||(L[0]&&L[0].name)||'',L);
   var seen={},h=ph?'<div class="pli" style="justify-content:space-between;margin-bottom:10px"><div><small>رقمو يلي سجّلو</small><b dir="ltr" style="font-size:17px">'+esc(ph)+'</b></div><div style="display:flex;gap:6px;flex:0 0 auto"><a class="btn" style="margin:0;padding:8px 12px;width:auto;background:#25D366;color:#fff" href="https://api.whatsapp.com/send?phone='+wp+'">💬</a><a class="btn alt" style="margin:0;padding:8px 12px;width:auto" href="tel:+'+wp+'">📞</a></div></div><a class="btn" style="display:block;text-align:center;margin:0 0 10px;background:#25D366;color:#fff;padding:13px" href="https://api.whatsapp.com/send?phone='+wp+'&text='+encodeURIComponent(msg)+'">📝 ابعتلو تقييمو ونصيحتك عالواتساب</a>':'';L.forEach(function(x){if(seen[x.course])return;seen[x.course]=1;var d=x.data||{},R=d.rules||[],W=(d.weak||[]).slice().sort(function(a,b){return (b.c||0)-(a.c||0);});
    var pct=x.total?Math.round((x.rules_done||0)*100/x.total):0,acc=x.answers?Math.round((x.answers-(x.mistakes||0))*100/x.answers):null;
@@ -779,12 +781,21 @@ function stOpen(p){if(!p)return;$('stT').textContent='📊 '+(p.name||'')+' · �
    else if(R.length)h+='<small>✅ ما غلط بولا قاعدة</small>';
    if(W.length)h+='<div class="mdl2" style="margin:6px 0 0">🔁 الأسئلة يلي غلط فيها</div>'+W.map(function(w){return '<div style="font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)"><b>'+esc(w.q||'')+'</b><br><small style="color:#e5484d">جاوب غلط: '+esc(w.a||'')+'</small><small> · القاعدة '+(w.n||'?')+(w.c>1?' · '+w.c+' مرات':'')+'</small></div>';}).join('');
    h+='<button type="button" class="btn alt" data-rs="'+esc(x.client_id)+'|'+x.course+'" style="width:100%;margin-top:6px">🔁 خلّيه يعيد هالكورس من الأول</button>'+(x.reset_at?'<small style="opacity:.7">آخر إعادة: '+ppAgo(x.reset_at)+'</small>':'')+'</div>';});
-  $('stB').innerHTML=h;
+  h+=labHTML(LB);$('stB').innerHTML=h;
   [].forEach.call($('stB').querySelectorAll('[data-rs]'),function(bt){bt.onclick=function(){
    if(!bt.dataset.ok){bt.dataset.ok='1';bt.textContent='⚠️ أكيد؟ بتنمحى نتيجتو وبيطلع من لوحة الشرف لحتى يخلّص من جديد. اكبس كمان مرة';bt.style.background='rgba(229,72,77,.15)';return;}
    var a2=bt.dataset.rs.split('|');bt.disabled=true;bt.textContent='⏳';
    prRpc('course_reset',{p_client_id:a2[0],p_course:a2[1]}).then(function(j){if(!j||!j.ok)throw j;toast('🔁 تمام، بس يفتح الكورس بيبلّش من جديد');HBT={};if(HB)hbLoad&&hbLoad().catch(function(){});stOpen(p);})
-   .catch(function(e){bt.disabled=false;bt.textContent='ما زبط: '+((e&&e.msg)||'جرّب كمان مرة');});};});}).catch(function(){$('stB').innerHTML='<p class="mds">ما زبط. فوت كأدمن وجرّب كمان مرة.</p>';});}
+   .catch(function(e){bt.disabled=false;bt.textContent='ما زبط: '+((e&&e.msg)||'جرّب كمان مرة');});};});});}).catch(function(){$('stB').innerHTML='<p class="mds">ما زبط. فوت كأدمن وجرّب كمان مرة.</p>';});}
+/* 🎛️ مشاريع مختبر التابلو لكل طالب */
+var PJN={dol:'تشغيل وتوقيف موتور',rev:'عكس اتجاه موتور',yd:'ستار دلتا مع تايمر',ats:'ATS بـ3 مصادر',fire:'إنذار حريق ومراوح شفط',room:'غرفة: ضو بمفتاحين درج + بريز',flat:'تابلو شقة مع ديفرنسيال',load:'سخّان ومكيّف: حساب الحمل'};
+function labHTML(LB){if(!LB||!LB.length)return '<div class="pli" style="flex-direction:column;align-items:stretch;margin-bottom:10px"><b style="font-size:16px">🎛️ مشاريع التابلو</b><small>لسّا ما فحص ولا مشروع.</small></div>';
+ return '<div class="pli" style="flex-direction:column;align-items:stretch;gap:8px;margin-bottom:10px"><b style="font-size:16px">🎛️ مشاريع التابلو</b>'+LB.map(function(x){
+  var F=x.fails||{},K=Object.keys(F).sort(function(a,b){return F[b]-F[a];}),lf=x.last_fail||[];
+  return '<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:8px"><span style="font-weight:700">'+(x.done_at?'✅ ':'⏳ ')+esc(PJN[x.project]||x.project)+'</span><span style="flex:0 0 auto">'+(x.best||0)+'/'+(x.total||'?')+'</span></div>'
+   +'<small>فحص '+(x.checks||0)+' مرة · تلميح '+(x.hints||0)+' مرة · آخر مرة '+ppAgo(x.updated_at)+(x.done_at?' · خلّصو 🎉':'')+'</small>'
+   +(!x.done_at&&lf.length?'<div style="font-size:13px;margin-top:4px;color:#e5484d">❌ هلّق عالق بـ: '+lf.map(esc).join(' · ')+'</div>':'')
+   +(K.length?'<div style="font-size:13px;margin-top:4px;opacity:.85">غلط فيها: '+K.slice(0,5).map(function(k){return esc(k)+' <span style="font-weight:700">'+F[k]+'×</span>';}).join(' · ')+'</div>':'')+'</div>';}).join('')+'</div>';}
 /* 📷 مسح QR الكتاب من جوّا التطبيق: هيك بيضلّ المفتاح شغّال (الكاميرا برّا بتفتح المتصفّح، والمفتاح مربوط بالتطبيق) */
 function qrLib(){return new Promise(function(ok,no){if(window.jsQR)return ok();var sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';sc.onload=ok;sc.onerror=no;document.head.appendChild(sc);});}
 function qrRead(file){return new Promise(function(ok,no){var u=URL.createObjectURL(file),im=new Image();im.onload=function(){
