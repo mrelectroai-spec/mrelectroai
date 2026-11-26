@@ -435,7 +435,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.26h";
+var APPV="2026.11.26i";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -784,7 +784,12 @@ function stOpen(p){if(!p)return;$('stT').textContent='📊 '+(p.name||'')+' · �
    else if(R.length)h+='<small>✅ ما غلط بولا قاعدة</small>';
    if(W.length)h+='<div class="mdl2" style="margin:6px 0 0">🔁 الأسئلة يلي غلط فيها</div>'+W.map(function(w){return '<div style="font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)"><b>'+esc(w.q||'')+'</b><br><small style="color:#e5484d">جاوب غلط: '+esc(w.a||'')+'</small><small> · القاعدة '+(w.n||'?')+(w.c>1?' · '+w.c+' مرات':'')+'</small></div>';}).join('');
    h+='<button type="button" class="btn alt" data-rs="'+esc(x.client_id)+'|'+x.course+'" style="width:100%;margin-top:6px">🔁 خلّيه يعيد هالكورس من الأول</button>'+(x.reset_at?'<small style="opacity:.7">آخر إعادة: '+ppAgo(x.reset_at)+'</small>':'')+'</div>';});
-  h+=labHTML(LB,p.name||(L[0]&&L[0].name)||(LB[0]&&LB[0].name)||'',wp);$('stB').innerHTML=h;
+  h+=labHTML(LB,p.name||(L[0]&&L[0].name)||(LB[0]&&LB[0].name)||'',wp);
+  var vids=[];[p.vid].concat(L.map(function(x){return x.vid;}),LB.map(function(x){return x.vid;})).forEach(function(v){if(v&&vids.indexOf(v)<0)vids.push(v);});
+  if(vids.length)h+='<button type="button" class="btn alt" id="labRs" style="display:block;width:100%;margin:0 0 10px;padding:10px">🔒 قفّل المشاريع ورجّعو لمشروع 1</button>';
+  $('stB').innerHTML=h;
+  var lr=$('labRs');if(lr)lr.onclick=function(){if(!lr.dataset.ok){lr.dataset.ok='1';lr.textContent='⚠️ أكيد؟ كبسة كمان مرة';return;}lr.disabled=true;lr.textContent='…';
+   Promise.all(vids.map(function(v){return prRpc('lab_reset',{p_vid:v});})).then(function(){lr.textContent='✅ تقفّلو. بس يفتح التطبيق، بيبقى مفتوح بس مشروع 1';}).catch(function(){lr.disabled=false;lr.textContent='ما زبط، جرّب كمان مرة';});};
   [].forEach.call($('stB').querySelectorAll('[data-rs]'),function(bt){bt.onclick=function(){
    if(!bt.dataset.ok){bt.dataset.ok='1';bt.textContent='⚠️ أكيد؟ بتنمحى نتيجتو وبيطلع من لوحة الشرف لحتى يخلّص من جديد. اكبس كمان مرة';bt.style.background='rgba(229,72,77,.15)';return;}
    var a2=bt.dataset.rs.split('|');bt.disabled=true;bt.textContent='⏳';
