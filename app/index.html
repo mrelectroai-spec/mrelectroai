@@ -435,7 +435,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.26d";
+var APPV="2026.11.26e";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -1121,9 +1121,11 @@ function hbTeach(){var T=ls('meaTeacher')==='1',box=$('hbS');box.hidden=!T;if(!T
  if(HBT[hbC]){hbTDraw();return;}box.innerHTML='<p class="mds">⏳ عم جيب كل الطلاب…</p>';
  var c0=hbC;Promise.all([admGet('students?course=eq.'+c0+'&select=name,phone,vid,rules_done,total,cur_rule,mistakes,answers,last_seen,finished_at&order=last_seen.desc&limit=300'),admGet('lab_progress?course=eq.'+c0+'&select=vid,name,phone,project,best,total,checks,hints,done_at,last_fail,updated_at&order=updated_at.desc&limit=500').catch(function(){return [];})]).then(function(R){HBT[c0]=Array.isArray(R[0])?R[0]:[];HBL[c0]=Array.isArray(R[1])?R[1]:[];hbTDraw();})
  .catch(function(){box.innerHTML='<p class="mds">فوت كأدمن لتشوف كل الطلاب.</p>';});}
-function hbTDraw(){var L=HBT[hbC]||[],box=$('hbS');
+/* نفس الطالب ممكن يعيد الكورس من الأول كذا مرة (كل مرة سطر جديد): منجمعهن بسطر واحد، آخر محاولة، ومعها عدد المحاولات */
+function hbGroup(R){var G={},O=[];(R||[]).forEach(function(x){var k=x.vid||String(x.phone||'').replace(/\D/g,'').slice(-8)||x.name;var g=G[k];if(!g){g=G[k]=Object.assign({tries:1},x);O.push(g);}else g.tries++;});return O;}
+function hbTDraw(){var L=hbGroup(HBT[hbC]),box=$('hbS');
  box.innerHTML='<div class="mdl2" style="display:flex;justify-content:space-between"><span>🎓 كل الطلاب بهالكورس ('+L.length+')</span><small style="font-weight:500;opacity:.75">بس إنت بتشوفها</small></div>'+(L.length?L.map(function(x,i){var pct=x.total?Math.round((x.rules_done||0)*100/x.total):0;
-  return '<div class="pli" data-hbt="'+i+'" style="cursor:pointer;display:block"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>'+esc(x.name||'بلا اسم')+(x.finished_at?' 🏁':'')+'</b><span style="font-size:18px">📊</span></div>'
+  return '<div class="pli" data-hbt="'+i+'" style="cursor:pointer;display:block"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>'+esc(x.name||'بلا اسم')+(x.finished_at?' 🏁':'')+(x.tries>1?' <small style="display:inline;font-weight:500;opacity:.75">🔁 عاد '+x.tries+' مرات</small>':'')+'</b><span style="font-size:18px">📊</span></div>'
   +'<div style="height:6px;border-radius:5px;background:var(--g-edge2);overflow:hidden;margin:6px 0 4px"><div style="height:100%;width:'+pct+'%;background:'+(x.mistakes>5?'#ffb020':'var(--volt)')+'"></div></div>'
   +'<small><span dir="ltr">'+esc(x.phone||'')+'</span> · '+(x.rules_done||0)+'/'+(x.total||'?')+' قاعدة'+(x.cur_rule&&!x.finished_at?' · هلّق بالـ'+x.cur_rule:'')+' · غلط '+(x.mistakes||0)+' · '+ppAgo(x.last_seen)+'</small></div>';}).join(''):'<p class="mds">لسّا ما حدا بلّش.</p>');
  box.insertAdjacentHTML('beforeend',hbLab());
