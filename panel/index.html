@@ -176,15 +176,21 @@ let B={comps:[],wires:[],on:false,blown:false},E=window.PENGINE(B),PJ=null,KEY='
 
 /* ---------- الصفحات ---------- */
 function done(id){return ls('panelDone_'+id)==='1';}
+/* المشاريع بالترتيب: ما بينفتح مشروع إلا ما يخلّص يلي قبلو (الفحص 100%) */
+const prevOf=p=>window.PROJECTS.filter(x=>x.course===p.course&&x.n===p.n-1)[0];
+const seqLocked=p=>{if(ls('meaTeacher')==='1')return null;const q=prevOf(p);return q&&!done(q.id)?q:null;};
+(function(){const v=ls('mea_vid');if(!v)return;fetch('https://utjpvjnhffapbwpbkkuc.supabase.co/rest/v1/rpc/lab_done',{method:'POST',headers:{apikey:'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK',Authorization:'Bearer sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK','Content-Type':'application/json'},body:JSON.stringify({p_vid:v})}).then(r=>r.json()).then(L=>{if(!Array.isArray(L))return;let ch=false;L.forEach(id=>{if(!done(id)){ls('panelDone_'+id,'1');ch=true;}});if(ch){if(!$('home').hidden)homeList();else if(!$('lockBox').hidden)route();}}).catch(()=>{});})();
 const PCID={electro:'course',classic:'classic'};const locked=p=>window.MEAPATH&&!window.MEAPATH.status(PCID[p.course]).unlocked;
-function homeList(){const card=p=>{const L=locked(p);return `<button class="pc glass${p.soon||L?' soon':''}${done(p.id)?' done':''}" type="button" ${p.soon?'disabled':''} data-open="${p.id}"><div class="i">${L?'🔒':p.icon}</div><div><b>مشروع ${p.n}: ${p.title}</b><span>${L?'بينفتح بس تخلّص الكورس بنتيجة ممتازة':done(p.id)?'خلّصتو ✓ فيك تعيدو':'ركّب الدارة كاملة، وبفحصلك ياها لحالي.'}</span></div><div class="go">${L?'🔒':done(p.id)?'✓ خلص':'ابدا ←'}</div></button>`;};
+function homeList(){const card=p=>{const L=locked(p),Q=!L&&seqLocked(p);return `<button class="pc glass${p.soon||L||Q?' soon':''}${done(p.id)?' done':''}" type="button" ${p.soon?'disabled':''} data-open="${p.id}"><div class="i">${L||Q?'🔒':p.icon}</div><div><b>مشروع ${p.n}: ${p.title}</b><span>${L?'بينفتح بس تخلّص الكورس بنتيجة ممتازة':Q?'بينفتح بس تخلّص مشروع '+Q.n+' وتفحصو صح 100%':done(p.id)?'خلّصتو ✓ فيك تعيدو':'ركّب الدارة كاملة، وبفحصلك ياها لحالي.'}</span></div><div class="go">${L||Q?'🔒':done(p.id)?'✓ خلص':'ابدا ←'}</div></button>`;};
  const C=[['electro','مشاريع كورس الكهربا'],['classic','مشاريع كورس الكلاسيك كنترول']];
  $('plist').innerHTML=C.map(([k,t])=>{const L=window.PROJECTS.filter(p=>p.course===k);const d=L.filter(p=>done(p.id)).length;return `<div class="sec">${t} · ${d}/${L.length} ✓</div>`+L.map(card).join('');}).join('')+
  `<div class="sec">مشاريع كورس الطاقة الشمسية</div><a class="pc glass" href="../sim/#projects" style="text-decoration:none;color:inherit"><div class="i">☀️</div><div><b>مشاريع الطاقة الشمسية</b><span>6 مشاريع بمختبر الطاقة: إنفرتر، بطاريات، ألواح، وإعدادات.</span></div><div class="go">افتح ←</div></a>`;}
 document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o&&!o.disabled)location.hash=o.dataset.open;});
 function route(){const h=location.hash.slice(1);if(h.startsWith('view='))return viewOpen(h.slice(5));if(!h){$('lockBox').hidden=true;$('lab').hidden=true;$('home').hidden=false;homeList();stop();return;}
  const p=window.PROJECTS.find(x=>x.id===h&&!x.soon);if(h!=='free'&&!p){location.hash='';return;}
- if(p&&locked(p)){const lk=window.MEAPATH.lockHTML(PCID[p.course]);$('lockBox').innerHTML=lk+'<p style="margin-top:12px"><a href="#" style="background:none;color:var(--muted);padding:0">رجوع للمشاريع</a></p>';$('lockBox').hidden=false;$('home').hidden=true;$('lab').hidden=true;return;}$('lockBox').hidden=true;
+ if(p&&locked(p)){const lk=window.MEAPATH.lockHTML(PCID[p.course]);$('lockBox').innerHTML=lk+'<p style="margin-top:12px"><a href="#" style="background:none;color:var(--muted);padding:0">رجوع للمشاريع</a></p>';$('lockBox').hidden=false;$('home').hidden=true;$('lab').hidden=true;return;}
+ const Q=p&&seqLocked(p);if(Q){$('lockBox').innerHTML=`<div class="lockc"><div style="font-size:40px">🔒</div><b>خطوة خطوة 💪</b><p>مشروع ${p.n} بينفتح بس تخلّص <b>مشروع ${Q.n}: ${Q.title}</b> وتكبس «✓ افحص مشروعي» ويطلع صح 100%.</p><a href="#${Q.id}">كمّل مشروع ${Q.n} ←</a></div><p style="margin-top:12px"><a href="#" style="background:none;color:var(--muted);padding:0">رجوع للمشاريع</a></p>`;$('lockBox').hidden=false;$('home').hidden=true;$('lab').hidden=true;stop();return;}
+ $('lockBox').hidden=true;
  open(p||null);}
 window.addEventListener('hashchange',route);
 window.addEventListener('mea-unl',()=>{if(!$('lockBox').hidden)route();else if(!$('home').hidden)homeList();});
