@@ -435,7 +435,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.26g";
+var APPV="2026.11.26h";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -1119,7 +1119,7 @@ function hbTeach(){var T=ls('meaTeacher')==='1',box=$('hbS');box.hidden=!T;if(!T
   if(!el.querySelector('.hbx'))el.firstChild.insertAdjacentHTML('beforeend','<span class="hbx" style="margin-inline-start:auto;font-size:18px">📊</span>');
   el.firstChild.style.width='100%';el.onclick=function(){hbOpen(x.n);};});
  if(HBT[hbC]){hbTDraw();return;}box.innerHTML='<p class="mds">⏳ عم جيب كل الطلاب…</p>';
- var c0=hbC;Promise.all([admGet('students?course=eq.'+c0+'&select=name,phone,vid,rules_done,total,cur_rule,mistakes,answers,last_seen,finished_at&order=last_seen.desc&limit=300'),admGet('lab_progress?course=eq.'+c0+'&select=vid,name,phone,project,best,total,checks,hints,done_at,last_fail,updated_at&order=updated_at.desc&limit=500').catch(function(){return [];})]).then(function(R){HBT[c0]=Array.isArray(R[0])?R[0]:[];HBL[c0]=Array.isArray(R[1])?R[1]:[];hbTDraw();})
+ var c0=hbC;Promise.all([admGet('students?course=eq.'+c0+'&select=name,phone,vid,rules_done,total,cur_rule,mistakes,answers,last_seen,finished_at&order=last_seen.desc&limit=300'),admGet('lab_progress?course=eq.'+c0+'&select=id,vid,name,phone,project,best,total,checks,hints,done_at,last_fail,updated_at,has_board:board->>comps&order=updated_at.desc&limit=500').catch(function(){return [];})]).then(function(R){HBT[c0]=Array.isArray(R[0])?R[0]:[];HBL[c0]=Array.isArray(R[1])?R[1]:[];hbTDraw();})
  .catch(function(){box.innerHTML='<p class="mds">فوت كأدمن لتشوف كل الطلاب.</p>';});}
 /* نفس الطالب ممكن يعيد الكورس من الأول كذا مرة (كل مرة سطر جديد): منجمعهن بسطر واحد، آخر محاولة، ومعها عدد المحاولات */
 function hbGroup(R){var G={},O=[];(R||[]).forEach(function(x){var k=x.vid||String(x.phone||'').replace(/\D/g,'').slice(-8)||x.name;var g=G[k];if(!g){g=G[k]=Object.assign({tries:1},x);O.push(g);}else g.tries++;});return O;}
@@ -1130,14 +1130,15 @@ function hbTDraw(){var L=hbGroup(HBT[hbC]),box=$('hbS');
   +'<small><span dir="ltr">'+esc(x.phone||'')+'</span> · '+(x.rules_done||0)+'/'+(x.total||'?')+' قاعدة'+(x.cur_rule&&!x.finished_at?' · هلّق بالـ'+x.cur_rule:'')+' · غلط '+(x.mistakes||0)+' · '+ppAgo(x.last_seen)+'</small></div>';}).join(''):'<p class="mds">لسّا ما حدا بلّش.</p>');
  box.insertAdjacentHTML('beforeend',hbLab());
  [].forEach.call(box.querySelectorAll('[data-hbt]'),function(el){el.onclick=function(){var x=L[+el.dataset.hbt];stOpen({name:x.name,phone:x.phone,vid:x.vid});};});
- [].forEach.call(box.querySelectorAll('[data-hbl]'),function(el){el.onclick=function(){var x=HBLG[+el.dataset.hbl];stOpen({name:x.name,phone:x.phone,vid:x.vid});};});}
+ [].forEach.call(box.querySelectorAll('[data-hbl]'),function(el){el.onclick=function(e){if(e&&e.target.closest('a'))return;var x=HBLG[+el.dataset.hbl];stOpen({name:x.name,phone:x.phone,vid:x.vid});};});}
 /* 🎛️ مين عم يشتغل مشاريع التابلو بهالكورس (حتى لو ما عمل كورس الأسئلة) */
 var HBLG=[];
 function hbLab(){var R=HBL[hbC]||[],G={},O=[];R.forEach(function(x){var g=G[x.vid];if(!g){g=G[x.vid]={vid:x.vid,name:x.name,phone:x.phone,P:[],last:x.updated_at};O.push(g);}if(!g.name&&x.name)g.name=x.name;if(!g.phone&&x.phone)g.phone=x.phone;g.P.push(x);});HBLG=O;
  return '<div class="mdl2" style="margin-top:14px">🎛️ مشاريع التابلو ('+O.length+')</div>'+(O.length?O.map(function(g,i){var d=g.P.filter(function(x){return x.done_at;}).length,st=g.P.filter(function(x){return !x.done_at;})[0];
   return '<div class="pli" data-hbl="'+i+'" style="cursor:pointer;display:block"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>'+esc(g.name||'بلا اسم')+'</b><span style="font-size:18px">📊</span></div>'
   +'<small><span dir="ltr">'+esc(g.phone||'')+'</span> · خلّص '+d+' مشروع'+(st?' · ⏳ '+esc(PJN[st.project]||st.project)+' '+(st.best||0)+'/'+(st.total||'?'):'')+' · '+ppAgo(g.last)+'</small>'
-  +(st&&(st.last_fail||[]).length?'<small style="display:block;color:#e5484d">❌ عالق بـ: '+esc(st.last_fail[0])+'</small>':'')+'</div>';}).join(''):'<p class="mds">لسّا ما حدا فحص مشروع.</p>');}
+  +(st&&(st.last_fail||[]).length?'<small style="display:block;color:#e5484d">❌ عالق بـ: '+esc(st.last_fail[0])+'</small>':'')
+  +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">'+g.P.slice().sort(function(a,b){return String(a.project).localeCompare(b.project);}).map(function(x){return x.has_board?'<a href="../panel/#view='+x.id+'" style="padding:6px 10px;border-radius:14px;background:var(--line);color:inherit;text-decoration:none;font-size:13px">'+(x.done_at?'✅':'⏳')+' 👀 '+esc(PJN[x.project]||x.project)+'</a>':'';}).join('')+'</div></div>';}).join(''):'<p class="mds">لسّا ما حدا فحص مشروع.</p>');}
 function hbOpen(n){var L=HBT[hbC]||[],x=L.filter(function(y){return ppNorm(y.name)===ppNorm(n);})[0];
  if(x){stOpen({name:x.name,phone:x.phone,vid:x.vid});return;}
  admGet('students?course=eq.'+hbC+'&name=eq.'+encodeURIComponent(n)+'&select=name,phone,vid&limit=1').then(function(R2){var y=(R2||[])[0];if(y)stOpen(y);else toast('ما لقيت تفاصيلو');}).catch(function(){toast('فوت كأدمن');});}
