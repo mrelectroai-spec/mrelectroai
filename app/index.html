@@ -435,7 +435,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.26c";
+var APPV="2026.11.26d";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -806,6 +806,7 @@ function labHTML(LB,name,wp){if(!LB||!LB.length)return '<div class="pli" style="
    +'<small>فحص '+(x.checks||0)+' مرة · تلميح '+(x.hints||0)+' مرة · آخر مرة '+ppAgo(x.updated_at)+(x.done_at?' · خلّصو 🎉':'')+'</small>'
    +(!x.done_at&&lf.length?'<div style="font-size:13px;margin-top:4px;color:#e5484d">❌ هلّق عالق بـ: '+lf.map(esc).join(' · ')+'</div>':'')
    +(K.length?'<div style="font-size:13px;margin-top:4px;opacity:.85">غلط فيها: '+K.slice(0,5).map(function(k){return esc(k)+' <span style="font-weight:700">'+F[k]+'×</span>';}).join(' · ')+'</div>':'')
+   +(x.board?'<a class="btn alt" style="display:block;text-align:center;margin:8px 0 0;padding:10px" href="../panel/#view='+x.id+'">👀 افتح التابلو تبعو متل ما وصّلو</a>':'<small style="display:block;opacity:.7;margin-top:6px">👀 التابلو تبعو بيبيّن بس يفحص مرة من بعد التحديث</small>')
    +(wp?'<a class="btn" style="display:block;text-align:center;margin:8px 0 0;padding:10px;background:#25D366;color:#fff" href="https://api.whatsapp.com/send?phone='+wp+'&text='+encodeURIComponent(labMsg(x,name))+'">'+(x.done_at?'👏 ابعتلو برافو':'🛠️ ابعتلو أغلاطو والتصحيح')+'</a>':'')+'</div>';}).join('')+'</div>';}
 /* 📷 مسح QR الكتاب من جوّا التطبيق: هيك بيضلّ المفتاح شغّال (الكاميرا برّا بتفتح المتصفّح، والمفتاح مربوط بالتطبيق) */
 function qrLib(){return new Promise(function(ok,no){if(window.jsQR)return ok();var sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';sc.onload=ok;sc.onerror=no;document.head.appendChild(sc);});}

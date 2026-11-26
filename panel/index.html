@@ -182,15 +182,22 @@ function homeList(){const card=p=>{const L=locked(p);return `<button class="pc g
  $('plist').innerHTML=C.map(([k,t])=>{const L=window.PROJECTS.filter(p=>p.course===k);const d=L.filter(p=>done(p.id)).length;return `<div class="sec">${t} · ${d}/${L.length} ✓</div>`+L.map(card).join('');}).join('')+
  `<div class="sec">مشاريع كورس الطاقة الشمسية</div><a class="pc glass" href="../sim/#projects" style="text-decoration:none;color:inherit"><div class="i">☀️</div><div><b>مشاريع الطاقة الشمسية</b><span>6 مشاريع بمختبر الطاقة: إنفرتر، بطاريات، ألواح، وإعدادات.</span></div><div class="go">افتح ←</div></a>`;}
 document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o&&!o.disabled)location.hash=o.dataset.open;});
-function route(){const h=location.hash.slice(1);if(!h){$('lockBox').hidden=true;$('lab').hidden=true;$('home').hidden=false;homeList();stop();return;}
+function route(){const h=location.hash.slice(1);if(h.startsWith('view='))return viewOpen(h.slice(5));if(!h){$('lockBox').hidden=true;$('lab').hidden=true;$('home').hidden=false;homeList();stop();return;}
  const p=window.PROJECTS.find(x=>x.id===h&&!x.soon);if(h!=='free'&&!p){location.hash='';return;}
  if(p&&locked(p)){const lk=window.MEAPATH.lockHTML(PCID[p.course]);$('lockBox').innerHTML=lk+'<p style="margin-top:12px"><a href="#" style="background:none;color:var(--muted);padding:0">رجوع للمشاريع</a></p>';$('lockBox').hidden=false;$('home').hidden=true;$('lab').hidden=true;return;}$('lockBox').hidden=true;
  open(p||null);}
 window.addEventListener('hashchange',route);
 
-function open(p){PJ=p;KEY='panel_'+(p?p.id:'free');$('home').hidden=true;$('lab').hidden=false;$('ttl').textContent=p?`مشروع ${p.n}: ${p.title}`:'مختبر حرّ';
+/* 👀 أنور بيفتح تابلو الطالب متل ما وصّلو (نسخة، ما بتأثّر عالطالب) */
+function viewOpen(id){let t=null;try{t=JSON.parse(ls('meaAdm')||'null');}catch(e){}
+ if(!t||!t.a||Date.now()>t.exp){alert('فوت عالتطبيق بوضع الأستاذ (أدمن) أول، ورجاع افتح المشروع');location.hash='';return;}
+ fetch('https://utjpvjnhffapbwpbkkuc.supabase.co/rest/v1/lab_progress?id=eq.'+encodeURIComponent(id)+'&select=project,name,board,best,total',{headers:{apikey:'sb_publishable_wSY0Oa0SmW_Ipgaerw-zCA_CM_PZQvK',Authorization:'Bearer '+t.a}}).then(r=>r.json()).then(R=>{const x=(R||[])[0];
+  const p=x&&window.PROJECTS.find(y=>y.id===x.project);if(!p){toast('ما لقيت المشروع',true);return;}
+  if(!x.board||!x.board.comps){toast('هالطالب لسّا ما فحص من بعد التحديث، ما في تابلو محفوظ',true);}
+  open(p,x.board&&x.board.comps?x.board:null,'view_'+id);$('ttl').textContent='👀 '+(x.name||'طالب')+' · '+p.title+' ('+(x.best||0)+'/'+(x.total||'?')+')';}).catch(()=>toast('ما زبط، جرّب كمان مرة',true));}
+function open(p,brd,vk){PJ=p;KEY='panel_'+(vk||(p?p.id:'free'));$('home').hidden=true;$('lab').hidden=false;$('ttl').textContent=p?`مشروع ${p.n}: ${p.title}`:'مختبر حرّ';
  B.on=false;B.blown=false;runUI();
- let saved=null;try{saved=JSON.parse(ls(KEY)||'null');}catch(e){}
+ let saved=brd?JSON.parse(JSON.stringify(brd)):null;if(!saved)try{saved=JSON.parse(ls(KEY)||'null');}catch(e){}
  if(saved&&saved.comps){B.comps=saved.comps;B.wires=saved.wires;for(const c of B.comps){c.st={};if(c.type.startsWith('mcb')||c.type==='rcd')c.st.on=true;}}
  else{B.comps=[];B.wires=[];if(p)p.setup((t,x,y)=>add(t,x,y,true));}
  if(p)B.comps.forEach(autoBrand);
@@ -459,7 +466,7 @@ function labLog(ev,x){try{const v=ls('mea_vid');if(!v||ls('meaTeacher')==='1')re
 const ltr=s=>String(s).replace(/[A-Za-z0-9][A-Za-z0-9.\-\/() ]*[A-Za-z0-9)]|[A-Za-z0-9]/g,m=>'<span dir="ltr" style="unicode-bidi:isolate">'+m+'</span>');
 let hi=0;function hint(){const h=ltr(PJ.hints[hi%PJ.hints.length]);hi++;labLog('hint');$('resBody').innerHTML=`<h3>💡 تلميح ${((hi-1)%PJ.hints.length)+1} من ${PJ.hints.length}<button type="button" data-close>سكّر</button></h3><p style="font-size:15px;line-height:1.9;margin:0 4px 10px">${h}</p><button class="big alt" type="button" id="nh">التلميح الجاي</button>`;openSheet('sRes');$('nh').onclick=hint;}
 function check(){const r=PJ.check(B);const n=r.filter(x=>x.pass).length,all=n===r.length;
- labLog('check',{n,t:r.length,fail:r.filter(x=>!x.pass).map(x=>String(x.txt).replace(/<[^>]*>/g,'').slice(0,200)),tip:r.filter(x=>!x.pass).map(x=>String(x.hint||'').replace(/<[^>]*>/g,'').slice(0,300))});
+ labLog('check',{board:JSON.parse(snapState()),n,t:r.length,fail:r.filter(x=>!x.pass).map(x=>String(x.txt).replace(/<[^>]*>/g,'').slice(0,200)),tip:r.filter(x=>!x.pass).map(x=>String(x.hint||'').replace(/<[^>]*>/g,'').slice(0,300))});
  if(all){ls('panelDone_'+PJ.id,'1');try{window.meaTrack&&window.meaTrack('done_'+PJ.id);}catch(e){}}
  $('resBody').innerHTML=`<h3>${all?'🎉 مشروعك زابط!':'نتيجة الفحص'}<button type="button" data-close>سكّر</button></h3>
  <div class="score">${n} / ${r.length}<small>${all?'برافو! الدارة شغّالة متل التابلو الحقيقي.':'صلّح اللي عليه ✗ وافحص كمان مرّة.'}</small></div>
