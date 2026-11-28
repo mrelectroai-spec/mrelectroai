@@ -243,6 +243,11 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 <script src="path.js?v=1126"></script>
 </head>
 <body>
+<div id="boot" style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(80% 50% at 50% 40%,#0f3a2e,#070F0D 70%);transition:opacity .35s">
+ <style>#boot .bl{position:relative;width:96px;height:96px}#boot .bl img{width:96px;height:96px;border-radius:24px;animation:bP 1.4s ease-in-out infinite}#boot .bl:before{content:'';position:absolute;inset:-14px;border-radius:34px;border:2.5px solid transparent;border-top-color:#22C79B;border-right-color:#22C79B66;animation:bS 1s linear infinite}#boot .bz{display:flex;gap:6px}#boot .bz i{width:7px;height:7px;border-radius:50%;background:#22C79B;animation:bD 1s ease-in-out infinite}#boot .bz i:nth-child(2){animation-delay:.15s}#boot .bz i:nth-child(3){animation-delay:.3s}
+ @keyframes bP{50%{transform:scale(1.06);filter:drop-shadow(0 0 18px #22C79B88)}}@keyframes bS{to{transform:rotate(360deg)}}@keyframes bD{50%{transform:translateY(-7px);opacity:.4}}</style>
+ <div class="bl"><img src="icon-192.png" alt=""></div><div class="bz"><i></i><i></i><i></i></div></div>
+<script>(function(){function go(){var b=document.getElementById('boot');if(!b)return;b.style.opacity='0';setTimeout(function(){b.remove();},380);}if(document.readyState==='complete')setTimeout(go,150);else window.addEventListener('load',function(){setTimeout(go,150);});setTimeout(go,6000);})();</script>
 <div class="bg" aria-hidden="true"></div>
 <div id="tchM" hidden style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(3,10,8,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)"><div class="set" style="width:min(340px,100%);padding:18px;margin:0"><div style="font:700 17px 'Readex Pro',sans-serif;margin-bottom:10px;text-align:center">🎓 وضع الأستاذ</div><div id="tchBox"><input id="tchPw" type="password" inputmode="numeric" placeholder="كلمة السر" autocomplete="off" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line,#ccc);background:transparent;color:inherit;font:inherit"><div id="tchErr" style="color:#e5484d;font-size:13px;min-height:18px;margin-top:4px"></div><button type="button" id="tchOk" style="width:100%;padding:11px;border:0;border-radius:12px;background:#16A37C;color:#fff;font:inherit;font-weight:700">ادخل</button></div></div></div>
 <div id="admM" hidden class="mdl" style="z-index:65"><div class="set mdb"><div class="mdt">🔐 دخول الأدمن</div><p class="mds">نفس الإيميل وكلمة السر تبع صفحة المفاتيح. بتحطّن مرة وحدة عهالتلفون.</p>
@@ -435,7 +440,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.28a";
+var APPV="2026.11.28b";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}

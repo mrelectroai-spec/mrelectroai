@@ -118,6 +118,16 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-
 .cm{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:start;padding:9px 11px;border-radius:12px;background:var(--chip,rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.12);color:inherit;font:inherit}
 .cm b{direction:ltr;font-size:13.5px}.cm small{font-size:12px;opacity:.8}.cm.on{border-color:var(--volt);background:rgba(34,199,155,.2)}
 .csr{width:100%;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:inherit;padding:0 12px;font:inherit;font-size:15px;margin-bottom:6px}
+
+/* ✨ حركات صغيرة */
+.rip{position:fixed;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:2.5px solid #22C79B;pointer-events:none;z-index:60;animation:rip .45s ease-out forwards}
+@keyframes rip{from{transform:scale(.3);opacity:1}to{transform:scale(1.6);opacity:0}}
+.cf{position:fixed;top:40%;left:50%;width:9px;height:14px;border-radius:2px;pointer-events:none;z-index:80;animation:cf 1.6s cubic-bezier(.15,.7,.4,1) forwards}
+@keyframes cf{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+.score.win{animation:win .7s cubic-bezier(.3,1.6,.5,1)}@keyframes win{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pc.unl .i{animation:unl 1.1s ease .2s both}@keyframes unl{0%{transform:scale(1)}30%{transform:scale(1.35) rotate(-12deg)}55%{transform:scale(1.2) rotate(10deg)}100%{transform:scale(1)}}
+.pc.unl{animation:unlg 1.6s ease .2s both}@keyframes unlg{0%,100%{box-shadow:none}40%{box-shadow:0 0 0 2px #22C79B,0 0 28px #22C79B88}}
+.nxt{display:block;text-align:center;margin:10px 0 0;padding:12px;border-radius:14px;background:#22C79B22;border:1.5px solid #22C79B;color:inherit;text-decoration:none;font-weight:700;animation:win .7s cubic-bezier(.3,1.6,.5,1) .5s both}
 </style>
 <script src="../t.js" data-page="panel" defer></script>
 <script src="../lang.js" defer></script>
@@ -184,7 +194,7 @@ const seqLocked=p=>{if(ls('meaTeacher')==='1')return null;const q=prevOf(p);retu
  /* أنور رجّعو لأول مشروع: منمحي «خلّصتو» عن كل المشاريع */
  if(R.reset&&R.reset!==ls('labRst')){try{Object.keys(localStorage).filter(k=>k.indexOf('panelDone_')===0).forEach(k=>localStorage.removeItem(k));}catch(e){}ls('labRst',R.reset);ch=true;}L.forEach(id=>{if(!done(id)){ls('panelDone_'+id,'1');ch=true;}});if(ch){if(!$('home').hidden)homeList();else if(!$('lockBox').hidden)route();}}).catch(()=>{});})();
 const PCID={electro:'course',classic:'classic'};const locked=p=>window.MEAPATH&&!window.MEAPATH.status(PCID[p.course]).unlocked;
-function homeList(){const card=p=>{const L=locked(p),Q=!L&&seqLocked(p);return `<button class="pc glass${p.soon||L||Q?' soon':''}${done(p.id)?' done':''}" type="button" ${p.soon?'disabled':''} data-open="${p.id}"><div class="i">${L||Q?'🔒':p.icon}</div><div><b>مشروع ${p.n}: ${p.title}</b><span>${L?'بينفتح بس تخلّص الكورس بنتيجة ممتازة':Q?'بينفتح بس تخلّص مشروع '+Q.n+' وتفحصو صح 100%':done(p.id)?'خلّصتو ✓ فيك تعيدو':'ركّب الدارة كاملة، وبفحصلك ياها لحالي.'}</span></div><div class="go">${L||Q?'🔒':done(p.id)?'✓ خلص':'ابدا ←'}</div></button>`;};
+function homeList(){const card=p=>{const L=locked(p),Q=!L&&seqLocked(p);const U=!L&&!Q&&!p.soon&&prevOf(p)&&ls('pjUnl_'+p.id)!=='1';if(U)ls('pjUnl_'+p.id,'1');return `<button class="pc glass${p.soon||L||Q?' soon':''}${done(p.id)?' done':''}${U?' unl':''}" type="button" ${p.soon?'disabled':''} data-open="${p.id}"><div class="i">${L||Q?'🔒':p.icon}</div><div><b>مشروع ${p.n}: ${p.title}</b><span>${L?'بينفتح بس تخلّص الكورس بنتيجة ممتازة':Q?'بينفتح بس تخلّص مشروع '+Q.n+' وتفحصو صح 100%':done(p.id)?'خلّصتو ✓ فيك تعيدو':'ركّب الدارة كاملة، وبفحصلك ياها لحالي.'}</span></div><div class="go">${L||Q?'🔒':done(p.id)?'✓ خلص':'ابدا ←'}</div></button>`;};
  const C=[['electro','مشاريع كورس الكهربا'],['classic','مشاريع كورس الكلاسيك كنترول']];
  $('plist').innerHTML=C.map(([k,t])=>{const L=window.PROJECTS.filter(p=>p.course===k);const d=L.filter(p=>done(p.id)).length;return `<div class="sec">${t} · ${d}/${L.length} ✓</div>`+L.map(card).join('');}).join('')+
  `<div class="sec">مشاريع كورس الطاقة الشمسية</div><a class="pc glass" href="../sim/#projects" style="text-decoration:none;color:inherit"><div class="i">☀️</div><div><b>مشاريع الطاقة الشمسية</b><span>6 مشاريع بمختبر الطاقة: إنفرتر، بطاريات، ألواح، وإعدادات.</span></div><div class="go">افتح ←</div></a>`;}
@@ -449,7 +459,7 @@ svg.addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,{x:e.clientX,y:e.cli
  const RUN=B.on&&tool!=='probe';const tp=RUN?null:tg.closest('[data-t]'),wh=RUN?null:tg.closest('[data-wh]'),act=tp||wh?null:pick('[data-act]'),wr=act?null:tg.closest('[data-w]'),pt=act?act.closest('[data-c]'):tg.closest('[data-c]');
  if(tp&&tool!=='probe'){drag={t:'link',from:tp.dataset.t,p0:p,moved:false};return;}
  if(tp&&tool==='probe'){probe(tp.dataset.t);return;}
- if(act&&pt){control(pt.dataset.c,act.dataset.act,true);drag={t:'act',c:pt.dataset.c,a:act.dataset.act};return;}
+ if(act&&pt){tapFx(e);control(pt.dataset.c,act.dataset.act,true);drag={t:'act',c:pt.dataset.c,a:act.dataset.act};return;}
  if(wh){const w=B.wires.find(x=>x.id===wh.dataset.wh);push();drag={t:'wh',w,y0:p.y,my0:wpath(w).my};return;}
  if(B.on&&!act&&(pt||wr)){drag={t:'pan',sx:e.clientX,sy:e.clientY,cam:{...cam},moved:false,lk:1};return;}
  if(pt&&tool!=='probe'){const c=B.comps.find(x=>x.id===pt.dataset.c);drag={t:'part',c,dx:p.x-c.x,dy:p.y-c.y,p0:p,moved:false};return;}
@@ -539,14 +549,21 @@ function labLog(ev,x){try{const v=ls('mea_vid');if(!v||ls('meaTeacher')==='1')re
 /* الرموز الإنكليزية (KM2 21-22) بتنقلب بالنص العربي: منعزلها LTR */
 const ltr=s=>String(s).replace(/[A-Za-z0-9][A-Za-z0-9.\-\/() ]*[A-Za-z0-9)]|[A-Za-z0-9]/g,m=>'<span dir="ltr" style="unicode-bidi:isolate">'+m+'</span>');
 let hi=0;function hint(){const h=ltr(PJ.hints[hi%PJ.hints.length]);hi++;labLog('hint');$('resBody').innerHTML=`<h3>💡 تلميح ${((hi-1)%PJ.hints.length)+1} من ${PJ.hints.length}<button type="button" data-close>سكّر</button></h3><p style="font-size:15px;line-height:1.9;margin:0 4px 10px">${h}</p><button class="big alt" type="button" id="nh">التلميح الجاي</button>`;openSheet('sRes');$('nh').onclick=hint;}
-function check(){const r=PJ.check(B);const n=r.filter(x=>x.pass).length,all=n===r.length;
+function check(){const r=PJ.check(B);const n=r.filter(x=>x.pass).length,all=n===r.length;const NX=all&&ls('meaTeacher')!=='1'?window.PROJECTS.filter(x=>x.course===PJ.course&&x.n===PJ.n+1&&!x.soon)[0]:null;
  labLog('check',{board:JSON.parse(snapState()),n,t:r.length,fail:r.filter(x=>!x.pass).map(x=>String(x.txt).replace(/<[^>]*>/g,'').slice(0,200)),tip:r.filter(x=>!x.pass).map(x=>String(x.hint||'').replace(/<[^>]*>/g,'').slice(0,300))});
  if(all){ls('panelDone_'+PJ.id,'1');try{window.meaTrack&&window.meaTrack('done_'+PJ.id);}catch(e){}}
  $('resBody').innerHTML=`<h3>${all?'🎉 مشروعك زابط!':'نتيجة الفحص'}<button type="button" data-close>سكّر</button></h3>
- <div class="score">${n} / ${r.length}<small>${all?'برافو! الدارة شغّالة متل التابلو الحقيقي.':'صلّح اللي عليه ✗ وافحص كمان مرّة.'}</small></div>
+ <div class="score${all?' win':''}">${n} / ${r.length}<small>${all?'برافو! الدارة شغّالة متل التابلو الحقيقي.':'صلّح اللي عليه ✗ وافحص كمان مرّة.'}</small></div>
  <ul class="res">${r.map(x=>`<li><i>${x.pass?'✅':'❌'}</i><div>${ltr(x.txt)}${x.pass?'':`<small>${ltr(x.hint)}</small>`}</div></li>`).join('')}</ul>
- ${all?`<button class="big" type="button" onclick="location.hash=''">رجوع للمشاريع</button>`:''}`;openSheet('sRes');}
+ ${all&&NX?`<a class="nxt" href="#${NX.id}" data-close>🔓 انفتحلك مشروع ${NX.n}: ${NX.title} ←</a>`:''}
+ ${all?`<button class="big" type="button" onclick="location.hash=''">رجوع للمشاريع</button>`:''}`;openSheet('sRes');if(all)setTimeout(confetti,250);}
 
+/* ✨ كبسة: دايرة صغيرة + رجفة خفيفة للتلفون */
+function tapFx(e){try{navigator.vibrate&&navigator.vibrate(12);}catch(x){}const r=document.createElement('i');r.className='rip';r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';document.body.appendChild(r);setTimeout(()=>r.remove(),500);}
+/* 🎉 مشروع زابط: قصاقيص ملوّنة */
+function confetti(){try{navigator.vibrate&&navigator.vibrate([20,40,30]);}catch(x){}const C=['#22C79B','#ffc93c','#ff6b6b','#5aa9ff','#fff'];
+ for(let i=0;i<60;i++){const d=document.createElement('i');d.className='cf';const a=Math.random()*Math.PI*2,v=140+Math.random()*260;
+  d.style.cssText+=`background:${C[i%5]};--x:${Math.cos(a)*v}px;--y:${Math.sin(a)*v+260}px;--r:${(Math.random()*720-360)|0}deg;animation-delay:${Math.random()*.15}s`;document.body.appendChild(d);setTimeout(()=>d.remove(),1900);}}
 /* ---------- إشعار ---------- */
 let tt=0;function toast(m,bad){const t=$('toast');t.textContent=m;t.classList.toggle('bad',!!bad);t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),bad?3800:2400);}
 window.addEventListener('resize',()=>{if(!$('lab').hidden)fit(false);});
