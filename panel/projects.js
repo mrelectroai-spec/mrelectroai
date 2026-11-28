@@ -11,7 +11,7 @@ const all=(b,t,f)=>b.comps.filter(c=>c.type===t&&(!f||f(c)));
 function sandbox(board){
  const b=clone({comps:board.comps,wires:board.wires});b.on=true;b.blown=false;
  for(const c of b.comps){c.st={};if(c.type==='mcb1'||c.type==='mcb3'||c.type==='rcd')c.st.on=true;}
- const E=window.PENGINE(b);const ev=[];const maxI={};const prot={};
+ const E=window.PENGINE(b);const ev=[];const maxI={};const prot={};if(SBX)SBX.push({maxI,prot});
  const rec=()=>{for(const w of b.wires){if((w.I||0)>(maxI[w.id]||0))maxI[w.id]=w.I;if(w.I>0.05){const p=E.protector(w);if(p&&(!prot[w.id]||p.A>prot[w.id].A))prot[w.id]={A:p.A,c:p.c.label};}}};
  const run=ms=>{for(let t=0;t<ms;t+=50){E.tick(0.05,ev);rec();}};
  const get=id=>b.comps.find(c=>c.id===id);
@@ -23,13 +23,17 @@ function sandbox(board){
   const bu=ev.find(x=>x.k==='burn');if(bu)return (bu.c.label||'قطعة')+' انحطّت على 400V واحترقت: الكويل واللمبة بدّن فاز ونوترال.';return null;};
  return {b,E,ev,run,get,press,name,cables,fault,maxI};
 }
+let SBX=null;
+/* 🧵 فحص الشرايط: منشغّل فحص المشروع على نسخة ومنجمع أعلى تيار والحماية فوق كل شريط */
+function wireReport(board,check){SBX=[];try{check(board);}catch(e){}const L=SBX;SBX=null;const maxI={},prot={};
+ for(const x of L){for(const k in x.maxI)maxI[k]=Math.max(maxI[k]||0,x.maxI[k]);for(const k in x.prot)if(!prot[k]||x.prot[k].A>prot[k].A)prot[k]=x.prot[k];}return {maxI,prot};}
 function R(){const out=[];const ok=(pass,txt,hint)=>out.push({pass:!!pass,txt,hint:hint||''});return {out,ok};}
 // فحص الكابلات والحماية والأرضي (مشترك)
 function common(S,ok,opts){
  const f=S.fault();ok(!f,'ما في قصر ولا شي محروق',f||'');
  const {hot,weak}=S.cables();
- ok(!hot.length,'كل شريط بيحمل التيار اللي مارق فيه',hot.length?`في ${hot.length} شريط رفيع على تيارو، متل ${S.name(hot[0].a)} ← ${S.name(hot[0].b)} (${fmt(S.maxI[hot[0].id])}A، بس بيحمل ${CAP[hot[0].mm2]}A). كبّر المقطع.`:'');
- ok(!weak.length,'القواطع أصغر من تحمّل الكابلات اللي بتحميها',weak.length?`الشريط ${S.name(weak[0][0].a)} ← ${S.name(weak[0][0].b)} (${weak[0][0].mm2}mm² بيحمل ${CAP[weak[0][0].mm2]}A) محمي بـ${weak[0][1].c} على ${weak[0][1].A}A: يا بتكبّر الكابل يا بتصغّر القاطع.`:'');
+ ok(!hot.length,'كل شريط بيحمل التيار اللي مارق فيه',hot.length?`في ${hot.length} شريط رفيع على تيارو، متل ${S.name(hot[0].a)} ← ${S.name(hot[0].b)} (${hot[0].mm2}mm² ومارق فيه ${fmt(S.maxI[hot[0].id])}A). فكّر: قدّيش لازم يكون المقطع؟`:'');
+ ok(!weak.length,'القواطع أصغر من تحمّل الكابلات اللي بتحميها',weak.length?`الشريط ${S.name(weak[0][0].a)} ← ${S.name(weak[0][0].b)} (${weak[0][0].mm2}mm²) محمي بـ${weak[0][1].c} على ${weak[0][1].A}A، والكابل ما بيتحمّل قيمة القاطع. فكّر: يا بتكبّر الكابل يا بتصغّر القاطع.`:'');
  if(opts&&opts.pe)for(const [id,lab] of opts.pe){const has=S.b.wires.some(w=>w.a===id+'.PE'||w.b===id+'.PE');ok(has,`${lab} موصول عالأرضي (PE)`,`وصّل PE تبع ${lab} على PE تبع المصدر بشريط أخضر/أصفر.`);}
 }
 
@@ -206,7 +210,7 @@ const PROJECTS=[
    ok(qs&&qs.rating===16,'قاطع البريز 16A',qs?`قاطع البريز ${qs.rating}A: البريز بيتحمّل 16A، فالقاطع 16A.`:'حط قاطع للبريز.');
    ok(qb&&qb.rating<=10,'قاطع الضو 10A أو أقل',qb?`قاطع الضو ${qb.rating}A: كبير على دارة ضو بـ1.5mm².`:'حط قاطع للضو.');
    const thin=S.b.wires.filter(w=>(w.a.startsWith(so.id+'.')||w.b.startsWith(so.id+'.'))&&!/\.PE$/.test(w.a+w.b)&&w.mm2<2.5);
-   ok(!thin.length,'شرايط البريز 2.5mm²','شرايط البريز لازم 2.5mm² (بتحمل 19A) لأنو البريز 16A.');
+   ok(!thin.length,'شرايط البريز 2.5mm²','شرايط البريز رفيعة على قاطع 16A. فكّر شو المقطع يلي بيتحمّلو.');
    common(S,ok);return out;}},
 
  {id:'flat',n:2,course:'electro',title:'تابلو شقة مع ديفرنسيال',icon:'🏠',
@@ -247,5 +251,5 @@ const PROJECTS=[
    S.run(60000);ok(!S.ev.find(e=>e.k==='trip'),'دقيقة كاملة شغّالين بلا ما يفصل شي',why('فصل قاطع: شوف أي واحد صغير على تيارو.'));
    common(S,ok,{pe:[[he.id,'السخّان'],[ac.id,'المكيّف']]});return out;}},
 ];
-window.PROJECTS=PROJECTS;window.PSANDBOX=sandbox;
+window.PROJECTS=PROJECTS;window.PSANDBOX=sandbox;window.WIRE_REPORT=wireReport;
 })();
