@@ -74,7 +74,7 @@ function questions(id){if(QS[id])return Promise.resolve(QS[id]);const base=(docu
  return fetch(u).then(r=>r.text()).then(t=>{let R=[];try{R=new Function(t+';return RULES;')();}catch(e){}return QS[id]=R;}).catch(()=>[]);}
 // قفل بصفحة المشاريع: بيرجّع HTML إذا مقفول، أو null إذا مفتوح
 function lockHTML(id,root){const s=status(id);if(s.unlocked)return null;root=root||'../';
- const step=!s.owned?'🔑 اشتري الكتاب وحط المفتاح':!s.read?'📖 خلّص قراية الكتاب':!s.finished?`🎯 خلّص كورس الأسئلة (${s.passed}/${s.total} قاعدة)`:`📊 نتيجتك ${s.mistakes} غلطات: لازم ${MAX_MISTAKES} أو أقل`;
+ const step=!s.owned?(/MrElectroAIApp/.test(navigator.userAgent)?'🔑 حط مفتاح الكتاب':'🔑 اشتري الكتاب وحط المفتاح'):!s.read?'📖 خلّص قراية الكتاب':!s.finished?`🎯 خلّص كورس الأسئلة (${s.passed}/${s.total} قاعدة)`:`📊 نتيجتك ${s.mistakes} غلطات: لازم ${MAX_MISTAKES} أو أقل`;
  return `<div class="lockc"><div style="font-size:40px">🔒</div><b>المشاريع بتنفتح بس تكون جاهز</b><p>${s.c.title}: ${step}.</p><a href="${root}app/#path">شوف مسارك ←</a></div>`;}
 /* إذا خلّص الكورس قبل (محاولة قديمة أو تلفون تاني) بنعرف من السيرفر ومنفتحلو المشاريع */
 function srvUnl(){const v=get('mea_vid')||'';let ph='';try{ph=(JSON.parse(get('mea_lead')||'{}')||{}).phone||'';}catch(e){}if(!v&&!ph)return;const CC={course:'electro',classic:'classic',solar:'solar'};

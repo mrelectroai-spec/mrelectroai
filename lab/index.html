@@ -1615,7 +1615,9 @@ function partLocked(d) {
   if (!M || PFREE.includes(d.id) || M.owned(b)) { $("plock").hidden = true; return false; }
   const free = PFREE.find(x => bookOf(x) === b);
   $("plT").textContent = d.name + ': بتنفتح مع الكتاب';
-  $("plP").textContent = 'هالقطعة من كتاب «' + PNAME[b] + '». اشتري الكتاب وحط المفتاح، بتنفتحلك كل قطعو.';
+  const inApp = /MrElectroAIApp/.test(navigator.userAgent); // جوّا التطبيق: ما في شرا برّا Google Play
+  $("plP").textContent = 'هالقطعة من كتاب «' + PNAME[b] + '». ' + (inApp ? 'حط مفتاح الكتاب' : 'اشتري الكتاب وحط المفتاح') + '، بتنفتحلك كل قطعو.';
+  $("plWa").hidden = inApp; $("plWa").style.display = inApp ? 'none' : '';
   $("plFree").href = '#' + free; $("plFree").onclick = () => { $("plock").hidden = true; };
   $("plWa").href = 'https://wa.me/96179434479?text=' + encodeURIComponent('بدي كتاب «' + PNAME[b] + '»');
   $("plE").textContent = ''; $("plGo").onclick = async () => { $("plGo").disabled = true; const r = await M.unlock(b, $("plK").value); $("plGo").disabled = false;

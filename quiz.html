@@ -787,9 +787,9 @@
                 </div>
               </div>
               ${promo}
-              <a class="buy-btn" id="sendBuy" href="${waLink(buildMessage(true))}" target="_blank" rel="noopener">اشتري الكتاب وابعت بطاقتي</a>
+              ${/MrElectroAIApp/.test(navigator.userAgent) ? '' : `<a class="buy-btn" id="sendBuy" href="${waLink(buildMessage(true))}" target="_blank" rel="noopener">اشتري الكتاب وابعت بطاقتي</a>`}
             </div>
-            <a class="next-btn" id="sendOnly" href="${waLink(buildMessage(false))}" target="_blank" rel="noopener" style="display:block;text-decoration:none;text-align:center">مش هلّق، ابعت بطاقتي بس</a>`;
+            <a class="next-btn" id="sendOnly" href="${waLink(buildMessage(false))}" target="_blank" rel="noopener" style="display:block;text-decoration:none;text-align:center">${/MrElectroAIApp/.test(navigator.userAgent) ? 'ابعت بطاقتي لأنور' : 'مش هلّق، ابعت بطاقتي بس'}</a>`;
         } else {
             html = `
             <h2>شكراً ${first} 💪</h2>

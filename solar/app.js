@@ -238,9 +238,10 @@
   function keyField() {
     return `<label for="ky">مفتاح الكورس</label>
         <input id="ky" type="text" autocomplete="off" spellcheck="false" placeholder="MEA-XXXX-XXXX" dir="ltr" style="text-transform:uppercase;font-family:'JetBrains Mono',monospace;letter-spacing:2px">
-        <div class="hint">المفتاح بيوصلك عالواتساب مع الكتاب.</div>`;
+        <div class="hint">${/MrElectroAIApp/.test(navigator.userAgent) ? 'المفتاح بيجي مع الكتاب.' : 'المفتاح بيوصلك عالواتساب مع الكتاب.'}</div>`;
   }
   function buyHint() {
+    if (/MrElectroAIApp/.test(navigator.userAgent)) return ''; // جوّا التطبيق: ما في شرا برّا Google Play
     return `<p class="muted" style="text-align:center;margin-top:18px">ما عندك مفتاح؟ <a href="https://wa.me/96179434479" style="color:var(--volt);font-weight:600">اشتري الكتاب عالواتساب</a> وبيوصلك معو.</p>`;
   }
   // طالب بلّش قبل ما ينحط المفتاح: منطلب المفتاح بس، وتقدّمو بيضل

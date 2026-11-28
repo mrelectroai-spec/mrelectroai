@@ -97,6 +97,7 @@
     border-radius:13px;padding:13px;margin-bottom:18px;font-size:12.5px;color:#B8D4CB;line-height:1.9;text-align:right}
   `;
 
+  const INAPP = /MrElectroAIApp/.test(navigator.userAgent); // جوّا التطبيق: ما في أسعار ولا دفع برّا Google Play
   function ui(){
     const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
     const d = document.createElement('div'); d.id='meaLock';
@@ -110,12 +111,12 @@
       <button class="go" id="meaGo">تفعيل</button>
       <div class="or"><span>أو</span></div>
       <button class="tr" id="meaTrial">🎁 جرّبها مجاناً 3 أيام</button>
-      <button class="btn wa" id="meaPrice">💵 شوف الأسعار</button>
+      ${INAPP ? '' : '<button class="btn wa" id="meaPrice">💵 شوف الأسعار</button>'}
       <div class="ft"><b style="color:#E4F0EC">MrElectroAI</b> — أنور الحسن الجاسم<br>
         <a href="${SITE}" target="_blank">زور موقعنا</a></div>
     </div>`;
     document.body.appendChild(d);
-    document.getElementById('meaPrice').onclick = priceView;
+    if(!INAPP) document.getElementById('meaPrice').onclick = priceView;
     document.getElementById('meaTrial').onclick = trialForm;
     const inp = document.getElementById('meaKey');
     inp.addEventListener('keydown', e=>{ if(e.key==='Enter') check(); });
@@ -251,8 +252,8 @@
       +'display:flex;align-items:center;justify-content:center;gap:10px';
     const P=PRICE[TOOL]||PRICE.all;
     b.innerHTML='🎁 تجربة مجانية — باقي '+days+' '+(days===1?'يوم':'أيام')
-      +' <a href="'+ask(P.n,'سنة',P.y)+'" target="_blank" style="background:#04140F;color:#22C79B;'
-      +'border-radius:8px;padding:5px 12px;text-decoration:none">اشترك بـ'+P.y+'$</a>';
+      +(INAPP?'':' <a href="'+ask(P.n,'سنة',P.y)+'" target="_blank" style="background:#04140F;color:#22C79B;'
+      +'border-radius:8px;padding:5px 12px;text-decoration:none">اشترك بـ'+P.y+'$</a>');
     document.body.appendChild(b);
   }
 

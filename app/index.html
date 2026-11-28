@@ -440,7 +440,7 @@ body.kb .nav{display:none}body.kb .comp{bottom:0}
 </nav>
 <script>
 /* تحديث تلقائي: كل ما يرجع المستخدم عالتطبيق منشيك version.json بدون كاش، وإذا في نسخة جديدة منعمل reload لصفحة جديدة */
-var APPV="2026.11.28b";
+var APPV="2026.11.28c";
 /* الكيبورد: لما ينفتح منخبّي الشريط تحت ومنخلّي خانة الكتابة وآخر رسالة باينين */
 (function(){var H=innerHeight,vv=window.visualViewport;function f(){var h=vv?vv.height:innerHeight;if(h>H)H=h;var on=H-h>140;document.body.classList.toggle('kb',on);
  if(on){var a=document.activeElement;if(a&&/TEXTAREA|INPUT/.test(a.tagName))setTimeout(function(){a.scrollIntoView({block:'end'});},60);}}
@@ -952,7 +952,7 @@ var R=[
  [/عرض سعر|تسعير|زبون|quote|price/i,'اعمل عرض سعر PDF للزبون بدقيقتين.\n[عرض السعر]('+B+'tools/quote/)','Make a PDF price quote for your customer in two minutes.\n[Price quote]('+B+'tools/quote/)'],
  [/إنفرتر|انفرتر|دايه|داي|deye|growatt|felicity|voltronic|inverter|إعدادات|اعدادات/i,'إعدادات الإنفرترات خطوة بخطوة، وجرّب التوصيل بالمختبر.\n[إعدادات الإنفرترات]('+B+'tools/inverters/)\n[إعدادات Deye]('+B+'tools/deye/)\n[مختبر الطاقة]('+B+'sim/)','Inverter settings step by step, and try the wiring in the lab.\n[Inverter settings]('+B+'tools/inverters/)\n[Deye settings]('+B+'tools/deye/)\n[Solar lab]('+B+'sim/)'],
  [/كونتاكت|كنتاكت|أوفرلود|اوفرلود|ريليه|كلاسيك|موتور|contactor|relay|overload|motor|classic/i,'الكلاسيك كنترول: شوف القطع بالـ3D، وخود الكورس المجاني قاعدة قاعدة. وقبل أي شغل، قطّع الكهربا.\n[مختبر القطع]('+B+'lab/)\n[كورس الكلاسيك]('+B+'classic/)','Classic control: see the parts in 3D and take the free course rule by rule. Always switch the power off before working.\n[Parts lab]('+B+'lab/)\n[Classic course]('+B+'classic/)'],
- [/كتاب|كتب|شراء|اشتري|سعر الكتاب|book|buy/i,'الكتب PDF، بتطلبها من أنور عالواتساب. وفيك تنزّل عيّنة مجانية قبل.\n[اطلب عالواتساب](https://wa.me/96179434479)\n[العيّنات المجانية]('+B+'sample/)','The books are PDFs; order them from Anwar on WhatsApp. You can download a free sample first.\n[Order on WhatsApp](https://wa.me/96179434479)\n[Free samples]('+B+'sample/)']];
+ [/كتاب|كتب|شراء|اشتري|سعر الكتاب|book|buy/i,(CAP?'كل كتاب بيجي معو مفتاح. حطّو بقسم الكتب وبينفتحلك الكورس كلّو. وفيك تنزّل عيّنة مجانية.\n[الكتب]('+B+'app/#books)\n[العيّنات المجانية]('+B+'sample/)':'الكتب PDF، بتطلبها من أنور عالواتساب. وفيك تنزّل عيّنة مجانية قبل.\n[اطلب عالواتساب](https://wa.me/96179434479)\n[العيّنات المجانية]('+B+'sample/)'),(CAP?'Every book comes with a key. Enter it in the Books tab to unlock the full course. You can also get a free sample.\n[Books]('+B+'app/#books)\n[Free samples]('+B+'sample/)':'The books are PDFs; order them from Anwar on WhatsApp. You can download a free sample first.\n[Order on WhatsApp](https://wa.me/96179434479)\n[Free samples]('+B+'sample/)')]];
 function local(q){for(var i=0;i<R.length;i++)if(R[i][0].test(q))return R[i][EN?2:1];
  return EN?'I couldn\'t get that. Try the tools or ask Anwar directly.\n[All tools]('+B+'tools/)\n[WhatsApp Anwar](https://wa.me/96179434479)':'ما فهمت عليك منيح. شوف الأدوات، أو اسأل أنور مباشرة.\n[كل الأدوات]('+B+'tools/)\n[احكي أنور عالواتساب](https://wa.me/96179434479)';}
 var busy=false;
@@ -988,7 +988,7 @@ function own(id){return window.MEAPATH?window.MEAPATH.owned(id):false;}
 /* نسخة غوغل بلاي (التطبيق الأصلي): ما في أسعار ولا «اشتري» للـPDF؛ بس «اطلب المطبوع» (شي ملموس) و«اسأل أنور» */
 var PLAY=!!CAP;if(PLAY)[].forEach.call(document.querySelectorAll('button'),function(x){if(x.textContent==='بدي اشتري كتاب')x.hidden=true;});
 function buyBtns(id,b){if(!PLAY)return '<a class="btn" href="'+buyU(b)+'" data-buy="'+id+'">🛒 بدي اشتري</a>';
- return '<a class="btn" href="'+buyU(b)+'" data-buy="'+id+'" data-kind="ask">💬 اسأل أنور</a>';}
+ return '';}/* جوّا التطبيق: ما في شرا رقمي برّا Google Play، بس «عندي مفتاح» و«اطلب المطبوع» */
 function paperBtn(id,b){return PLAY?'<a class="btn alt" href="'+buyU(b)+'" data-buy="'+id+'" data-kind="paper" style="display:block;width:100%;margin-top:8px;text-align:center">📕 اطلب الكتاب المطبوع'+(b.price?' · <span dir="ltr">'+b.price+'</span>':'')+'<small style="display:block;font-weight:500;font-size:12px;opacity:.8">بلبنان · توصيل ببلاش · الدفع عند الاستلام</small></a>':'';}
 function buyU(b){return WA+encodeURIComponent('مرحبا أنور 👋 بدي كتاب «'+b.t+'»');}
 function contents(id){var b=BOOKD[id];return [['📖','الكتاب PDF',b.rules+' قاعدة'],['🎯','كورس أسئلة',b.q+' سؤال'],['📊','تقرير بنقاط ضعفك','مع أرقام الصفحات'],['🛠️',b.proj.n+' مشاريع عملية',b.proj.t],['🧩','قطع 3D',b.parts.length+' قطعة'],['🧰','أدوات',b.tools.map(function(x){return x[0];}).join('، ')],['🎓','شهادة من أنور','إذا خلّصت بـ5 غلطات أو أقل']];}
@@ -1030,7 +1030,7 @@ function ri(icon,t,sub,st,href,cls){return (href?'<a class="ri '+(cls||'')+'" hr
 function openBook(id){var b=BOOKD[id],o=own(id),L='🔒';
  var h='<div class="grab"></div><div class="bh"><img src="'+b.cv+'" alt=""><div><b>'+b.t+'</b><span>الكتاب '+b.n+' · '+b.rules+' قاعدة · '+b.lv+'</span>'+(o?'<span class="own1">✅ الكتاب عندك: كل شي مفتوح</span>':'')+'</div></div>';
  if(!o&&id==='course'&&promoOn())h+=giftH();
- if(!o)h+='<div class="row">'+buyBtns(id,b)+'<button type="button" class="btn alt" id="haveKey">🔑 عندي مفتاح</button></div>'+paperBtn(id,b)+'<div class="kbx" id="kbx" hidden><input id="kIn" placeholder="MEA-XXXX-XXXX" dir="ltr" autocomplete="off" spellcheck="false"><div class="er" id="kEr"></div><button type="button" class="btn" id="kGo" style="width:100%">فعّل</button></div>';
+ if(!o)h+='<div class="row">'+buyBtns(id,b)+'<button type="button" class="btn'+(PLAY?'':' alt')+'" id="haveKey">🔑 عندي مفتاح</button></div>'+paperBtn(id,b)+'<div class="kbx" id="kbx" hidden><input id="kIn" placeholder="MEA-XXXX-XXXX" dir="ltr" autocomplete="off" spellcheck="false"><div class="er" id="kEr"></div><button type="button" class="btn" id="kGo" style="width:100%">فعّل</button></div>';
  h+='<div class="sec2">'+(o?'كل شي معك':'شو في بقلبو')+'</div>';
  if(o&&window.MEAPATH.hasPdf(id))h+='<button type="button" class="ri pdf" id="pdfGo" style="width:100%;text-align:start"><i>📥</i><div class="t">نزّل الكتاب PDF<small>نسختك الخاصة، عليها رقم مفتاحك</small></div><span class="st">نزّل ←</span></button>';
  if(b.sample)h+=ri('📄','العيّنة المجانية','اقرا أول صفحات الكتاب','مفتوحة ←',b.sample,'fr');
